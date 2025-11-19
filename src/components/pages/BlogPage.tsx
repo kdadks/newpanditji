@@ -1,9 +1,20 @@
+import { useKV } from '@github/spark/hooks'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { BookOpen, CaretRight } from '@phosphor-icons/react'
-import { blogArticles } from '../../lib/data'
+import { blogArticles as defaultBlogs } from '../../lib/data'
+
+interface BlogArticle {
+  id: string
+  title: string
+  excerpt: string
+  category: string
+  content?: string
+}
 
 export default function BlogPage() {
+  const [adminBlogs] = useKV<BlogArticle[]>('admin-blogs', defaultBlogs)
+  const blogArticles = adminBlogs || defaultBlogs
   return (
     <div className="w-full py-16 md:py-24">
       <div className="container mx-auto px-4 max-w-7xl">

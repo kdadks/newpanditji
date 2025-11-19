@@ -1,7 +1,31 @@
+import { useKV } from '@github/spark/hooks'
 import { Card, CardContent } from '../ui/card'
 import { Heart, Book, Users, HandHeart } from '@phosphor-icons/react'
 
+interface CharityProject {
+  id: string
+  title: string
+  description: string
+  videoUrl?: string
+  category: string
+}
+
+const getYouTubeEmbedUrl = (url: string) => {
+  const videoId = url.split('youtu.be/')[1]?.split('?')[0] || url.split('v=')[1]?.split('&')[0]
+  return `https://www.youtube.com/embed/${videoId}`
+}
+
 export default function CharityPage() {
+  const [adminProjects] = useKV<CharityProject[]>('admin-charity', [
+    {
+      id: 'one-rotary-gita',
+      title: 'One Rotary One Gita Project',
+      description: 'A groundbreaking initiative to distribute the Bhagavad Gita to communities worldwide, making this sacred wisdom accessible to all. Through partnership with Rotary clubs and community organizations, we aim to spread the universal teachings of the Gita across cultures and continents. This project represents our commitment to sharing timeless spiritual wisdom that transcends boundaries and brings people together through shared values of duty, devotion, and dharma.',
+      videoUrl: 'https://youtu.be/92VjrCUL1K8',
+      category: 'Scripture Distribution'
+    }
+  ])
+  const projects = adminProjects || []
   return (
     <div className="w-full py-16 md:py-24">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -14,28 +38,43 @@ export default function CharityPage() {
         </div>
 
         <div className="max-w-4xl mx-auto space-y-8">
-          <Card className="overflow-hidden">
-            <CardContent className="p-0">
-              <div className="aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/92VjrCUL1K8"
-                  title="One Rotary One Gita Project"
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-              <div className="p-8">
-                <h2 className="font-heading font-semibold text-2xl mb-3">One Rotary One Gita Project</h2>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  A groundbreaking initiative to distribute the Bhagavad Gita to communities worldwide, making this sacred wisdom accessible to all. Through partnership with Rotary clubs and community organizations, we aim to spread the universal teachings of the Gita across cultures and continents.
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  This project represents our commitment to sharing timeless spiritual wisdom that transcends boundaries and brings people together through shared values of duty, devotion, and dharma.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {projects.map((project) => (
+            <Card key={project.id} className="overflow-hidden">
+              <CardContent className="p-0">
+                {project.videoUrl && (
+                  <div className="aspect-video">
+                    <iframe
+                      src={getYouTubeEmbedUrl(project.videoUrl)}
+                      title={project.title}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+                <div className="p-8">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className="font-heading font-semibold text-2xl">{project.title}</h2>
+                    <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
+                      {project.category}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {project.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {projects.length === 0 && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Heart className="mx-auto mb-4 text-muted-foreground" size={48} />
+                <p className="text-muted-foreground">No charity projects have been added yet.</p>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>

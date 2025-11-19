@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Page } from '../App'
 import { Button } from './ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
-import { List, X, FlowerLotus } from '@phosphor-icons/react'
+import { List, X, FlowerLotus, Shield } from '@phosphor-icons/react'
 
 interface HeaderProps {
   currentPage: Page
@@ -22,6 +22,21 @@ const navItems: { page: Page; label: string }[] = [
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
+
+  useEffect(() => {
+    const checkOwner = async () => {
+      try {
+        const user = await window.spark.user()
+        if (user) {
+          setIsOwner(user.isOwner)
+        }
+      } catch (error) {
+        setIsOwner(false)
+      }
+    }
+    checkOwner()
+  }, [])
 
   const handleNavClick = (page: Page) => {
     onNavigate(page)
@@ -54,6 +69,16 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               {item.label}
             </Button>
           ))}
+          {isOwner && (
+            <Button
+              variant={currentPage === 'admin' ? 'default' : 'ghost'}
+              onClick={() => handleNavClick('admin')}
+              className={`gap-2 ${currentPage === 'admin' ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <Shield size={16} weight="fill" />
+              Admin
+            </Button>
+          )}
         </nav>
 
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -78,6 +103,16 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   {item.label}
                 </Button>
               ))}
+              {isOwner && (
+                <Button
+                  variant={currentPage === 'admin' ? 'default' : 'ghost'}
+                  onClick={() => handleNavClick('admin')}
+                  className={`justify-start text-left gap-2 ${currentPage === 'admin' ? 'bg-primary text-primary-foreground' : ''}`}
+                >
+                  <Shield size={16} weight="fill" />
+                  Admin
+                </Button>
+              )}
             </div>
           </SheetContent>
         </Sheet>

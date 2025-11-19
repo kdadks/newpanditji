@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Clock } from '@phosphor-icons/react'
-import { services, categoryNames, Service } from '../../lib/data'
+import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 
 export default function ServicesPage() {
+  const [adminServices] = useKV<Service[]>('admin-services', defaultServices)
+  const services = adminServices || defaultServices
   const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>('all')
 
   const filteredServices = selectedCategory === 'all' 

@@ -9,10 +9,13 @@ import BlogPage from './components/pages/BlogPage'
 import CharityPage from './components/pages/CharityPage'
 import TestimonialsPage from './components/pages/TestimonialsPage'
 import ContactPage from './components/pages/ContactPage'
+import AdminPage from './components/pages/AdminPage'
+import TermsPage from './components/pages/TermsPage'
+import PrivacyPage from './components/pages/PrivacyPage'
 import WhatsAppButton from './components/WhatsAppButton'
 import { Toaster } from './components/ui/sonner'
 
-export type Page = 'home' | 'services' | 'about' | 'gallery' | 'blog' | 'charity' | 'testimonials' | 'contact'
+export type Page = 'home' | 'services' | 'about' | 'gallery' | 'blog' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
 
 function App() {
   const [currentPage, setCurrentPage] = useKV<Page>('currentPage', 'home')
@@ -40,6 +43,12 @@ function App() {
         return <TestimonialsPage />
       case 'contact':
         return <ContactPage />
+      case 'admin':
+        return <AdminPage />
+      case 'terms':
+        return <TermsPage />
+      case 'privacy':
+        return <PrivacyPage />
       default:
         return <HomePage onNavigate={handleNavigate} />
     }

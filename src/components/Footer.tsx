@@ -12,7 +12,7 @@ export default function Footer({ onNavigate }: FooterProps) {
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <FlowerLotus className="text-accent" size={28} weight="fill" />
@@ -49,6 +49,27 @@ export default function Footer({ onNavigate }: FooterProps) {
               <li>
                 <button onClick={() => onNavigate('testimonials')} className="text-sm hover:text-accent transition-colors">
                   Testimonials
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('charity')} className="text-sm hover:text-accent transition-colors">
+                  Charity Work
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-heading font-semibold text-lg mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <button onClick={() => onNavigate('terms')} className="text-sm hover:text-accent transition-colors">
+                  Terms & Conditions
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('privacy')} className="text-sm hover:text-accent transition-colors">
+                  Privacy Policy
                 </button>
               </li>
             </ul>

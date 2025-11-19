@@ -8,9 +8,16 @@ A comprehensive digital platform for Pandit Rajesh Joshi to showcase Hindu relig
 3. **Trustworthy** - Professional yet warm design that establishes credibility while welcoming visitors of all spiritual backgrounds
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - Multi-page navigation with service catalog, gallery, blog, contact forms, and video integration requiring state management for navigation, form handling, and content filtering
+  - Multi-page navigation with service catalog, gallery, blog, contact forms, video integration, admin dashboard for content management, and legal pages requiring state management for navigation, form handling, content filtering, and user authentication
 
 ## Essential Features
+
+### Admin Dashboard & Content Management
+- **Functionality**: Secure admin panel accessible only to website owner for managing all content (Services, Photos, Videos, Blogs, Charity Projects)
+- **Purpose**: Enables website owner to add, edit, and delete content without code changes, keeping the site current
+- **Trigger**: Owner clicks Admin link in navigation (only visible to authenticated owner)
+- **Progression**: Authenticate via GitHub → Access admin dashboard → Select content type (Services/Photos/Videos/Blogs/Charity) → Add/Edit/Delete content → Changes reflect immediately on public pages
+- **Success criteria**: Owner can manage all content types easily, changes persist across sessions, unauthorized users cannot access admin panel
 
 ### Service Catalog Browser
 - **Functionality**: Displays 40+ religious services organized by category (Poojas, Sanskars, Paath, Consultations, Wellness) with detailed descriptions, durations, and purposes
@@ -20,11 +27,11 @@ A comprehensive digital platform for Pandit Rajesh Joshi to showcase Hindu relig
 - **Success criteria**: Users can easily find specific services, understand what each ceremony entails, and know approximate time commitments
 
 ### Multi-Page Navigation System
-- **Functionality**: Seamless navigation between Home, Services, About, Gallery, Blog, Charity Work, Testimonials, and Contact pages
-- **Purpose**: Organizes extensive content into logical sections while maintaining easy access to all information
-- **Trigger**: User clicks navigation menu items or internal page links
-- **Progression**: Land on home → Navigate via menu → View content → Access related pages → Contact for services
-- **Success criteria**: Users never feel lost, can access any page within 2 clicks, and understand their current location
+- **Functionality**: Seamless navigation between Home, Services, About, Gallery, Blog, Charity Work, Testimonials, Contact, Admin (owner only), Terms & Conditions, and Privacy Policy pages
+- **Purpose**: Organizes extensive content into logical sections while maintaining easy access to all information and legal compliance
+- **Trigger**: User clicks navigation menu items, footer links, or internal page links
+- **Progression**: Land on home → Navigate via menu → View content → Access related pages → Contact for services or view legal pages
+- **Success criteria**: Users never feel lost, can access any page within 2 clicks, understand their current location, and find legal information easily
 
 ### Contact & Inquiry System
 - **Functionality**: Contact form with service selection, WhatsApp integration, email display, and social media links
@@ -34,26 +41,36 @@ A comprehensive digital platform for Pandit Rajesh Joshi to showcase Hindu relig
 - **Success criteria**: Forms submit successfully, user receives confirmation, contact information is clearly visible on every page
 
 ### Multimedia Gallery
-- **Functionality**: Photo galleries of past ceremonies and embedded YouTube videos (17+ educational, poetry, charity, podcast content)
-- **Purpose**: Builds trust through visual documentation and provides free spiritual education resources
-- **Trigger**: User navigates to Gallery page or clicks video thumbnails
-- **Progression**: Browse gallery → Select media type (photos/videos) → View content → Watch videos or view ceremony photos
-- **Success criteria**: All media loads efficiently, videos embed properly, galleries are organized and browsable
+- **Functionality**: Admin-managed photo galleries and embedded YouTube videos (educational, poetry, charity, podcast content) with category filtering
+- **Purpose**: Builds trust through visual documentation and provides free spiritual education resources, fully manageable by owner
+- **Trigger**: User navigates to Gallery page or owner manages content via Admin panel
+- **Progression**: Browse gallery → Select media type (photos/videos) → View content → Watch videos or view ceremony photos; Admin can add/remove media
+- **Success criteria**: All media loads efficiently, videos embed properly, galleries are organized and browsable, admin can update content easily
 
 ### Blog & Educational Content
-- **Functionality**: Article system showcasing spiritual wisdom, Hindu traditions, and educational content
-- **Purpose**: Establishes thought leadership and provides valuable spiritual knowledge to community
-- **Trigger**: User navigates to Blog section or clicks article links
-- **Progression**: View blog listing → Select article → Read content → Navigate to related articles
-- **Success criteria**: Articles are readable, well-formatted, and encourage engagement with spiritual teachings
+- **Functionality**: Admin-managed article system showcasing spiritual wisdom, Hindu traditions, and educational content
+- **Purpose**: Establishes thought leadership, provides valuable spiritual knowledge, and allows owner to publish new content easily
+- **Trigger**: User navigates to Blog section or owner manages articles via Admin panel
+- **Progression**: View blog listing → Select article → Read content → Navigate to related articles; Admin can add/edit/delete articles
+- **Success criteria**: Articles are readable, well-formatted, encourage engagement, and owner can publish new content without technical knowledge
+
+### Legal & Policy Pages
+- **Functionality**: Complete Terms & Conditions and Privacy Policy pages accessible from footer
+- **Purpose**: Provides legal transparency, informs users of rights and responsibilities, ensures compliance with privacy regulations
+- **Trigger**: User clicks Terms or Privacy links in footer
+- **Progression**: Navigate to footer → Click legal link → Read complete policy document
+- **Success criteria**: Legal pages are comprehensive, clearly written, easily accessible, and professionally formatted
 
 ## Edge Case Handling
 
+- **Admin Access Control** - Only GitHub-authenticated website owner can access admin panel; unauthorized users see clear access denied message
+- **Content Persistence** - All admin-managed content (services, photos, videos, blogs, charity) persists using KV storage across sessions
 - **Service Discovery** - Search/filter functionality helps users find specific ceremonies from 40+ options without overwhelming scrolling
 - **Mobile Contact** - WhatsApp and phone number become direct-tap links on mobile devices for immediate connection
 - **Video Loading** - YouTube embeds with lazy loading prevent page slowdown; fallback links if embed fails
-- **Form Validation** - Clear error messages guide users to complete required fields correctly before submission
-- **Empty States** - Graceful handling if gallery sections or testimonials are being populated over time
+- **Form Validation** - Clear error messages guide users to complete required fields correctly before submission in both contact forms and admin panels
+- **Empty States** - Graceful handling when galleries, blogs, or charity sections have no content yet, with helpful messages for admins
+- **Data Migration** - Default content from lib/data.ts serves as fallback if admin hasn't customized content yet
 
 ## Design Direction
 
