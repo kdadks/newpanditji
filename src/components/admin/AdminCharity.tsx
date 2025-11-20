@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -18,7 +18,7 @@ interface CharityProject {
 }
 
 export default function AdminCharity() {
-  const [projects, setProjects] = useKV<CharityProject[]>('admin-charity', [
+  const [projects, setProjects] = useLocalStorage<CharityProject[]>('admin-charity', [
     {
       id: 'one-rotary-gita',
       title: 'One Rotary One Gita Project',

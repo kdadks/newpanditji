@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Page } from '../App'
+import { Page, NavigationData } from '../App'
 import { Button } from './ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { List, X, FlowerLotus, Shield } from '@phosphor-icons/react'
+import { authService } from '../services/auth'
 
 interface HeaderProps {
   currentPage: Page
-  onNavigate: (page: Page) => void
+  onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
 const navItems: { page: Page; label: string }[] = [
@@ -27,7 +28,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   useEffect(() => {
     const checkOwner = async () => {
       try {
-        const user = await window.spark.user()
+        const user = await authService.user()
         if (user) {
           setIsOwner(user.isOwner)
         }
@@ -36,6 +37,10 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
       }
     }
     checkOwner()
+
+    // Recheck auth status when page changes (to update after login/logout)
+    const interval = setInterval(checkOwner, 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const handleNavClick = (page: Page) => {
@@ -51,7 +56,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           onClick={() => handleNavClick('home')}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <FlowerLotus className="text-primary" size={32} weight="fill" />
+          <img src="/Raj ji.jpg" alt="Pandit Rajesh Joshi" className="w-10 h-10 rounded-full object-cover border-2 border-primary" />
           <div className="flex flex-col items-start">
             <span className="font-heading font-bold text-xl text-primary">Pandit Rajesh Joshi</span>
             <span className="text-xs text-muted-foreground hidden sm:block">Hindu Priest & Spiritual Guide</span>
@@ -90,7 +95,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <div className="flex flex-col gap-4 mt-8">
               <div className="flex items-center gap-2 mb-4">
-                <FlowerLotus className="text-primary" size={28} weight="fill" />
+                <img src="/Raj ji.jpg" alt="Pandit Rajesh Joshi" className="w-8 h-8 rounded-full object-cover border-2 border-primary" />
                 <span className="font-heading font-bold text-lg text-primary">Navigation</span>
               </div>
               {navItems.map(item => (

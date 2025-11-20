@@ -1,7 +1,9 @@
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { usePageSEO } from '../../hooks/usePageSEO'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
-import { BookOpen, CaretRight } from '@phosphor-icons/react'
+import { Badge } from '../ui/badge'
+import { BookOpen, CaretRight, Calendar, User, Sparkle } from '@phosphor-icons/react'
 import { blogArticles as defaultBlogs } from '../../lib/data'
 
 interface BlogArticle {
@@ -13,45 +15,162 @@ interface BlogArticle {
 }
 
 export default function BlogPage() {
-  const [adminBlogs] = useKV<BlogArticle[]>('admin-blogs', defaultBlogs)
+  usePageSEO({
+    title: 'Hindu Spirituality & Philosophy | Blog on Rituals, Traditions & Vedic Wisdom',
+    description: 'Discover insights on Hindu spirituality, pooja significance, and Vedic traditions. Learn about spiritual practices and sacred rituals in modern life.',
+    keywords: 'Hindu spirituality, pooja blog, spiritual practices, Vedic wisdom, Hindu traditions, spiritual guidance, ritual significance',
+    canonicalUrl: 'https://panditrajesh.ie/blog'
+  })
+
+  const [adminBlogs] = useLocalStorage<BlogArticle[]>('admin-blogs', defaultBlogs)
   const blogArticles = adminBlogs || defaultBlogs
+
+  // Get unique categories
+  const categories = [...new Set(blogArticles.map(article => article.category))]
+
   return (
-    <div className="w-full py-16 md:py-24">
+    <div className="w-full py-12 md:py-16">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="text-center mb-12">
-          <BookOpen className="mx-auto mb-6 text-primary" size={64} />
-          <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4">Spiritual Wisdom Blog</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Insights on Hindu philosophy, spirituality, and practical guidance for modern living
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <Sparkle size={16} weight="fill" />
+            Spiritual Wisdom & Insights
+          </div>
+
+          <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground">
+            Spiritual <span className="text-primary">Wisdom</span> Blog
+          </h1>
+
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Discover profound insights on Hindu philosophy, spirituality, and practical guidance
+            for navigating life's sacred journey with wisdom and grace.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-6">
-          {blogArticles.map(article => (
-            <Card key={article.id} className="hover:shadow-lg transition-all hover:border-primary/30">
-              <CardContent className="p-8">
-                <div className="mb-3">
-                  <span className="text-xs font-medium text-accent bg-accent/10 px-3 py-1 rounded-full">
-                    {article.category}
-                  </span>
+        {/* Categories */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <Badge variant="secondary" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
+            All Articles
+          </Badge>
+          {categories.map(category => (
+            <Badge key={category} variant="outline" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
+              {category}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Featured Article */}
+        {blogArticles.length > 0 && (
+          <div className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="font-heading font-semibold text-2xl mb-2">Featured Article</h2>
+              <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <Card className="border-0 shadow-2xl bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden">
+              <CardContent className="p-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2">
+                  <div className="p-8 lg:p-12 flex flex-col justify-center">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Badge className="bg-primary/20 text-primary border-primary/30">
+                        {blogArticles[0].category}
+                      </Badge>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Calendar size={14} />
+                        Recent
+                      </div>
+                    </div>
+
+                    <h2 className="font-heading font-bold text-3xl lg:text-4xl mb-4 leading-tight">
+                      {blogArticles[0].title}
+                    </h2>
+
+                    <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                      {blogArticles[0].excerpt}
+                    </p>
+
+                    <Button className="w-fit shadow-lg hover:shadow-xl transition-all duration-300">
+                      <BookOpen className="mr-2" size={18} />
+                      Read Full Article
+                      <CaretRight className="ml-2" size={16} />
+                    </Button>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12">
+                    <div className="text-center">
+                      <BookOpen className="text-primary/60 mx-auto mb-4" size={80} />
+                      <p className="text-primary/60 font-medium">Spiritual Wisdom</p>
+                    </div>
+                  </div>
                 </div>
-                <h2 className="font-heading font-semibold text-2xl mb-3">{article.title}</h2>
-                <p className="text-muted-foreground mb-4 leading-relaxed">{article.excerpt}</p>
-                <Button variant="ghost" className="text-primary hover:text-primary/80">
-                  Read More
-                  <CaretRight className="ml-2" size={16} />
-                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Article Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {blogArticles.slice(1).map((article, index) => (
+            <Card key={article.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              <CardContent className="relative p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="secondary" className="text-xs">
+                    {article.category}
+                  </Badge>
+                  <div className="text-primary/60 text-lg font-bold">
+                    {(index + 2).toString().padStart(2, '0')}
+                  </div>
+                </div>
+
+                <h3 className="font-heading font-semibold text-xl mb-3 group-hover:text-primary transition-colors duration-300 leading-tight">
+                  {article.title}
+                </h3>
+
+                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
+                  {article.excerpt}
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <User size={14} />
+                    Pandit Rajesh Joshi
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-0 h-auto font-medium group-hover:translate-x-1 transition-transform duration-300">
+                    Read More →
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="text-center mt-12 p-8 bg-muted/30 rounded-lg max-w-2xl mx-auto">
-          <h3 className="font-heading font-semibold text-xl mb-2">More Articles Coming Soon</h3>
-          <p className="text-muted-foreground">
-            We regularly publish new articles on Hindu spirituality, philosophy, and practices. Check back often for fresh insights and wisdom.
-          </p>
-        </div>
+        {/* Newsletter/Coming Soon */}
+        <Card className="bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 border-0 shadow-xl">
+          <CardContent className="p-8 md:p-12 text-center">
+            <BookOpen className="mx-auto mb-6 text-primary" size={48} />
+
+            <h3 className="font-heading font-semibold text-2xl mb-4">More Wisdom Coming Soon</h3>
+
+            <p className="text-muted-foreground text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
+              We regularly publish new articles on Hindu spirituality, philosophy, and practical guidance
+              for modern living. Subscribe to stay updated with fresh insights and timeless wisdom.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button variant="outline" className="px-6 py-2">
+                <Calendar className="mr-2" size={18} />
+                Notify Me of New Articles
+              </Button>
+              <span className="text-muted-foreground text-sm">or</span>
+              <Button variant="ghost" className="px-6 py-2 text-primary hover:text-primary/80">
+                Browse All Categories
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

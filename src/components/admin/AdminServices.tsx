@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -12,7 +12,7 @@ import { toast } from 'sonner'
 import { Service, services as defaultServices } from '../../lib/data'
 
 export default function AdminServices() {
-  const [services, setServices] = useKV<Service[]>('admin-services', defaultServices)
+  const [services, setServices] = useLocalStorage<Service[]>('admin-services', defaultServices)
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -21,8 +21,20 @@ export default function AdminServices() {
     name: '',
     category: 'pooja',
     duration: '',
-    description: ''
+    description: '',
+    detailedDescription: '',
+    benefits: [],
+    includes: [],
+    requirements: [],
+    price: '',
+    bestFor: []
   })
+
+  // Helper states for array inputs
+  const [benefitInput, setBenefitInput] = useState('')
+  const [includesInput, setIncludesInput] = useState('')
+  const [requirementInput, setRequirementInput] = useState('')
+  const [bestForInput, setBestForInput] = useState('')
 
   const handleAdd = () => {
     setFormData({
@@ -30,8 +42,18 @@ export default function AdminServices() {
       name: '',
       category: 'pooja',
       duration: '',
-      description: ''
+      description: '',
+      detailedDescription: '',
+      benefits: [],
+      includes: [],
+      requirements: [],
+      price: '',
+      bestFor: []
     })
+    setBenefitInput('')
+    setIncludesInput('')
+    setRequirementInput('')
+    setBestForInput('')
     setEditingService(null)
     setIsDialogOpen(true)
   }
@@ -154,16 +176,243 @@ export default function AdminServices() {
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Short Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe the service..."
-                rows={4}
+                placeholder="Brief description (shown on card)..."
+                rows={3}
               />
             </div>
-            <div className="flex gap-2 justify-end">
+
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-4">Detailed Information (Optional)</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="detailedDescription">Detailed Description</Label>
+                  <Textarea
+                    id="detailedDescription"
+                    value={formData.detailedDescription || ''}
+                    onChange={(e) => setFormData({ ...formData, detailedDescription: e.target.value })}
+                    placeholder="Full description (shown in modal)..."
+                    rows={4}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="price">Price (€)</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
+                      <Input
+                        id="price"
+                        className="pl-7"
+                        value={formData.price || ''}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="e.g., 150 or Contact for pricing"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Enter amount or text like "Contact for pricing"</p>
+                </div>
+
+                <div>
+                  <Label>Benefits</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={benefitInput}
+                      onChange={(e) => setBenefitInput(e.target.value)}
+                      placeholder="Add a benefit..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && benefitInput.trim()) {
+                          setFormData({ ...formData, benefits: [...(formData.benefits || []), benefitInput.trim()] })
+                          setBenefitInput('')
+                          e.preventDefault()
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (benefitInput.trim()) {
+                          setFormData({ ...formData, benefits: [...(formData.benefits || []), benefitInput.trim()] })
+                          setBenefitInput('')
+                        }
+                      }}
+                    >
+                      <Plus size={16} />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.benefits || []).map((benefit, index) => (
+                      <span
+                        key={index}
+                        className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1"
+                      >
+                        {benefit}
+                        <X
+                          size={14}
+                          className="cursor-pointer hover:text-destructive"
+                          onClick={() => setFormData({
+                            ...formData,
+                            benefits: (formData.benefits || []).filter((_, i) => i !== index)
+                          })}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>What's Included</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={includesInput}
+                      onChange={(e) => setIncludesInput(e.target.value)}
+                      placeholder="Add an included item..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && includesInput.trim()) {
+                          setFormData({ ...formData, includes: [...(formData.includes || []), includesInput.trim()] })
+                          setIncludesInput('')
+                          e.preventDefault()
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (includesInput.trim()) {
+                          setFormData({ ...formData, includes: [...(formData.includes || []), includesInput.trim()] })
+                          setIncludesInput('')
+                        }
+                      }}
+                    >
+                      <Plus size={16} />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.includes || []).map((item, index) => (
+                      <span
+                        key={index}
+                        className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1"
+                      >
+                        {item}
+                        <X
+                          size={14}
+                          className="cursor-pointer hover:text-destructive"
+                          onClick={() => setFormData({
+                            ...formData,
+                            includes: (formData.includes || []).filter((_, i) => i !== index)
+                          })}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Requirements</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={requirementInput}
+                      onChange={(e) => setRequirementInput(e.target.value)}
+                      placeholder="Add a requirement..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && requirementInput.trim()) {
+                          setFormData({ ...formData, requirements: [...(formData.requirements || []), requirementInput.trim()] })
+                          setRequirementInput('')
+                          e.preventDefault()
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (requirementInput.trim()) {
+                          setFormData({ ...formData, requirements: [...(formData.requirements || []), requirementInput.trim()] })
+                          setRequirementInput('')
+                        }
+                      }}
+                    >
+                      <Plus size={16} />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.requirements || []).map((req, index) => (
+                      <span
+                        key={index}
+                        className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1"
+                      >
+                        {req}
+                        <X
+                          size={14}
+                          className="cursor-pointer hover:text-destructive"
+                          onClick={() => setFormData({
+                            ...formData,
+                            requirements: (formData.requirements || []).filter((_, i) => i !== index)
+                          })}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Best For (Tags)</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={bestForInput}
+                      onChange={(e) => setBestForInput(e.target.value)}
+                      placeholder="Add a tag..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && bestForInput.trim()) {
+                          setFormData({ ...formData, bestFor: [...(formData.bestFor || []), bestForInput.trim()] })
+                          setBestForInput('')
+                          e.preventDefault()
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (bestForInput.trim()) {
+                          setFormData({ ...formData, bestFor: [...(formData.bestFor || []), bestForInput.trim()] })
+                          setBestForInput('')
+                        }
+                      }}
+                    >
+                      <Plus size={16} />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.bestFor || []).map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1"
+                      >
+                        {tag}
+                        <X
+                          size={14}
+                          className="cursor-pointer hover:text-destructive"
+                          onClick={() => setFormData({
+                            ...formData,
+                            bestFor: (formData.bestFor || []).filter((_, i) => i !== index)
+                          })}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end pt-4 border-t">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 <X size={18} className="mr-2" />
                 Cancel

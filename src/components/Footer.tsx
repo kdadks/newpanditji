@@ -1,9 +1,9 @@
-import { Page } from '../App'
+import { Page, NavigationData } from '../App'
 import { FlowerLotus, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react'
 import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo, PinterestLogo } from '@phosphor-icons/react'
 
 interface FooterProps {
-  onNavigate: (page: Page) => void
+  onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
 export default function Footer({ onNavigate }: FooterProps) {

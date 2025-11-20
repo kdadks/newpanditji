@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -19,7 +19,7 @@ interface BlogArticle {
 }
 
 export default function AdminBlogs() {
-  const [blogs, setBlogs] = useKV<BlogArticle[]>('admin-blogs', defaultBlogs)
+  const [blogs, setBlogs] = useLocalStorage<BlogArticle[]>('admin-blogs', defaultBlogs)
   const [editingBlog, setEditingBlog] = useState<BlogArticle | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState<BlogArticle>({

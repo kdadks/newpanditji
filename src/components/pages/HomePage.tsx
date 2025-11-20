@@ -1,63 +1,148 @@
-import { Page } from '../../App'
+import { Page, NavigationData } from '../../App'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
+import { Badge } from '../ui/badge'
 import { FlowerLotus, BookOpen, Heart, Users, Phone } from '@phosphor-icons/react'
 import { services, categoryNames } from '../../lib/data'
+import { usePageSEO } from '../../hooks/usePageSEO'
 
 interface HomePageProps {
-  onNavigate: (page: Page) => void
+  onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
   const featuredServices = services.slice(0, 6)
 
+  // SEO Configuration
+  usePageSEO({
+    title: 'Hindu Pooja & Rituals in Ireland | Expert Ceremonies & Spiritual Guidance',
+    description: 'Professional Hindu pooja services, rituals, and spiritual guidance in Ireland, UK, and Northern Ireland. Authentic ceremonies by Pandit Rajesh Joshi. 15+ years experience.',
+    keywords: 'Hindu pooja, Hindu ritual, Indian pooja, pooja in Ireland, Hindu priest Ireland, Hindu ceremonies, Lakshmi puja, Durga puja, Hindu priest UK, Northern Ireland pooja',
+    canonicalUrl: 'https://panditrajesh.com/'
+  })
+
   return (
     <div className="w-full">
-      <section className="relative bg-gradient-to-br from-primary/10 via-accent/5 to-background py-20 md:py-32">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center max-w-4xl mx-auto">
-            <FlowerLotus className="mx-auto mb-6 text-primary" size={64} weight="fill" />
-            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground">
-              Welcome to Traditional Hindu Services
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-              Experience authentic Hindu ceremonies, spiritual guidance, and sacred rituals performed with devotion and traditional knowledge by Pandit Rajesh Joshi
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" onClick={() => onNavigate('services')} className="text-base">
-                Explore Services
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => onNavigate('contact')} className="text-base">
-                <Phone className="mr-2" />
-                Contact Us
-              </Button>
+      <section className="relative bg-gradient-to-br from-primary/5 via-accent/10 to-background pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+            {/* Left side - Image */}
+            <div className="order-2 lg:order-1 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <img
+                  src="/Raj ji.jpg"
+                  alt="Pandit Rajesh Joshi"
+                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-8 border-white/80 shadow-2xl hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
+                  <FlowerLotus size={24} weight="fill" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Content */}
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <FlowerLotus size={16} weight="fill" />
+                Traditional Hindu Priest & Spiritual Guide
+              </div>
+
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground leading-tight">
+                Experience <span className="text-primary">Authentic</span> Hindu Ceremonies
+              </h1>
+
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
+                Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                <Button size="lg" onClick={() => onNavigate('services')} className="text-base px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <BookOpen className="mr-2" size={20} />
+                  Explore Services
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => onNavigate('contact')} className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                  <Phone className="mr-2" size={20} />
+                  Contact Us
+                </Button>
+              </div>
+
+              {/* Statistics */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">500+</div>
+                  <div className="text-sm text-muted-foreground">Poojas Performed</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">250+</div>
+                  <div className="text-sm text-muted-foreground">Happy Clients</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">15+</div>
+                  <div className="text-sm text-muted-foreground">Years Experience</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">5</div>
+                  <div className="text-sm text-muted-foreground">Books Written</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 md:py-24">
+      <section className="pt-6 md:pt-10 pb-2 md:pb-4 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Our Services</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive religious and spiritual services for all of life's sacred moments
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <FlowerLotus size={16} weight="fill" />
+              Our Sacred Services
+            </div>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Comprehensive Spiritual Services</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              From birth ceremonies to final rites, we provide authentic Hindu rituals and spiritual guidance
+              for every sacred moment in life.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {featuredServices.map(service => (
-              <Card key={service.id} className="hover:shadow-lg transition-all hover:border-accent/50">
-                <CardContent className="p-6">
-                  <div className="mb-3">
-                    <span className="text-xs font-medium text-accent bg-accent/10 px-3 py-1 rounded-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {featuredServices.map((service, index) => (
+              <Card key={service.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <CardContent className="relative p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                       {categoryNames[service.category]}
                     </span>
+                    <div className="text-primary/60 text-lg font-bold">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
                   </div>
-                  <h3 className="font-heading font-semibold text-xl mb-2">{service.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <span className="font-medium">Duration: {service.duration}</span>
+
+                  <h3 className="font-heading font-semibold text-xl mb-3 group-hover:text-primary transition-colors duration-300">
+                    {service.name}
+                  </h3>
+
+                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                    {service.description}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <FlowerLotus size={14} className="mr-1 text-primary/60" />
+                      Duration: {service.duration}
+                    </div>
+                    <button 
+                      onClick={() => onNavigate({ page: 'services', category: service.category })}
+                      className="text-primary font-medium text-sm hover:translate-x-1 transition-transform duration-300 cursor-pointer hover:text-primary/80"
+                    >
+                      Learn More →
+                    </button>
                   </div>
                 </CardContent>
               </Card>
@@ -65,41 +150,47 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           <div className="text-center">
-            <Button onClick={() => onNavigate('services')} variant="outline" size="lg">
+            <Button
+              onClick={() => onNavigate('services')}
+              variant="outline"
+              size="lg"
+              className="px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <BookOpen className="mr-2" size={20} />
               View All 40+ Services
             </Button>
           </div>
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="py-10 md:py-16 bg-muted/30">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="text-center">
-              <CardContent className="p-8">
-                <BookOpen className="mx-auto mb-4 text-primary" size={48} />
-                <h3 className="font-heading font-semibold text-xl mb-2">Deep Knowledge</h3>
-                <p className="text-muted-foreground">
+              <CardContent className="p-6">
+                <BookOpen className="mx-auto mb-3 text-primary" size={40} />
+                <h3 className="font-heading font-semibold text-lg mb-2">Deep Knowledge</h3>
+                <p className="text-muted-foreground text-sm">
                   Extensive understanding of Hindu scriptures, rituals, and traditions passed through generations
                 </p>
               </CardContent>
             </Card>
 
             <Card className="text-center">
-              <CardContent className="p-8">
-                <Heart className="mx-auto mb-4 text-primary" size={48} weight="fill" />
-                <h3 className="font-heading font-semibold text-xl mb-2">Devotional Service</h3>
-                <p className="text-muted-foreground">
+              <CardContent className="p-6">
+                <Heart className="mx-auto mb-3 text-primary" size={40} weight="fill" />
+                <h3 className="font-heading font-semibold text-lg mb-2">Devotional Service</h3>
+                <p className="text-muted-foreground text-sm">
                   Every ceremony performed with genuine devotion, care, and respect for sacred traditions
                 </p>
               </CardContent>
             </Card>
 
             <Card className="text-center">
-              <CardContent className="p-8">
-                <Users className="mx-auto mb-4 text-primary" size={48} weight="fill" />
-                <h3 className="font-heading font-semibold text-xl mb-2">Community Focused</h3>
-                <p className="text-muted-foreground">
+              <CardContent className="p-6">
+                <Users className="mx-auto mb-3 text-primary" size={40} weight="fill" />
+                <h3 className="font-heading font-semibold text-lg mb-2">Community Focused</h3>
+                <p className="text-muted-foreground text-sm">
                   Dedicated to serving families and communities with accessible spiritual guidance
                 </p>
               </CardContent>
@@ -108,10 +199,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </section>
 
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-16">
         <div className="container mx-auto px-4 max-w-7xl text-center">
-          <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-6">Ready to Begin Your Spiritual Journey?</h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
+          <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-4">Ready to Begin Your Spiritual Journey?</h2>
+          <p className="text-muted-foreground text-base mb-6 max-w-2xl mx-auto">
             Contact us to discuss your ceremony needs or for spiritual consultation
           </p>
           <Button size="lg" onClick={() => onNavigate('contact')}>

@@ -4,6 +4,13 @@ export interface Service {
   category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
   duration: string
   description: string
+  // Detailed information (optional)
+  detailedDescription?: string
+  benefits?: string[]
+  includes?: string[]
+  requirements?: string[]
+  price?: string
+  bestFor?: string[]
 }
 
 export const services: Service[] = [

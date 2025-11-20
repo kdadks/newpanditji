@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -18,7 +18,7 @@ interface Video {
 }
 
 export default function AdminVideos() {
-  const [videos, setVideos] = useKV<Video[]>('admin-videos', defaultVideos as Video[])
+  const [videos, setVideos] = useLocalStorage<Video[]>('admin-videos', defaultVideos as Video[])
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState<Video>({

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Plus, Trash, Upload } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -16,7 +16,7 @@ interface Photo {
 }
 
 export default function AdminPhotos() {
-  const [photos, setPhotos] = useKV<Photo[]>('admin-photos', [])
+  const [photos, setPhotos] = useLocalStorage<Photo[]>('admin-photos', [])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState<Photo>({
     id: '',
