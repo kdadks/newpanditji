@@ -1,3 +1,25 @@
+export interface ServiceDetail {
+  deity?: {
+    name: string
+    description: string
+    significance: string
+  }
+  nature?: string
+  purpose?: string[]
+  significance?: string[]
+  scripturalRoots?: {
+    source: string
+    description: string
+  }
+  whenToPerform?: string[]
+  whereAndWho?: string
+  specialForNRIs?: string[]
+  coreAspects?: {
+    title: string
+    content: string
+  }[]
+}
+
 export interface Service {
   id: string
   name: string
@@ -11,6 +33,13 @@ export interface Service {
   requirements?: string[]
   price?: string
   bestFor?: string[]
+  details?: ServiceDetail
+  // Pooja Samagri file (PDF/DOCX)
+  samagriFile?: {
+    name: string
+    data: string // Base64 encoded file data
+    type: string // MIME type
+  }
 }
 
 export const services: Service[] = [
@@ -19,7 +48,51 @@ export const services: Service[] = [
     name: 'Satyanarayana Pooja',
     category: 'pooja',
     duration: '2.5 hours',
-    description: 'Worship of Lord Satyanarayana for prosperity, peace, and fulfillment of wishes. One of the most popular Hindu ceremonies for family well-being.'
+    description: 'Worship of Lord Satyanarayana for prosperity, peace, and fulfillment of wishes. One of the most popular Hindu ceremonies for family well-being.',
+    details: {
+      deity: {
+        name: 'Sri Satyanarayana Swamy',
+        description: 'A compassionate form of Lord Vishnu, especially worshipped in Kali Yuga as the Lord of Truth.',
+        significance: '"Satya" means truth; "Narayana" refers to the Supreme Being who pervades everything—so Satyanarayana is "the Supreme Truth present in all." The puja reminds us that prosperity and peace come when our life is rooted in honesty, gratitude, and fulfilment of our promises.'
+      },
+      nature: 'Sri Satyanarayana Pooja is a sacred vow (vrata) and worship performed to seek blessings for health, long life, success in personal, family, and professional endeavours, prosperity, wealth, abundance, peace at home and harmony in relationships, and protection from obstacles, negativity, and past karmic burdens.',
+      purpose: [
+        'Health and long life',
+        'Success in personal, family, and professional endeavours',
+        'Prosperity, wealth, and abundance',
+        'Peace at home and harmony in relationships',
+        'Protection from obstacles, negativity, and past karmic burdens'
+      ],
+      significance: [
+        'Removal of obstacles and sorrows – Helps clear inner and outer blockages in life',
+        'Success and prosperity – Supports fulfilment of goals, financial stability, and abundance',
+        'Family well-being – Enhances peace, unity, and understanding among family members',
+        'Improved health – Associated with relief from illness and strengthening of body and mind',
+        'Fulfilment of vows and desires – Especially powerful when performed as gratitude after a wish is fulfilled',
+        'Purification and spiritual growth – Encourages truthfulness, devotion, and righteous conduct'
+      ],
+      scripturalRoots: {
+        source: 'Skanda Purana (Reva Khanda)',
+        description: 'The puja and its stories (vrata katha) are traditionally linked to the Skanda Purana, Reva Khanda, where Lord Vishnu explains the vrata to Sage Narada for the benefit of humanity. The Katha is usually read in multiple chapters, with stories of a poor brahmana, a woodcutter, a merchant and his family, and a king—each showing the fruits of performing the puja and keeping one\'s word. The central teaching: When we honour truth, gratitude, and our spiritual vows, divine grace flows naturally into our lives.'
+      },
+      whenToPerform: [
+        'Purnima (Full Moon) of any month',
+        'Ekadashi (11th lunar day)',
+        'Amavasya or other special tithis, depending on family tradition',
+        'Life milestones – marriages, housewarming (Griha Pravesh), start of a new job or business, birthdays, anniversaries',
+        'After fulfilment of a vow or completion of a major event, as an offering of gratitude',
+        'The puja is often done in the evening, when the family can gather and listen peacefully to the Katha, though it can be performed in the morning as well'
+      ],
+      whereAndWho: 'The puja can be conducted at home, in a temple, or in a community hall. It is a very inclusive ritual—men and women can both participate. Devotees from all regions and backgrounds take part. Often done as a collective family or community puja, where everyone joins in the Katha, bhajans, and distribution of prasad.',
+      specialForNRIs: [
+        'It is simple enough to perform at home, yet deep enough to create a powerful spiritual atmosphere',
+        'It brings everyone—grandparents, parents, children, and friends—into one circle of listening, chanting, and sharing prasad',
+        'The stories in the Katha show children in a very practical way how truthfulness, gratitude, and keeping promises matter in real life, not just in theory',
+        'Doing this puja on special days (results, job change, new house, recovery from illness, etc.) teaches the next generation that every success is linked to divine grace and should be acknowledged with thanks',
+        'A bridge between home and homeland—we may live in Ireland, UK, USA, or anywhere else, but our hearts bow to the same Lord Satyanarayana that our parents and grandparents worshipped',
+        'A living classroom of tradition—children see, participate, read small parts of the Katha, and learn how to sit in puja, offer flowers, and take prasad with reverence'
+      ]
+    }
   },
   {
     id: 'ganesh-chaturthi',

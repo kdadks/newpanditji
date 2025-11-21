@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react'
 import { Page, NavigationData } from '../App'
 import { Button } from './ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
-import { List, X, FlowerLotus, Shield } from '@phosphor-icons/react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
+import { List, X, FlowerLotus, Shield, CaretDown } from '@phosphor-icons/react'
 import { authService } from '../services/auth'
 
 interface HeaderProps {
@@ -10,10 +16,17 @@ interface HeaderProps {
   onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
-const navItems: { page: Page; label: string }[] = [
+const navItems: { page: Page; label: string; submenu?: { page: Page; label: string }[] }[] = [
   { page: 'home', label: 'Home' },
   { page: 'services', label: 'Services' },
-  { page: 'about', label: 'About' },
+  {
+    page: 'about',
+    label: 'About',
+    submenu: [
+      { page: 'about', label: 'About Us' },
+      { page: 'why-choose-us', label: 'Why Choose Us' }
+    ]
+  },
   { page: 'gallery', label: 'Gallery' },
   { page: 'blog', label: 'Blog' },
   { page: 'charity', label: 'Charity Work' },
@@ -64,16 +77,45 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
-          {navItems.map(item => (
-            <Button
-              key={item.page}
-              variant={currentPage === item.page ? 'default' : 'ghost'}
-              onClick={() => handleNavClick(item.page)}
-              className={currentPage === item.page ? 'bg-primary text-primary-foreground' : ''}
-            >
-              {item.label}
-            </Button>
-          ))}
+          {navItems.map(item => {
+            if (item.submenu) {
+              const isActive = item.submenu.some(sub => sub.page === currentPage)
+              return (
+                <DropdownMenu key={item.page}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={isActive ? 'default' : 'ghost'}
+                      className={`gap-1 ${isActive ? 'bg-primary text-primary-foreground' : ''}`}
+                    >
+                      {item.label}
+                      <CaretDown size={14} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {item.submenu.map(subItem => (
+                      <DropdownMenuItem
+                        key={subItem.page}
+                        onClick={() => handleNavClick(subItem.page)}
+                        className="cursor-pointer"
+                      >
+                        {subItem.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )
+            }
+            return (
+              <Button
+                key={item.page}
+                variant={currentPage === item.page ? 'default' : 'ghost'}
+                onClick={() => handleNavClick(item.page)}
+                className={currentPage === item.page ? 'bg-primary text-primary-foreground' : ''}
+              >
+                {item.label}
+              </Button>
+            )
+          })}
           {isOwner && (
             <Button
               variant={currentPage === 'admin' ? 'default' : 'ghost'}
@@ -98,16 +140,37 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                 <img src="/Raj ji.jpg" alt="Pandit Rajesh Joshi" className="w-8 h-8 rounded-full object-cover border-2 border-primary" />
                 <span className="font-heading font-bold text-lg text-primary">Navigation</span>
               </div>
-              {navItems.map(item => (
-                <Button
-                  key={item.page}
-                  variant={currentPage === item.page ? 'default' : 'ghost'}
-                  onClick={() => handleNavClick(item.page)}
-                  className={`justify-start text-left ${currentPage === item.page ? 'bg-primary text-primary-foreground' : ''}`}
-                >
-                  {item.label}
-                </Button>
-              ))}
+              {navItems.map(item => {
+                if (item.submenu) {
+                  return (
+                    <div key={item.page} className="space-y-1">
+                      <div className="text-xs font-semibold text-muted-foreground px-2 py-1.5">
+                        {item.label}
+                      </div>
+                      {item.submenu.map(subItem => (
+                        <Button
+                          key={subItem.page}
+                          variant={currentPage === subItem.page ? 'default' : 'ghost'}
+                          onClick={() => handleNavClick(subItem.page)}
+                          className={`justify-start text-left w-full pl-6 ${currentPage === subItem.page ? 'bg-primary text-primary-foreground' : ''}`}
+                        >
+                          {subItem.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )
+                }
+                return (
+                  <Button
+                    key={item.page}
+                    variant={currentPage === item.page ? 'default' : 'ghost'}
+                    onClick={() => handleNavClick(item.page)}
+                    className={`justify-start text-left ${currentPage === item.page ? 'bg-primary text-primary-foreground' : ''}`}
+                  >
+                    {item.label}
+                  </Button>
+                )
+              })}
               {isOwner && (
                 <Button
                   variant={currentPage === 'admin' ? 'default' : 'ghost'}

@@ -10,6 +10,7 @@ import { updateMetaTags, pageSEOConfig, generateOrganizationSchema } from './uti
 const HomePage = lazy(() => import('./components/pages/HomePage'))
 const ServicesPage = lazy(() => import('./components/pages/ServicesPage'))
 const AboutPage = lazy(() => import('./components/pages/AboutPage'))
+const WhyChooseUsPage = lazy(() => import('./components/pages/WhyChooseUsPage'))
 const GalleryPage = lazy(() => import('./components/pages/GalleryPage'))
 const BlogPage = lazy(() => import('./components/pages/BlogPage'))
 const CharityPage = lazy(() => import('./components/pages/CharityPage'))
@@ -29,7 +30,7 @@ const PageLoader = () => (
   </div>
 )
 
-export type Page = 'home' | 'services' | 'about' | 'gallery' | 'blog' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
+export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
 
 export type NavigationData = {
   page: Page
@@ -46,7 +47,7 @@ function App() {
       const path = window.location.pathname.slice(1) // Remove leading slash
       if (path === 'admin') {
         setCurrentPage('admin')
-      } else if (path && ['home', 'services', 'about', 'gallery', 'blog', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
+      } else if (path && ['home', 'services', 'about', 'why-choose-us', 'gallery', 'blog', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
         setCurrentPage(path as Page)
       }
     }
@@ -101,6 +102,8 @@ function App() {
         return <ServicesPage initialCategory={currentCategory} />
       case 'about':
         return <AboutPage />
+      case 'why-choose-us':
+        return <WhyChooseUsPage />
       case 'gallery':
         return <GalleryPage />
       case 'blog':

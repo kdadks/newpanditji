@@ -2,7 +2,7 @@ import { Page, NavigationData } from '../../App'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { FlowerLotus, BookOpen, Heart, Users, Phone } from '@phosphor-icons/react'
+import { FlowerLotus, BookOpen, Heart, Users, Phone, Sparkle } from '@phosphor-icons/react'
 import { services, categoryNames } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
 
@@ -32,7 +32,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
             {/* Left side - Image */}
-            <div className="order-2 lg:order-1 flex justify-center">
+            <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
@@ -47,7 +47,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
 
             {/* Right side - Content */}
-            <div className="order-1 lg:order-2 text-center lg:text-left">
+            <div className="order-2 lg:order-2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <FlowerLotus size={16} weight="fill" />
                 Traditional Hindu Priest & Spiritual Guide
@@ -62,13 +62,17 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                <Button size="lg" onClick={() => onNavigate('services')} className="text-base px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button size="lg" onClick={() => onNavigate('about')} className="text-base px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Users className="mr-2" size={20} />
+                  About Us
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => onNavigate('why-choose-us')} className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                  <Sparkle className="mr-2" size={20} weight="fill" />
+                  Why Choose Us
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => onNavigate('services')} className="text-base px-8 py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all duration-300">
                   <BookOpen className="mr-2" size={20} />
                   Explore Services
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate('contact')} className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-                  <Phone className="mr-2" size={20} />
-                  Contact Us
                 </Button>
               </div>
 
