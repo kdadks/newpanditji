@@ -23,11 +23,17 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
   return (
     <div className="w-full">
-      <section className="relative bg-gradient-to-br from-primary/5 via-accent/10 to-background pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
+      <section className="relative pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+        <div className="absolute inset-0">
+          <img 
+            src="/images/South Asian Temple Complex.png" 
+            alt="" 
+            className="w-full h-full object-cover opacity-30"
+          />
+        </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
@@ -40,9 +46,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   alt="Pandit Rajesh Joshi"
                   className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-8 border-white/80 shadow-2xl hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
-                  <FlowerLotus size={24} weight="fill" />
-                </div>
               </div>
             </div>
 
@@ -163,6 +166,84 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <BookOpen className="mr-2" size={20} />
               View All 40+ Services
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Sacred Spaces Gallery Section */}
+      <section className="py-12 md:py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <FlowerLotus size={16} weight="fill" />
+              Sacred Spaces
+            </div>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-3">Divine Temples & Sacred Altars</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Experience the beauty and serenity of traditional Hindu temples and ceremonial spaces
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
+                  alt="Divine Vaidyanath Temple"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white font-semibold text-lg mb-1">Divine Vaidyanath Temple</h3>
+                  <p className="text-white/80 text-xs">Sacred Hindu Architecture</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="/images/Golden Temples of Devotion.png"
+                  alt="Golden Temples"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white font-semibold text-lg mb-1">Golden Temples</h3>
+                  <p className="text-white/80 text-xs">Places of Worship & Devotion</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="/images/South Asian Temple Complex.png"
+                  alt="South Asian Temple Complex"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white font-semibold text-lg mb-1">Temple Complex</h3>
+                  <p className="text-white/80 text-xs">Traditional Sacred Grounds</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="/images/Traditional Altar with Marigold Flowers.png"
+                  alt="Traditional Altar"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white font-semibold text-lg mb-1">Sacred Altar</h3>
+                  <p className="text-white/80 text-xs">Adorned with Marigold Flowers</p>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
