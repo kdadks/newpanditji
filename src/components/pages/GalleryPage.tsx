@@ -36,6 +36,7 @@ export default function GalleryPage() {
   const photos = adminPhotos || []
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | 'educational' | 'poetry' | 'charity' | 'podcast'>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [activeTab, setActiveTab] = useState('videos')
 
   const filteredVideos = selectedVideoCategory === 'all'
     ? videos
@@ -94,7 +95,7 @@ export default function GalleryPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="videos" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
             <TabsList className="grid w-full max-w-md grid-cols-2 mb-4 sm:mb-0">
               <TabsTrigger value="videos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
@@ -237,8 +238,8 @@ export default function GalleryPage() {
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button variant="outline" className="px-6">
-                      <Images className="mr-2" size={18} />
+                    <Button variant="outline" className="px-6" onClick={() => setActiveTab('videos')}>
+                      <PlayCircle className="mr-2" size={18} />
                       Browse Videos Instead
                     </Button>
                     <Button variant="ghost" className="px-6">

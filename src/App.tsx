@@ -99,7 +99,7 @@ function App() {
       case 'home':
         return <HomePage onNavigate={handleNavigate} />
       case 'services':
-        return <ServicesPage initialCategory={currentCategory} />
+        return <ServicesPage initialCategory={currentCategory} onNavigate={handleNavigate} />
       case 'about':
         return <AboutPage />
       case 'why-choose-us':

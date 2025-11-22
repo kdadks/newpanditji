@@ -120,20 +120,20 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Statistics */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">500+</div>
-                  <div className="text-sm text-muted-foreground">Poojas Performed</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>500+</div>
+                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Poojas Performed</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">250+</div>
-                  <div className="text-sm text-muted-foreground">Happy Clients</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>250+</div>
+                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Happy Clients</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">15+</div>
-                  <div className="text-sm text-muted-foreground">Years Experience</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>15+</div>
+                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Years Experience</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">5</div>
-                  <div className="text-sm text-muted-foreground">Books Written</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>5</div>
+                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Books Written</div>
                 </div>
               </div>
             </div>
@@ -157,9 +157,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {featuredServices.map((service, index) => (
-              <Card key={service.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
+              <Card key={service.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 h-full flex flex-col">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <CardContent className="relative p-6">
+                <CardContent className="relative p-6 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                       {categoryNames[service.category]}
@@ -173,11 +173,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     {service.name}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow">
                     {service.description}
                   </p>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <FlowerLotus size={14} className="mr-1 text-primary/60" />
                       Duration: {service.duration}

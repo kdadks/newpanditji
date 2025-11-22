@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Card, CardContent } from '../ui/card'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer } from '@phosphor-icons/react'
+import { Input } from '../ui/input'
+import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight } from '@phosphor-icons/react'
 import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { Page, NavigationData } from '../../App'
 
 interface ServicesPageProps {
   initialCategory?: string
+  onNavigate?: (pageOrData: Page | NavigationData) => void
 }
 
-export default function ServicesPage({ initialCategory = 'all' }: ServicesPageProps) {
+export default function ServicesPage({ initialCategory = 'all', onNavigate }: ServicesPageProps) {
   const [adminServices] = useLocalStorage<Service[]>('admin-services', defaultServices)
   const services = adminServices || defaultServices
   const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>(initialCategory as Service['category'] | 'all')
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // SEO Configuration
   usePageSEO({
@@ -34,9 +38,18 @@ export default function ServicesPage({ initialCategory = 'all' }: ServicesPagePr
     }
   }, [initialCategory])
 
-  const filteredServices = selectedCategory === 'all'
-    ? services
-    : services.filter(s => s.category === selectedCategory)
+  const filteredServices = services.filter(service => {
+    // Filter by category
+    const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory
+
+    // Filter by search query
+    const matchesSearch = searchQuery === '' ||
+      service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (service.detailedDescription && service.detailedDescription.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    return matchesCategory && matchesSearch
+  })
 
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
@@ -44,43 +57,141 @@ export default function ServicesPage({ initialCategory = 'all' }: ServicesPagePr
   }
 
   return (
-    <div className="w-full py-16 md:py-24">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="text-center mb-12">
-          <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4">Our Services</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
-          </p>
+    <div className="w-full">
+      {/* Hero Section with Rolling Background */}
+      <section className="relative pt-16 md:pt-20 pb-12 md:pb-16 overflow-hidden">
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 flex">
+          <div className="flex animate-scroll-left">
+            <img
+              src="/images/Traditional Altar with Marigold Flowers.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/South Asian Temple Complex.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/Golden Temples of Devotion.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+          </div>
+          <div className="flex animate-scroll-left" aria-hidden="true">
+            <img
+              src="/images/Traditional Altar with Marigold Flowers.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/South Asian Temple Complex.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/Golden Temples of Devotion.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+            <img
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-60"
+            />
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30"></div>
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="flex justify-between items-start">
+            <div className="text-center flex-1">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+                Our Services
+              </h1>
+              <p className="text-lg md:text-xl text-gray-900 font-semibold max-w-2xl mx-auto" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+                Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
+              </p>
+            </div>
+
+            {/* Why Choose Us CTA Button - Right Aligned */}
+            <div className="hidden lg:block ml-4">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => onNavigate?.('why-choose-us')}
+                className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+              >
+                <Sparkle className="mr-2" size={20} weight="fill" />
+                Why Choose Us
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Content Section */}
+      <div className="w-full py-8 md:py-12">
+        <div className="container mx-auto px-4 max-w-7xl">
+
+        {/* Search Bar */}
+        <div className="mb-8 max-w-2xl mx-auto">
+          <div className="relative">
+            <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Input
+              type="text"
+              placeholder="Search services by name or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 h-12 text-base"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={20} />
+              </button>
+            )}
+          </div>
         </div>
 
-        <Tabs value={selectedCategory} className="mb-12" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')}>
+        <Tabs value={selectedCategory} className="mb-8" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')}>
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto gap-2 bg-muted/50 p-2">
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              All Services
+              All Services ({services.length})
             </TabsTrigger>
             <TabsTrigger value="pooja" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Poojas
+              Poojas ({services.filter(s => s.category === 'pooja').length})
             </TabsTrigger>
             <TabsTrigger value="sanskar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Sanskars
+              Sanskars ({services.filter(s => s.category === 'sanskar').length})
             </TabsTrigger>
             <TabsTrigger value="paath" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Paath
+              Paath ({services.filter(s => s.category === 'paath').length})
             </TabsTrigger>
             <TabsTrigger value="consultation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Consultations
+              Consultations ({services.filter(s => s.category === 'consultation').length})
             </TabsTrigger>
             <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Wellness
+              Wellness ({services.filter(s => s.category === 'wellness').length})
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="mb-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredServices.length}</span> service{filteredServices.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+        {searchQuery && (
+          <div className="mb-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">{filteredServices.length}</span> result{filteredServices.length !== 1 ? 's' : ''} for "<span className="font-semibold text-foreground">{searchQuery}</span>"
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map(service => (
@@ -119,38 +230,6 @@ export default function ServicesPage({ initialCategory = 'all' }: ServicesPagePr
             <p className="text-muted-foreground">No services found in this category.</p>
           </div>
         )}
-
-        <section className="mt-16 pt-16 border-t border-border">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-4">Why Choose Our Services?</h2>
-            <div className="space-y-4 text-left">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-heading font-semibold text-lg mb-2">Authentic Traditional Knowledge</h3>
-                  <p className="text-muted-foreground">
-                    All ceremonies are performed according to Vedic scriptures and traditional practices, ensuring authenticity and spiritual efficacy.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-heading font-semibold text-lg mb-2">Personalized Approach</h3>
-                  <p className="text-muted-foreground">
-                    Each service is tailored to your family's specific needs, traditions, and preferences while maintaining ritual sanctity.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-heading font-semibold text-lg mb-2">Educational Guidance</h3>
-                  <p className="text-muted-foreground">
-                    Every ritual is explained in detail, helping you understand the significance and meaning behind each sacred practice.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
 
         {/* Service Details Modal */}
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
@@ -540,6 +619,7 @@ export default function ServicesPage({ initialCategory = 'all' }: ServicesPagePr
             )}
           </DialogContent>
         </Dialog>
+        </div>
       </div>
     </div>
   )
