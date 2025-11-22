@@ -24,16 +24,54 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   return (
     <div className="w-full">
       <section className="relative pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0">
-          <img 
-            src="/images/South Asian Temple Complex.png" 
-            alt="" 
-            className="w-full h-full object-cover opacity-30"
-          />
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 flex">
+          <div className="flex animate-scroll-left">
+            <img 
+              src="/images/South Asian Temple Complex.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/Golden Temples of Devotion.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/Traditional Altar with Marigold Flowers.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+          </div>
+          <div className="flex animate-scroll-left" aria-hidden="true">
+            <img 
+              src="/images/South Asian Temple Complex.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/Golden Temples of Devotion.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/Traditional Altar with Marigold Flowers.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img 
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" 
+              alt="" 
+              className="h-full w-auto object-cover opacity-40"
+            />
+          </div>
         </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40"></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
@@ -51,16 +89,16 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
                 <FlowerLotus size={16} weight="fill" />
                 Traditional Hindu Priest & Spiritual Guide
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground leading-tight">
-                Experience <span className="text-primary">Authentic</span> Hindu Ceremonies
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+                Experience <span className="text-primary" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.9)'}}>Authentic</span> Hindu Ceremonies
               </h1>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
+              <p className="text-lg md:text-xl text-gray-900 font-semibold mb-8 leading-relaxed max-w-2xl" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.8)'}}>
                 Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
               </p>
 
@@ -171,20 +209,20 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Sacred Spaces Gallery Section */}
-      <section className="py-12 md:py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-8 md:py-12 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-3">
               <FlowerLotus size={16} weight="fill" />
               Sacred Spaces
             </div>
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-3">Divine Temples & Sacred Altars</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-2">Divine Temples & Sacred Altars</h2>
+            <p className="text-muted-foreground text-base max-w-2xl mx-auto">
               Experience the beauty and serenity of traditional Hindu temples and ceremonial spaces
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
               <div className="relative h-56 overflow-hidden">
                 <img
