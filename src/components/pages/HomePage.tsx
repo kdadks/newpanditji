@@ -80,9 +80,16 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
-                  src="/Raj ji.jpg"
+                  src="/images/Logo/Raj ji.png"
                   alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-8 border-white/80 shadow-2xl hover:scale-105 transition-transform duration-300"
+                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
+                  style={{
+                    imageRendering: '-webkit-optimize-contrast',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                    willChange: 'transform'
+                  }}
+                  loading="eager"
                 />
               </div>
             </div>
@@ -94,11 +101,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 Traditional Hindu Priest & Spiritual Guide
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>
-                Experience <span className="text-primary" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.9)'}}>Authentic</span> Hindu Ceremonies
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-slate-900">
+                Experience <span className="text-primary">Authentic</span> Hindu Ceremonies
               </h1>
 
-              <p className="text-lg md:text-xl text-gray-900 font-semibold mb-8 leading-relaxed max-w-2xl" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+              <p className="text-lg md:text-xl text-slate-700 font-medium mb-8 leading-relaxed max-w-2xl">
                 Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
               </p>
 
@@ -120,22 +127,60 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Statistics */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>500+</div>
-                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Poojas Performed</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">500+</div>
+                  <div className="text-sm font-semibold text-slate-700">Poojas Performed</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>250+</div>
-                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Happy Clients</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">250+</div>
+                  <div className="text-sm font-semibold text-slate-700">Happy Clients</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>15+</div>
-                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Years Experience</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">15+</div>
+                  <div className="text-sm font-semibold text-slate-700">Years Experience</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>5</div>
-                  <div className="text-sm font-semibold text-gray-900" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(255,255,255,0.7)'}}>Books Written</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">5</div>
+                  <div className="text-sm font-semibold text-slate-700">Books Written</div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Rolling Photo Gallery Section */}
+      <section className="py-8 md:py-12 bg-muted/30 overflow-hidden">
+        <div className="container mx-auto px-4 max-w-7xl mb-8">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Heart size={16} weight="fill" />
+              Our Journey
+            </div>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Moments of Devotion</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Celebrating sacred ceremonies and spiritual gatherings with authenticity and devotion
+            </p>
+          </div>
+        </div>
+
+        {/* Rolling Gallery */}
+        <div className="relative w-full h-64 md:h-80">
+          <div className="absolute inset-0 flex gap-4">
+            <div className="flex gap-4 animate-scroll-left">
+              <img src="/images/Raj 1.jpg" alt="Sacred Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 1.jpg" alt="Traditional Pooja" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+            </div>
+            <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
+              <img src="/images/Raj 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Raj 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Raj 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+              <img src="/images/Pooja 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
             </div>
           </div>
         </div>

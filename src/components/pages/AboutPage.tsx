@@ -1,9 +1,15 @@
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil, Briefcase, HandHeart, Lightbulb, MedalMilitary, BookOpen, Atom } from '@phosphor-icons/react'
+import { Button } from '../ui/button'
+import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil, Briefcase, HandHeart, Lightbulb, MedalMilitary, BookOpen, Atom, ArrowRight, ChatCircleDots } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { Page } from '../../App'
 
-export default function AboutPage() {
+interface AboutPageProps {
+  onNavigate?: (page: Page) => void
+}
+
+export default function AboutPage({ onNavigate }: AboutPageProps) {
   // SEO Configuration
   usePageSEO({
     title: 'About Rajesh Joshi "eYogi Raj" | Industrialist, Scholar, Pandit & Author',
@@ -13,27 +19,139 @@ export default function AboutPage() {
   })
 
   return (
-    <div className="w-full py-16 md:py-24">
-      <div className="container mx-auto px-4 max-w-7xl">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="relative inline-block mb-4">
+    <div className="w-full">
+      {/* Hero Section with Rolling Background */}
+      <section className="relative pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 flex">
+          <div className="flex animate-scroll-left">
             <img
-              src="/Raj ji.jpg"
-              alt="Pandit Rajesh Joshi"
-              className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+              src="/images/South Asian Temple Complex.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/Golden Temples of Devotion.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/Traditional Altar with Marigold Flowers.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
             />
           </div>
-          <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
-            About <span className="text-primary">Rajesh Joshi</span> "eYogi Raj"
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker
-          </p>
+          <div className="flex animate-scroll-left" aria-hidden="true">
+            <img
+              src="/images/South Asian Temple Complex.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/Golden Temples of Devotion.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/Traditional Altar with Marigold Flowers.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+            <img
+              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
+              alt=""
+              className="h-full w-auto object-cover opacity-40"
+            />
+          </div>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40"></div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+            {/* Left side - Image */}
+            <div className="order-1 lg:order-1 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <img
+                  src="/images/Logo/Raj ji.png"
+                  alt="Pandit Rajesh Joshi"
+                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
+                  style={{
+                    imageRendering: '-webkit-optimize-contrast',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                    willChange: 'transform'
+                  }}
+                  loading="eager"
+                />
+              </div>
+            </div>
+
+            {/* Right side - Content */}
+            <div className="order-2 lg:order-2 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
+                <FlowerLotus size={16} weight="fill" />
+                Hindu Scholar & Spiritual Guide
+              </div>
+
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-slate-900">
+                Meet <span className="text-primary">Rajesh Joshi</span> "eYogi Raj"
+              </h1>
+
+              <p className="text-base md:text-lg lg:text-xl text-slate-700 font-medium mb-6 md:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker bridging ancient wisdom with modern life.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start mb-6 md:mb-8">
+                <Button size="lg" onClick={() => onNavigate?.('books')} className="text-sm md:text-base px-6 md:px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+                  <BookOpen className="mr-2" size={18} weight="fill" />
+                  Published Books
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => onNavigate?.('charity')} className="text-sm md:text-base px-6 md:px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 w-full sm:w-auto">
+                  <HandHeart className="mr-2" size={18} weight="fill" />
+                  Charity Work
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => onNavigate?.('testimonials')} className="text-sm md:text-base px-6 md:px-8 py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all duration-300 w-full sm:w-auto">
+                  <ChatCircleDots className="mr-2" size={18} weight="fill" />
+                  Testimonials
+                </Button>
+              </div>
+
+              {/* Statistics */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">200+</div>
+                  <div className="text-sm font-semibold text-slate-700">Poojas Performed</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">100+</div>
+                  <div className="text-sm font-semibold text-slate-700">Poems Composed</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">10+</div>
+                  <div className="text-sm font-semibold text-slate-700">Years Teaching</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">6</div>
+                  <div className="text-sm font-semibold text-slate-700">Books Written</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="pt-12 md:pt-16 pb-8 md:pb-12 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 max-w-7xl">
+
+        {/* Quick Stats Cards - Removed as stats are now in hero */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 hidden">
           <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-2">200+</div>
             <div className="text-sm text-muted-foreground font-medium">Poojas Performed</div>
@@ -56,9 +174,9 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main Content Grid - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          {/* Spiritual Journey */}
+          {/* Left Column - Spiritual Journey (Takes 2 columns) */}
           <div className="lg:col-span-2">
             <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-card to-card/50">
               <CardContent className="p-8">
@@ -104,13 +222,94 @@ export default function AboutPage() {
                     career, performing all ceremonies without any monetary gain. His commitment to Karma Kanda (Daily
                     Rituals) and the power of Bhakti has made him a beacon of authentic Vedic traditions.
                   </p>
+
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-6">
+                    <div className="flex items-start gap-4">
+                      <Book className="text-primary flex-shrink-0 mt-1" size={24} />
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-2">Literary Contributions</h4>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Rajesh Ji has written multiple books on Indian culture and Sanatana Dharma, connecting ancient
+                          wisdom to modern science. His books are published with hundreds of physical copies in circulation
+                          across Ireland and India, including <span className="font-semibold text-foreground">Hinduism Basics for All</span>,
+                          <span className="font-semibold text-foreground"> Hinduism and Science</span>,
+                          <span className="font-semibold text-foreground"> eYogi Yoga & Meditation Guide</span>,
+                          <span className="font-semibold text-foreground"> Navaratri: The Bhakti of Shakti</span>,
+                          <span className="font-semibold text-foreground"> Diwali: The Oldest Festival</span>, and
+                          <span className="font-semibold text-foreground"> Leaving Cert Guide</span> (co-authored).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-accent/5 border border-accent/20 rounded-lg p-5 mt-4">
+                    <div className="flex items-start gap-4">
+                      <Pencil className="text-primary flex-shrink-0 mt-1" size={24} />
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-2">Poetry & Public Speaking</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Composed <span className="font-semibold text-foreground">100+ Hindi poems</span>, regularly recited at various prestigious stages in Ireland and USA.
+                          As a motivational speaker, Rajesh Ji weaves ancient wisdom into inspiring talks that resonate
+                          with modern audiences.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Expertise Cards */}
-          <div className="space-y-6">
+          {/* Right Column - Combined Cards (Takes 1 column) */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Areas of Interest & Expertise Card */}
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-accent/5 to-secondary/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Lightbulb className="text-primary" size={24} weight="fill" />
+                  </div>
+                  <h3 className="font-heading font-semibold text-xl">Areas of Interest & Expertise</h3>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <Atom className="mr-2" size={14} />
+                    Quantum Mechanics
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <Book className="mr-2" size={14} />
+                    Ancient Scriptures
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <BookOpen className="mr-2" size={14} />
+                    Indian History
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <Heart className="mr-2" size={14} weight="fill" />
+                    Positive Psychology
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <Pencil className="mr-2" size={14} />
+                    Poetry
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <FlowerLotus className="mr-2" size={14} weight="fill" />
+                    Yoga & Meditation
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <MedalMilitary className="mr-2" size={14} />
+                    Astronomy
+                  </Badge>
+                  <Badge variant="outline" className="justify-start py-2 text-xs">
+                    <Sparkle className="mr-2" size={14} weight="fill" />
+                    Sanatana Dharma
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Academic Excellence Card */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10">
               <CardContent className="p-6 text-center">
                 <GraduationCap className="mx-auto mb-4 text-primary" size={48} />
@@ -122,6 +321,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
+            {/* Irish Industrialist Card */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10">
               <CardContent className="p-6 text-center">
                 <Briefcase className="mx-auto mb-4 text-primary" size={48} />
@@ -133,6 +333,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
+            {/* eYogi Gurukul Card */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/5 to-secondary/10">
               <CardContent className="p-6 text-center">
                 <HandHeart className="mx-auto mb-4 text-primary" size={48} weight="fill" />
@@ -146,125 +347,41 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Interests Section */}
-        <Card className="mb-16 border-0 shadow-lg bg-gradient-to-br from-accent/5 to-secondary/5">
-          <CardContent className="p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Lightbulb className="text-primary" size={24} weight="fill" />
-              </div>
-              <h2 className="font-heading font-semibold text-2xl">Areas of Interest & Expertise</h2>
+        {/* Photo Gallery Section */}
+        <div className="mb-16 overflow-hidden">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Heart className="text-primary" size={16} weight="fill" />
+              Our Journey
             </div>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Moments of Devotion & Service</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Glimpses of sacred ceremonies, spiritual gatherings, and community service performed with devotion and authenticity
+            </p>
+          </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <Atom className="mr-2" size={16} />
-                Quantum Mechanics
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <Book className="mr-2" size={16} />
-                Ancient Scriptures
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <BookOpen className="mr-2" size={16} />
-                Indian History
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <Heart className="mr-2" size={16} weight="fill" />
-                Positive Psychology
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <Pencil className="mr-2" size={16} />
-                Poetry
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <FlowerLotus className="mr-2" size={16} weight="fill" />
-                Yoga & Meditation
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <MedalMilitary className="mr-2" size={16} />
-                Astronomy
-              </Badge>
-              <Badge variant="outline" className="justify-center py-3 text-sm">
-                <Sparkle className="mr-2" size={16} weight="fill" />
-                Sanatana Dharma
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Books Section */}
-        <Card className="mb-16 border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
-          <CardContent className="p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Book className="text-primary" size={24} />
+          {/* Rolling Gallery */}
+          <div className="relative w-full h-64 md:h-80">
+            <div className="absolute inset-0 flex gap-4">
+              <div className="flex gap-4 animate-scroll-left">
+                <img src="/images/Raj 1.jpg" alt="Rajesh Joshi Ji" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 1.jpg" alt="Traditional Pooja Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
               </div>
-              <h2 className="font-heading font-semibold text-2xl">Literary Contributions</h2>
-            </div>
-
-            <div className="space-y-6">
-              <p className="text-base text-muted-foreground leading-relaxed">
-                Rajesh Ji has written multiple books on Indian culture and Sanatana Dharma, connecting ancient
-                wisdom to modern science. His books are published with hundreds of physical copies in circulation
-                across Ireland and India. He has also composed over <span className="font-semibold text-foreground">100 Hindi poems</span>,
-                recited at prestigious stages in Ireland and USA.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-5 rounded-lg border border-primary/20">
-                  <Book className="text-primary mb-3" size={28} />
-                  <h4 className="font-semibold text-foreground mb-2">Hinduism Basics for All</h4>
-                  <p className="text-sm text-muted-foreground">Foundational understanding of Hindu philosophy</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-accent/5 to-accent/10 p-5 rounded-lg border border-accent/20">
-                  <Atom className="text-primary mb-3" size={28} />
-                  <h4 className="font-semibold text-foreground mb-2">Hinduism and Science</h4>
-                  <p className="text-sm text-muted-foreground">Bridging ancient wisdom and modern knowledge</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 p-5 rounded-lg border border-secondary/20">
-                  <FlowerLotus className="text-primary mb-3" size={28} weight="fill" />
-                  <h4 className="font-semibold text-foreground mb-2">eYogi Yoga & Meditation Guide</h4>
-                  <p className="text-sm text-muted-foreground">His own meditation methodology for beginners</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-5 rounded-lg border border-primary/20">
-                  <Sparkle className="text-primary mb-3" size={28} weight="fill" />
-                  <h4 className="font-semibold text-foreground mb-2">Navaratri: The Bhakti of Shakti</h4>
-                  <p className="text-sm text-muted-foreground">Deep dive into the festival of divine feminine</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-accent/5 to-secondary/5 p-5 rounded-lg border border-accent/20">
-                  <Trophy className="text-primary mb-3" size={28} weight="fill" />
-                  <h4 className="font-semibold text-foreground mb-2">Diwali: The Oldest Festival</h4>
-                  <p className="text-sm text-muted-foreground">History and significance of the festival of lights</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-secondary/5 to-primary/5 p-5 rounded-lg border border-secondary/20">
-                  <GraduationCap className="text-primary mb-3" size={28} />
-                  <h4 className="font-semibold text-foreground mb-2">Leaving Cert Guide</h4>
-                  <p className="text-sm text-muted-foreground">Co-authored with Dr. Hanumantha Rao & Dr. Reeta Joshi</p>
-                </div>
-              </div>
-
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-6">
-                <div className="flex items-start gap-4">
-                  <Pencil className="text-primary flex-shrink-0 mt-1" size={24} />
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Poetry & Public Speaking</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Composed 100+ Hindi poems, regularly recited at various prestigious stages in Ireland and USA.
-                      As a motivational speaker, Rajesh Ji weaves ancient wisdom into inspiring talks that resonate
-                      with modern audiences.
-                    </p>
-                  </div>
-                </div>
+              <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
+                <img src="/images/Raj 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Raj 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Raj 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                <img src="/images/Pooja 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* What to Expect Section */}
         <Card className="mb-16 border-0 shadow-xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
@@ -432,7 +549,8 @@ export default function AboutPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

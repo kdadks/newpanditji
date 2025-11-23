@@ -141,6 +141,11 @@ export const pageSEOConfig = {
     description: 'Learn about the significance of Hindu poojas, sanskars, vedic astrology, and spiritual practices in modern life.',
     keywords: 'Hindu pooja significance, spiritual practices, vedic wisdom, Hindu traditions, spiritual guidance',
   },
+  books: {
+    title: 'Books by Rajesh Joshi Ji | Hindu Philosophy, Yoga & Meditation',
+    description: 'Explore enlightening books on Hinduism, Yoga, Meditation, Diwali, Navaratri, and spiritual practices. Ancient wisdom with modern scientific understanding.',
+    keywords: 'Hindu books, Yoga guide, Meditation books, Hinduism and Science, Diwali book, Navaratri guide, Bhagavad Gita, Vedanta, spiritual books',
+  },
   charity: {
     title: 'Hindu Charity & Community Service | Spiritual Education',
     description: 'Community initiatives and charitable work promoting Hindu education and spiritual awareness in Ireland and beyond.',

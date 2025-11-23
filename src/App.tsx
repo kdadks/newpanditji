@@ -13,6 +13,7 @@ const AboutPage = lazy(() => import('./components/pages/AboutPage'))
 const WhyChooseUsPage = lazy(() => import('./components/pages/WhyChooseUsPage'))
 const GalleryPage = lazy(() => import('./components/pages/GalleryPage'))
 const BlogPage = lazy(() => import('./components/pages/BlogPage'))
+const BooksPage = lazy(() => import('./components/pages/BooksPage'))
 const CharityPage = lazy(() => import('./components/pages/CharityPage'))
 const TestimonialsPage = lazy(() => import('./components/pages/TestimonialsPage'))
 const ContactPage = lazy(() => import('./components/pages/ContactPage'))
@@ -30,7 +31,7 @@ const PageLoader = () => (
   </div>
 )
 
-export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
+export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
 
 export type NavigationData = {
   page: Page
@@ -47,7 +48,7 @@ function App() {
       const path = window.location.pathname.slice(1) // Remove leading slash
       if (path === 'admin') {
         setCurrentPage('admin')
-      } else if (path && ['home', 'services', 'about', 'why-choose-us', 'gallery', 'blog', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
+      } else if (path && ['home', 'services', 'about', 'why-choose-us', 'gallery', 'blog', 'books', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
         setCurrentPage(path as Page)
       }
     }
@@ -101,13 +102,15 @@ function App() {
       case 'services':
         return <ServicesPage initialCategory={currentCategory} onNavigate={handleNavigate} />
       case 'about':
-        return <AboutPage />
+        return <AboutPage onNavigate={handleNavigate} />
       case 'why-choose-us':
         return <WhyChooseUsPage />
       case 'gallery':
         return <GalleryPage />
       case 'blog':
         return <BlogPage />
+      case 'books':
+        return <BooksPage />
       case 'charity':
         return <CharityPage />
       case 'testimonials':

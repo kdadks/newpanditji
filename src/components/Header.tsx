@@ -18,18 +18,18 @@ interface HeaderProps {
 
 const navItems: { page: Page; label: string; submenu?: { page: Page; label: string }[] }[] = [
   { page: 'home', label: 'Home' },
-  { page: 'services', label: 'Services' },
   {
     page: 'about',
     label: 'About',
     submenu: [
       { page: 'about', label: 'About Us' },
-      { page: 'why-choose-us', label: 'Why Choose Us' }
+      { page: 'why-choose-us', label: 'Why Choose Us' },
+      { page: 'books', label: 'Books' },
+      { page: 'charity', label: 'Charity Work' }
     ]
   },
+  { page: 'services', label: 'Services' },
   { page: 'gallery', label: 'Gallery' },
-  { page: 'blog', label: 'Blog' },
-  { page: 'charity', label: 'Charity Work' },
   { page: 'testimonials', label: 'Testimonials' },
   { page: 'contact', label: 'Contact' }
 ]
@@ -79,7 +79,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
         <nav className="hidden md:flex items-center gap-1">
           {navItems.map(item => {
             if (item.submenu) {
-              const isActive = item.submenu.some(sub => sub.page === currentPage)
+              const isActive = item.submenu.some(sub => sub.page === currentPage) || currentPage === item.page
               return (
                 <DropdownMenu key={item.page}>
                   <DropdownMenuTrigger asChild>
@@ -96,7 +96,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                       <DropdownMenuItem
                         key={subItem.page}
                         onClick={() => handleNavClick(subItem.page)}
-                        className="cursor-pointer"
+                        className={`cursor-pointer ${currentPage === subItem.page ? 'bg-primary/10' : ''}`}
                       >
                         {subItem.label}
                       </DropdownMenuItem>

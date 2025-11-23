@@ -22,6 +22,45 @@ interface Video {
   url: string
 }
 
+const defaultPhotos: Photo[] = [
+  {
+    id: '1',
+    url: '/images/Raj 1.jpg',
+    title: 'Sacred Ceremony Moment',
+    category: 'ceremony'
+  },
+  {
+    id: '2',
+    url: '/images/Raj 2.jpg',
+    title: 'Spiritual Guidance',
+    category: 'ceremony'
+  },
+  {
+    id: '3',
+    url: '/images/Raj 3.jpg',
+    title: 'Traditional Rituals',
+    category: 'ceremony'
+  },
+  {
+    id: '4',
+    url: '/images/Pooja 1.jpg',
+    title: 'Pooja Ceremony',
+    category: 'pooja'
+  },
+  {
+    id: '5',
+    url: '/images/Pooja 2.jpg',
+    title: 'Divine Offerings',
+    category: 'pooja'
+  },
+  {
+    id: '6',
+    url: '/images/Pooja 3.jpg',
+    title: 'Sacred Worship',
+    category: 'pooja'
+  }
+]
+
 export default function GalleryPage() {
   usePageSEO({
     title: 'Hindu Ceremony Photos & Pooja Videos | Religious Rituals Gallery Ireland',
@@ -31,9 +70,9 @@ export default function GalleryPage() {
   })
 
   const [adminVideos] = useLocalStorage<Video[]>('admin-videos', defaultVideos as Video[])
-  const [adminPhotos] = useLocalStorage<Photo[]>('admin-photos', [])
+  const [adminPhotos] = useLocalStorage<Photo[]>('admin-photos', defaultPhotos)
   const videos = adminVideos || defaultVideos
-  const photos = adminPhotos || []
+  const photos = (adminPhotos && adminPhotos.length > 0) ? adminPhotos : defaultPhotos
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | 'educational' | 'poetry' | 'charity' | 'podcast'>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
@@ -249,44 +288,38 @@ export default function GalleryPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-                {photos.map((photo, index) => (
-                  <Card key={photo.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105">
-                    <CardContent className="p-0">
-                      <div className="aspect-video bg-muted relative overflow-hidden">
-                        <img
-                          src={photo.url}
-                          alt={photo.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-                        <div className="absolute top-3 left-3">
-                          <Badge variant="secondary" className="bg-white/90 text-foreground border-0">
-                            {photo.category}
-                          </Badge>
-                        </div>
-                        <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
-                          {String(index + 1).padStart(2, '0')}
-                        </div>
+              <div className="space-y-8">
+                {/* Rolling Photo Gallery */}
+                <div className="mb-8 overflow-hidden">
+                  <h2 className="font-heading font-bold text-2xl md:text-3xl mb-6 text-center">
+                    Moments of <span className="text-primary">Devotion & Service</span>
+                  </h2>
+                  <div className="relative w-full h-64 md:h-80 lg:h-96">
+                    <div className="absolute inset-0 flex gap-4">
+                      <div className="flex gap-4 animate-scroll-left">
+                        {photos.map((photo) => (
+                          <img
+                            key={photo.id}
+                            src={photo.url}
+                            alt={photo.title}
+                            className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
+                            loading="lazy"
+                          />
+                        ))}
+                        {/* Duplicate for seamless loop */}
+                        {photos.map((photo) => (
+                          <img
+                            key={`${photo.id}-duplicate`}
+                            src={photo.url}
+                            alt={photo.title}
+                            className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
+                            loading="lazy"
+                          />
+                        ))}
                       </div>
-
-                      <div className="p-6">
-                        <h3 className="font-heading font-semibold text-lg mb-2 group-hover:text-primary transition-colors duration-300">
-                          {photo.title}
-                        </h3>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Images size={14} className="text-primary" />
-                            Ceremony Photo
-                          </div>
-                          <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-0 h-auto">
-                            View →
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </TabsContent>

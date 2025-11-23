@@ -47,6 +47,11 @@ export default function Footer({ onNavigate }: FooterProps) {
                 </button>
               </li>
               <li>
+                <button onClick={() => onNavigate('books')} className="text-sm hover:text-accent transition-colors">
+                  Books
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigate('testimonials')} className="text-sm hover:text-accent transition-colors">
                   Testimonials
                 </button>

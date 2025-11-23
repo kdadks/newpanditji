@@ -110,17 +110,30 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
         <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30"></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          <div className="flex justify-between items-start">
-            <div className="text-center flex-1">
-              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+          <div className="lg:flex lg:justify-between lg:items-start">
+            <div className="text-center lg:flex-1">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-slate-900">
                 Our Services
               </h1>
-              <p className="text-lg md:text-xl text-gray-900 font-semibold max-w-2xl mx-auto" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.8)'}}>
+              <p className="text-lg md:text-xl text-slate-700 font-medium max-w-2xl mx-auto mb-6 lg:mb-0">
                 Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
               </p>
+
+              {/* Why Choose Us CTA Button - Centered on Mobile */}
+              <div className="lg:hidden flex justify-center">
+                <Button
+                  size="default"
+                  variant="outline"
+                  onClick={() => onNavigate?.('why-choose-us')}
+                  className="text-base px-6 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                >
+                  <Sparkle className="mr-2" size={20} weight="fill" />
+                  Why Choose Us
+                </Button>
+              </div>
             </div>
 
-            {/* Why Choose Us CTA Button - Right Aligned */}
+            {/* Why Choose Us CTA Button - Right Aligned on Desktop */}
             <div className="hidden lg:block ml-4">
               <Button
                 size="lg"
