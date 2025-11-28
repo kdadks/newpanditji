@@ -47,64 +47,96 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="w-full py-12 md:py-16">
-      <div className="container mx-auto px-4 max-w-7xl">
-        {/* Hero Section */}
-        <div className="text-center mb-10">
-          <div className="relative inline-block mb-6">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-2xl scale-110"></div>
-            <EnvelopeSimple className="relative text-primary" size={60} weight="fill" />
-            <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg">
-              <Sparkle size={14} weight="fill" />
-            </div>
+    <div className="w-full">
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 flex">
+          <div className="flex animate-scroll-left">
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
-
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Heart size={14} weight="fill" />
-            Connect With Us
-          </div>
-
-          <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-foreground">
-            Let's Begin Your <span className="text-primary">Sacred Journey</span>
-          </h1>
-
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Whether you're planning a traditional ceremony or seeking spiritual guidance,
-            we're here to serve your family's sacred needs with devotion and expertise.
-          </p>
-        </div>
-
-        {/* Trust Indicators */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          <div className="text-center">
-            <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="text-primary" size={24} weight="fill" />
-            </div>
-            <div className="text-sm font-medium text-foreground mb-1">Trusted Service</div>
-            <div className="text-xs text-muted-foreground">15+ Years Experience</div>
-          </div>
-          <div className="text-center">
-            <div className="bg-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="text-primary" size={24} weight="fill" />
-            </div>
-            <div className="text-sm font-medium text-foreground mb-1">Authentic Rituals</div>
-            <div className="text-xs text-muted-foreground">Vedic Traditions</div>
-          </div>
-          <div className="text-center">
-            <div className="bg-secondary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="text-primary" size={24} weight="fill" />
-            </div>
-            <div className="text-sm font-medium text-foreground mb-1">Quick Response</div>
-            <div className="text-xs text-muted-foreground">Within 24 Hours</div>
-          </div>
-          <div className="text-center">
-            <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Heart className="text-primary" size={24} weight="fill" />
-            </div>
-            <div className="text-sm font-medium text-foreground mb-1">Personal Care</div>
-            <div className="text-xs text-muted-foreground">Family-Focused</div>
+          <div className="flex animate-scroll-left" aria-hidden="true">
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
         </div>
+        
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+        
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          {/* Hero Content */}
+          <div className="text-center mb-8">
+            <div className="relative inline-block mb-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-400/30 rounded-full blur-2xl scale-110"></div>
+              <EnvelopeSimple className="relative text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" size={60} weight="fill" />
+              <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg">
+                <Sparkle size={14} weight="fill" />
+              </div>
+            </div>
+
+            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-4 shadow-xl">
+              <Heart size={14} weight="fill" />
+              Connect With Us
+            </div>
+
+            <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              Let's Begin Your <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Sacred Journey</span>
+            </h1>
+
+            <p className="text-lg text-white/95 max-w-2xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              Whether you're planning a traditional ceremony or seeking spiritual guidance,
+              we're here to serve your family's sacred needs with devotion and expertise.
+            </p>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="text-amber-400" size={24} weight="fill" />
+              </div>
+              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Trusted Service</div>
+              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">15+ Years Experience</div>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="text-amber-400" size={24} weight="fill" />
+              </div>
+              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Authentic Rituals</div>
+              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Vedic Traditions</div>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="text-amber-400" size={24} weight="fill" />
+              </div>
+              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Quick Response</div>
+              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Within 24 Hours</div>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="text-amber-400" size={24} weight="fill" />
+              </div>
+              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Personal Care</div>
+              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Family-Focused</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <div className="py-8 md:py-12">
 
         {/* Contact Form & Info */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto mb-16">

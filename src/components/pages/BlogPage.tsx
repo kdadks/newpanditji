@@ -29,24 +29,57 @@ export default function BlogPage() {
   const categories = [...new Set(blogArticles.map(article => article.category))]
 
   return (
-    <div className="w-full py-12 md:py-16">
-      <div className="container mx-auto px-4 max-w-7xl">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Sparkle size={16} weight="fill" />
-            Spiritual Wisdom & Insights
+    <div className="w-full">
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 flex">
+          <div className="flex animate-scroll-left">
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
-
-          <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground">
-            Spiritual <span className="text-primary">Wisdom</span> Blog
-          </h1>
-
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Discover profound insights on Hindu philosophy, spirituality, and practical guidance
-            for navigating life's sacred journey with wisdom and grace.
-          </p>
+          <div className="flex animate-scroll-left" aria-hidden="true">
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+          </div>
         </div>
+        
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+        
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          {/* Hero Content */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
+              <Sparkle size={16} weight="fill" />
+              Spiritual Wisdom & Insights
+            </div>
+
+            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              Spiritual <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Wisdom</span> Blog
+            </h1>
+
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              Discover profound insights on Hindu philosophy, spirituality, and practical guidance
+              for navigating life's sacred journey with wisdom and grace.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <div className="py-8 md:py-12">
+        <div className="container mx-auto px-4 max-w-7xl">
 
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -171,6 +204,7 @@ export default function BlogPage() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )

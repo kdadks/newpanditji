@@ -172,83 +172,49 @@ export default function BooksPage() {
 
   return (
     <div className="w-full">
-      {/* Hero Section with Rolling Background */}
-      <section className="relative pt-16 md:pt-20 pb-12 md:pb-16 overflow-hidden min-h-[300px] md:min-h-[350px]">
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling book cover images */}
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
-            <img
-              src="/images/books/hinduism-basics-for-all.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/hinduism-and-science.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/diwali.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/navaratri.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/eyogi-yoga-meditation.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/leaving-cert-guide.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
+            <img src="/images/books/hinduism-basics-for-all.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/hinduism-and-science.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/diwali.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/navaratri.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/eyogi-yoga-meditation.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/leaving-cert-guide.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img
-              src="/images/books/hinduism-basics-for-all.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/hinduism-and-science.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/diwali.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/navaratri.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/eyogi-yoga-meditation.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
-            <img
-              src="/images/books/leaving-cert-guide.jpeg"
-              alt=""
-              className="h-full w-auto object-cover opacity-50 md:opacity-60"
-            />
+            <img src="/images/books/hinduism-basics-for-all.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/hinduism-and-science.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/diwali.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/navaratri.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/eyogi-yoga-meditation.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src="/images/books/leaving-cert-guide.jpeg" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-background/20 to-background/40 md:from-background/30 md:via-transparent md:to-background/30"></div>
+        
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+        
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
-        <div className="container mx-auto px-4 max-w-7xl relative z-10 h-full flex items-center">
-          <div className="text-center w-full">
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl mb-3 md:mb-4 px-2 text-slate-900">
-              Books by <span className="text-primary">Rajesh Joshi Ji</span>
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
+              <Sparkle size={16} weight="fill" />
+              Wisdom & Knowledge
+            </div>
+
+            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              Books by <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Rajesh Joshi Ji</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-700 font-medium max-w-3xl mx-auto px-4">
+
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality. Ancient wisdom presented with modern scientific understanding.
             </p>
           </div>

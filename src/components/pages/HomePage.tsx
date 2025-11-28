@@ -71,7 +71,15 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             />
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40"></div>
+        
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+        
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
@@ -101,11 +109,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 Traditional Hindu Priest & Spiritual Guide
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-slate-900">
-                Experience <span className="text-primary">Authentic</span> Hindu Ceremonies
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                Experience <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Authentic</span> Hindu Ceremonies
               </h1>
 
-              <p className="text-lg md:text-xl text-slate-700 font-medium mb-8 leading-relaxed max-w-2xl">
+              <p className="text-lg md:text-xl text-white/95 font-medium mb-8 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
               </p>
 
@@ -127,20 +135,20 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Statistics */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">500+</div>
-                  <div className="text-sm font-semibold text-slate-700">Poojas Performed</div>
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">500+</div>
+                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Poojas Performed</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">250+</div>
-                  <div className="text-sm font-semibold text-slate-700">Happy Clients</div>
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">250+</div>
+                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Happy Clients</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">15+</div>
-                  <div className="text-sm font-semibold text-slate-700">Years Experience</div>
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">15+</div>
+                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Years Experience</div>
                 </div>
                 <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">5</div>
-                  <div className="text-sm font-semibold text-slate-700">Books Written</div>
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">5</div>
+                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Books Written</div>
                 </div>
               </div>
             </div>

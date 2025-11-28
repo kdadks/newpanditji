@@ -66,56 +66,64 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
             <img
               src="/images/Traditional Altar with Marigold Flowers.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/South Asian Temple Complex.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/Golden Temples of Devotion.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
             <img
               src="/images/Traditional Altar with Marigold Flowers.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/South Asian Temple Complex.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/Golden Temples of Devotion.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
             <img
               src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
               alt=""
-              className="h-full w-auto object-cover opacity-60"
+              className="h-full w-auto object-cover opacity-40"
             />
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30"></div>
+        
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+        
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="lg:flex lg:justify-between lg:items-start">
             <div className="text-center lg:flex-1">
-              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-slate-900">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Our Services
               </h1>
-              <p className="text-lg md:text-xl text-slate-700 font-medium max-w-2xl mx-auto mb-6 lg:mb-0">
+              <p className="text-lg md:text-xl text-white/95 font-medium max-w-2xl mx-auto mb-6 lg:mb-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
               </p>
 
