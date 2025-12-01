@@ -134,29 +134,28 @@ export default function GalleryPage() {
               Our <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Gallery</span>
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Explore our collection of ceremony memories, educational content, and spiritual insights
               that capture the essence of Hindu traditions and wisdom.
             </p>
-          </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{videos.length}+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Educational Videos</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{photos.length}</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Ceremony Photos</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">500+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Happy Families</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">24/7</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Spiritual Support</div>
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">{videos.length}+</span> Videos
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">{photos.length}</span> Photos
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">500+</span> Families
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">24/7</span> Support
+              </span>
             </div>
           </div>
         </div>

@@ -210,13 +210,28 @@ export default function BooksPage() {
               Wisdom & Knowledge
             </div>
 
-            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Books by <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Rajesh Joshi Ji</span>
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality. Ancient wisdom presented with modern scientific understanding.
             </p>
+
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">6</span> Books Published
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">15K+</span> Years of Wisdom
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">Multiple</span> Topics Covered
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -225,37 +240,21 @@ export default function BooksPage() {
       <div className="w-full py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-7xl">
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
-            <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">6</div>
-              <div className="text-sm text-muted-foreground font-medium">Published Books</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">15K+</div>
-              <div className="text-sm text-muted-foreground font-medium">Years of Wisdom</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-gradient-to-br from-secondary/5 to-secondary/10 col-span-2 md:col-span-1">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">Multiple</div>
-              <div className="text-sm text-muted-foreground font-medium">Topics Covered</div>
-            </div>
-          </div>
-
           {/* Books Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {books.map(book => {
               return (
                 <Card
                   key={book.id}
-                  className="hover:shadow-xl transition-all hover:border-primary/30 hover:-translate-y-2 cursor-pointer overflow-hidden group"
+                  className="hover:shadow-xl transition-all hover:border-primary/30 hover:-translate-y-2 cursor-pointer overflow-hidden group flex flex-col h-full"
                   onClick={() => handleBookClick(book)}
                 >
                   {/* Book Cover Image */}
-                  <div className="relative h-80 overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
+                  <div className="relative h-80 overflow-hidden bg-gradient-to-br from-muted/50 to-muted flex-shrink-0">
                     <img
                       src={book.coverImage}
                       alt={book.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 right-3">
                       <Badge variant="secondary" className="text-xs shadow-lg">
@@ -264,16 +263,16 @@ export default function BooksPage() {
                     </div>
                   </div>
 
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 flex flex-col flex-grow">
                     <h3 className="font-heading font-bold text-xl mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {book.title}
                     </h3>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow">
                       {book.subtitle}
                     </p>
 
-                    <Button variant="ghost" size="sm" className="w-full text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <Button variant="ghost" size="sm" className="w-full text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors mt-auto">
                       View Details →
                     </Button>
                   </CardContent>

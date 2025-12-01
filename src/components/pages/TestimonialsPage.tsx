@@ -45,14 +45,6 @@ export default function TestimonialsPage() {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="relative inline-block mb-8">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-400/30 rounded-full blur-2xl scale-110"></div>
-              <Quotes className="relative text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" size={80} weight="fill" />
-              <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
-                <Sparkle size={16} weight="fill" />
-              </div>
-            </div>
-
             <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
               <Heart size={16} weight="fill" />
               Voices of Devotion
@@ -62,29 +54,28 @@ export default function TestimonialsPage() {
               What Our <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Community</span> Says
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Discover the heartfelt experiences of families who have found spiritual guidance,
               peace, and sacred moments through our traditional Hindu ceremonies.
             </p>
-          </div>
 
-          {/* Stats Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">250+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Happy Families</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">500+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Ceremonies Performed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">4.9/5</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Average Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">15+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Years of Service</div>
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">250+</span> Families
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">500+</span> Ceremonies
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">4.9/5</span> Rating
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">15+</span> Years
+              </span>
             </div>
           </div>
         </div>

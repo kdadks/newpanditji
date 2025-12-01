@@ -111,11 +111,30 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 Meet <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Rajesh Joshi</span> "eYogi Raj"
               </h1>
 
-              <p className="text-base md:text-lg lg:text-xl text-white/95 font-medium mb-6 md:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <p className="text-base md:text-lg lg:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker bridging ancient wisdom with modern life.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start mb-6 md:mb-8">
+              {/* Statistics - Compact inline version */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">200+</span> Poojas
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">100+</span> Poems
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">10+</span> Years Teaching
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">6</span> Books
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
                 <Button size="lg" onClick={() => onNavigate?.('books')} className="text-sm md:text-base px-6 md:px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
                   <BookOpen className="mr-2" size={18} weight="fill" />
                   Published Books
@@ -128,26 +147,6 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                   <ChatCircleDots className="mr-2" size={18} weight="fill" />
                   Testimonials
                 </Button>
-              </div>
-
-              {/* Statistics */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">200+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Poojas Performed</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">100+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Poems Composed</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">10+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Years Teaching</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">6</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Books Written</div>
-                </div>
               </div>
             </div>
           </div>

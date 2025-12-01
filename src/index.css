@@ -149,6 +149,45 @@ h1, h2, h3, h4, h5, h6 {
   animation: scroll-left 40s linear infinite;
 }
 
+/* Services carousel animation - right to left */
+@keyframes scroll-services {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-services {
+  animation: scroll-services 60s linear infinite;
+}
+
+.animate-scroll-services:hover {
+  animation-play-state: paused;
+}
+
+/* Desktop only animation */
+@media (min-width: 768px) {
+  .md\:animate-scroll-services {
+    animation: scroll-services 60s linear infinite;
+  }
+  
+  .md\:animate-scroll-services:hover {
+    animation-play-state: paused;
+  }
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Sunrise effect animations */
 @keyframes sunrise-glow {
   0%, 100% {

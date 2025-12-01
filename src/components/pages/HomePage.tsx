@@ -1,17 +1,23 @@
+import { useState } from 'react'
 import { Page, NavigationData } from '../../App'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
-import { Badge } from '../ui/badge'
-import { FlowerLotus, BookOpen, Heart, Users, Phone, Sparkle } from '@phosphor-icons/react'
-import { services, categoryNames } from '../../lib/data'
+import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/react'
+import { services, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 
 interface HomePageProps {
   onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
-  const featuredServices = services.slice(0, 6)
+  const [adminServices] = useLocalStorage<Service[]>('admin-services', services)
+  const allServices = adminServices || services
+  const featuredServices = allServices.slice(0, 12) // Get more services for the carousel
+  
+  // Service carousel pause state on hover
+  const [isPaused, setIsPaused] = useState(false)
 
   // SEO Configuration
   usePageSEO({
@@ -109,15 +115,34 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 Traditional Hindu Priest & Spiritual Guide
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Experience <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Authentic</span> Hindu Ceremonies
               </h1>
 
-              <p className="text-lg md:text-xl text-white/95 font-medium mb-8 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <p className="text-lg md:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+              {/* Statistics - Compact inline version */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">500+</span> Poojas
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">250+</span> Clients
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">15+</span> Years
+                </span>
+                <span className="text-white/50">•</span>
+                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-bold text-amber-400">5</span> Books
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button size="lg" onClick={() => onNavigate('about')} className="text-base px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
                   <Users className="mr-2" size={20} />
                   About Us
@@ -131,70 +156,34 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   Explore Services
                 </Button>
               </div>
-
-              {/* Statistics */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">500+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Poojas Performed</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">250+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Happy Clients</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">15+</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Years Experience</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl font-bold text-amber-400 mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">5</div>
-                  <div className="text-sm font-semibold text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Books Written</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Rolling Photo Gallery Section */}
-      <section className="py-8 md:py-12 bg-muted/30 overflow-hidden">
-        <div className="container mx-auto px-4 max-w-7xl mb-8">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <Heart size={16} weight="fill" />
-              Our Journey
-            </div>
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Moments of Devotion</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Celebrating sacred ceremonies and spiritual gatherings with authenticity and devotion
-            </p>
+      {/* Floating Rolling Photo Gallery - Between Hero and Services */}
+      <div className="relative w-full h-48 md:h-64 z-20 overflow-hidden">
+        <div className="absolute inset-0 flex gap-4">
+          <div className="flex gap-4 animate-scroll-left">
+            <img src="/images/Raj 1.jpg" alt="Sacred Ceremony" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 1.jpg" alt="Traditional Pooja" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+          </div>
+          <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
+            <img src="/images/Raj 1.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 1.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Raj 2.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 2.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Raj 3.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            <img src="/images/Pooja 3.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
           </div>
         </div>
+      </div>
 
-        {/* Rolling Gallery */}
-        <div className="relative w-full h-64 md:h-80">
-          <div className="absolute inset-0 flex gap-4">
-            <div className="flex gap-4 animate-scroll-left">
-              <img src="/images/Raj 1.jpg" alt="Sacred Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 1.jpg" alt="Traditional Pooja" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-            </div>
-            <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
-              <img src="/images/Raj 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Raj 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Raj 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-              <img src="/images/Pooja 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pt-6 md:pt-10 pb-2 md:pb-4 bg-gradient-to-b from-background to-muted/20">
+      <section className="pt-12 md:pt-16 pb-2 md:pb-4 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -207,12 +196,26 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               for every sacred moment in life.
             </p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {/* Rolling Services Carousel */}
+        <div 
+          className="relative w-full overflow-x-auto md:overflow-hidden py-4 scrollbar-hide"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
+          <div className={`flex gap-6 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
+            {/* First set of cards */}
             {featuredServices.map((service, index) => (
-              <Card key={service.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 h-full flex flex-col">
+              <Card 
+                key={`${service.id}-1`}
+                onClick={() => onNavigate({ page: 'services', category: service.category })}
+                className="group relative flex-shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
+              >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <CardContent className="relative p-6 flex flex-col h-full">
+                <CardContent className="relative p-6 flex flex-col h-full min-h-[280px]">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                       {categoryNames[service.category]}
@@ -226,28 +229,66 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     {service.name}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow">
+                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow line-clamp-3">
                     {service.description}
                   </p>
 
-                  <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <FlowerLotus size={14} className="mr-1 text-primary/60" />
                       Duration: {service.duration}
                     </div>
-                    <button 
-                      onClick={() => onNavigate({ page: 'services', category: service.category })}
-                      className="text-primary font-medium text-sm hover:translate-x-1 transition-transform duration-300 cursor-pointer hover:text-primary/80"
-                    >
-                      Learn More →
-                    </button>
+                    <span className="text-primary font-medium text-sm group-hover:translate-x-1 transition-transform duration-300">
+                      View Details →
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {/* Duplicate set for seamless loop */}
+            {featuredServices.map((service, index) => (
+              <Card 
+                key={`${service.id}-2`}
+                onClick={() => onNavigate({ page: 'services', category: service.category })}
+                className="group relative flex-shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
+                aria-hidden="true"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <CardContent className="relative p-6 flex flex-col h-full min-h-[280px]">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                      {categoryNames[service.category]}
+                    </span>
+                    <div className="text-primary/60 text-lg font-bold">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+
+                  <h3 className="font-heading font-semibold text-xl mb-3 group-hover:text-primary transition-colors duration-300">
+                    {service.name}
+                  </h3>
+
+                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow line-clamp-3">
+                    {service.description}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <FlowerLotus size={14} className="mr-1 text-primary/60" />
+                      Duration: {service.duration}
+                    </div>
+                    <span className="text-primary font-medium text-sm group-hover:translate-x-1 transition-transform duration-300">
+                      View Details →
+                    </span>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+        </div>
 
-          <div className="text-center">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mt-8">
             <Button
               onClick={() => onNavigate('services')}
               variant="outline"

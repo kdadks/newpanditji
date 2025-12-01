@@ -78,58 +78,37 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="relative inline-block mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-400/30 rounded-full blur-2xl scale-110"></div>
-              <EnvelopeSimple className="relative text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" size={60} weight="fill" />
-              <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg">
-                <Sparkle size={14} weight="fill" />
-              </div>
-            </div>
-
-            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-4 shadow-xl">
-              <Heart size={14} weight="fill" />
+            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
+              <Heart size={16} weight="fill" />
               Connect With Us
             </div>
 
-            <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Let's Begin Your <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Sacred Journey</span>
             </h1>
 
-            <p className="text-lg text-white/95 max-w-2xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Whether you're planning a traditional ceremony or seeking spiritual guidance,
               we're here to serve your family's sacred needs with devotion and expertise.
             </p>
-          </div>
 
-          {/* Trust Indicators */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="text-amber-400" size={24} weight="fill" />
-              </div>
-              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Trusted Service</div>
-              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">15+ Years Experience</div>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="text-amber-400" size={24} weight="fill" />
-              </div>
-              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Authentic Rituals</div>
-              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Vedic Traditions</div>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="text-amber-400" size={24} weight="fill" />
-              </div>
-              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Quick Response</div>
-              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Within 24 Hours</div>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="text-amber-400" size={24} weight="fill" />
-              </div>
-              <div className="text-sm font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mb-1">Personal Care</div>
-              <div className="text-xs text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Family-Focused</div>
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">15+</span> Years Experience
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">24hr</span> Response
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">500+</span> Families
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">Global</span> Service
+              </span>
             </div>
           </div>
         </div>

@@ -86,29 +86,28 @@ export default function CharityPage() {
               Charity <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">& Compassion</span>
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               Serving humanity through spiritual education and community initiatives,
               making sacred wisdom accessible to all who seek enlightenment and peace.
             </p>
-          </div>
 
-          {/* Impact Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">1000+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Gitas Distributed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">50+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Communities Served</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">25+</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Rotary Clubs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">24/7</div>
-              <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Spiritual Support</div>
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">1000+</span> Gitas Distributed
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">50+</span> Communities
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">25+</span> Rotary Clubs
+              </span>
+              <span className="text-white/50">•</span>
+              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-bold text-amber-400">24/7</span> Support
+              </span>
             </div>
           </div>
         </div>
