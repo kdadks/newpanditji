@@ -5,15 +5,16 @@ import { Card, CardContent } from '../ui/card'
 import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/react'
 import { services, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { useServices } from '../../hooks/useServices'
 
 interface HomePageProps {
   onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
-  const [adminServices] = useLocalStorage<Service[]>('admin-services', services)
-  const allServices = adminServices || services
+  const { services: dbServices } = useServices()
+  // Use database services if available, otherwise fall back to defaults
+  const allServices = (dbServices && dbServices.length > 0) ? dbServices : services
   const featuredServices = allServices.slice(0, 12) // Get more services for the carousel
   
   // Service carousel pause state on hover

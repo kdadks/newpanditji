@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
+import { useBlogs, convertLegacyBlog } from '../../hooks/useBlogs'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Article } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -8,21 +8,21 @@ import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
-import { blogArticles as defaultBlogs } from '../../lib/data'
+import type { BlogPostRow } from '../../lib/supabase'
 
-interface BlogArticle {
+interface BlogFormData {
   id: string
   title: string
   excerpt: string
   category: string
-  content?: string
+  content: string
 }
 
 export default function AdminBlogs() {
-  const [blogs, setBlogs] = useLocalStorage<BlogArticle[]>('admin-blogs', defaultBlogs)
-  const [editingBlog, setEditingBlog] = useState<BlogArticle | null>(null)
+  const { blogs, isLoading, createBlog, updateBlog, deleteBlog, isCreating, isUpdating, isDeleting } = useBlogs()
+  const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [formData, setFormData] = useState<BlogArticle>({
+  const [formData, setFormData] = useState<BlogFormData>({
     id: '',
     title: '',
     excerpt: '',
@@ -32,7 +32,7 @@ export default function AdminBlogs() {
 
   const handleAdd = () => {
     setFormData({
-      id: `blog-${Date.now()}`,
+      id: '',
       title: '',
       excerpt: '',
       category: 'Spiritual Practice',
@@ -42,37 +42,68 @@ export default function AdminBlogs() {
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (blog: BlogArticle) => {
-    setFormData({ ...blog })
+  const handleEdit = (blog: BlogPostRow) => {
+    setFormData({
+      id: blog.id,
+      title: blog.title,
+      excerpt: blog.excerpt,
+      category: blog.category,
+      content: blog.content
+    })
     setEditingBlog(blog)
     setIsDialogOpen(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.excerpt) {
       toast.error('Please fill in required fields')
       return
     }
 
-    setBlogs((currentBlogs) => {
-      const blogList = currentBlogs || []
+    try {
       if (editingBlog) {
-        return blogList.map(b => b.id === editingBlog.id ? formData : b)
+        await updateBlog({
+          id: editingBlog.id,
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content || formData.excerpt,
+          category: formData.category
+        })
       } else {
-        return [...blogList, formData]
+        const newBlog = convertLegacyBlog({
+          title: formData.title,
+          excerpt: formData.excerpt,
+          category: formData.category,
+          content: formData.content
+        })
+        await createBlog(newBlog)
       }
-    })
-
-    toast.success(editingBlog ? 'Blog updated successfully' : 'Blog added successfully')
-    setIsDialogOpen(false)
-    setEditingBlog(null)
+      setIsDialogOpen(false)
+      setEditingBlog(null)
+    } catch {
+      // Error toast is handled by the hook
+    }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this blog article?')) {
-      setBlogs((currentBlogs) => (currentBlogs || []).filter(b => b.id !== id))
-      toast.success('Blog deleted successfully')
+      try {
+        await deleteBlog(id)
+      } catch {
+        // Error toast is handled by the hook
+      }
     }
+  }
+
+  const isSaving = isCreating || isUpdating
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Spinner className="animate-spin text-primary" size={32} />
+        <span className="ml-2 text-muted-foreground">Loading blogs...</span>
+      </div>
+    )
   }
 
   return (
@@ -86,33 +117,59 @@ export default function AdminBlogs() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {(blogs || []).map((blog) => (
-              <Card key={blog.id} className="border-l-4 border-l-primary/30">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-heading font-semibold text-lg">{blog.title}</h3>
-                        <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
-                          {blog.category}
-                        </span>
+          {blogs.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Article size={48} className="mx-auto mb-4" />
+              <p>No blog articles yet. Click "Add Blog" to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {blogs.map((blog) => (
+                <Card key={blog.id} className="border-l-4 border-l-primary/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-heading font-semibold text-lg">{blog.title}</h3>
+                          <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
+                            {blog.category}
+                          </span>
+                          {blog.is_published ? (
+                            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                              Published
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
+                              Draft
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{blog.excerpt}</p>
+                        {blog.read_time_minutes && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {blog.read_time_minutes} min read
+                          </p>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground">{blog.excerpt}</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
+                          <PencilSimple size={16} />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleDelete(blog.id)}
+                          disabled={isDeleting}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
-                        <PencilSimple size={16} />
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(blog.id)}>
-                        <Trash size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -129,6 +186,7 @@ export default function AdminBlogs() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., The Significance of Regular Pooja"
+                disabled={isSaving}
               />
             </div>
             <div>
@@ -138,6 +196,7 @@ export default function AdminBlogs() {
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 placeholder="e.g., Spiritual Practice, Hindu Traditions"
+                disabled={isSaving}
               />
             </div>
             <div>
@@ -148,26 +207,37 @@ export default function AdminBlogs() {
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                 placeholder="A brief summary of the article..."
                 rows={3}
+                disabled={isSaving}
               />
             </div>
             <div>
-              <Label htmlFor="content">Full Content (Optional)</Label>
+              <Label htmlFor="content">Full Content</Label>
               <Textarea
                 id="content"
-                value={formData.content || ''}
+                value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Full article content..."
                 rows={6}
+                disabled={isSaving}
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
                 <X size={18} className="mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleSave}>
-                <FloppyDisk size={18} className="mr-2" />
-                Save
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Spinner className="mr-2 animate-spin" size={18} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FloppyDisk size={18} className="mr-2" />
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           </div>

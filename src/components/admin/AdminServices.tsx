@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, Eye, UploadSimple, FilePdf, FileDoc } from '@phosphor-icons/react'
+import { useState, useRef } from 'react'
+import { useAdminServices, convertLegacyService } from '../../hooks/useServices'
+import { uploadDocument, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl } from '../../lib/storage'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -12,17 +13,50 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
-import { Service, ServiceDetail, services as defaultServices, categoryNames } from '../../lib/data'
+import { categoryNames } from '../../lib/data'
+import type { AdminServiceRow } from '../../lib/supabase'
+import { generateSlug } from '../../lib/supabase'
+
+type ServiceCategory = 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
+
+interface ServiceFormData {
+  id: string
+  name: string
+  category: ServiceCategory
+  duration: string
+  description: string
+  detailedDescription: string
+  benefits: string[]
+  includes: string[]
+  requirements: string[]
+  price: string
+  bestFor: string[]
+  details?: {
+    deity?: { name: string; description: string; significance: string }
+    nature?: string
+    purpose?: string[]
+    significance?: string[]
+    scripturalRoots?: { source: string; description: string }
+    whenToPerform?: string[]
+    whereAndWho?: string
+    specialForNRIs?: string[]
+  }
+  samagriFile?: { name: string; data: string; type: string }
+  samagriFileUrl?: string
+}
 
 export default function AdminServices() {
-  const [services, setServices] = useLocalStorage<Service[]>('admin-services', defaultServices)
-  const [editingService, setEditingService] = useState<Service | null>(null)
+  const { services, isLoading, createService, updateService, deleteService, isCreating, isUpdating, isDeleting } = useAdminServices()
+  const [editingService, setEditingService] = useState<AdminServiceRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterCategory, setFilterCategory] = useState<'all' | Service['category']>('all')
+  const [filterCategory, setFilterCategory] = useState<'all' | ServiceCategory>('all')
   const [currentTab, setCurrentTab] = useState('basic')
+  const [isUploading, setIsUploading] = useState(false)
+  const [selectedSamagriFile, setSelectedSamagriFile] = useState<File | null>(null)
+  const samagriFileInputRef = useRef<HTMLInputElement>(null)
 
-  const [formData, setFormData] = useState<Service>({
+  const [formData, setFormData] = useState<ServiceFormData>({
     id: '',
     name: '',
     category: 'pooja',
@@ -43,7 +77,7 @@ export default function AdminServices() {
   const [bestForInput, setBestForInput] = useState('')
 
   // Filter services
-  const filteredServices = (services || []).filter(service => {
+  const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory
@@ -52,7 +86,7 @@ export default function AdminServices() {
 
   const handleAdd = () => {
     setFormData({
-      id: `service-${Date.now()}`,
+      id: '',
       name: '',
       category: 'pooja',
       duration: '',
@@ -70,51 +104,170 @@ export default function AdminServices() {
     setBestForInput('')
     setEditingService(null)
     setCurrentTab('basic')
+    setSelectedSamagriFile(null)
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (service: Service) => {
-    setFormData({ ...service })
+  const handleEdit = (service: AdminServiceRow) => {
+    setFormData({
+      id: service.id,
+      name: service.name,
+      category: service.category,
+      duration: service.duration,
+      description: service.description,
+      detailedDescription: service.detailed_description || '',
+      benefits: service.benefits || [],
+      includes: service.includes || [],
+      requirements: service.requirements || [],
+      price: service.price || '',
+      bestFor: service.best_for || [],
+      details: {
+        deity: service.deity_info as ServiceFormData['details']['deity'] | undefined,
+        nature: undefined,
+        purpose: undefined,
+        significance: undefined,
+        scripturalRoots: service.scriptural_roots as ServiceFormData['details']['scripturalRoots'] | undefined,
+        whenToPerform: service.when_to_perform || undefined,
+        whereAndWho: service.where_and_who || undefined,
+        specialForNRIs: service.special_for_nris || undefined
+      },
+      samagriFileUrl: service.samagri_file_url || undefined,
+      samagriFile: service.samagri_file_url ? {
+        name: service.samagri_file_name || 'Samagri List',
+        type: service.samagri_file_url.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
+        data: '' // Not needed for display
+      } : undefined
+    })
     setEditingService(service)
     setCurrentTab('basic')
+    setSelectedSamagriFile(null)
     setIsDialogOpen(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.duration || !formData.description) {
       toast.error('Please fill in all required fields (Name, Duration, Description)')
       return
     }
 
-    setServices((currentServices) => {
-      const serviceList = currentServices || []
-      if (editingService) {
-        return serviceList.map(s => s.id === editingService.id ? formData : s)
-      } else {
-        return [...serviceList, formData]
+    try {
+      setIsUploading(true)
+      let samagriFileUrl = formData.samagriFileUrl || null
+      let samagriFileName = formData.samagriFile?.name || null
+
+      // Upload new samagri file if selected
+      if (selectedSamagriFile) {
+        const result = await uploadDocument(selectedSamagriFile, 'samagri')
+        samagriFileUrl = result.url
+        samagriFileName = result.fileName
+
+        // Delete old file from storage if it was a Supabase Storage file
+        if (editingService?.samagri_file_url && isSupabaseStorageUrl(editingService.samagri_file_url)) {
+          const oldPath = extractPathFromUrl(editingService.samagri_file_url, BUCKETS.DOCUMENTS)
+          if (oldPath) {
+            try {
+              await deleteFile(BUCKETS.DOCUMENTS, oldPath)
+            } catch (error) {
+              console.warn('Failed to delete old samagri file:', error)
+            }
+          }
+        }
       }
-    })
 
-    toast.success(editingService ? 'Service updated successfully!' : 'Service added successfully!')
-    setIsDialogOpen(false)
-    setEditingService(null)
+      if (editingService) {
+        await updateService({
+          id: editingService.id,
+          name: formData.name,
+          slug: generateSlug(formData.name),
+          category: formData.category,
+          duration: formData.duration,
+          description: formData.description,
+          detailed_description: formData.detailedDescription || null,
+          benefits: formData.benefits.length > 0 ? formData.benefits : null,
+          includes: formData.includes.length > 0 ? formData.includes : null,
+          requirements: formData.requirements.length > 0 ? formData.requirements : null,
+          price: formData.price || null,
+          best_for: formData.bestFor.length > 0 ? formData.bestFor : null,
+          deity_info: formData.details?.deity || null,
+          scriptural_roots: formData.details?.scripturalRoots || null,
+          when_to_perform: formData.details?.whenToPerform || null,
+          where_and_who: formData.details?.whereAndWho || null,
+          special_for_nris: formData.details?.specialForNRIs || null,
+          samagri_file_url: samagriFileUrl,
+          samagri_file_name: samagriFileName
+        })
+      } else {
+        const newService = convertLegacyService({
+          name: formData.name,
+          category: formData.category,
+          duration: formData.duration,
+          description: formData.description,
+          detailedDescription: formData.detailedDescription,
+          benefits: formData.benefits,
+          includes: formData.includes,
+          requirements: formData.requirements,
+          price: formData.price,
+          bestFor: formData.bestFor,
+          details: formData.details,
+          samagriFile: formData.samagriFile
+        })
+        // Override with storage URL if we uploaded
+        if (samagriFileUrl) {
+          newService.samagri_file_url = samagriFileUrl
+          newService.samagri_file_name = samagriFileName
+        }
+        await createService(newService)
+      }
+      setIsDialogOpen(false)
+      setEditingService(null)
+      setSelectedSamagriFile(null)
+    } catch (error) {
+      console.error('Save error:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to save service')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
-      setServices((currentServices) => (currentServices || []).filter(s => s.id !== id))
-      toast.success('Service deleted successfully')
+      try {
+        await deleteService(id)
+      } catch {
+        // Error toast is handled by the hook
+      }
     }
   }
 
-  const handleDuplicate = (service: Service) => {
-    const duplicated = {
-      ...service,
-      id: `service-${Date.now()}`,
-      name: `${service.name} (Copy)`
+  const handleDuplicate = async (service: AdminServiceRow) => {
+    const duplicated = convertLegacyService({
+      name: `${service.name} (Copy)`,
+      category: service.category,
+      duration: service.duration,
+      description: service.description,
+      detailedDescription: service.detailed_description || undefined,
+      benefits: service.benefits || undefined,
+      includes: service.includes || undefined,
+      requirements: service.requirements || undefined,
+      price: service.price || undefined,
+      bestFor: service.best_for || undefined
+    })
+    try {
+      await createService(duplicated)
+    } catch {
+      // Error toast is handled by the hook
     }
-    setServices((currentServices) => [...(currentServices || []), duplicated])
-    toast.success('Service duplicated successfully!')
+  }
+
+  const isSaving = isCreating || isUpdating || isUploading
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Spinner className="animate-spin text-primary" size={32} />
+        <span className="ml-2 text-muted-foreground">Loading services...</span>
+      </div>
+    )
   }
 
   return (
@@ -151,7 +304,7 @@ export default function AdminServices() {
               />
             </div>
             <div className="w-full md:w-48">
-              <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as any)}>
+              <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as 'all' | ServiceCategory)}>
                 <SelectTrigger>
                   <div className="flex items-center gap-2">
                     <FunnelSimple size={16} />
@@ -171,7 +324,7 @@ export default function AdminServices() {
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
             Showing <span className="font-semibold text-foreground">{filteredServices.length}</span> of{' '}
-            <span className="font-semibold text-foreground">{(services || []).length}</span> services
+            <span className="font-semibold text-foreground">{services.length}</span> services
           </div>
         </CardContent>
       </Card>
@@ -181,10 +334,17 @@ export default function AdminServices() {
         {filteredServices.length === 0 ? (
           <Card className="col-span-full border-dashed border-2">
             <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground mb-4">No services found matching your criteria</p>
-              <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline">
-                Clear Filters
-              </Button>
+              <Package size={48} className="mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground mb-4">
+                {services.length === 0 
+                  ? 'No services yet. Click "Add New Service" to get started.' 
+                  : 'No services found matching your criteria'}
+              </p>
+              {services.length > 0 && (
+                <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline">
+                  Clear Filters
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (
@@ -195,9 +355,14 @@ export default function AdminServices() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-heading font-semibold text-xl">{service.name}</h3>
-                      {service.details?.deity && (
+                      {service.deity_info && (
                         <Badge variant="secondary" className="text-xs">
                           📚 Detailed
+                        </Badge>
+                      )}
+                      {service.is_popular && (
+                        <Badge variant="default" className="text-xs">
+                          ⭐ Popular
                         </Badge>
                       )}
                     </div>
@@ -241,6 +406,7 @@ export default function AdminServices() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDuplicate(service)}
+                    disabled={isCreating}
                   >
                     <Plus size={16} />
                   </Button>
@@ -248,6 +414,7 @@ export default function AdminServices() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(service.id)}
+                    disabled={isDeleting}
                   >
                     <Trash size={16} />
                   </Button>
@@ -599,67 +766,79 @@ export default function AdminServices() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col gap-4">
-                      {formData.samagriFile ? (
+                      {(formData.samagriFile || formData.samagriFileUrl || selectedSamagriFile) ? (
                         <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
                           <div className="flex items-center gap-3">
-                            {formData.samagriFile.type.includes('pdf') ? (
+                            {(selectedSamagriFile?.type || formData.samagriFile?.type || '').includes('pdf') || formData.samagriFileUrl?.endsWith('.pdf') ? (
                               <FilePdf size={32} className="text-red-500" weight="fill" />
                             ) : (
                               <FileDoc size={32} className="text-blue-500" weight="fill" />
                             )}
                             <div className="flex-1">
-                              <p className="font-medium">{formData.samagriFile.name}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{selectedSamagriFile?.name || formData.samagriFile?.name || 'Samagri List'}</p>
+                                {formData.samagriFileUrl && isSupabaseStorageUrl(formData.samagriFileUrl) && (
+                                  <span className="bg-primary/90 text-primary-foreground text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <CloudArrowUp size={10} />
+                                    Stored
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-xs text-muted-foreground">
-                                {formData.samagriFile.type} • {(formData.samagriFile.data.length * 0.75 / 1024).toFixed(0)} KB
+                                {selectedSamagriFile 
+                                  ? `${(selectedSamagriFile.size / 1024).toFixed(0)} KB - Ready to upload`
+                                  : formData.samagriFileUrl 
+                                    ? 'Stored in cloud'
+                                    : formData.samagriFile?.data 
+                                      ? `${(formData.samagriFile.data.length * 0.75 / 1024).toFixed(0)} KB`
+                                      : ''
+                                }
                               </p>
                             </div>
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() => setFormData({ ...formData, samagriFile: undefined })}
+                              onClick={() => {
+                                setFormData({ ...formData, samagriFile: undefined, samagriFileUrl: undefined })
+                                setSelectedSamagriFile(null)
+                              }}
                             >
                               <Trash size={16} className="text-destructive" />
                             </Button>
                           </div>
                         </div>
                       ) : (
-                        <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-3">
+                        <div 
+                          className="border-2 border-dashed rounded-lg p-8 text-center space-y-3 cursor-pointer hover:border-primary/50 transition-colors"
+                          onClick={() => samagriFileInputRef.current?.click()}
+                        >
+                          <input
+                            ref={samagriFileInputRef}
+                            type="file"
+                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                if (file.size > 50 * 1024 * 1024) {
+                                  toast.error('File size must be less than 50MB')
+                                  return
+                                }
+                                setSelectedSamagriFile(file)
+                                toast.success('File selected! Save to upload.')
+                              }
+                            }}
+                            className="hidden"
+                            disabled={isSaving}
+                          />
                           <div className="flex justify-center">
                             <UploadSimple size={48} className="text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium mb-1">Upload Samagri List</p>
-                            <p className="text-xs text-muted-foreground">PDF or DOCX files accepted (max 5MB)</p>
+                            <p className="text-sm font-medium mb-1">Click to Upload Samagri List</p>
+                            <p className="text-xs text-muted-foreground">PDF or DOCX files accepted (max 50MB)</p>
+                            <p className="text-xs text-primary mt-2">Files are stored securely in the cloud</p>
                           </div>
-                          <Input
-                            type="file"
-                            accept=".pdf,.doc,.docx"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) {
-                                if (file.size > 5 * 1024 * 1024) {
-                                  toast.error('File size must be less than 5MB')
-                                  return
-                                }
-                                const reader = new FileReader()
-                                reader.onloadend = () => {
-                                  const base64 = reader.result as string
-                                  setFormData({
-                                    ...formData,
-                                    samagriFile: {
-                                      name: file.name,
-                                      data: base64.split(',')[1], // Remove data URL prefix
-                                      type: file.type
-                                    }
-                                  })
-                                  toast.success('File uploaded successfully!')
-                                }
-                                reader.readAsDataURL(file)
-                              }
-                            }}
-                            className="max-w-xs mx-auto cursor-pointer"
-                          />
                         </div>
                       )}
                     </div>
@@ -994,13 +1173,22 @@ export default function AdminServices() {
           </div>
 
           <div className="flex gap-3 justify-end pt-4 border-t bg-background">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
               <X size={18} className="mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSave} className="min-w-[120px]">
-              <FloppyDisk size={18} className="mr-2" />
-              Save Service
+            <Button onClick={handleSave} className="min-w-[120px]" disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Spinner className="mr-2 animate-spin" size={18} />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <FloppyDisk size={18} className="mr-2" />
+                  Save Service
+                </>
+              )}
             </Button>
           </div>
         </DialogContent>

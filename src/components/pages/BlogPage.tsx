@@ -1,9 +1,9 @@
-import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useBlogs } from '../../hooks/useBlogs'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { BookOpen, CaretRight, Calendar, User, Sparkle } from '@phosphor-icons/react'
+import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch } from '@phosphor-icons/react'
 import { blogArticles as defaultBlogs } from '../../lib/data'
 
 interface BlogArticle {
@@ -22,8 +22,9 @@ export default function BlogPage() {
     canonicalUrl: 'https://panditrajesh.ie/blog'
   })
 
-  const [adminBlogs] = useLocalStorage<BlogArticle[]>('admin-blogs', defaultBlogs)
-  const blogArticles = adminBlogs || defaultBlogs
+  const { blogs: dbBlogs, isLoading } = useBlogs()
+  // Use database blogs if available, otherwise fall back to defaults
+  const blogArticles = (dbBlogs && dbBlogs.length > 0) ? dbBlogs : defaultBlogs
 
   // Get unique categories
   const categories = [...new Set(blogArticles.map(article => article.category))]
@@ -93,6 +94,13 @@ export default function BlogPage() {
           ))}
         </div>
 
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <CircleNotch className="animate-spin text-primary" size={48} />
+          </div>
+        ) : (
+        <>
         {/* Featured Article */}
         {blogArticles.length > 0 && (
           <div className="mb-16">
@@ -204,6 +212,8 @@ export default function BlogPage() {
             </div>
           </CardContent>
         </Card>
+        </>
+        )}
         </div>
       </div>
     </div>

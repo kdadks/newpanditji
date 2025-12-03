@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
+import { useCharity, convertLegacyProject } from '../../hooks/useCharity'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Heart } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -8,28 +8,21 @@ import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
+import type { CharityProjectRow } from '../../lib/supabase'
 
-interface CharityProject {
+interface CharityFormData {
   id: string
   title: string
   description: string
-  videoUrl?: string
+  videoUrl: string
   category: string
 }
 
 export default function AdminCharity() {
-  const [projects, setProjects] = useLocalStorage<CharityProject[]>('admin-charity', [
-    {
-      id: 'one-rotary-gita',
-      title: 'One Rotary One Gita Project',
-      description: 'A groundbreaking initiative to distribute the Bhagavad Gita to communities worldwide, making this sacred wisdom accessible to all.',
-      videoUrl: 'https://youtu.be/92VjrCUL1K8',
-      category: 'Scripture Distribution'
-    }
-  ])
-  const [editingProject, setEditingProject] = useState<CharityProject | null>(null)
+  const { projects, isLoading, createProject, updateProject, deleteProject, isCreating, isUpdating, isDeleting } = useCharity()
+  const [editingProject, setEditingProject] = useState<CharityProjectRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [formData, setFormData] = useState<CharityProject>({
+  const [formData, setFormData] = useState<CharityFormData>({
     id: '',
     title: '',
     description: '',
@@ -39,7 +32,7 @@ export default function AdminCharity() {
 
   const handleAdd = () => {
     setFormData({
-      id: `project-${Date.now()}`,
+      id: '',
       title: '',
       description: '',
       videoUrl: '',
@@ -49,37 +42,69 @@ export default function AdminCharity() {
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (project: CharityProject) => {
-    setFormData({ ...project })
+  const handleEdit = (project: CharityProjectRow) => {
+    setFormData({
+      id: project.id,
+      title: project.name,
+      description: project.full_description,
+      videoUrl: project.video_url || '',
+      category: project.category
+    })
     setEditingProject(project)
     setIsDialogOpen(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.description) {
       toast.error('Please fill in required fields')
       return
     }
 
-    setProjects((currentProjects) => {
-      const projectList = currentProjects || []
+    try {
       if (editingProject) {
-        return projectList.map(p => p.id === editingProject.id ? formData : p)
+        await updateProject({
+          id: editingProject.id,
+          name: formData.title,
+          short_description: formData.description.substring(0, 200),
+          full_description: formData.description,
+          video_url: formData.videoUrl || null,
+          category: formData.category
+        })
       } else {
-        return [...projectList, formData]
+        const newProject = convertLegacyProject({
+          title: formData.title,
+          description: formData.description,
+          videoUrl: formData.videoUrl,
+          category: formData.category
+        })
+        await createProject(newProject)
       }
-    })
-
-    toast.success(editingProject ? 'Project updated successfully' : 'Project added successfully')
-    setIsDialogOpen(false)
-    setEditingProject(null)
+      setIsDialogOpen(false)
+      setEditingProject(null)
+    } catch {
+      // Error toast is handled by the hook
+    }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this charity project?')) {
-      setProjects((currentProjects) => (currentProjects || []).filter(p => p.id !== id))
-      toast.success('Project deleted successfully')
+      try {
+        await deleteProject(id)
+      } catch {
+        // Error toast is handled by the hook
+      }
     }
+  }
+
+  const isSaving = isCreating || isUpdating
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Spinner className="animate-spin text-primary" size={32} />
+        <span className="ml-2 text-muted-foreground">Loading charity projects...</span>
+      </div>
+    )
   }
 
   return (
@@ -93,36 +118,57 @@ export default function AdminCharity() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {(projects || []).map((project) => (
-              <Card key={project.id} className="border-l-4 border-l-primary/30">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-heading font-semibold text-lg">{project.title}</h3>
-                        <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
-                          {project.category}
-                        </span>
+          {projects.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Heart size={48} className="mx-auto mb-4" />
+              <p>No charity projects yet. Click "Add Project" to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {projects.map((project) => (
+                <Card key={project.id} className="border-l-4 border-l-primary/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-heading font-semibold text-lg">{project.name}</h3>
+                          <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
+                            {project.category}
+                          </span>
+                          {project.is_active ? (
+                            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                              Inactive
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{project.short_description}</p>
+                        {project.video_url && (
+                          <p className="text-xs text-muted-foreground">Video: {project.video_url}</p>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground mb-2">{project.description}</p>
-                      {project.videoUrl && (
-                        <p className="text-xs text-muted-foreground">Video: {project.videoUrl}</p>
-                      )}
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(project)}>
+                          <PencilSimple size={16} />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleDelete(project.id)}
+                          disabled={isDeleting}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(project)}>
-                        <PencilSimple size={16} />
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)}>
-                        <Trash size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -139,6 +185,7 @@ export default function AdminCharity() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., One Rotary One Gita Project"
+                disabled={isSaving}
               />
             </div>
             <div>
@@ -148,6 +195,7 @@ export default function AdminCharity() {
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 placeholder="e.g., Scripture Distribution, Community Education"
+                disabled={isSaving}
               />
             </div>
             <div>
@@ -158,25 +206,36 @@ export default function AdminCharity() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Describe the charity project..."
                 rows={4}
+                disabled={isSaving}
               />
             </div>
             <div>
               <Label htmlFor="videoUrl">Video URL (Optional)</Label>
               <Input
                 id="videoUrl"
-                value={formData.videoUrl || ''}
+                value={formData.videoUrl}
                 onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                 placeholder="https://youtu.be/..."
+                disabled={isSaving}
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
                 <X size={18} className="mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleSave}>
-                <FloppyDisk size={18} className="mr-2" />
-                Save
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Spinner className="mr-2 animate-spin" size={18} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FloppyDisk size={18} className="mr-2" />
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           </div>

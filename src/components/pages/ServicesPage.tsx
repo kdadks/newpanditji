@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { useServices } from '../../hooks/useServices'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
-import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight } from '@phosphor-icons/react'
+import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch } from '@phosphor-icons/react'
 import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { Page, NavigationData } from '../../App'
@@ -17,8 +17,9 @@ interface ServicesPageProps {
 }
 
 export default function ServicesPage({ initialCategory = 'all', onNavigate }: ServicesPageProps) {
-  const [adminServices] = useLocalStorage<Service[]>('admin-services', defaultServices)
-  const services = adminServices || defaultServices
+  const { services: dbServices, isLoading } = useServices()
+  // Use database services if available, otherwise fall back to defaults
+  const services = (dbServices && dbServices.length > 0) ? dbServices : defaultServices
   const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>(initialCategory as Service['category'] | 'all')
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
@@ -214,8 +215,14 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
+        {isLoading && (
+          <div className="flex justify-center items-center py-12">
+            <CircleNotch className="animate-spin text-primary" size={48} />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredServices.map(service => (
+          {!isLoading && filteredServices.map(service => (
             <Card
               key={service.id}
               className="hover:shadow-lg transition-all hover:border-primary/30 hover:-translate-y-1 cursor-pointer"
@@ -293,10 +300,15 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                           size="sm"
                           variant="outline"
                           onClick={() => {
-                            const link = document.createElement('a')
-                            link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
-                            link.download = selectedService.samagriFile!.name
-                            link.click()
+                            // Handle both URL-based and base64-based files
+                            if (selectedService.samagriFile!.url) {
+                              window.open(selectedService.samagriFile!.url, '_blank')
+                            } else if (selectedService.samagriFile!.data) {
+                              const link = document.createElement('a')
+                              link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
+                              link.download = selectedService.samagriFile!.name
+                              link.click()
+                            }
                           }}
                           className="gap-2"
                         >
@@ -307,15 +319,21 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                           size="sm"
                           variant="outline"
                           onClick={() => {
-                            const blob = new Blob(
-                              [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
-                              { type: selectedService.samagriFile!.type }
-                            )
-                            const url = URL.createObjectURL(blob)
-                            const printWindow = window.open(url, '_blank')
-                            if (printWindow) {
-                              printWindow.onload = () => {
-                                printWindow.print()
+                            // Handle both URL-based and base64-based files
+                            if (selectedService.samagriFile!.url) {
+                              const printWindow = window.open(selectedService.samagriFile!.url, '_blank')
+                              if (printWindow) {
+                                printWindow.onload = () => printWindow.print()
+                              }
+                            } else if (selectedService.samagriFile!.data) {
+                              const blob = new Blob(
+                                [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
+                                { type: selectedService.samagriFile!.type }
+                              )
+                              const url = URL.createObjectURL(blob)
+                              const printWindow = window.open(url, '_blank')
+                              if (printWindow) {
+                                printWindow.onload = () => printWindow.print()
                               }
                             }
                           }}
@@ -403,10 +421,15 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                                 <Button
                                   size="sm"
                                   onClick={() => {
-                                    const link = document.createElement('a')
-                                    link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
-                                    link.download = selectedService.samagriFile!.name
-                                    link.click()
+                                    // Handle both URL-based and base64-based files
+                                    if (selectedService.samagriFile!.url) {
+                                      window.open(selectedService.samagriFile!.url, '_blank')
+                                    } else if (selectedService.samagriFile!.data) {
+                                      const link = document.createElement('a')
+                                      link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
+                                      link.download = selectedService.samagriFile!.name
+                                      link.click()
+                                    }
                                   }}
                                   className="gap-2"
                                 >
@@ -417,15 +440,21 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                                   size="sm"
                                   variant="outline"
                                   onClick={() => {
-                                    const blob = new Blob(
-                                      [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
-                                      { type: selectedService.samagriFile!.type }
-                                    )
-                                    const url = URL.createObjectURL(blob)
-                                    const printWindow = window.open(url, '_blank')
-                                    if (printWindow) {
-                                      printWindow.onload = () => {
-                                        printWindow.print()
+                                    // Handle both URL-based and base64-based files
+                                    if (selectedService.samagriFile!.url) {
+                                      const printWindow = window.open(selectedService.samagriFile!.url, '_blank')
+                                      if (printWindow) {
+                                        printWindow.onload = () => printWindow.print()
+                                      }
+                                    } else if (selectedService.samagriFile!.data) {
+                                      const blob = new Blob(
+                                        [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
+                                        { type: selectedService.samagriFile!.type }
+                                      )
+                                      const url = URL.createObjectURL(blob)
+                                      const printWindow = window.open(url, '_blank')
+                                      if (printWindow) {
+                                        printWindow.onload = () => printWindow.print()
                                       }
                                     }
                                   }}

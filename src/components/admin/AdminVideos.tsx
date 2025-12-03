@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X } from '@phosphor-icons/react'
+import { useVideos, convertLegacyVideo } from '../../hooks/useVideos'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Video as VideoIcon } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -8,20 +8,22 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
-import { videos as defaultVideos } from '../../lib/data'
+import type { VideoRow } from '../../lib/supabase'
 
-interface Video {
+type VideoCategory = 'educational' | 'poetry' | 'charity' | 'podcast' | 'other'
+
+interface VideoFormData {
   id: string
   title: string
-  category: 'educational' | 'poetry' | 'charity' | 'podcast'
+  category: VideoCategory
   url: string
 }
 
 export default function AdminVideos() {
-  const [videos, setVideos] = useLocalStorage<Video[]>('admin-videos', defaultVideos as Video[])
-  const [editingVideo, setEditingVideo] = useState<Video | null>(null)
+  const { videos, isLoading, createVideo, updateVideo, deleteVideo, isCreating, isUpdating, isDeleting } = useVideos()
+  const [editingVideo, setEditingVideo] = useState<VideoRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [formData, setFormData] = useState<Video>({
+  const [formData, setFormData] = useState<VideoFormData>({
     id: '',
     title: '',
     category: 'educational',
@@ -30,7 +32,7 @@ export default function AdminVideos() {
 
   const handleAdd = () => {
     setFormData({
-      id: `video-${Date.now()}`,
+      id: '',
       title: '',
       category: 'educational',
       url: ''
@@ -39,37 +41,72 @@ export default function AdminVideos() {
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (video: Video) => {
-    setFormData({ ...video })
+  const handleEdit = (video: VideoRow) => {
+    setFormData({
+      id: video.id,
+      title: video.title,
+      category: video.category,
+      url: video.youtube_url
+    })
     setEditingVideo(video)
     setIsDialogOpen(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.url) {
       toast.error('Please fill in all fields')
       return
     }
 
-    setVideos((currentVideos) => {
-      const videoList = currentVideos || []
+    try {
       if (editingVideo) {
-        return videoList.map(v => v.id === editingVideo.id ? formData : v)
+        const legacyData = convertLegacyVideo({
+          title: formData.title,
+          url: formData.url,
+          category: formData.category
+        })
+        await updateVideo({
+          id: editingVideo.id,
+          title: legacyData.title,
+          youtube_url: legacyData.youtube_url,
+          youtube_id: legacyData.youtube_id,
+          thumbnail_url: legacyData.thumbnail_url,
+          category: legacyData.category
+        })
       } else {
-        return [...videoList, formData]
+        const newVideo = convertLegacyVideo({
+          title: formData.title,
+          url: formData.url,
+          category: formData.category
+        })
+        await createVideo(newVideo)
       }
-    })
-
-    toast.success(editingVideo ? 'Video updated successfully' : 'Video added successfully')
-    setIsDialogOpen(false)
-    setEditingVideo(null)
+      setIsDialogOpen(false)
+      setEditingVideo(null)
+    } catch {
+      // Error toast is handled by the hook
+    }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this video?')) {
-      setVideos((currentVideos) => (currentVideos || []).filter(v => v.id !== id))
-      toast.success('Video deleted successfully')
+      try {
+        await deleteVideo(id)
+      } catch {
+        // Error toast is handled by the hook
+      }
     }
+  }
+
+  const isSaving = isCreating || isUpdating
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Spinner className="animate-spin text-primary" size={32} />
+        <span className="ml-2 text-muted-foreground">Loading videos...</span>
+      </div>
+    )
   }
 
   return (
@@ -83,33 +120,57 @@ export default function AdminVideos() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {(videos || []).map((video) => (
-              <Card key={video.id} className="border-l-4 border-l-primary/30">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-heading font-semibold text-lg">{video.title}</h3>
-                        <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
-                          {video.category}
-                        </span>
+          {videos.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <VideoIcon size={48} className="mx-auto mb-4" />
+              <p>No videos yet. Click "Add Video" to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {videos.map((video) => (
+                <Card key={video.id} className="border-l-4 border-l-primary/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex gap-4 flex-1">
+                        {video.thumbnail_url && (
+                          <img 
+                            src={video.thumbnail_url} 
+                            alt={video.title}
+                            className="w-24 h-16 object-cover rounded"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none'
+                            }}
+                          />
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-heading font-semibold text-lg">{video.title}</h3>
+                            <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
+                              {video.category}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground break-all">{video.youtube_url}</p>
+                        </div>
                       </div>
-                      <p className="text-xs text-muted-foreground break-all">{video.url}</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(video)}>
+                          <PencilSimple size={16} />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleDelete(video.id)}
+                          disabled={isDeleting}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(video)}>
-                        <PencilSimple size={16} />
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(video.id)}>
-                        <Trash size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -126,13 +187,15 @@ export default function AdminVideos() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Hinduism and Science Lecture"
+                disabled={isSaving}
               />
             </div>
             <div>
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value: Video['category']) => setFormData({ ...formData, category: value })}
+                onValueChange={(value: VideoCategory) => setFormData({ ...formData, category: value })}
+                disabled={isSaving}
               >
                 <SelectTrigger id="category">
                   <SelectValue />
@@ -142,6 +205,7 @@ export default function AdminVideos() {
                   <SelectItem value="poetry">Poetry</SelectItem>
                   <SelectItem value="charity">Charity Work</SelectItem>
                   <SelectItem value="podcast">Podcast</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -152,16 +216,26 @@ export default function AdminVideos() {
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                 placeholder="https://youtu.be/..."
+                disabled={isSaving}
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
                 <X size={18} className="mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleSave}>
-                <FloppyDisk size={18} className="mr-2" />
-                Save
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Spinner className="mr-2 animate-spin" size={18} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FloppyDisk size={18} className="mr-2" />
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           </div>

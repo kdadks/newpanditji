@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Shield, Package, Images, Video, BookOpen, Heart, Key, SignOut } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { Shield, Package, Images, Video, BookOpen, Heart, Key, SignOut, Spinner } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Button } from '../ui/button'
@@ -10,56 +10,41 @@ import AdminPhotos from '../admin/AdminPhotos'
 import AdminVideos from '../admin/AdminVideos'
 import AdminBlogs from '../admin/AdminBlogs'
 import AdminCharity from '../admin/AdminCharity'
-import { authService, User } from '../../services/auth'
+import { useAuth } from '../../hooks/useAuth'
 import { toast } from 'sonner'
 
 export default function AdminPage() {
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
-  const [userInfo, setUserInfo] = useState<User | null>(null)
-  const [username, setUsername] = useState('')
+  const { user, loading, isAuthenticated, login, logout } = useAuth()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await authService.user()
-        if (user) {
-          setUserInfo(user)
-          setIsAuthorized(user.isOwner)
-        } else {
-          setIsAuthorized(false)
-        }
-      } catch (error) {
-        setIsAuthorized(false)
-      }
-    }
-    checkAuth()
-  }, [])
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = authService.login(username, password)
-    if (success) {
-      authService.user().then(user => {
-        setUserInfo(user)
-        setIsAuthorized(user?.isOwner ?? false)
+    setIsLoggingIn(true)
+    
+    try {
+      const success = await login(email, password)
+      if (success) {
         toast.success('Login successful!')
-      })
-    } else {
-      toast.error('Invalid credentials. Please try again.')
+      } else {
+        toast.error('Invalid credentials. Please try again.')
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.')
+    } finally {
+      setIsLoggingIn(false)
     }
   }
 
-  const handleLogout = () => {
-    authService.logout()
-    setUserInfo(null)
-    setIsAuthorized(false)
-    setUsername('')
+  const handleLogout = async () => {
+    await logout()
+    setEmail('')
     setPassword('')
     toast.success('Logged out successfully')
   }
 
-  if (isAuthorized === null) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -70,7 +55,7 @@ export default function AdminPage() {
     )
   }
 
-  if (!isAuthorized) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md mx-4 w-full">
@@ -81,14 +66,15 @@ export default function AdminPage() {
           <CardContent className="p-6">
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoggingIn}
                 />
               </div>
               <div className="space-y-2">
@@ -100,16 +86,26 @@ export default function AdminPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoggingIn}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                <Key className="mr-2" size={18} />
-                Login
+              <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                {isLoggingIn ? (
+                  <>
+                    <Spinner className="mr-2 animate-spin" size={18} />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    <Key className="mr-2" size={18} />
+                    Login
+                  </>
+                )}
               </Button>
             </form>
             <div className="mt-4 p-3 bg-muted rounded-md">
               <p className="text-xs text-muted-foreground text-center">
-                Test credentials - Username: admin, Password: admin123
+                Admin access only. Contact the site owner for credentials.
               </p>
             </div>
           </CardContent>
@@ -129,7 +125,7 @@ export default function AdminPage() {
                 <h1 className="font-heading font-bold text-4xl">Admin Dashboard</h1>
               </div>
               <p className="text-muted-foreground">
-                Welcome, {userInfo?.username}! Manage your website content below.
+                Welcome, {user?.email}! Manage your website content below.
               </p>
             </div>
             <Button variant="outline" onClick={handleLogout} className="gap-2">

@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useVideos } from '../../hooks/useVideos'
+import { usePhotos } from '../../hooks/usePhotos'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List } from '@phosphor-icons/react'
+import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch } from '@phosphor-icons/react'
 import { videos as defaultVideos } from '../../lib/data'
 
 interface Photo {
@@ -69,10 +70,12 @@ export default function GalleryPage() {
     canonicalUrl: 'https://panditrajesh.ie/gallery'
   })
 
-  const [adminVideos] = useLocalStorage<Video[]>('admin-videos', defaultVideos as Video[])
-  const [adminPhotos] = useLocalStorage<Photo[]>('admin-photos', defaultPhotos)
-  const videos = adminVideos || defaultVideos
-  const photos = (adminPhotos && adminPhotos.length > 0) ? adminPhotos : defaultPhotos
+  const { videos: dbVideos, isLoading: loadingVideos } = useVideos()
+  const { photos: dbPhotos, isLoading: loadingPhotos } = usePhotos()
+  
+  // Use database data if available, otherwise fall back to defaults
+  const videos = (dbVideos && dbVideos.length > 0) ? dbVideos : defaultVideos as Video[]
+  const photos = (dbPhotos && dbPhotos.length > 0) ? dbPhotos : defaultPhotos
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | 'educational' | 'poetry' | 'charity' | 'podcast'>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
@@ -81,9 +84,10 @@ export default function GalleryPage() {
     ? videos
     : videos.filter(v => v.category === selectedVideoCategory)
 
-  const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.split('youtu.be/')[1] || url.split('v=')[1]
-    return `https://www.youtube.com/embed/${videoId}`
+  const getYouTubeEmbedUrl = (url: string | undefined) => {
+    if (!url) return ''
+    const videoId = url.split('youtu.be/')[1] || url.split('v=')[1]?.split('&')[0]
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : ''
   }
 
   const categoryColors = {
@@ -245,21 +249,34 @@ export default function GalleryPage() {
             </div>
 
             {/* Videos Grid */}
+            {loadingVideos ? (
+              <div className="flex justify-center items-center py-12">
+                <CircleNotch className="animate-spin text-primary" size={48} />
+              </div>
+            ) : (
             <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-              {filteredVideos.map((video, index) => (
+              {filteredVideos.map((video, index) => {
+                const embedUrl = getYouTubeEmbedUrl(video.url)
+                return (
                 <Card key={video.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
                   <CardContent className="p-0">
                     <div className="aspect-video relative overflow-hidden">
-                      <iframe
-                        src={getYouTubeEmbedUrl(video.url)}
-                        title={video.title}
-                        className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                      {embedUrl ? (
+                        <iframe
+                          src={embedUrl}
+                          title={video.title}
+                          className="w-full h-full transition-transform duration-300 group-hover:scale-105"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <PlayCircle size={48} className="text-muted-foreground" />
+                        </div>
+                      )}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                       <div className="absolute top-3 left-3">
-                        <Badge className={`${categoryColors[video.category]} border`}>
+                        <Badge className={`${categoryColors[video.category] || 'bg-gray-100 text-gray-800 border-gray-200'} border`}>
                           {video.category}
                         </Badge>
                       </div>
@@ -284,12 +301,17 @@ export default function GalleryPage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )})}
             </div>
+            )}
           </TabsContent>
 
           <TabsContent value="photos">
-            {!photos || photos.length === 0 ? (
+            {loadingPhotos ? (
+              <div className="flex justify-center items-center py-12">
+                <CircleNotch className="animate-spin text-primary" size={48} />
+              </div>
+            ) : !photos || photos.length === 0 ? (
               <Card className="border-0 shadow-xl bg-linear-to-br from-muted/50 to-muted/20">
                 <CardContent className="p-12 md:p-16 text-center">
                   <div className="relative mb-8">

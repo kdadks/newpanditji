@@ -1,49 +1,32 @@
-export interface ServiceDetail {
-  deity?: {
-    name: string
-    description: string
-    significance: string
-  }
-  nature?: string
-  purpose?: string[]
-  significance?: string[]
-  scripturalRoots?: {
-    source: string
-    description: string
-  }
-  whenToPerform?: string[]
-  whereAndWho?: string
-  specialForNRIs?: string[]
-  coreAspects?: {
-    title: string
-    content: string
-  }[]
+/**
+ * Data Migration Script
+ * Migrates default data from data.ts to Supabase database
+ * 
+ * Run with: npx tsx scripts/migrate-data.ts
+ */
+
+import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+
+// Load environment variables
+dotenv.config()
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL
+const supabaseServiceKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Missing Supabase environment variables')
+  console.log('Required: VITE_SUPABASE_URL and VITE_SUPABASE_SERVICE_ROLE_KEY (or VITE_SUPABASE_ANON_KEY)')
+  process.exit(1)
 }
 
-export interface Service {
-  id: string
-  name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
-  duration: string
-  description: string
-  // Detailed information (optional)
-  detailedDescription?: string
-  benefits?: string[]
-  includes?: string[]
-  requirements?: string[]
-  price?: string
-  bestFor?: string[]
-  details?: ServiceDetail
-  // Pooja Samagri file (PDF/DOCX)
-  samagriFile?: {
-    name: string
-    data?: string // Base64 encoded file data (legacy support)
-    url?: string // URL to file in Supabase Storage
-    type: string // MIME type
-  }
-}
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-export const services: Service[] = [
+// ============================================================================
+// DEFAULT DATA FROM data.ts
+// ============================================================================
+
+const services = [
   {
     id: 'satyanarayana-pooja',
     name: 'Satyanarayana Pooja',
@@ -370,123 +353,24 @@ export const services: Service[] = [
   }
 ]
 
-export const videos = [
-  {
-    id: 'hinduism-science',
-    title: 'Hinduism and Science Lecture',
-    category: 'educational',
-    url: 'https://youtu.be/O8spP86OTTg'
-  },
-  {
-    id: 'hinduism-basics',
-    title: 'Hinduism Basics for Irish Students',
-    category: 'educational',
-    url: 'https://youtu.be/YeHE8a3m_hg'
-  },
-  {
-    id: 'hindu-scriptures',
-    title: 'Hindu Scriptures Overview',
-    category: 'educational',
-    url: 'https://youtu.be/4YIkfX-OY6k'
-  },
-  {
-    id: 'navaratri-science',
-    title: 'Navaratri Science',
-    category: 'educational',
-    url: 'https://youtu.be/DAVeXgfBprw'
-  },
-  {
-    id: 'hinduism-15min',
-    title: 'Hinduism in 15 minutes',
-    category: 'educational',
-    url: 'https://youtu.be/FwSWgnAzfSM'
-  },
-  {
-    id: 'pathar-ki-pratiksha',
-    title: 'Pathar Ki Pratiksha Poem',
-    category: 'poetry',
-    url: 'https://youtu.be/r99sntvoD5Q'
-  },
-  {
-    id: 'loved-and-lived',
-    title: 'Loved and Lived Poem',
-    category: 'poetry',
-    url: 'https://youtu.be/SWHnlJNkLYo'
-  },
-  {
-    id: 'mere-ghar-ek-beti',
-    title: 'Mere Ghar Ek Beti Hai',
-    category: 'poetry',
-    url: 'https://youtu.be/uETVb822KTw'
-  },
-  {
-    id: 'one-rotary-gita',
-    title: 'One Rotary One Gita Project',
-    category: 'charity',
-    url: 'https://youtu.be/92VjrCUL1K8'
-  },
-  {
-    id: 'hare-krishna-ireland',
-    title: 'Hare Krishna Movement in Ireland',
-    category: 'podcast',
-    url: 'https://youtu.be/KB_fvzis8VM'
-  },
-  {
-    id: 'indian-food-ireland',
-    title: 'Indian Food in Ireland',
-    category: 'podcast',
-    url: 'https://youtu.be/N4tA-Gt8pfs'
-  },
-  {
-    id: 'stress-killer',
-    title: 'Stress the Killer',
-    category: 'podcast',
-    url: 'https://youtu.be/0-vCRP3i-mY'
-  },
-  {
-    id: 'business-vedanta',
-    title: 'Business to Vedanta',
-    category: 'podcast',
-    url: 'https://youtu.be/Ld9oWNtRT8E'
-  },
-  {
-    id: '1980s-ireland',
-    title: '1980s Ireland',
-    category: 'podcast',
-    url: 'https://youtu.be/uN1afFk_Tgw'
-  }
+const videos = [
+  { id: 'hinduism-science', title: 'Hinduism and Science Lecture', category: 'educational', url: 'https://youtu.be/O8spP86OTTg' },
+  { id: 'hinduism-basics', title: 'Hinduism Basics for Irish Students', category: 'educational', url: 'https://youtu.be/YeHE8a3m_hg' },
+  { id: 'hindu-scriptures', title: 'Hindu Scriptures Overview', category: 'educational', url: 'https://youtu.be/4YIkfX-OY6k' },
+  { id: 'navaratri-science', title: 'Navaratri Science', category: 'educational', url: 'https://youtu.be/DAVeXgfBprw' },
+  { id: 'hinduism-15min', title: 'Hinduism in 15 minutes', category: 'educational', url: 'https://youtu.be/FwSWgnAzfSM' },
+  { id: 'pathar-ki-pratiksha', title: 'Pathar Ki Pratiksha Poem', category: 'poetry', url: 'https://youtu.be/r99sntvoD5Q' },
+  { id: 'loved-and-lived', title: 'Loved and Lived Poem', category: 'poetry', url: 'https://youtu.be/SWHnlJNkLYo' },
+  { id: 'mere-ghar-ek-beti', title: 'Mere Ghar Ek Beti Hai', category: 'poetry', url: 'https://youtu.be/uETVb822KTw' },
+  { id: 'one-rotary-gita', title: 'One Rotary One Gita Project', category: 'charity', url: 'https://youtu.be/92VjrCUL1K8' },
+  { id: 'hare-krishna-ireland', title: 'Hare Krishna Movement in Ireland', category: 'podcast', url: 'https://youtu.be/KB_fvzis8VM' },
+  { id: 'indian-food-ireland', title: 'Indian Food in Ireland', category: 'podcast', url: 'https://youtu.be/N4tA-Gt8pfs' },
+  { id: 'stress-killer', title: 'Stress the Killer', category: 'podcast', url: 'https://youtu.be/0-vCRP3i-mY' },
+  { id: 'business-vedanta', title: 'Business to Vedanta', category: 'podcast', url: 'https://youtu.be/Ld9oWNtRT8E' },
+  { id: '1980s-ireland', title: '1980s Ireland', category: 'podcast', url: 'https://youtu.be/uN1afFk_Tgw' }
 ]
 
-export const categoryNames = {
-  pooja: 'Poojas',
-  sanskar: 'Sanskars',
-  paath: 'Paath/Recitations',
-  consultation: 'Consultations',
-  wellness: 'Meditation & Yoga'
-}
-
-export const testimonials = [
-  {
-    id: 1,
-    name: 'Priya Sharma',
-    text: 'Pandit Rajesh Ji performed our housewarming ceremony with such devotion and knowledge. Every ritual was explained beautifully. We felt truly blessed.',
-    service: 'Griha Pravesh'
-  },
-  {
-    id: 2,
-    name: 'Amit Patel',
-    text: 'The wedding ceremony was perfect! Pandit Ji made sure both families understood each ritual and created such a sacred atmosphere. Highly recommended.',
-    service: 'Vivah'
-  },
-  {
-    id: 3,
-    name: 'Lakshmi Iyer',
-    text: 'Excellent knowledge of scriptures and very patient in explaining everything. The Satyanarayana Pooja at our home brought so much peace to our family.',
-    service: 'Satyanarayana Pooja'
-  }
-]
-
-export const blogArticles = [
+const blogArticles = [
   {
     id: 'significance-pooja',
     title: 'The Significance of Regular Pooja in Modern Life',
@@ -506,3 +390,260 @@ export const blogArticles = [
     category: 'Astrology'
   }
 ]
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function extractYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/,
+  ]
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match) return match[1]
+  }
+  
+  return null
+}
+
+// ============================================================================
+// MIGRATION FUNCTIONS
+// ============================================================================
+
+async function createServiceCategories() {
+  console.log('\n📁 Creating service categories...')
+  
+  const categories = [
+    { name: 'Poojas', slug: 'pooja', description: 'Traditional Hindu worship ceremonies', sort_order: 1, is_active: true },
+    { name: 'Sanskars', slug: 'sanskar', description: 'Life milestone ceremonies', sort_order: 2, is_active: true },
+    { name: 'Paath/Recitations', slug: 'paath', description: 'Sacred text recitations', sort_order: 3, is_active: true },
+    { name: 'Consultations', slug: 'consultation', description: 'Spiritual guidance and counseling', sort_order: 4, is_active: true },
+    { name: 'Meditation & Yoga', slug: 'wellness', description: 'Wellness and spiritual practices', sort_order: 5, is_active: true }
+  ]
+
+  const { data, error } = await supabase
+    .from('service_categories')
+    .upsert(categories, { onConflict: 'slug' })
+    .select()
+
+  if (error) {
+    console.error('❌ Error creating categories:', error.message)
+    return null
+  }
+
+  console.log(`✅ Created/updated ${data.length} service categories`)
+  return data
+}
+
+async function migrateServices(categoryMap: Record<string, string>) {
+  console.log('\n📋 Migrating services...')
+  
+  const serviceRecords = services.map((service, index) => ({
+    slug: service.id,
+    name: service.name,
+    category_id: categoryMap[service.category] || null,
+    short_description: service.description,
+    full_description: service.details?.nature || null,
+    duration: service.duration,
+    price: null,
+    benefits: service.details?.purpose || null,
+    includes: null,
+    requirements: null,
+    best_for: null,
+    deity_info: service.details?.deity || null,
+    nature: service.details?.nature || null,
+    purpose: service.details?.purpose || null,
+    significance: service.details?.significance || null,
+    scriptural_roots: service.details?.scripturalRoots || null,
+    when_to_perform: service.details?.whenToPerform || null,
+    where_and_who: service.details?.whereAndWho || null,
+    special_notes: service.details?.specialForNRIs || null,
+    core_aspects: null,
+    samagri_items: null,
+    samagri_file_url: null,
+    featured_image_url: null,
+    gallery_images: null,
+    is_featured: false,
+    is_popular: service.id === 'satyanarayana-pooja' || service.id === 'vivah' || service.id === 'vastu-shanti',
+    view_count: 0,
+    inquiry_count: 0,
+    meta_title: service.name,
+    meta_description: service.description,
+    meta_keywords: [service.category, 'hindu', 'pooja', 'ceremony'],
+    is_published: true,
+    sort_order: index
+  }))
+
+  const { data, error } = await supabase
+    .from('services')
+    .upsert(serviceRecords, { onConflict: 'slug' })
+    .select()
+
+  if (error) {
+    console.error('❌ Error migrating services:', error.message)
+    return
+  }
+
+  console.log(`✅ Migrated ${data.length} services`)
+}
+
+async function migrateVideos() {
+  console.log('\n🎬 Migrating videos...')
+  
+  const videoRecords = videos.map((video, index) => {
+    const youtubeId = extractYouTubeId(video.url)
+    return {
+      slug: video.id,
+      title: video.title,
+      description: null,
+      video_url: video.url,
+      thumbnail_url: youtubeId ? `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg` : null,
+      category: video.category,
+      duration: null,
+      view_count: 0,
+      is_featured: false,
+      is_published: true,
+      sort_order: index
+    }
+  })
+
+  const { data, error } = await supabase
+    .from('videos')
+    .upsert(videoRecords, { onConflict: 'slug' })
+    .select()
+
+  if (error) {
+    console.error('❌ Error migrating videos:', error.message)
+    return
+  }
+
+  console.log(`✅ Migrated ${data.length} videos`)
+}
+
+async function createBlogCategories() {
+  console.log('\n📝 Creating blog categories...')
+  
+  const uniqueCategories = [...new Set(blogArticles.map(b => b.category))]
+  const categoryRecords = uniqueCategories.map((cat, index) => ({
+    name: cat,
+    slug: generateSlug(cat),
+    description: `Articles about ${cat}`,
+    sort_order: index,
+    is_active: true
+  }))
+
+  const { data, error } = await supabase
+    .from('blog_categories')
+    .upsert(categoryRecords, { onConflict: 'slug' })
+    .select()
+
+  if (error) {
+    console.error('❌ Error creating blog categories:', error.message)
+    return null
+  }
+
+  console.log(`✅ Created ${data.length} blog categories`)
+  return data
+}
+
+async function migrateBlogs(categoryMap: Record<string, string>) {
+  console.log('\n📰 Migrating blog posts...')
+  
+  const blogRecords = blogArticles.map(blog => ({
+    slug: blog.id,
+    title: blog.title,
+    excerpt: blog.excerpt,
+    content: blog.excerpt, // Use excerpt as content placeholder
+    category_id: categoryMap[blog.category] || null,
+    featured_image_url: null,
+    meta_title: blog.title,
+    meta_description: blog.excerpt,
+    meta_keywords: [blog.category.toLowerCase(), 'hindu', 'spirituality'],
+    canonical_url: null,
+    reading_time_minutes: Math.ceil(blog.excerpt.split(' ').length / 200),
+    view_count: 0,
+    status: 'published',
+    is_featured: false,
+    published_at: new Date().toISOString()
+  }))
+
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .upsert(blogRecords, { onConflict: 'slug' })
+    .select()
+
+  if (error) {
+    console.error('❌ Error migrating blogs:', error.message)
+    return
+  }
+
+  console.log(`✅ Migrated ${data.length} blog posts`)
+}
+
+// ============================================================================
+// MAIN MIGRATION
+// ============================================================================
+
+async function runMigration() {
+  console.log('🚀 Starting data migration to Supabase...')
+  console.log(`📍 Target: ${supabaseUrl}`)
+  console.log('=' .repeat(60))
+
+  try {
+    // 1. Create service categories and get mapping
+    const serviceCategories = await createServiceCategories()
+    if (!serviceCategories) {
+      console.error('❌ Failed to create service categories. Aborting.')
+      process.exit(1)
+    }
+    
+    const serviceCategoryMap: Record<string, string> = {}
+    serviceCategories.forEach(cat => {
+      serviceCategoryMap[cat.slug] = cat.id
+    })
+
+    // 2. Migrate services
+    await migrateServices(serviceCategoryMap)
+
+    // 3. Migrate videos
+    await migrateVideos()
+
+    // 4. Create blog categories and get mapping
+    const blogCategories = await createBlogCategories()
+    const blogCategoryMap: Record<string, string> = {}
+    if (blogCategories) {
+      blogCategories.forEach(cat => {
+        blogCategoryMap[cat.name] = cat.id
+      })
+    }
+
+    // 5. Migrate blogs
+    await migrateBlogs(blogCategoryMap)
+
+    console.log('\n' + '=' .repeat(60))
+    console.log('✅ Migration completed successfully!')
+    console.log('\nNext steps:')
+    console.log('1. Verify data in Supabase Dashboard')
+    console.log('2. Restart your dev server (npm run dev)')
+    console.log('3. Check the services page')
+
+  } catch (error) {
+    console.error('\n❌ Migration failed:', error)
+    process.exit(1)
+  }
+}
+
+// Run the migration
+runMigration()

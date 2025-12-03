@@ -1,9 +1,9 @@
-import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useCharity } from '../../hooks/useCharity'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { Heart, Book, Users, HandHeart, Sparkle, Target, Globe, Trophy } from '@phosphor-icons/react'
+import { Heart, Book, Users, HandHeart, Sparkle, Target, Globe, Trophy, CircleNotch } from '@phosphor-icons/react'
 
 interface CharityProject {
   id: string
@@ -12,6 +12,16 @@ interface CharityProject {
   videoUrl?: string
   category: string
 }
+
+const defaultProjects: CharityProject[] = [
+  {
+    id: 'one-rotary-gita',
+    title: 'One Rotary One Gita Project',
+    description: 'A groundbreaking initiative to distribute the Bhagavad Gita to communities worldwide, making this sacred wisdom accessible to all. Through partnership with Rotary clubs and community organizations, we aim to spread the universal teachings of the Gita across cultures and continents. This project represents our commitment to sharing timeless spiritual wisdom that transcends boundaries and brings people together through shared values of duty, devotion, and dharma.',
+    videoUrl: 'https://youtu.be/92VjrCUL1K8',
+    category: 'Scripture Distribution'
+  }
+]
 
 const getYouTubeEmbedUrl = (url: string) => {
   const videoId = url.split('youtu.be/')[1]?.split('?')[0] || url.split('v=')[1]?.split('&')[0]
@@ -26,16 +36,9 @@ export default function CharityPage() {
     canonicalUrl: 'https://panditrajesh.ie/charity'
   })
 
-  const [adminProjects] = useLocalStorage<CharityProject[]>('admin-charity', [
-    {
-      id: 'one-rotary-gita',
-      title: 'One Rotary One Gita Project',
-      description: 'A groundbreaking initiative to distribute the Bhagavad Gita to communities worldwide, making this sacred wisdom accessible to all. Through partnership with Rotary clubs and community organizations, we aim to spread the universal teachings of the Gita across cultures and continents. This project represents our commitment to sharing timeless spiritual wisdom that transcends boundaries and brings people together through shared values of duty, devotion, and dharma.',
-      videoUrl: 'https://youtu.be/92VjrCUL1K8',
-      category: 'Scripture Distribution'
-    }
-  ])
-  const projects = adminProjects || []
+  const { projects: dbProjects, isLoading } = useCharity()
+  // Use database projects if available, otherwise fall back to defaults
+  const projects = (dbProjects && dbProjects.length > 0) ? dbProjects : defaultProjects
 
   return (
     <div className="w-full">
@@ -118,7 +121,11 @@ export default function CharityPage() {
 
         {/* Featured Projects */}
         <div className="space-y-12 mb-16">
-          {projects.map((project, index) => (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <CircleNotch className="animate-spin text-primary" size={48} />
+            </div>
+          ) : projects.map((project, index) => (
             <Card key={project.id} className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden">
               <CardContent className="p-0">
                 <div className={`grid grid-cols-1 lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''}`}>

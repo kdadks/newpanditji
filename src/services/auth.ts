@@ -1,77 +1,191 @@
 /**
- * Simple authentication service
- * Replaces GitHub Spark authentication
+ * Supabase Authentication Service
+ * Handles admin authentication using Supabase Auth
  */
 
-export interface User {
-  username: string
-  isOwner: boolean
+import { supabase } from '../lib/supabase'
+import type { User, Session } from '@supabase/supabase-js'
+
+// Auth user type with role
+export interface AuthUser {
+  id: string
+  email: string
+  role: 'owner' | 'admin'
 }
 
-// Test account credentials (will be replaced with database authentication later)
-const TEST_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123'
+// Session state type
+interface AuthState {
+  user: AuthUser | null
+  session: Session | null
+  loading: boolean
 }
+
+// Create a simple state container
+let authState: AuthState = {
+  user: null,
+  session: null,
+  loading: true
+}
+
+// Listeners for auth state changes
+type AuthStateListener = (state: AuthState) => void
+const listeners: Set<AuthStateListener> = new Set()
+
+// Notify all listeners of state changes
+const notifyListeners = () => {
+  listeners.forEach(listener => listener(authState))
+}
+
+// Transform Supabase user to AuthUser
+const transformUser = (user: User | null): AuthUser | null => {
+  if (!user) return null
+  return {
+    id: user.id,
+    email: user.email || '',
+    role: 'owner' // Super admin only - no public signup
+  }
+}
+
+// Initialize auth state from Supabase session
+const initializeAuth = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    authState = {
+      user: transformUser(session?.user ?? null),
+      session: session,
+      loading: false
+    }
+    notifyListeners()
+  } catch (error) {
+    console.error('Error initializing auth:', error)
+    authState = { user: null, session: null, loading: false }
+    notifyListeners()
+  }
+}
+
+// Set up auth state change listener
+supabase.auth.onAuthStateChange((_event, session) => {
+  authState = {
+    user: transformUser(session?.user ?? null),
+    session: session,
+    loading: false
+  }
+  notifyListeners()
+})
+
+// Initialize on module load
+initializeAuth()
 
 class AuthService {
-  private currentUser: User | null = null
-
-  constructor() {
-    // Check if user is already logged in
-    const savedUser = localStorage.getItem('auth_user')
-    if (savedUser) {
-      try {
-        this.currentUser = JSON.parse(savedUser)
-      } catch (error) {
-        console.error('Error parsing saved user:', error)
-        localStorage.removeItem('auth_user')
-      }
-    }
-  }
-
   /**
-   * Login with username and password
+   * Login with email and password
    */
-  login(username: string, password: string): boolean {
-    if (username === TEST_CREDENTIALS.username && password === TEST_CREDENTIALS.password) {
-      this.currentUser = {
-        username: username,
-        isOwner: true
+  async login(email: string, password: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        console.error('Login error:', error.message)
+        return false
       }
-      localStorage.setItem('auth_user', JSON.stringify(this.currentUser))
-      return true
+
+      return !!data.user
+    } catch (error) {
+      console.error('Login exception:', error)
+      return false
     }
-    return false
   }
 
   /**
    * Logout current user
    */
-  logout(): void {
-    this.currentUser = null
-    localStorage.removeItem('auth_user')
+  async logout(): Promise<void> {
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   /**
-   * Get current user (mimics window.spark.user() API)
+   * Get current authenticated user
    */
-  async user(): Promise<User | null> {
-    return this.currentUser
+  user(): AuthUser | null {
+    return authState.user
+  }
+
+  /**
+   * Get current session
+   */
+  session(): Session | null {
+    return authState.session
   }
 
   /**
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return this.currentUser !== null
+    return authState.user !== null
   }
 
   /**
-   * Check if current user is owner
+   * Check if user has owner role
    */
   isOwner(): boolean {
-    return this.currentUser?.isOwner ?? false
+    return authState.user?.role === 'owner'
+  }
+
+  /**
+   * Check if auth is still loading
+   */
+  isLoading(): boolean {
+    return authState.loading
+  }
+
+  /**
+   * Subscribe to auth state changes
+   */
+  subscribe(listener: AuthStateListener): () => void {
+    listeners.add(listener)
+    // Immediately call listener with current state
+    listener(authState)
+    // Return unsubscribe function
+    return () => {
+      listeners.delete(listener)
+    }
+  }
+
+  /**
+   * Request password reset email
+   */
+  async resetPassword(email: string): Promise<boolean> {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin?reset=true`
+      })
+      return !error
+    } catch (error) {
+      console.error('Password reset error:', error)
+      return false
+    }
+  }
+
+  /**
+   * Update user password (when logged in)
+   */
+  async updatePassword(newPassword: string): Promise<boolean> {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+      return !error
+    } catch (error) {
+      console.error('Update password error:', error)
+      return false
+    }
   }
 }
 
