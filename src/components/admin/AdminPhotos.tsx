@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { usePhotos, convertLegacyPhoto, type Photo } from '../../hooks/usePhotos'
 import { uploadImage, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl, fileToBase64 } from '../../lib/storage'
-import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, FunnelSimple, Package, Camera, FolderSimple, FileImage, Link } from '@phosphor-icons/react'
+import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, FunnelSimple, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -9,6 +9,7 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Badge } from '../ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Progress } from '../ui/progress'
 import { toast } from 'sonner'
 
 interface PhotoFormData {
@@ -16,6 +17,14 @@ interface PhotoFormData {
   url: string
   title: string
   category: string
+}
+
+interface FileUploadItem {
+  file: File
+  preview: string
+  title: string
+  status: 'pending' | 'uploading' | 'success' | 'error'
+  error?: string
 }
 
 export default function AdminPhotos() {
@@ -33,8 +42,14 @@ export default function AdminPhotos() {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<FileUploadItem[]>([])
   const [currentTab, setCurrentTab] = useState('upload')
+  const [isBulkMode, setIsBulkMode] = useState(false)
+  const [bulkCategory, setBulkCategory] = useState('gallery')
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadingCount, setUploadingCount] = useState({ current: 0, total: 0 })
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
   // Get unique categories from photos
   const categories = Array.from(new Set(photos.map(p => p.category).filter(Boolean)))
@@ -56,7 +71,28 @@ export default function AdminPhotos() {
     setEditingPhoto(null)
     setPreviewUrl(null)
     setSelectedFile(null)
+    setSelectedFiles([])
     setCurrentTab('upload')
+    setIsBulkMode(false)
+    setIsDialogOpen(true)
+  }
+
+  const handleBulkAdd = () => {
+    setFormData({
+      id: '',
+      url: '',
+      title: '',
+      category: 'gallery'
+    })
+    setEditingPhoto(null)
+    setPreviewUrl(null)
+    setSelectedFile(null)
+    setSelectedFiles([])
+    setBulkCategory('gallery')
+    setCurrentTab('upload')
+    setIsBulkMode(true)
+    setUploadProgress(0)
+    setUploadingCount({ current: 0, total: 0 })
     setIsDialogOpen(true)
   }
 
@@ -108,6 +144,142 @@ export default function AdminPhotos() {
     }
   }
 
+  const handleMultiFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    const newFiles: FileUploadItem[] = []
+    const errors: string[] = []
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      
+      // Validate file type
+      if (!validTypes.includes(file.type)) {
+        errors.push(`${file.name}: Invalid file type`)
+        continue
+      }
+
+      // Validate file size
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: File too large (max 10MB)`)
+        continue
+      }
+
+      try {
+        const base64 = await fileToBase64(file)
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+        
+        newFiles.push({
+          file,
+          preview: base64,
+          title: nameWithoutExt,
+          status: 'pending'
+        })
+      } catch (error) {
+        errors.push(`${file.name}: Failed to process`)
+      }
+    }
+
+    if (errors.length > 0) {
+      toast.error(`Some files were skipped:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? `\n...and ${errors.length - 3} more` : ''}`)
+    }
+
+    if (newFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...newFiles])
+      toast.success(`${newFiles.length} file(s) added to upload queue`)
+    }
+
+    // Reset input
+    if (bulkFileInputRef.current) {
+      bulkFileInputRef.current.value = ''
+    }
+  }
+
+  const removeFileFromQueue = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const updateFileTitle = (index: number, title: string) => {
+    setSelectedFiles(prev => prev.map((item, i) => 
+      i === index ? { ...item, title } : item
+    ))
+  }
+
+  const handleBulkUpload = async () => {
+    if (selectedFiles.length === 0) {
+      toast.error('Please select files to upload')
+      return
+    }
+
+    const filesToUpload = selectedFiles.filter(f => f.status === 'pending')
+    if (filesToUpload.length === 0) {
+      toast.error('No pending files to upload')
+      return
+    }
+
+    setIsUploading(true)
+    setUploadingCount({ current: 0, total: filesToUpload.length })
+    setUploadProgress(0)
+
+    let successCount = 0
+    let errorCount = 0
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const item = selectedFiles[i]
+      if (item.status !== 'pending') continue
+
+      // Update status to uploading
+      setSelectedFiles(prev => prev.map((f, idx) => 
+        idx === i ? { ...f, status: 'uploading' as const } : f
+      ))
+      setUploadingCount(prev => ({ ...prev, current: prev.current + 1 }))
+
+      try {
+        // Upload the file
+        const result = await uploadImage(item.file, bulkCategory)
+        
+        // Create the photo record
+        const newPhoto = convertLegacyPhoto({
+          title: item.title || item.file.name,
+          url: result.url,
+          category: bulkCategory
+        })
+        await createPhoto(newPhoto)
+
+        // Update status to success
+        setSelectedFiles(prev => prev.map((f, idx) => 
+          idx === i ? { ...f, status: 'success' as const } : f
+        ))
+        successCount++
+      } catch (error) {
+        // Update status to error
+        setSelectedFiles(prev => prev.map((f, idx) => 
+          idx === i ? { ...f, status: 'error' as const, error: error instanceof Error ? error.message : 'Upload failed' } : f
+        ))
+        errorCount++
+      }
+
+      // Update progress
+      const progress = Math.round(((i + 1) / selectedFiles.length) * 100)
+      setUploadProgress(progress)
+    }
+
+    setIsUploading(false)
+
+    if (successCount > 0 && errorCount === 0) {
+      toast.success(`Successfully uploaded ${successCount} photo(s)`)
+      setIsDialogOpen(false)
+      setSelectedFiles([])
+    } else if (successCount > 0 && errorCount > 0) {
+      toast.warning(`Uploaded ${successCount} photo(s), ${errorCount} failed`)
+    } else {
+      toast.error('All uploads failed')
+    }
+  }
+
   const handleSave = async () => {
     if (!formData.title) {
       toast.error('Please enter a title')
@@ -147,7 +319,7 @@ export default function AdminPhotos() {
           alt_text: formData.title,
           original_name: formData.title,
           file_url: imageUrl,
-          folder: formData.category || null
+          folder: formData.category || undefined
         })
       } else {
         const newPhoto = convertLegacyPhoto({
@@ -215,10 +387,16 @@ export default function AdminPhotos() {
                 All images from books, gallery, and other sources
               </CardDescription>
             </div>
-            <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
-              <Plus size={20} weight="bold" />
-              Add Photo
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleBulkAdd} variant="outline" className="gap-2 shadow-md hover:shadow-lg transition-all">
+                <Images size={20} weight="bold" />
+                Bulk Upload
+              </Button>
+              <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
+                <Plus size={20} weight="bold" />
+                Add Photo
+              </Button>
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -357,265 +535,472 @@ export default function AdminPhotos() {
       </Card>
 
       {/* Modern Redesigned Photo Modal */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 !bg-background">
+      <Dialog open={isDialogOpen} onOpenChange={(open) => {
+        if (!open && !isUploading) {
+          setIsDialogOpen(false)
+          setSelectedFile(null)
+          setPreviewUrl(null)
+          setSelectedFiles([])
+        }
+      }}>
+        <DialogContent className={`max-h-[90vh] overflow-hidden p-0 !bg-background ${isBulkMode ? 'max-w-4xl' : 'max-w-3xl'}`}>
           {/* Gradient Header */}
           <div className="relative overflow-hidden bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 px-6 py-6">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
-                <Camera className="h-7 w-7 text-white" weight="duotone" />
+                {isBulkMode ? (
+                  <Images className="h-7 w-7 text-white" weight="duotone" />
+                ) : (
+                  <Camera className="h-7 w-7 text-white" weight="duotone" />
+                )}
               </div>
               <div>
                 <DialogTitle className="text-xl font-bold text-white">
-                  {editingPhoto ? 'Edit Photo' : 'Add New Photo'}
+                  {isBulkMode ? 'Bulk Upload Photos' : editingPhoto ? 'Edit Photo' : 'Add New Photo'}
                 </DialogTitle>
                 <p className="text-cyan-100 text-sm mt-0.5">
-                  {editingPhoto ? 'Update photo details and image' : 'Upload a new photo to your gallery'}
+                  {isBulkMode 
+                    ? 'Upload multiple photos at once' 
+                    : editingPhoto 
+                      ? 'Update photo details and image' 
+                      : 'Upload a new photo to your gallery'}
                 </p>
               </div>
             </div>
             
-            {/* Progress Steps */}
-            <div className="flex items-center gap-2 mt-5">
-              {[
-                { id: 'upload', label: 'Upload Image', icon: FileImage },
-                { id: 'details', label: 'Photo Details', icon: FolderSimple }
-              ].map((step) => (
-                <button
-                  key={step.id}
-                  onClick={() => setCurrentTab(step.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    currentTab === step.id
-                      ? 'bg-white text-cyan-700 shadow-lg'
-                      : 'bg-white/20 text-white hover:bg-white/30'
-                  }`}
-                >
-                  <step.icon className="h-3.5 w-3.5" weight="bold" />
-                  <span>{step.label}</span>
-                </button>
-              ))}
-            </div>
+            {/* Progress Steps - Only for single mode */}
+            {!isBulkMode && (
+              <div className="flex items-center gap-2 mt-5">
+                {[
+                  { id: 'upload', label: 'Upload Image', icon: FileImage },
+                  { id: 'details', label: 'Photo Details', icon: FolderSimple }
+                ].map((step) => (
+                  <button
+                    key={step.id}
+                    onClick={() => setCurrentTab(step.id)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      currentTab === step.id
+                        ? 'bg-white text-cyan-700 shadow-lg'
+                        : 'bg-white/20 text-white hover:bg-white/30'
+                    }`}
+                  >
+                    <step.icon className="h-3.5 w-3.5" weight="bold" />
+                    <span>{step.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           
           {/* Form Content */}
           <div className="flex flex-col h-[calc(90vh-180px)]">
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              {/* Upload Tab */}
-              {currentTab === 'upload' && (
+              {/* BULK UPLOAD MODE */}
+              {isBulkMode ? (
                 <div className="space-y-5">
-                  {/* Image Upload Area */}
-                  <Card className="border-2 border-teal-100 !bg-background">
-                    <CardContent className="pt-5">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
-                          <CloudArrowUp className="h-4 w-4 text-teal-600" weight="duotone" />
-                        </div>
-                        <h3 className="font-semibold text-teal-900">Upload Image</h3>
-                      </div>
-                      
-                      <div 
-                        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
-                          previewUrl 
-                            ? 'border-teal-300 bg-teal-50/50' 
-                            : 'border-gray-200 hover:border-teal-400 hover:bg-teal-50/30'
-                        }`}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-                          onChange={handleFileSelect}
-                          className="hidden"
-                          disabled={isSaving}
-                        />
-                        
-                        {previewUrl ? (
-                          <div className="relative">
-                            <img 
-                              src={previewUrl} 
-                              alt="Preview" 
-                              className="max-h-56 mx-auto rounded-lg object-contain shadow-md"
-                            />
-                            <div className="mt-3 flex items-center justify-center gap-2">
-                              <Badge variant="outline" className="bg-teal-100 border-teal-300">
-                                <FileImage className="h-3 w-3 mr-1" />
-                                {selectedFile ? selectedFile.name : 'Current image'}
-                              </Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Click to change image
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="py-8">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mx-auto mb-4">
-                              <CloudArrowUp className="h-8 w-8 text-teal-600" weight="duotone" />
-                            </div>
-                            <p className="font-medium text-gray-700">
-                              Click to upload an image
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              JPEG, PNG, GIF, WebP, SVG (max 10MB)
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Or use URL */}
-                  <Card className="border-2 border-blue-100 !bg-background">
-                    <CardContent className="pt-5">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
-                          <Link className="h-4 w-4 text-blue-600" weight="duotone" />
-                        </div>
-                        <h3 className="font-semibold text-blue-900">Or Use Image URL</h3>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="url" className="text-sm font-medium">
-                          External Image URL
-                        </Label>
-                        <Input
-                          id="url"
-                          value={formData.url}
-                          onChange={(e) => {
-                            setFormData({ ...formData, url: e.target.value })
-                            if (e.target.value && !selectedFile) {
-                              setPreviewUrl(e.target.value)
-                            }
-                          }}
-                          placeholder="https://example.com/image.jpg"
-                          className="h-11 bg-background"
-                          disabled={isSaving || !!selectedFile}
-                        />
-                        {selectedFile && (
-                          <p className="text-xs text-amber-600">
-                            ℹ️ Clear the uploaded file to use a URL instead
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-              
-              {/* Details Tab */}
-              {currentTab === 'details' && (
-                <div className="space-y-5">
-                  {/* Photo Title */}
-                  <Card className="border-2 border-cyan-100 !bg-background">
-                    <CardContent className="pt-5">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100">
-                          <ImageIcon className="h-4 w-4 text-cyan-600" weight="duotone" />
-                        </div>
-                        <h3 className="font-semibold text-cyan-900">Photo Information</h3>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="title" className="text-sm font-medium">
-                          Photo Title <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="title"
-                          value={formData.title}
-                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          placeholder="e.g., Wedding Ceremony 2024"
-                          className="h-11 bg-background"
-                          disabled={isSaving}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          A descriptive title helps organize and find your photos
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Category Selection */}
+                  {/* Category Selection for Bulk */}
                   <Card className="border-2 border-indigo-100 !bg-background">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
                           <FolderSimple className="h-4 w-4 text-indigo-600" weight="duotone" />
                         </div>
-                        <h3 className="font-semibold text-indigo-900">Category / Folder</h3>
+                        <h3 className="font-semibold text-indigo-900">Category for All Photos</h3>
                       </div>
                       
-                      <div className="space-y-3">
-                        <Label htmlFor="category" className="text-sm font-medium">
-                          Select Category
-                        </Label>
-                        <Select
-                          value={formData.category}
-                          onValueChange={(value) => setFormData({ ...formData, category: value })}
-                          disabled={isSaving}
-                        >
-                          <SelectTrigger id="category" className="h-11 bg-background">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="books">📚 Books</SelectItem>
-                            <SelectItem value="gallery">🖼️ Gallery</SelectItem>
-                            <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
-                            <SelectItem value="pooja">🙏 Pooja</SelectItem>
-                            <SelectItem value="wedding">💒 Wedding</SelectItem>
-                            <SelectItem value="charity">❤️ Charity</SelectItem>
-                            <SelectItem value="events">🎉 Events</SelectItem>
-                            <SelectItem value="general">📁 General</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <Select
+                        value={bulkCategory}
+                        onValueChange={setBulkCategory}
+                        disabled={isUploading}
+                      >
+                        <SelectTrigger className="h-11 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="books">📚 Books</SelectItem>
+                          <SelectItem value="gallery">🖼️ Gallery</SelectItem>
+                          <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
+                          <SelectItem value="pooja">🙏 Pooja</SelectItem>
+                          <SelectItem value="wedding">💒 Wedding</SelectItem>
+                          <SelectItem value="charity">❤️ Charity</SelectItem>
+                          <SelectItem value="events">🎉 Events</SelectItem>
+                          <SelectItem value="general">📁 General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </CardContent>
+                  </Card>
+
+                  {/* Bulk Upload Area */}
+                  <Card className="border-2 border-teal-100 !bg-background">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
+                            <CloudArrowUp className="h-4 w-4 text-teal-600" weight="duotone" />
+                          </div>
+                          <h3 className="font-semibold text-teal-900">Select Multiple Images</h3>
+                        </div>
+                        {selectedFiles.length > 0 && (
+                          <Badge variant="secondary">
+                            {selectedFiles.length} file(s) selected
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div 
+                        className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all border-gray-200 hover:border-teal-400 hover:bg-teal-50/30"
+                        onClick={() => bulkFileInputRef.current?.click()}
+                      >
+                        <input
+                          ref={bulkFileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                          onChange={handleMultiFileSelect}
+                          className="hidden"
+                          multiple
+                          disabled={isUploading}
+                        />
                         
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map((cat) => (
-                            <Badge 
-                              key={cat}
-                              variant="outline" 
-                              className={`cursor-pointer transition-all capitalize ${
-                                formData.category === cat 
-                                  ? 'bg-indigo-100 border-indigo-300 text-indigo-700' 
-                                  : 'hover:bg-indigo-50'
-                              }`}
-                              onClick={() => setFormData({ ...formData, category: cat })}
-                            >
-                              {cat}
-                            </Badge>
-                          ))}
+                        <div className="py-4">
+                          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mx-auto mb-4">
+                            <Images className="h-8 w-8 text-teal-600" weight="duotone" />
+                          </div>
+                          <p className="font-medium text-gray-700">
+                            Click to select multiple images
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            JPEG, PNG, GIF, WebP, SVG (max 10MB each)
+                          </p>
+                          <p className="text-xs text-teal-600 mt-1">
+                            You can select multiple files at once
+                          </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                  
-                  {/* Preview */}
-                  {previewUrl && formData.title && (
-                    <div className="rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 p-4 border border-cyan-200">
-                      <h4 className="font-medium text-cyan-800 text-sm mb-3">👁️ Preview</h4>
-                      <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <div className="flex gap-4">
-                          <img 
-                            src={previewUrl} 
-                            alt="Preview" 
-                            className="w-24 h-24 rounded-lg object-cover shadow-sm"
-                          />
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{formData.title}</h4>
-                            <Badge variant="outline" className="mt-2 capitalize">
-                              {formData.category}
-                            </Badge>
+
+                  {/* Upload Queue */}
+                  {selectedFiles.length > 0 && (
+                    <Card className="border-2 border-cyan-100 !bg-background">
+                      <CardContent className="pt-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100">
+                              <FileImage className="h-4 w-4 text-cyan-600" weight="duotone" />
+                            </div>
+                            <h3 className="font-semibold text-cyan-900">Upload Queue</h3>
+                          </div>
+                          {!isUploading && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedFiles([])}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              Clear All
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Progress Bar */}
+                        {isUploading && (
+                          <div className="mb-4 space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">
+                                Uploading {uploadingCount.current} of {uploadingCount.total}
+                              </span>
+                              <span className="font-medium">{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} className="h-2" />
+                          </div>
+                        )}
+
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {selectedFiles.map((item, index) => (
+                            <div 
+                              key={index} 
+                              className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                item.status === 'success' 
+                                  ? 'bg-green-50 border-green-200' 
+                                  : item.status === 'error'
+                                    ? 'bg-red-50 border-red-200'
+                                    : item.status === 'uploading'
+                                      ? 'bg-blue-50 border-blue-200'
+                                      : 'bg-gray-50 border-gray-200'
+                              }`}
+                            >
+                              <img 
+                                src={item.preview} 
+                                alt={item.title}
+                                className="w-12 h-12 rounded object-cover"
+                              />
+                              <div className="flex-1 min-w-0">
+                                {item.status === 'pending' && !isUploading ? (
+                                  <Input
+                                    value={item.title}
+                                    onChange={(e) => updateFileTitle(index, e.target.value)}
+                                    className="h-8 text-sm"
+                                    placeholder="Enter title..."
+                                  />
+                                ) : (
+                                  <p className="text-sm font-medium truncate">{item.title}</p>
+                                )}
+                                {item.error && (
+                                  <p className="text-xs text-red-500 mt-1">{item.error}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {item.status === 'pending' && (
+                                  <Badge variant="outline" className="text-xs">Pending</Badge>
+                                )}
+                                {item.status === 'uploading' && (
+                                  <Spinner className="h-4 w-4 animate-spin text-blue-500" />
+                                )}
+                                {item.status === 'success' && (
+                                  <CheckCircle className="h-5 w-5 text-green-500" weight="fill" />
+                                )}
+                                {item.status === 'error' && (
+                                  <WarningCircle className="h-5 w-5 text-red-500" weight="fill" />
+                                )}
+                                {item.status === 'pending' && !isUploading && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeFileFromQueue(index)}
+                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              ) : (
+                /* SINGLE UPLOAD MODE */
+                <>
+                  {/* Upload Tab */}
+                  {currentTab === 'upload' && (
+                    <div className="space-y-5">
+                      {/* Image Upload Area */}
+                      <Card className="border-2 border-teal-100 !bg-background">
+                        <CardContent className="pt-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
+                              <CloudArrowUp className="h-4 w-4 text-teal-600" weight="duotone" />
+                            </div>
+                            <h3 className="font-semibold text-teal-900">Upload Image</h3>
+                          </div>
+                          
+                          <div 
+                            className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                              previewUrl 
+                                ? 'border-teal-300 bg-teal-50/50' 
+                                : 'border-gray-200 hover:border-teal-400 hover:bg-teal-50/30'
+                            }`}
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                              onChange={handleFileSelect}
+                              className="hidden"
+                              disabled={isSaving}
+                            />
+                            
+                            {previewUrl ? (
+                              <div className="relative">
+                                <img 
+                                  src={previewUrl} 
+                                  alt="Preview" 
+                                  className="max-h-56 mx-auto rounded-lg object-contain shadow-md"
+                                />
+                                <div className="mt-3 flex items-center justify-center gap-2">
+                                  <Badge variant="outline" className="bg-teal-100 border-teal-300">
+                                    <FileImage className="h-3 w-3 mr-1" />
+                                    {selectedFile ? selectedFile.name : 'Current image'}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  Click to change image
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="py-8">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mx-auto mb-4">
+                                  <CloudArrowUp className="h-8 w-8 text-teal-600" weight="duotone" />
+                                </div>
+                                <p className="font-medium text-gray-700">
+                                  Click to upload an image
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  JPEG, PNG, GIF, WebP, SVG (max 10MB)
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Or use URL */}
+                      <Card className="border-2 border-blue-100 !bg-background">
+                        <CardContent className="pt-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                              <Link className="h-4 w-4 text-blue-600" weight="duotone" />
+                            </div>
+                            <h3 className="font-semibold text-blue-900">Or Use Image URL</h3>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="url" className="text-sm font-medium">
+                              External Image URL
+                            </Label>
+                            <Input
+                              id="url"
+                              value={formData.url}
+                              onChange={(e) => {
+                                setFormData({ ...formData, url: e.target.value })
+                                if (e.target.value && !selectedFile) {
+                                  setPreviewUrl(e.target.value)
+                                }
+                              }}
+                              placeholder="https://example.com/image.jpg"
+                              className="h-11 bg-background"
+                              disabled={isSaving || !!selectedFile}
+                            />
                             {selectedFile && (
-                              <p className="text-xs text-muted-foreground mt-2">
-                                📤 Will be uploaded to cloud storage
+                              <p className="text-xs text-amber-600">
+                                ℹ️ Clear the uploaded file to use a URL instead
                               </p>
                             )}
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     </div>
                   )}
-                </div>
+                  
+                  {/* Details Tab */}
+                  {currentTab === 'details' && (
+                    <div className="space-y-5">
+                      {/* Photo Title */}
+                      <Card className="border-2 border-cyan-100 !bg-background">
+                        <CardContent className="pt-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100">
+                              <ImageIcon className="h-4 w-4 text-cyan-600" weight="duotone" />
+                            </div>
+                            <h3 className="font-semibold text-cyan-900">Photo Information</h3>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="title" className="text-sm font-medium">
+                              Photo Title <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                              id="title"
+                              value={formData.title}
+                              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                              placeholder="e.g., Wedding Ceremony 2024"
+                              className="h-11 bg-background"
+                              disabled={isSaving}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              A descriptive title helps organize and find your photos
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Category Selection */}
+                      <Card className="border-2 border-indigo-100 !bg-background">
+                        <CardContent className="pt-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
+                              <FolderSimple className="h-4 w-4 text-indigo-600" weight="duotone" />
+                            </div>
+                            <h3 className="font-semibold text-indigo-900">Category / Folder</h3>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <Label htmlFor="category" className="text-sm font-medium">
+                              Select Category
+                            </Label>
+                            <Select
+                              value={formData.category}
+                              onValueChange={(value) => setFormData({ ...formData, category: value })}
+                              disabled={isSaving}
+                            >
+                              <SelectTrigger id="category" className="h-11 bg-background">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="books">📚 Books</SelectItem>
+                                <SelectItem value="gallery">🖼️ Gallery</SelectItem>
+                                <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
+                                <SelectItem value="pooja">🙏 Pooja</SelectItem>
+                                <SelectItem value="wedding">💒 Wedding</SelectItem>
+                                <SelectItem value="charity">❤️ Charity</SelectItem>
+                                <SelectItem value="events">🎉 Events</SelectItem>
+                                <SelectItem value="general">📁 General</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map((cat) => (
+                                <Badge 
+                                  key={cat}
+                                  variant="outline" 
+                                  className={`cursor-pointer transition-all capitalize ${
+                                    formData.category === cat 
+                                      ? 'bg-indigo-100 border-indigo-300 text-indigo-700' 
+                                      : 'hover:bg-indigo-50'
+                                  }`}
+                                  onClick={() => setFormData({ ...formData, category: cat })}
+                                >
+                                  {cat}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Preview */}
+                      {previewUrl && formData.title && (
+                        <div className="rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 p-4 border border-cyan-200">
+                          <h4 className="font-medium text-cyan-800 text-sm mb-3">👁️ Preview</h4>
+                          <div className="bg-white rounded-lg p-4 shadow-sm">
+                            <div className="flex gap-4">
+                              <img 
+                                src={previewUrl} 
+                                alt="Preview" 
+                                className="w-24 h-24 rounded-lg object-cover shadow-sm"
+                              />
+                              <div className="flex-1">
+                                <h4 className="font-semibold">{formData.title}</h4>
+                                <Badge variant="outline" className="mt-2 capitalize">
+                                  {formData.category}
+                                </Badge>
+                                {selectedFile && (
+                                  <p className="text-xs text-muted-foreground mt-2">
+                                    📤 Will be uploaded to cloud storage
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
             
@@ -623,7 +1008,7 @@ export default function AdminPhotos() {
             <div className="border-t bg-muted/30 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {currentTab !== 'upload' && (
+                  {!isBulkMode && currentTab !== 'upload' && (
                     <Button
                       type="button"
                       variant="outline"
@@ -643,14 +1028,33 @@ export default function AdminPhotos() {
                       setIsDialogOpen(false)
                       setSelectedFile(null)
                       setPreviewUrl(null)
+                      setSelectedFiles([])
                     }}
-                    disabled={isSaving}
+                    disabled={isUploading}
                   >
                     <X className="h-4 w-4 mr-2" />
                     Cancel
                   </Button>
                   
-                  {currentTab === 'upload' ? (
+                  {isBulkMode ? (
+                    <Button 
+                      onClick={handleBulkUpload} 
+                      disabled={isUploading || selectedFiles.filter(f => f.status === 'pending').length === 0}
+                      className="gap-2 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Spinner className="h-4 w-4 animate-spin" />
+                          Uploading {uploadingCount.current}/{uploadingCount.total}...
+                        </>
+                      ) : (
+                        <>
+                          <CloudArrowUp className="h-4 w-4" weight="bold" />
+                          Upload {selectedFiles.filter(f => f.status === 'pending').length} Photo(s)
+                        </>
+                      )}
+                    </Button>
+                  ) : currentTab === 'upload' ? (
                     <Button
                       type="button"
                       onClick={() => setCurrentTab('details')}

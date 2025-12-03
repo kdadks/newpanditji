@@ -269,6 +269,132 @@ export interface BookRow {
 export type BookInsert = Omit<BookRow, 'id' | 'created_at' | 'updated_at'>
 export type BookUpdate = Partial<BookInsert>
 
+// Page types - matches migration 20241203000002_pages.sql
+export interface PageRow {
+  id: string
+  slug: string
+  title: string
+  meta_title: string | null
+  meta_description: string | null
+  meta_keywords: string[] | null
+  og_title: string | null
+  og_description: string | null
+  og_image_url: string | null
+  canonical_url: string | null
+  is_published: boolean
+  is_indexed: boolean
+  template_type: string
+  custom_css: string | null
+  custom_js: string | null
+  sort_order: number
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type PageInsert = Omit<PageRow, 'id' | 'created_at' | 'updated_at'>
+export type PageUpdate = Partial<PageInsert>
+
+// Page Section types - matches migration 20241203000002_pages.sql
+export interface PageSectionRow {
+  id: string
+  page_id: string
+  section_key: string
+  section_type: string
+  title: string | null
+  subtitle: string | null
+  content: Record<string, unknown>
+  background_color: string | null
+  background_image_url: string | null
+  sort_order: number
+  is_visible: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type PageSectionInsert = Omit<PageSectionRow, 'id' | 'created_at' | 'updated_at'>
+export type PageSectionUpdate = Partial<PageSectionInsert>
+
+// Site Settings types - matches migration 20241203000011_settings.sql
+export interface SiteSettingsRow {
+  id: string
+  primary_email: string | null
+  secondary_email: string | null
+  primary_phone: string | null
+  secondary_phone: string | null
+  whatsapp_number: string | null
+  address: string | null
+  address_line2: string | null
+  city: string | null
+  state: string | null
+  country: string
+  postal_code: string | null
+  business_hours: Record<string, unknown> | null
+  timezone: string
+  facebook_page_url: string | null
+  instagram_url: string | null
+  youtube_channel_url: string | null
+  twitter_url: string | null
+  linkedin_url: string | null
+  enable_contact_form: boolean
+  enable_testimonials: boolean
+  enable_blog: boolean
+  enable_gallery: boolean
+  enable_books: boolean
+  enable_charity: boolean
+  enable_booking: boolean
+  enable_newsletter: boolean
+  maintenance_mode: boolean
+  maintenance_message: string | null
+  maintenance_end_time: string | null
+  site_logo_url: string | null
+  site_logo_dark_url: string | null
+  site_favicon_url: string | null
+  primary_color: string
+  secondary_color: string
+  accent_color: string
+  footer_text: string | null
+  copyright_text: string | null
+  updated_by: string | null
+  updated_at: string
+}
+
+export type SiteSettingsUpdate = Partial<Omit<SiteSettingsRow, 'id' | 'updated_at'>>
+
+// Menu types - matches migration 20241203000011_settings.sql
+export interface MenuRow {
+  id: string
+  name: string
+  location: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type MenuInsert = Omit<MenuRow, 'id' | 'created_at' | 'updated_at'>
+export type MenuUpdate = Partial<MenuInsert>
+
+// Menu Item types - matches migration 20241203000011_settings.sql
+export interface MenuItemRow {
+  id: string
+  menu_id: string
+  parent_id: string | null
+  label: string
+  url: string
+  page_id: string | null
+  icon: string | null
+  target: string
+  css_class: string | null
+  sort_order: number
+  is_visible: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type MenuItemInsert = Omit<MenuItemRow, 'id' | 'created_at' | 'updated_at'>
+export type MenuItemUpdate = Partial<MenuItemInsert>
+
 // Helper function to extract YouTube video ID from various URL formats
 export function extractYouTubeId(url: string): string | null {
   const patterns = [

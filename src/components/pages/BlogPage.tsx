@@ -26,8 +26,8 @@ export default function BlogPage() {
   // Use database blogs if available, otherwise fall back to defaults
   const blogArticles = (dbBlogs && dbBlogs.length > 0) ? dbBlogs : defaultBlogs
 
-  // Get unique categories
-  const categories = [...new Set(blogArticles.map(article => article.category))]
+  // Get unique categories (filter out undefined/null values)
+  const categories = [...new Set(blogArticles.map(article => article.category).filter((c): c is string => Boolean(c)))]
 
   return (
     <div className="w-full">
@@ -87,8 +87,8 @@ export default function BlogPage() {
           <Badge variant="secondary" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
             All Articles
           </Badge>
-          {categories.map(category => (
-            <Badge key={category} variant="outline" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
+          {categories.map((category, index) => (
+            <Badge key={category || `category-${index}`} variant="outline" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
               {category}
             </Badge>
           ))}
