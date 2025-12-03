@@ -79,7 +79,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -92,7 +92,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             {/* Left side - Image */}
             <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
                   src="/images/Logo/Raj ji.png"
                   alt="Pandit Rajesh Joshi"
@@ -183,7 +183,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </div>
 
-      <section className="pt-12 md:pt-16 pb-2 md:pb-4 bg-gradient-to-b from-background to-muted/20">
+      <section className="pt-12 md:pt-16 pb-2 md:pb-4 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -212,9 +212,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <Card 
                 key={`${service.id}-1`}
                 onClick={() => onNavigate({ page: 'services', category: service.category })}
-                className="group relative flex-shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
+                className="group relative shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <CardContent className="relative p-6 flex flex-col h-full min-h-[280px]">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
@@ -229,7 +229,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     {service.name}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow line-clamp-3">
+                  <p className="text-muted-foreground mb-4 leading-relaxed grow line-clamp-3">
                     {service.description}
                   </p>
 
@@ -250,10 +250,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <Card 
                 key={`${service.id}-2`}
                 onClick={() => onNavigate({ page: 'services', category: service.category })}
-                className="group relative flex-shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
+                className="group relative shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
                 aria-hidden="true"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <CardContent className="relative p-6 flex flex-col h-full min-h-[280px]">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
@@ -268,7 +268,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     {service.name}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 leading-relaxed flex-grow line-clamp-3">
+                  <p className="text-muted-foreground mb-4 leading-relaxed grow line-clamp-3">
                     {service.description}
                   </p>
 
@@ -303,7 +303,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Sacred Spaces Gallery Section */}
-      <section className="py-8 md:py-12 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-8 md:py-12 bg-linear-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-3">
@@ -324,7 +324,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   alt="Divine Vaidyanath Temple"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-white font-semibold text-lg mb-1">Divine Vaidyanath Temple</h3>
                   <p className="text-white/80 text-xs">Sacred Hindu Architecture</p>
@@ -339,7 +339,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   alt="Golden Temples"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-white font-semibold text-lg mb-1">Golden Temples</h3>
                   <p className="text-white/80 text-xs">Places of Worship & Devotion</p>
@@ -354,7 +354,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   alt="South Asian Temple Complex"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-white font-semibold text-lg mb-1">Temple Complex</h3>
                   <p className="text-white/80 text-xs">Traditional Sacred Grounds</p>
@@ -369,7 +369,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   alt="Traditional Altar"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-white font-semibold text-lg mb-1">Sacred Altar</h3>
                   <p className="text-white/80 text-xs">Adorned with Marigold Flowers</p>

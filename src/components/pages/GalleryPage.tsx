@@ -114,7 +114,7 @@ export default function GalleryPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -247,7 +247,7 @@ export default function GalleryPage() {
             {/* Videos Grid */}
             <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredVideos.map((video, index) => (
-                <Card key={video.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
+                <Card key={video.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
                   <CardContent className="p-0">
                     <div className="aspect-video relative overflow-hidden">
                       <iframe
@@ -290,7 +290,7 @@ export default function GalleryPage() {
 
           <TabsContent value="photos">
             {!photos || photos.length === 0 ? (
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-muted/50 to-muted/20">
+              <Card className="border-0 shadow-xl bg-linear-to-br from-muted/50 to-muted/20">
                 <CardContent className="p-12 md:p-16 text-center">
                   <div className="relative mb-8">
                     <Images className="mx-auto text-muted-foreground" size={80} />

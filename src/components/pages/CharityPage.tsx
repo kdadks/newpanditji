@@ -58,7 +58,7 @@ export default function CharityPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -70,7 +70,7 @@ export default function CharityPage() {
           {/* Hero Content */}
           <div className="text-center mb-8">
             <div className="relative inline-block mb-8">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-400/30 rounded-full blur-2xl scale-110"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-amber-400/30 to-orange-400/30 rounded-full blur-2xl scale-110"></div>
               <Heart className="relative text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" size={80} weight="fill" />
               <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
                 <Sparkle size={16} weight="fill" />
@@ -119,7 +119,7 @@ export default function CharityPage() {
         {/* Featured Projects */}
         <div className="space-y-12 mb-16">
           {projects.map((project, index) => (
-            <Card key={project.id} className="border-0 shadow-2xl bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden">
+            <Card key={project.id} className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden">
               <CardContent className="p-0">
                 <div className={`grid grid-cols-1 lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''}`}>
                   <div className="p-8 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
@@ -168,7 +168,7 @@ export default function CharityPage() {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                      <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                         <div className="text-center">
                           <Book className="text-primary/60 mx-auto mb-4" size={64} />
                           <p className="text-primary/60 font-medium">Sacred Wisdom</p>
@@ -184,7 +184,7 @@ export default function CharityPage() {
 
         {/* Service Areas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10 text-center">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10 text-center">
             <CardContent className="p-8">
               <Book className="mx-auto mb-6 text-primary" size={48} />
               <h3 className="font-heading font-semibold text-xl mb-4">Scripture Distribution</h3>
@@ -198,7 +198,7 @@ export default function CharityPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10 text-center">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10 text-center">
             <CardContent className="p-8">
               <Users className="mx-auto mb-6 text-primary" size={48} weight="fill" />
               <h3 className="font-heading font-semibold text-xl mb-4">Community Education</h3>
@@ -212,7 +212,7 @@ export default function CharityPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/5 to-secondary/10 text-center">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10 text-center">
             <CardContent className="p-8">
               <HandHeart className="mx-auto mb-6 text-primary" size={48} weight="fill" />
               <h3 className="font-heading font-semibold text-xl mb-4">Spiritual Support</h3>
@@ -228,7 +228,7 @@ export default function CharityPage() {
         </div>
 
         {/* Mission Statement */}
-        <Card className="border-0 shadow-xl bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
+        <Card className="border-0 shadow-xl bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
           <CardContent className="p-8 md:p-12">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -241,7 +241,7 @@ export default function CharityPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Globe className="text-primary" size={20} />
                   </div>
                   <div>
@@ -253,7 +253,7 @@ export default function CharityPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Heart className="text-primary" size={20} weight="fill" />
                   </div>
                   <div>
@@ -265,7 +265,7 @@ export default function CharityPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Trophy className="text-primary" size={20} />
                   </div>
                   <div>
@@ -279,8 +279,8 @@ export default function CharityPage() {
 
               <div className="text-center">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
-                  <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-full p-8">
+                  <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                  <div className="relative bg-linear-to-br from-primary/10 to-accent/10 rounded-full p-8">
                     <Heart className="text-primary mx-auto" size={64} weight="fill" />
                   </div>
                 </div>
@@ -293,7 +293,7 @@ export default function CharityPage() {
         </Card>
 
         {/* Call to Action */}
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 to-accent/10">
+        <Card className="border-0 shadow-xl bg-linear-to-br from-primary/10 to-accent/10">
           <CardContent className="p-8 md:p-12 text-center">
             <HandHeart className="mx-auto mb-6 text-primary" size={48} weight="fill" />
 

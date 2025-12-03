@@ -84,13 +84,13 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-heading font-semibold text-lg mb-4">Contact</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm">
-                <EnvelopeSimple size={18} className="mt-0.5 flex-shrink-0" />
+                <EnvelopeSimple size={18} className="mt-0.5 shrink-0" />
                 <a href="mailto:panditjoshirajesh@gmail.com" className="hover:text-accent transition-colors">
                   panditjoshirajesh@gmail.com
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm">
-                <MapPin size={18} className="mt-0.5 flex-shrink-0" />
+                <MapPin size={18} className="mt-0.5 shrink-0" />
                 <span>Serving communities worldwide</span>
               </li>
             </ul>

@@ -67,7 +67,7 @@ export default function ContactPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -120,7 +120,7 @@ export default function ContactPage() {
         {/* Contact Form & Info */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto mb-16">
           {/* Contact Form */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/80">
+          <Card className="border-0 shadow-xl bg-linear-to-br from-card to-card/80">
             <CardContent className="p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-primary/10 rounded-lg">
@@ -211,7 +211,7 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/5 to-primary/10">
+            <Card className="border-0 shadow-xl bg-linear-to-br from-primary/5 to-primary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -222,7 +222,7 @@ export default function ContactPage() {
 
                 <div className="space-y-6">
                   <div className="flex items-start gap-4 p-4 bg-white/50 rounded-lg hover:bg-white/70 transition-colors">
-                    <EnvelopeSimple size={24} className="text-primary mt-1 flex-shrink-0" />
+                    <EnvelopeSimple size={24} className="text-primary mt-1 shrink-0" />
                     <div>
                       <p className="font-semibold mb-1 text-foreground">Email</p>
                       <a href="mailto:panditjoshirajesh@gmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">
@@ -233,7 +233,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 bg-white/50 rounded-lg hover:bg-white/70 transition-colors">
-                    <WhatsappLogo size={24} className="text-primary mt-1 flex-shrink-0" weight="fill" />
+                    <WhatsappLogo size={24} className="text-primary mt-1 shrink-0" weight="fill" />
                     <div>
                       <p className="font-semibold mb-1 text-foreground">WhatsApp</p>
                       <a href="https://wa.me/353123456789" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors text-sm">
@@ -244,7 +244,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 bg-white/50 rounded-lg hover:bg-white/70 transition-colors">
-                    <MapPin size={24} className="text-primary mt-1 flex-shrink-0" />
+                    <MapPin size={24} className="text-primary mt-1 shrink-0" />
                     <div>
                       <p className="font-semibold mb-1 text-foreground">Service Area</p>
                       <p className="text-muted-foreground text-sm">
@@ -257,7 +257,7 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-gradient-to-r from-accent/10 via-primary/5 to-secondary/10">
+            <Card className="border-0 shadow-lg bg-linear-to-r from-accent/10 via-primary/5 to-secondary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-accent/10 rounded-lg">
@@ -290,13 +290,13 @@ export default function ContactPage() {
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
 
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/80">
+          <Card className="border-0 shadow-xl bg-linear-to-br from-card to-card/80">
             <CardContent className="p-8">
               <Accordion type="single" collapsible className="w-full space-y-4">
                 <AccordionItem value="item-1" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">1</span>
                       </div>
                       How do I book a ceremony?
@@ -311,7 +311,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-2" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">2</span>
                       </div>
                       Do you provide the pooja materials (samagri)?
@@ -326,7 +326,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-3" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">3</span>
                       </div>
                       What is the dakshina/fee structure?
@@ -341,7 +341,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-4" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">4</span>
                       </div>
                       Can ceremonies be performed virtually?
@@ -356,7 +356,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-5" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">5</span>
                       </div>
                       How far in advance should I book?
@@ -372,7 +372,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-6" className="border-0 bg-white/50 rounded-lg px-6">
                   <AccordionTrigger className="text-left hover:text-primary transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <span className="text-primary font-semibold text-sm">6</span>
                       </div>
                       Do you explain the rituals during ceremonies?

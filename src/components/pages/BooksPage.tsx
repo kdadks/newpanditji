@@ -195,7 +195,7 @@ export default function BooksPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -250,7 +250,7 @@ export default function BooksPage() {
                   onClick={() => handleBookClick(book)}
                 >
                   {/* Book Cover Image */}
-                  <div className="relative h-80 overflow-hidden bg-gradient-to-br from-muted/50 to-muted flex-shrink-0">
+                  <div className="relative h-80 overflow-hidden bg-linear-to-br from-muted/50 to-muted shrink-0">
                     <img
                       src={book.coverImage}
                       alt={book.title}
@@ -263,12 +263,12 @@ export default function BooksPage() {
                     </div>
                   </div>
 
-                  <CardContent className="p-6 flex flex-col flex-grow">
+                  <CardContent className="p-6 flex flex-col grow">
                     <h3 className="font-heading font-bold text-xl mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {book.title}
                     </h3>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 grow">
                       {book.subtitle}
                     </p>
 
@@ -282,7 +282,7 @@ export default function BooksPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="mt-16 text-center p-8 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
+          <div className="mt-16 text-center p-8 rounded-lg bg-linear-to-br from-primary/5 to-accent/5 border border-primary/10">
             <BookOpen className="mx-auto mb-4 text-primary" size={48} weight="fill" />
             <h2 className="font-heading font-bold text-2xl md:text-3xl mb-3">
               Interested in These Books?
@@ -305,7 +305,7 @@ export default function BooksPage() {
               <DialogHeader>
                 <div className="flex flex-col md:flex-row items-start gap-6 mb-4">
                   {/* Book Cover Image */}
-                  <div className="w-full md:w-48 flex-shrink-0">
+                  <div className="w-full md:w-48 shrink-0">
                     <img
                       src={selectedBook.coverImage}
                       alt={selectedBook.title}
@@ -329,7 +329,7 @@ export default function BooksPage() {
 
               <div className="space-y-6 mt-4">
                 {/* Full Description */}
-                <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-indigo-50">
+                <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
                   <CardContent className="p-6">
                     <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
                       <BookOpen className="text-primary" size={24} />
@@ -343,7 +343,7 @@ export default function BooksPage() {
 
                 {/* Chapters */}
                 {selectedBook.chapters && selectedBook.chapters.length > 0 && (
-                  <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-violet-50">
+                  <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-violet-50">
                     <CardContent className="p-6">
                       <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                         <BookBookmark className="text-primary" size={24} weight="fill" />
@@ -362,7 +362,7 @@ export default function BooksPage() {
                 )}
 
                 {/* Key Topics */}
-                <Card className="border-0 shadow-md bg-gradient-to-br from-green-50 to-emerald-50">
+                <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
                   <CardContent className="p-6">
                     <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                       <Lightbulb className="text-primary" size={24} weight="fill" />
@@ -371,7 +371,7 @@ export default function BooksPage() {
                     <ul className="space-y-2">
                       {selectedBook.keyTopics.map((topic, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <Sparkle className="text-primary mt-0.5 flex-shrink-0" size={16} weight="fill" />
+                          <Sparkle className="text-primary mt-0.5 shrink-0" size={16} weight="fill" />
                           <span className="text-muted-foreground text-sm">{topic}</span>
                         </li>
                       ))}
@@ -380,7 +380,7 @@ export default function BooksPage() {
                 </Card>
 
                 {/* Target Audience */}
-                <Card className="border-0 shadow-md bg-gradient-to-br from-orange-50 to-amber-50">
+                <Card className="border-0 shadow-md bg-linear-to-br from-orange-50 to-amber-50">
                   <CardContent className="p-6">
                     <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
                       <Users className="text-primary" size={24} weight="fill" />

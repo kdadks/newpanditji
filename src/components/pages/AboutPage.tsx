@@ -71,7 +71,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -84,7 +84,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             {/* Left side - Image */}
             <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
                   src="/images/Logo/Raj ji.png"
                   alt="Pandit Rajesh Joshi"
@@ -154,27 +154,27 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
       </section>
 
       {/* Content Section */}
-      <section className="pt-12 md:pt-16 pb-8 md:pb-12 bg-gradient-to-b from-background to-muted/20">
+      <section className="pt-12 md:pt-16 pb-8 md:pb-12 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
 
         {/* Quick Stats Cards - Removed as stats are now in hero */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 hidden">
-          <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="text-center p-4 rounded-lg bg-linear-to-br from-primary/5 to-primary/10">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-2">200+</div>
             <div className="text-sm text-muted-foreground font-medium">Poojas Performed</div>
             <div className="text-xs text-muted-foreground/70 mt-1">Since 2001</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10">
+          <div className="text-center p-4 rounded-lg bg-linear-to-br from-accent/5 to-accent/10">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-2">100+</div>
             <div className="text-sm text-muted-foreground font-medium">Poems Composed</div>
             <div className="text-xs text-muted-foreground/70 mt-1">Hindi Poetry</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-gradient-to-br from-secondary/5 to-secondary/10">
+          <div className="text-center p-4 rounded-lg bg-linear-to-br from-secondary/5 to-secondary/10">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-2">10+</div>
             <div className="text-sm text-muted-foreground font-medium">Years Teaching</div>
             <div className="text-xs text-muted-foreground/70 mt-1">eYogi Gurukul</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5">
+          <div className="text-center p-4 rounded-lg bg-linear-to-br from-primary/5 to-accent/5">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-2">5+</div>
             <div className="text-sm text-muted-foreground font-medium">Published Books</div>
             <div className="text-xs text-muted-foreground/70 mt-1">On Hinduism</div>
@@ -185,7 +185,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {/* Left Column - Spiritual Journey (Takes 2 columns) */}
           <div className="lg:col-span-2">
-            <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-card to-card/50">
+            <Card className="h-full border-0 shadow-lg bg-linear-to-br from-card to-card/50">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -232,7 +232,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
 
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-6">
                     <div className="flex items-start gap-4">
-                      <Book className="text-primary flex-shrink-0 mt-1" size={24} />
+                      <Book className="text-primary shrink-0 mt-1" size={24} />
                       <div>
                         <h4 className="font-semibold text-foreground mb-2">Literary Contributions</h4>
                         <p className="text-sm text-muted-foreground mb-3">
@@ -251,7 +251,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
 
                   <div className="bg-accent/5 border border-accent/20 rounded-lg p-5 mt-4">
                     <div className="flex items-start gap-4">
-                      <Pencil className="text-primary flex-shrink-0 mt-1" size={24} />
+                      <Pencil className="text-primary shrink-0 mt-1" size={24} />
                       <div>
                         <h4 className="font-semibold text-foreground mb-2">Poetry & Public Speaking</h4>
                         <p className="text-sm text-muted-foreground">
@@ -270,7 +270,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
           {/* Right Column - Combined Cards (Takes 1 column) */}
           <div className="lg:col-span-1 space-y-6">
             {/* Areas of Interest & Expertise Card */}
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-accent/5 to-secondary/5">
+            <Card className="border-0 shadow-lg bg-linear-to-br from-accent/5 to-secondary/5">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -317,7 +317,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             </Card>
 
             {/* Academic Excellence Card */}
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10">
               <CardContent className="p-6 text-center">
                 <GraduationCap className="mx-auto mb-4 text-primary" size={48} />
                 <h3 className="font-heading font-semibold text-xl mb-3">Academic Excellence</h3>
@@ -329,7 +329,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             </Card>
 
             {/* Irish Industrialist Card */}
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10">
               <CardContent className="p-6 text-center">
                 <Briefcase className="mx-auto mb-4 text-primary" size={48} />
                 <h3 className="font-heading font-semibold text-xl mb-3">Irish Industrialist</h3>
@@ -341,7 +341,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             </Card>
 
             {/* eYogi Gurukul Card */}
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/5 to-secondary/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10">
               <CardContent className="p-6 text-center">
                 <HandHeart className="mx-auto mb-4 text-primary" size={48} weight="fill" />
                 <h3 className="font-heading font-semibold text-xl mb-3">eYogi Gurukul</h3>
@@ -391,7 +391,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         </div>
 
         {/* What to Expect Section */}
-        <Card className="mb-16 border-0 shadow-xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+        <Card className="mb-16 border-0 shadow-xl bg-linear-to-br from-primary/5 via-accent/5 to-secondary/5">
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -406,9 +406,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20">
+              <div className="bg-linear-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <BookOpen className="text-primary" size={24} />
                   </div>
                   <div>
@@ -421,9 +421,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-accent/5 to-accent/10 p-6 rounded-lg border border-accent/20">
+              <div className="bg-linear-to-br from-accent/5 to-accent/10 p-6 rounded-lg border border-accent/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                     <Atom className="text-primary" size={24} />
                   </div>
                   <div>
@@ -436,9 +436,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 p-6 rounded-lg border border-secondary/20">
+              <div className="bg-linear-to-br from-secondary/5 to-secondary/10 p-6 rounded-lg border border-secondary/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
                     <FlowerLotus className="text-primary" size={24} weight="fill" />
                   </div>
                   <div>
@@ -451,9 +451,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
+              <div className="bg-linear-to-br from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Users className="text-primary" size={24} weight="fill" />
                   </div>
                   <div>
@@ -466,9 +466,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
+              <div className="bg-linear-to-br from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                     <Book className="text-primary" size={24} />
                   </div>
                   <div>
@@ -481,9 +481,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-secondary/5 to-primary/5 p-6 rounded-lg border border-secondary/20">
+              <div className="bg-linear-to-br from-secondary/5 to-primary/5 p-6 rounded-lg border border-secondary/20">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
                     <Lightbulb className="text-primary" size={24} weight="fill" />
                   </div>
                   <div>
@@ -496,9 +496,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-6 rounded-lg border border-primary/20 md:col-span-2">
+              <div className="bg-linear-to-br from-primary/5 to-secondary/5 p-6 rounded-lg border border-primary/20 md:col-span-2">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Heart className="text-primary" size={24} weight="fill" />
                   </div>
                   <div>
@@ -516,7 +516,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         </Card>
 
         {/* Community Service */}
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-accent/5 to-primary/5">
+        <Card className="border-0 shadow-xl bg-linear-to-br from-accent/5 to-primary/5">
           <CardContent className="p-8">
             <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -527,9 +527,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
+              <div className="bg-linear-to-r from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
                 <div className="flex items-start gap-4">
-                  <BookOpen className="text-primary flex-shrink-0 mt-1" size={32} />
+                  <BookOpen className="text-primary shrink-0 mt-1" size={32} />
                   <div>
                     <h3 className="font-semibold text-lg mb-2 text-foreground">One Notary One Gita Project</h3>
                     <p className="text-muted-foreground">
@@ -540,9 +540,9 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
+              <div className="bg-linear-to-r from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
                 <div className="flex items-start gap-4">
-                  <Heart className="text-primary flex-shrink-0 mt-1" size={32} weight="fill" />
+                  <Heart className="text-primary shrink-0 mt-1" size={32} weight="fill" />
                   <div>
                     <h3 className="font-semibold text-lg mb-2 text-foreground">Seva Without Monetary Gain</h3>
                     <p className="text-muted-foreground">

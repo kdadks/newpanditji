@@ -49,7 +49,7 @@ export default function BlogPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -101,7 +101,7 @@ export default function BlogPage() {
               <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
             </div>
 
-            <Card className="border-0 shadow-2xl bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden">
+            <Card className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden">
               <CardContent className="p-0">
                 <div className="grid grid-cols-1 lg:grid-cols-2">
                   <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -130,7 +130,7 @@ export default function BlogPage() {
                     </Button>
                   </div>
 
-                  <div className="bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12">
+                  <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12">
                     <div className="text-center">
                       <BookOpen className="text-primary/60 mx-auto mb-4" size={80} />
                       <p className="text-primary/60 font-medium">Spiritual Wisdom</p>
@@ -145,8 +145,8 @@ export default function BlogPage() {
         {/* Article Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {blogArticles.slice(1).map((article, index) => (
-            <Card key={article.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Card key={article.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
+              <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
               <CardContent className="relative p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -181,7 +181,7 @@ export default function BlogPage() {
         </div>
 
         {/* Newsletter/Coming Soon */}
-        <Card className="bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 border-0 shadow-xl">
+        <Card className="bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 border-0 shadow-xl">
           <CardContent className="p-8 md:p-12 text-center">
             <BookOpen className="mx-auto mb-6 text-primary" size={48} />
 

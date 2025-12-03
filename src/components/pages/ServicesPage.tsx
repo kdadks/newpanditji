@@ -109,7 +109,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -272,7 +272,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                 <div className="space-y-6 mt-6">
                   {/* Quick Info Bar */}
-                  <div className="flex flex-wrap gap-4 p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20">
+                  <div className="flex flex-wrap gap-4 p-4 bg-linear-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20">
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="text-primary" size={20} />
                       <span className="font-medium">{selectedService.duration}</span>
@@ -330,10 +330,10 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Deity Information */}
                   {selectedService.details?.deity && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-orange-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-orange-50">
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                          <FlowerLotus className="text-primary flex-shrink-0 mt-1" size={32} weight="fill" />
+                          <FlowerLotus className="text-primary shrink-0 mt-1" size={32} weight="fill" />
                           <div>
                             <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
                               Who is {selectedService.details.deity.name}?
@@ -354,7 +354,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Nature and Purpose */}
                   {selectedService.details?.nature && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-indigo-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <BookOpen className="text-primary" size={24} />
@@ -367,7 +367,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                           <ul className="space-y-2">
                             {selectedService.details.purpose.map((item, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                                 <span className="text-muted-foreground text-sm">{item}</span>
                               </li>
                             ))}
@@ -379,7 +379,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Pooja Samagri Section */}
                   {selectedService.samagriFile && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-rose-50 to-pink-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-rose-50 to-pink-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <Package className="text-primary" size={24} weight="fill" />
@@ -388,9 +388,9 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         <div className="bg-white/60 border border-rose-200 rounded-lg p-5 space-y-4">
                           <div className="flex items-start gap-4">
                             {selectedService.samagriFile.type.includes('pdf') ? (
-                              <FilePdf size={48} className="text-red-500 flex-shrink-0" weight="fill" />
+                              <FilePdf size={48} className="text-red-500 shrink-0" weight="fill" />
                             ) : (
-                              <FileDoc size={48} className="text-blue-500 flex-shrink-0" weight="fill" />
+                              <FileDoc size={48} className="text-blue-500 shrink-0" weight="fill" />
                             )}
                             <div className="flex-1">
                               <p className="font-medium text-foreground mb-2">
@@ -444,7 +444,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Significance and Benefits */}
                   {selectedService.details?.significance && selectedService.details.significance.length > 0 && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-green-50 to-emerald-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <Star className="text-primary" size={24} weight="fill" />
@@ -453,7 +453,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         <ul className="space-y-3">
                           {selectedService.details.significance.map((item, index) => (
                             <li key={index} className="flex items-start gap-3">
-                              <Sparkle className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                              <Sparkle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                               <span className="text-muted-foreground text-sm leading-relaxed">{item}</span>
                             </li>
                           ))}
@@ -464,7 +464,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Scriptural Roots */}
                   {selectedService.details?.scripturalRoots && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-violet-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-violet-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <BookOpen className="text-primary" size={24} />
@@ -482,7 +482,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* When to Perform */}
                   {selectedService.details?.whenToPerform && selectedService.details.whenToPerform.length > 0 && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-cyan-50 to-sky-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-cyan-50 to-sky-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <Calendar className="text-primary" size={24} />
@@ -491,7 +491,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         <ul className="space-y-2">
                           {selectedService.details.whenToPerform.map((item, index) => (
                             <li key={index} className="flex items-start gap-2">
-                              <CheckCircle className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                              <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                               <span className="text-muted-foreground text-sm">{item}</span>
                             </li>
                           ))}
@@ -502,7 +502,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Where and Who */}
                   {selectedService.details?.whereAndWho && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-pink-50 to-rose-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-pink-50 to-rose-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <MapPin className="text-primary" size={24} />
@@ -517,7 +517,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Special for NRIs */}
                   {selectedService.details?.specialForNRIs && selectedService.details.specialForNRIs.length > 0 && (
-                    <Card className="border-0 shadow-md bg-gradient-to-br from-orange-50 to-red-50">
+                    <Card className="border-0 shadow-md bg-linear-to-br from-orange-50 to-red-50">
                       <CardContent className="p-6">
                         <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                           <Heart className="text-primary" size={24} weight="fill" />
@@ -529,7 +529,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         <ul className="space-y-3">
                           {selectedService.details.specialForNRIs.map((item, index) => (
                             <li key={index} className="flex items-start gap-3">
-                              <Users className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                              <Users className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                               <span className="text-muted-foreground text-sm leading-relaxed">{item}</span>
                             </li>
                           ))}
@@ -565,7 +565,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                           <ul className="space-y-2">
                             {selectedService.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                                 <span className="text-muted-foreground">{benefit}</span>
                               </li>
                             ))}
@@ -583,7 +583,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                           <ul className="space-y-2">
                             {selectedService.includes.map((item, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 flex-shrink-0" size={18} weight="fill" />
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
                                 <span className="text-muted-foreground">{item}</span>
                               </li>
                             ))}

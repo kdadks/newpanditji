@@ -131,7 +131,7 @@ export default function WhyChooseUsPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -188,11 +188,11 @@ export default function WhyChooseUsPage() {
           {reasons.map((reason, index) => {
             const Icon = reason.icon
             return (
-              <Card key={index} className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br ${reason.gradient}`}>
+              <Card key={index} className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br ${reason.gradient}`}>
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Icon Section */}
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <div className={`w-16 h-16 ${reason.iconBg} rounded-xl flex items-center justify-center`}>
                         <Icon className="text-primary" size={32} weight="fill" />
                       </div>
@@ -220,7 +220,7 @@ export default function WhyChooseUsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
                           {reason.highlights.map((highlight, idx) => (
                             <div key={idx} className="flex items-start gap-2">
-                              <CheckCircle className="text-primary flex-shrink-0 mt-0.5" size={18} weight="fill" />
+                              <CheckCircle className="text-primary shrink-0 mt-0.5" size={18} weight="fill" />
                               <span className="text-sm text-muted-foreground">{highlight}</span>
                             </div>
                           ))}
@@ -229,9 +229,9 @@ export default function WhyChooseUsPage() {
 
                       {/* Shloka */}
                       {reason.shloka && (
-                        <div className="mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5">
+                        <div className="mt-6 bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5">
                           <div className="flex items-start gap-3 mb-3">
-                            <BookOpen className="text-primary flex-shrink-0 mt-1" size={24} />
+                            <BookOpen className="text-primary shrink-0 mt-1" size={24} />
                             <div className="flex-1">
                               <p className="text-base font-sanskrit text-foreground leading-relaxed mb-2">
                                 {reason.shloka.sanskrit}
@@ -256,7 +256,7 @@ export default function WhyChooseUsPage() {
         </div>
 
         {/* Call to Action */}
-        <Card className="mt-12 border-0 shadow-xl bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10">
+        <Card className="mt-12 border-0 shadow-xl bg-linear-to-r from-primary/10 via-accent/10 to-secondary/10">
           <CardContent className="p-8 text-center">
             <Sparkle className="mx-auto mb-4 text-primary" size={48} weight="fill" />
             <h2 className="font-heading font-bold text-2xl md:text-3xl mb-4 text-foreground">

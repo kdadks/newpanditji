@@ -120,7 +120,7 @@ export default function AdminServices() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -669,7 +669,7 @@ export default function AdminServices() {
 
               {/* Spiritual Details Tab */}
               <TabsContent value="comprehensive" className="space-y-6 mt-6">
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-6 mb-6">
+                <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-6 mb-6">
                   <h4 className="font-semibold mb-3 flex items-center gap-2">
                     💡 Spiritual & Scriptural Details
                   </h4>
@@ -690,7 +690,7 @@ export default function AdminServices() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Deity Information */}
-                  <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50">
+                  <Card className="border-amber-200 bg-linear-to-br from-amber-50/50 to-orange-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         🕉️ Deity Information
@@ -763,7 +763,7 @@ export default function AdminServices() {
                   </Card>
 
                   {/* Nature and Purpose */}
-                  <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
+                  <Card className="border-blue-200 bg-linear-to-br from-blue-50/50 to-indigo-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         📖 Nature & Purpose
@@ -802,7 +802,7 @@ export default function AdminServices() {
                   </Card>
 
                   {/* Significance */}
-                  <Card className="border-green-200 bg-gradient-to-br from-green-50/50 to-emerald-50/50">
+                  <Card className="border-green-200 bg-linear-to-br from-green-50/50 to-emerald-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         ⭐ Significance & Benefits
@@ -827,7 +827,7 @@ export default function AdminServices() {
                   </Card>
 
                   {/* Scriptural Roots */}
-                  <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-violet-50/50">
+                  <Card className="border-purple-200 bg-linear-to-br from-purple-50/50 to-violet-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         📜 Scriptural Roots
@@ -875,7 +875,7 @@ export default function AdminServices() {
                   </Card>
 
                   {/* When to Perform */}
-                  <Card className="border-cyan-200 bg-gradient-to-br from-cyan-50/50 to-sky-50/50">
+                  <Card className="border-cyan-200 bg-linear-to-br from-cyan-50/50 to-sky-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         📅 When to Perform
@@ -899,7 +899,7 @@ export default function AdminServices() {
                   </Card>
 
                   {/* Where and Who */}
-                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50/50 to-rose-50/50">
+                  <Card className="border-pink-200 bg-linear-to-br from-pink-50/50 to-rose-50/50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         📍 Where & Who
@@ -922,7 +922,7 @@ export default function AdminServices() {
                 </div>
 
                 {/* Special for NRIs - Full Width */}
-                <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-red-50/50">
+                <Card className="border-orange-200 bg-linear-to-br from-orange-50/50 to-red-50/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       ❤️ Special for NRIs / Families Abroad
@@ -955,7 +955,7 @@ export default function AdminServices() {
                     <CardDescription>How your service will appear to users</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="border rounded-lg p-6 bg-gradient-to-br from-primary/5 to-accent/5">
+                    <div className="border rounded-lg p-6 bg-linear-to-br from-primary/5 to-accent/5">
                       <div className="flex items-center gap-3 mb-4">
                         <h3 className="text-2xl font-heading font-bold">{formData.name || 'Service Name'}</h3>
                         <Badge>{categoryNames[formData.category]}</Badge>

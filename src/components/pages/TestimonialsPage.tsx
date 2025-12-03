@@ -34,7 +34,7 @@ export default function TestimonialsPage() {
         </div>
         
         {/* Sunrise gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
         
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
@@ -87,8 +87,8 @@ export default function TestimonialsPage() {
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {testimonials.map((testimonial, index) => (
-            <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 hover:scale-105">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
+              <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
               <CardContent className="relative p-6">
                 {/* Quote Icon */}
@@ -131,7 +131,7 @@ export default function TestimonialsPage() {
         </div>
 
         {/* Share Your Experience */}
-        <Card className="border-0 shadow-xl bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
+        <Card className="border-0 shadow-xl bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
           <CardContent className="p-8 md:p-12 text-center">
             <Heart className="mx-auto mb-6 text-primary" size={48} weight="fill" />
 
@@ -191,7 +191,7 @@ export default function TestimonialsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded-lg">
@@ -206,7 +206,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-accent/10 rounded-lg">
@@ -221,7 +221,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/5 to-secondary/10">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-secondary/10 rounded-lg">
@@ -236,7 +236,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary/5 to-accent/5">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-accent/5">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded-lg">
