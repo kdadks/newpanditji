@@ -64,7 +64,6 @@ function mapServiceRowToAdminRow(row: ServiceRowWithCategory): AdminServiceRow {
     category: category as AdminServiceRow['category'],
     description: row.short_description,
     detailed_description: row.full_description,
-    samagri_file_name: row.samagri_file_url ? 'Samagri List' : null,
     special_for_nris: row.special_notes,
   }
 }

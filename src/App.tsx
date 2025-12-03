@@ -128,16 +128,18 @@ function App() {
     }
   }
 
+  const isAdminPage = currentPage === 'admin'
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header currentPage={currentPage || 'home'} onNavigate={handleNavigate} />
+      {!isAdminPage && <Header currentPage={currentPage || 'home'} onNavigate={handleNavigate} />}
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           {renderPage()}
         </Suspense>
       </main>
-      <Footer onNavigate={handleNavigate} />
-      <WhatsAppButton />
+      {!isAdminPage && <Footer onNavigate={handleNavigate} />}
+      {!isAdminPage && <WhatsAppButton />}
       <Toaster />
     </div>
   )

@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import { usePhotos, convertLegacyPhoto, type Photo } from '../../hooks/usePhotos'
 import { uploadImage, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl, fileToBase64 } from '../../lib/storage'
-import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp } from '@phosphor-icons/react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, FunnelSimple, Package, Camera, FolderSimple, FileImage, Link } from '@phosphor-icons/react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Badge } from '../ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
 
@@ -20,6 +22,8 @@ export default function AdminPhotos() {
   const { photos, isLoading, createPhoto, updatePhoto, deletePhoto, isCreating, isUpdating, isDeleting } = usePhotos()
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCategory, setFilterCategory] = useState<string>('all')
   const [formData, setFormData] = useState<PhotoFormData>({
     id: '',
     url: '',
@@ -29,7 +33,18 @@ export default function AdminPhotos() {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [currentTab, setCurrentTab] = useState('upload')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Get unique categories from photos
+  const categories = Array.from(new Set(photos.map(p => p.category).filter(Boolean)))
+
+  // Filter photos
+  const filteredPhotos = photos.filter(photo => {
+    const matchesSearch = photo.title?.toLowerCase().includes(searchQuery.toLowerCase()) || false
+    const matchesCategory = filterCategory === 'all' || photo.category === filterCategory
+    return matchesSearch && matchesCategory
+  })
 
   const handleAdd = () => {
     setFormData({
@@ -41,6 +56,7 @@ export default function AdminPhotos() {
     setEditingPhoto(null)
     setPreviewUrl(null)
     setSelectedFile(null)
+    setCurrentTab('upload')
     setIsDialogOpen(true)
   }
 
@@ -54,6 +70,7 @@ export default function AdminPhotos() {
     setEditingPhoto(photo)
     setPreviewUrl(photo.url)
     setSelectedFile(null)
+    setCurrentTab('upload')
     setIsDialogOpen(true)
   }
 
@@ -188,23 +205,102 @@ export default function AdminPhotos() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Manage Photos</CardTitle>
-          <Button onClick={handleAdd} className="gap-2">
-            <Plus size={18} />
-            Add Photo
-          </Button>
+      {/* Header */}
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <CardTitle className="text-2xl font-heading">Photo Gallery</CardTitle>
+              <CardDescription className="mt-2">
+                All images from books, gallery, and other sources
+              </CardDescription>
+            </div>
+            <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
+              <Plus size={20} weight="bold" />
+              Add Photo
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          {photos.length === 0 ? (
+      </Card>
+
+      {/* Search and Filter */}
+      <Card className="border-0 shadow-md">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+              <Input
+                placeholder="Search photos by title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="w-full md:w-56">
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <FunnelSimple size={16} />
+                    <SelectValue placeholder="All Categories" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">{filteredPhotos.length}</span> of{' '}
+              <span className="font-semibold text-foreground">{photos.length}</span> photos
+            </div>
+            {categories.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {categories.slice(0, 5).map((cat) => (
+                  <Badge key={cat} variant="outline" className="text-xs">
+                    {cat}
+                  </Badge>
+                ))}
+                {categories.length > 5 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{categories.length - 5} more
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Photos Grid */}
+      <Card>
+        <CardContent className="p-6">
+          {filteredPhotos.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <Upload size={48} className="mx-auto mb-4" />
-              <p>No photos yet. Click "Add Photo" to get started.</p>
+              {photos.length === 0 ? (
+                <>
+                  <Upload size={48} className="mx-auto mb-4" />
+                  <p>No photos yet. Click "Add Photo" to get started.</p>
+                </>
+              ) : (
+                <>
+                  <Package size={48} className="mx-auto mb-4" />
+                  <p className="mb-4">No photos found matching your criteria</p>
+                  <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline">
+                    Clear Filters
+                  </Button>
+                </>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {photos.map((photo) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredPhotos.map((photo) => (
                 <Card key={photo.id} className="overflow-hidden">
                   <CardContent className="p-0">
                     <div className="aspect-video bg-muted relative">
@@ -225,7 +321,11 @@ export default function AdminPhotos() {
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold mb-1 truncate">{photo.title}</h3>
-                      <span className="text-xs text-muted-foreground">{photo.category}</span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          {photo.category}
+                        </Badge>
+                      </div>
                       <div className="flex gap-2 mt-2">
                         <Button
                           variant="outline"
@@ -256,130 +356,325 @@ export default function AdminPhotos() {
         </CardContent>
       </Card>
 
+      {/* Modern Redesigned Photo Modal */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editingPhoto ? 'Edit Photo' : 'Add New Photo'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Image Upload Area */}
-            <div>
-              <Label>Photo Image</Label>
-              <div 
-                className="mt-2 border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  disabled={isSaving}
-                />
-                
-                {previewUrl ? (
-                  <div className="relative">
-                    <img 
-                      src={previewUrl} 
-                      alt="Preview" 
-                      className="max-h-48 mx-auto rounded-lg object-contain"
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {selectedFile ? selectedFile.name : 'Click to change image'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="py-8">
-                    <ImageIcon className="mx-auto text-muted-foreground mb-2" size={48} />
-                    <p className="text-sm text-muted-foreground">
-                      Click to upload an image
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      JPEG, PNG, GIF, WebP, SVG (max 10MB)
-                    </p>
-                  </div>
-                )}
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 !bg-background">
+          {/* Gradient Header */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 px-6 py-6">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                <Camera className="h-7 w-7 text-white" weight="duotone" />
               </div>
-            </div>
-
-            {/* Or use URL */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or enter URL</span>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="url">Image URL</Label>
-              <Input
-                id="url"
-                value={formData.url}
-                onChange={(e) => {
-                  setFormData({ ...formData, url: e.target.value })
-                  if (e.target.value && !selectedFile) {
-                    setPreviewUrl(e.target.value)
-                  }
-                }}
-                placeholder="https://..."
-                disabled={isSaving || !!selectedFile}
-              />
-              {selectedFile && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Clear the uploaded file to use a URL instead
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  {editingPhoto ? 'Edit Photo' : 'Add New Photo'}
+                </DialogTitle>
+                <p className="text-cyan-100 text-sm mt-0.5">
+                  {editingPhoto ? 'Update photo details and image' : 'Upload a new photo to your gallery'}
                 </p>
+              </div>
+            </div>
+            
+            {/* Progress Steps */}
+            <div className="flex items-center gap-2 mt-5">
+              {[
+                { id: 'upload', label: 'Upload Image', icon: FileImage },
+                { id: 'details', label: 'Photo Details', icon: FolderSimple }
+              ].map((step) => (
+                <button
+                  key={step.id}
+                  onClick={() => setCurrentTab(step.id)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    currentTab === step.id
+                      ? 'bg-white text-cyan-700 shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  <step.icon className="h-3.5 w-3.5" weight="bold" />
+                  <span>{step.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Form Content */}
+          <div className="flex flex-col h-[calc(90vh-180px)]">
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {/* Upload Tab */}
+              {currentTab === 'upload' && (
+                <div className="space-y-5">
+                  {/* Image Upload Area */}
+                  <Card className="border-2 border-teal-100 !bg-background">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
+                          <CloudArrowUp className="h-4 w-4 text-teal-600" weight="duotone" />
+                        </div>
+                        <h3 className="font-semibold text-teal-900">Upload Image</h3>
+                      </div>
+                      
+                      <div 
+                        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                          previewUrl 
+                            ? 'border-teal-300 bg-teal-50/50' 
+                            : 'border-gray-200 hover:border-teal-400 hover:bg-teal-50/30'
+                        }`}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          disabled={isSaving}
+                        />
+                        
+                        {previewUrl ? (
+                          <div className="relative">
+                            <img 
+                              src={previewUrl} 
+                              alt="Preview" 
+                              className="max-h-56 mx-auto rounded-lg object-contain shadow-md"
+                            />
+                            <div className="mt-3 flex items-center justify-center gap-2">
+                              <Badge variant="outline" className="bg-teal-100 border-teal-300">
+                                <FileImage className="h-3 w-3 mr-1" />
+                                {selectedFile ? selectedFile.name : 'Current image'}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Click to change image
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="py-8">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mx-auto mb-4">
+                              <CloudArrowUp className="h-8 w-8 text-teal-600" weight="duotone" />
+                            </div>
+                            <p className="font-medium text-gray-700">
+                              Click to upload an image
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              JPEG, PNG, GIF, WebP, SVG (max 10MB)
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Or use URL */}
+                  <Card className="border-2 border-blue-100 !bg-background">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                          <Link className="h-4 w-4 text-blue-600" weight="duotone" />
+                        </div>
+                        <h3 className="font-semibold text-blue-900">Or Use Image URL</h3>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="url" className="text-sm font-medium">
+                          External Image URL
+                        </Label>
+                        <Input
+                          id="url"
+                          value={formData.url}
+                          onChange={(e) => {
+                            setFormData({ ...formData, url: e.target.value })
+                            if (e.target.value && !selectedFile) {
+                              setPreviewUrl(e.target.value)
+                            }
+                          }}
+                          placeholder="https://example.com/image.jpg"
+                          className="h-11 bg-background"
+                          disabled={isSaving || !!selectedFile}
+                        />
+                        {selectedFile && (
+                          <p className="text-xs text-amber-600">
+                            ℹ️ Clear the uploaded file to use a URL instead
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+              
+              {/* Details Tab */}
+              {currentTab === 'details' && (
+                <div className="space-y-5">
+                  {/* Photo Title */}
+                  <Card className="border-2 border-cyan-100 !bg-background">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100">
+                          <ImageIcon className="h-4 w-4 text-cyan-600" weight="duotone" />
+                        </div>
+                        <h3 className="font-semibold text-cyan-900">Photo Information</h3>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="title" className="text-sm font-medium">
+                          Photo Title <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="title"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          placeholder="e.g., Wedding Ceremony 2024"
+                          className="h-11 bg-background"
+                          disabled={isSaving}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          A descriptive title helps organize and find your photos
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Category Selection */}
+                  <Card className="border-2 border-indigo-100 !bg-background">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
+                          <FolderSimple className="h-4 w-4 text-indigo-600" weight="duotone" />
+                        </div>
+                        <h3 className="font-semibold text-indigo-900">Category / Folder</h3>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <Label htmlFor="category" className="text-sm font-medium">
+                          Select Category
+                        </Label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) => setFormData({ ...formData, category: value })}
+                          disabled={isSaving}
+                        >
+                          <SelectTrigger id="category" className="h-11 bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="books">📚 Books</SelectItem>
+                            <SelectItem value="gallery">🖼️ Gallery</SelectItem>
+                            <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
+                            <SelectItem value="pooja">🙏 Pooja</SelectItem>
+                            <SelectItem value="wedding">💒 Wedding</SelectItem>
+                            <SelectItem value="charity">❤️ Charity</SelectItem>
+                            <SelectItem value="events">🎉 Events</SelectItem>
+                            <SelectItem value="general">📁 General</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map((cat) => (
+                            <Badge 
+                              key={cat}
+                              variant="outline" 
+                              className={`cursor-pointer transition-all capitalize ${
+                                formData.category === cat 
+                                  ? 'bg-indigo-100 border-indigo-300 text-indigo-700' 
+                                  : 'hover:bg-indigo-50'
+                              }`}
+                              onClick={() => setFormData({ ...formData, category: cat })}
+                            >
+                              {cat}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Preview */}
+                  {previewUrl && formData.title && (
+                    <div className="rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 p-4 border border-cyan-200">
+                      <h4 className="font-medium text-cyan-800 text-sm mb-3">👁️ Preview</h4>
+                      <div className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex gap-4">
+                          <img 
+                            src={previewUrl} 
+                            alt="Preview" 
+                            className="w-24 h-24 rounded-lg object-cover shadow-sm"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{formData.title}</h4>
+                            <Badge variant="outline" className="mt-2 capitalize">
+                              {formData.category}
+                            </Badge>
+                            {selectedFile && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                📤 Will be uploaded to cloud storage
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
-
-            <div>
-              <Label htmlFor="title">Photo Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Wedding Ceremony 2024"
-                disabled={isSaving}
-              />
-            </div>
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., ceremony, pooja, wedding"
-                disabled={isSaving}
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsDialogOpen(false)
-                  setSelectedFile(null)
-                  setPreviewUrl(null)
-                }} 
-                disabled={isSaving}
-              >
-                <X size={18} className="mr-2" />
-                Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Spinner className="mr-2 animate-spin" size={18} />
-                    {isUploading ? 'Uploading...' : 'Saving...'}
-                  </>
-                ) : (
-                  <>
-                    <FloppyDisk size={18} className="mr-2" />
-                    Save
-                  </>
-                )}
-              </Button>
+            
+            {/* Footer */}
+            <div className="border-t bg-muted/30 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {currentTab !== 'upload' && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setCurrentTab('upload')}
+                      className="gap-2"
+                    >
+                      ← Back
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsDialogOpen(false)
+                      setSelectedFile(null)
+                      setPreviewUrl(null)
+                    }}
+                    disabled={isSaving}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                  
+                  {currentTab === 'upload' ? (
+                    <Button
+                      type="button"
+                      onClick={() => setCurrentTab('details')}
+                      className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
+                      disabled={!previewUrl && !formData.url}
+                    >
+                      Continue to Details →
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleSave} 
+                      disabled={isSaving}
+                      className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                    >
+                      {isSaving ? (
+                        <Spinner className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <FloppyDisk className="h-4 w-4" weight="bold" />
+                      )}
+                      {isUploading ? 'Uploading...' : editingPhoto ? 'Update Photo' : 'Save Photo'}
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </DialogContent>

@@ -10,7 +10,8 @@
         "lint": "eslint .",
         "optimize": "vite optimize",
         "preview": "vite preview",
-        "migrate": "tsx scripts/migrate-data.ts"
+        "migrate": "tsx scripts/migrate-data.ts",
+        "migrate:images": "tsx scripts/migrate-images-to-supabase.ts"
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",

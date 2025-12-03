@@ -104,7 +104,6 @@ export interface AdminServiceRow extends ServiceRow {
   category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
   description: string
   detailed_description: string | null
-  samagri_file_name: string | null
   special_for_nris: string[] | null
 }
 
@@ -212,6 +211,63 @@ export interface CharityProjectRow {
 
 export type CharityProjectInsert = Omit<CharityProjectRow, 'id' | 'created_at' | 'updated_at'>
 export type CharityProjectUpdate = Partial<CharityProjectInsert>
+
+// Testimonial types - matches migration 20241203000006_content.sql
+export interface TestimonialRow {
+  id: string
+  client_name: string
+  client_location: string | null
+  client_image_url: string | null
+  service_name: string | null
+  service_id: string | null
+  testimonial_text: string
+  rating: number | null
+  is_approved: boolean
+  is_featured: boolean
+  is_published: boolean
+  source: string
+  submitted_at: string
+  approved_by: string | null
+  approved_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TestimonialInsert = Omit<TestimonialRow, 'id' | 'created_at' | 'updated_at' | 'submitted_at'>
+export type TestimonialUpdate = Partial<TestimonialInsert>
+
+// Book types - matches migration 20241203000006_content.sql
+export interface BookRow {
+  id: string
+  title: string
+  subtitle: string | null
+  slug: string
+  author: string
+  isbn: string | null
+  description: string
+  full_description: string | null
+  category: string
+  key_topics: string[] | null
+  target_audience: string | null
+  chapter_list: string[] | null
+  cover_image_url: string | null
+  preview_pdf_url: string | null
+  amazon_url: string | null
+  flipkart_url: string | null
+  other_purchase_urls: Record<string, string> | null
+  publication_date: string | null
+  page_count: number | null
+  language: string
+  is_published: boolean
+  is_featured: boolean
+  sort_order: number
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type BookInsert = Omit<BookRow, 'id' | 'created_at' | 'updated_at'>
+export type BookUpdate = Partial<BookInsert>
 
 // Helper function to extract YouTube video ID from various URL formats
 export function extractYouTubeId(url: string): string | null {

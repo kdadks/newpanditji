@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { Shield, Package, Images, Video, BookOpen, Heart, Key, SignOut, Spinner } from '@phosphor-icons/react'
+import { Shield, Key, Spinner } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import AdminLayout from '../admin/AdminLayout'
+import AdminAnalytics from '../admin/AdminAnalytics'
 import AdminServices from '../admin/AdminServices'
-import AdminPhotos from '../admin/AdminPhotos'
-import AdminVideos from '../admin/AdminVideos'
+import AdminMedia from '../admin/AdminMedia'
+import AdminBooks from '../admin/AdminBooks'
 import AdminBlogs from '../admin/AdminBlogs'
+import AdminTestimonials from '../admin/AdminTestimonials'
 import AdminCharity from '../admin/AdminCharity'
+import AdminProfile from '../admin/AdminProfile'
+import AdminContent from '../admin/AdminContent'
 import { useAuth } from '../../hooks/useAuth'
 import { toast } from 'sonner'
 
@@ -18,15 +22,19 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [currentSection, setCurrentSection] = useState('analytics')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoggingIn(true)
-    
+
     try {
       const success = await login(email, password)
       if (success) {
-        toast.success('Login successful!')
+        toast.success('Welcome Rajesh Ji! 🙏', {
+          description: 'You have successfully logged into the admin dashboard',
+          duration: 4000,
+        })
       } else {
         toast.error('Invalid credentials. Please try again.')
       }
@@ -41,7 +49,33 @@ export default function AdminPage() {
     await logout()
     setEmail('')
     setPassword('')
+    setCurrentSection('analytics')
     toast.success('Logged out successfully')
+  }
+
+  const renderContent = () => {
+    switch (currentSection) {
+      case 'analytics':
+        return <AdminAnalytics />
+      case 'services':
+        return <AdminServices />
+      case 'media':
+        return <AdminMedia />
+      case 'books':
+        return <AdminBooks />
+      case 'blogs':
+        return <AdminBlogs />
+      case 'testimonials':
+        return <AdminTestimonials />
+      case 'charity':
+        return <AdminCharity />
+      case 'profile':
+        return <AdminProfile />
+      case 'content':
+        return <AdminContent />
+      default:
+        return <AdminAnalytics />
+    }
   }
 
   if (loading) {
@@ -115,71 +149,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="w-full py-16 md:py-24 min-h-screen">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Shield className="text-primary" size={40} weight="fill" />
-                <h1 className="font-heading font-bold text-4xl">Admin Dashboard</h1>
-              </div>
-              <p className="text-muted-foreground">
-                Welcome, {user?.email}! Manage your website content below.
-              </p>
-            </div>
-            <Button variant="outline" onClick={handleLogout} className="gap-2">
-              <SignOut size={18} />
-              Logout
-            </Button>
-          </div>
-        </div>
-
-        <Tabs defaultValue="services" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto gap-2 bg-muted/50 p-2 mb-8">
-            <TabsTrigger value="services" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Package className="mr-2" size={18} />
-              Services
-            </TabsTrigger>
-            <TabsTrigger value="photos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Images className="mr-2" size={18} />
-              Photos
-            </TabsTrigger>
-            <TabsTrigger value="videos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Video className="mr-2" size={18} />
-              Videos
-            </TabsTrigger>
-            <TabsTrigger value="blogs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <BookOpen className="mr-2" size={18} />
-              Blogs
-            </TabsTrigger>
-            <TabsTrigger value="charity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Heart className="mr-2" size={18} />
-              Charity
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="services">
-            <AdminServices />
-          </TabsContent>
-
-          <TabsContent value="photos">
-            <AdminPhotos />
-          </TabsContent>
-
-          <TabsContent value="videos">
-            <AdminVideos />
-          </TabsContent>
-
-          <TabsContent value="blogs">
-            <AdminBlogs />
-          </TabsContent>
-
-          <TabsContent value="charity">
-            <AdminCharity />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+    <AdminLayout
+      currentSection={currentSection}
+      onSectionChange={setCurrentSection}
+      onLogout={handleLogout}
+      userEmail={user?.email}
+    >
+      {renderContent()}
+    </AdminLayout>
   )
 }

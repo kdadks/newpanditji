@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
 import { useAdminServices, convertLegacyService } from '../../hooks/useServices'
+import { usePhotos } from '../../hooks/usePhotos'
 import { uploadDocument, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl } from '../../lib/storage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp, Image as ImageIcon, Clock } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -29,24 +30,15 @@ interface ServiceFormData {
   benefits: string[]
   includes: string[]
   requirements: string[]
-  price: string
-  bestFor: string[]
-  details?: {
-    deity?: { name: string; description: string; significance: string }
-    nature?: string
-    purpose?: string[]
-    significance?: string[]
-    scripturalRoots?: { source: string; description: string }
-    whenToPerform?: string[]
-    whereAndWho?: string
-    specialForNRIs?: string[]
-  }
+  dakshina: string
+  imageUrl?: string
   samagriFile?: { name: string; data: string; type: string }
   samagriFileUrl?: string
 }
 
-export default function AdminServices() {
+export default function AdminServicesNew() {
   const { services, isLoading, createService, updateService, deleteService, isCreating, isUpdating, isDeleting } = useAdminServices()
+  const { photos } = usePhotos()
   const [editingService, setEditingService] = useState<AdminServiceRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -54,6 +46,7 @@ export default function AdminServices() {
   const [currentTab, setCurrentTab] = useState('basic')
   const [isUploading, setIsUploading] = useState(false)
   const [selectedSamagriFile, setSelectedSamagriFile] = useState<File | null>(null)
+  const [showImagePicker, setShowImagePicker] = useState(false)
   const samagriFileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<ServiceFormData>({
@@ -66,15 +59,14 @@ export default function AdminServices() {
     benefits: [],
     includes: [],
     requirements: [],
-    price: '',
-    bestFor: []
+    dakshina: '',
+    imageUrl: ''
   })
 
   // Helper states for array inputs
   const [benefitInput, setBenefitInput] = useState('')
   const [includesInput, setIncludesInput] = useState('')
   const [requirementInput, setRequirementInput] = useState('')
-  const [bestForInput, setBestForInput] = useState('')
 
   // Filter services
   const filteredServices = services.filter(service => {
@@ -95,16 +87,16 @@ export default function AdminServices() {
       benefits: [],
       includes: [],
       requirements: [],
-      price: '',
-      bestFor: []
+      dakshina: '',
+      imageUrl: ''
     })
     setBenefitInput('')
     setIncludesInput('')
     setRequirementInput('')
-    setBestForInput('')
     setEditingService(null)
     setCurrentTab('basic')
     setSelectedSamagriFile(null)
+    setShowImagePicker(false)
     setIsDialogOpen(true)
   }
 
@@ -119,28 +111,19 @@ export default function AdminServices() {
       benefits: service.benefits || [],
       includes: service.includes || [],
       requirements: service.requirements || [],
-      price: service.price || '',
-      bestFor: service.best_for || [],
-      details: {
-        deity: service.deity_info as ServiceFormData['details']['deity'] | undefined,
-        nature: undefined,
-        purpose: undefined,
-        significance: undefined,
-        scripturalRoots: service.scriptural_roots as ServiceFormData['details']['scripturalRoots'] | undefined,
-        whenToPerform: service.when_to_perform || undefined,
-        whereAndWho: service.where_and_who || undefined,
-        specialForNRIs: service.special_for_nris || undefined
-      },
+      dakshina: service.price || '',
+      imageUrl: service.featured_image_url || '',
       samagriFileUrl: service.samagri_file_url || undefined,
       samagriFile: service.samagri_file_url ? {
-        name: service.samagri_file_name || 'Samagri List',
+        name: 'Samagri List',
         type: service.samagri_file_url.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
-        data: '' // Not needed for display
+        data: ''
       } : undefined
     })
     setEditingService(service)
     setCurrentTab('basic')
     setSelectedSamagriFile(null)
+    setShowImagePicker(false)
     setIsDialogOpen(true)
   }
 
@@ -153,13 +136,11 @@ export default function AdminServices() {
     try {
       setIsUploading(true)
       let samagriFileUrl = formData.samagriFileUrl || null
-      let samagriFileName = formData.samagriFile?.name || null
 
       // Upload new samagri file if selected
       if (selectedSamagriFile) {
         const result = await uploadDocument(selectedSamagriFile, 'samagri')
         samagriFileUrl = result.url
-        samagriFileName = result.fileName
 
         // Delete old file from storage if it was a Supabase Storage file
         if (editingService?.samagri_file_url && isSupabaseStorageUrl(editingService.samagri_file_url)) {
@@ -179,22 +160,15 @@ export default function AdminServices() {
           id: editingService.id,
           name: formData.name,
           slug: generateSlug(formData.name),
-          category: formData.category,
+          short_description: formData.description,
+          full_description: formData.detailedDescription || null,
           duration: formData.duration,
-          description: formData.description,
-          detailed_description: formData.detailedDescription || null,
           benefits: formData.benefits.length > 0 ? formData.benefits : null,
           includes: formData.includes.length > 0 ? formData.includes : null,
           requirements: formData.requirements.length > 0 ? formData.requirements : null,
-          price: formData.price || null,
-          best_for: formData.bestFor.length > 0 ? formData.bestFor : null,
-          deity_info: formData.details?.deity || null,
-          scriptural_roots: formData.details?.scripturalRoots || null,
-          when_to_perform: formData.details?.whenToPerform || null,
-          where_and_who: formData.details?.whereAndWho || null,
-          special_for_nris: formData.details?.specialForNRIs || null,
-          samagri_file_url: samagriFileUrl,
-          samagri_file_name: samagriFileName
+          price: formData.dakshina || null,
+          featured_image_url: formData.imageUrl || null,
+          samagri_file_url: samagriFileUrl
         })
       } else {
         const newService = convertLegacyService({
@@ -206,15 +180,12 @@ export default function AdminServices() {
           benefits: formData.benefits,
           includes: formData.includes,
           requirements: formData.requirements,
-          price: formData.price,
-          bestFor: formData.bestFor,
-          details: formData.details,
-          samagriFile: formData.samagriFile
+          price: formData.dakshina,
+          bestFor: []
         })
-        // Override with storage URL if we uploaded
+        newService.featured_image_url = formData.imageUrl || null
         if (samagriFileUrl) {
           newService.samagri_file_url = samagriFileUrl
-          newService.samagri_file_name = samagriFileName
         }
         await createService(newService)
       }
@@ -239,26 +210,6 @@ export default function AdminServices() {
     }
   }
 
-  const handleDuplicate = async (service: AdminServiceRow) => {
-    const duplicated = convertLegacyService({
-      name: `${service.name} (Copy)`,
-      category: service.category,
-      duration: service.duration,
-      description: service.description,
-      detailedDescription: service.detailed_description || undefined,
-      benefits: service.benefits || undefined,
-      includes: service.includes || undefined,
-      requirements: service.requirements || undefined,
-      price: service.price || undefined,
-      bestFor: service.best_for || undefined
-    })
-    try {
-      await createService(duplicated)
-    } catch {
-      // Error toast is handled by the hook
-    }
-  }
-
   const isSaving = isCreating || isUpdating || isUploading
 
   if (isLoading) {
@@ -273,7 +224,7 @@ export default function AdminServices() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -336,8 +287,8 @@ export default function AdminServices() {
             <CardContent className="p-12 text-center">
               <Package size={48} className="mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground mb-4">
-                {services.length === 0 
-                  ? 'No services yet. Click "Add New Service" to get started.' 
+                {services.length === 0
+                  ? 'No services yet. Click "Add New Service" to get started.'
                   : 'No services found matching your criteria'}
               </p>
               {services.length > 0 && (
@@ -351,15 +302,17 @@ export default function AdminServices() {
           filteredServices.map((service) => (
             <Card key={service.id} className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary overflow-hidden">
               <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-start gap-4 mb-4">
+                  {service.featured_image_url && (
+                    <img
+                      src={service.featured_image_url}
+                      alt={service.name}
+                      className="w-20 h-20 object-cover rounded-lg border-2 border-primary/20"
+                    />
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-heading font-semibold text-xl">{service.name}</h3>
-                      {service.deity_info && (
-                        <Badge variant="secondary" className="text-xs">
-                          📚 Detailed
-                        </Badge>
-                      )}
                       {service.is_popular && (
                         <Badge variant="default" className="text-xs">
                           ⭐ Popular
@@ -372,9 +325,9 @@ export default function AdminServices() {
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
-                  {service.description}
-                </p>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed"
+                   dangerouslySetInnerHTML={{ __html: service.description }}
+                />
 
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
                   <span className="flex items-center gap-1">
@@ -382,7 +335,7 @@ export default function AdminServices() {
                   </span>
                   {service.price && (
                     <span className="flex items-center gap-1">
-                      <span className="font-medium">💰</span> {service.price}
+                      <span className="font-medium">🪔</span> Dakshina: {service.price}
                     </span>
                   )}
                   {service.benefits && service.benefits.length > 0 && (
@@ -403,14 +356,6 @@ export default function AdminServices() {
                     Edit
                   </Button>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDuplicate(service)}
-                    disabled={isCreating}
-                  >
-                    <Plus size={16} />
-                  </Button>
-                  <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(service.id)}
@@ -425,772 +370,673 @@ export default function AdminServices() {
         )}
       </div>
 
-      {/* Edit/Add Dialog */}
+      {/* Edit/Add Dialog - Modern Stunning UX */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[98vw] lg:max-w-[1600px] max-h-[95vh] overflow-hidden flex flex-col">
-          <DialogHeader className="pb-4 border-b">
-            <DialogTitle className="text-2xl font-heading">
-              {editingService ? `Edit: ${editingService.name}` : 'Add New Service'}
-            </DialogTitle>
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 !bg-background border shadow-2xl">
+          {/* Stunning Header */}
+          <DialogHeader className="relative px-8 pt-8 pb-6 bg-gradient-to-r from-primary/10 via-accent/5 to-secondary/10 border-b bg-background">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative flex items-center gap-4">
+              <div className="p-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg shadow-primary/25">
+                {editingService ? (
+                  <PencilSimple size={28} className="text-white" weight="bold" />
+                ) : (
+                  <Plus size={28} className="text-white" weight="bold" />
+                )}
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-heading font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                  {editingService ? 'Edit Service' : 'Create New Service'}
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {editingService 
+                    ? `Updating "${editingService.name}"` 
+                    : 'Add a new pooja, sanskar, or spiritual service'
+                  }
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Indicator */}
+            <div className="relative mt-6 flex items-center justify-between">
+              {[
+                { id: 'basic', label: 'Basic Info', icon: '📝', step: 1 },
+                { id: 'details', label: 'Details', icon: '✨', step: 2 },
+                { id: 'media', label: 'Media', icon: '🖼️', step: 3 }
+              ].map((tab, index) => (
+                <div key={tab.id} className="flex items-center flex-1">
+                  <button
+                    onClick={() => setCurrentTab(tab.id)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
+                      currentTab === tab.id 
+                        ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105' 
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <span className={`text-xl transition-transform duration-300 ${currentTab === tab.id ? 'scale-110' : 'group-hover:scale-110'}`}>
+                      {tab.icon}
+                    </span>
+                    <div className="text-left hidden sm:block">
+                      <div className="text-xs opacity-70">Step {tab.step}</div>
+                      <div className="font-medium text-sm">{tab.label}</div>
+                    </div>
+                  </button>
+                  {index < 2 && (
+                    <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
+                      ['basic', 'details', 'media'].indexOf(currentTab) > index 
+                        ? 'bg-primary' 
+                        : 'bg-border'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto">
+          {/* Content Area with Custom Scrollbar */}
+          <div className="flex-1 overflow-y-auto px-8 py-6 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent bg-background">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <div className="sticky top-0 bg-background z-10 pb-4">
-                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2 bg-muted/50 p-2">
-                  <TabsTrigger value="basic" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    📝 Basic Info
-                  </TabsTrigger>
-                  <TabsTrigger value="details" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    ✨ Benefits & Lists
-                  </TabsTrigger>
-                  <TabsTrigger value="comprehensive" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    📚 Spiritual Details
-                  </TabsTrigger>
-                  <TabsTrigger value="preview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    👁️ Preview
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
               {/* Basic Info Tab */}
-              <TabsContent value="basic" className="space-y-6 mt-6">
-                <Card className="border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Essential Information</CardTitle>
-                    <CardDescription>Core details that appear on service cards</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TabsContent value="basic" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+                {/* Service Identity Section */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Package size={20} className="text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Service Identity</h3>
+                        <p className="text-xs text-muted-foreground">Define the core details of your service</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="name" className="text-base">Service Name *</Label>
+                        <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+                          Service Name <span className="text-destructive">*</span>
+                        </Label>
                         <Input
                           id="name"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           placeholder="e.g., Satyanarayana Pooja"
-                          className="text-base"
+                          className="h-12 bg-background border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="category" className="text-base">Category *</Label>
+                        <Label htmlFor="category" className="text-sm font-medium flex items-center gap-2">
+                          Category <span className="text-destructive">*</span>
+                        </Label>
                         <Select
                           value={formData.category}
-                          onValueChange={(value: Service['category']) => setFormData({ ...formData, category: value })}
+                          onValueChange={(value: ServiceCategory) => setFormData({ ...formData, category: value })}
                         >
-                          <SelectTrigger id="category" className="text-base">
+                          <SelectTrigger id="category" className="h-12 bg-background border-border/50">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pooja">Poojas</SelectItem>
-                            <SelectItem value="sanskar">Sanskars</SelectItem>
-                            <SelectItem value="paath">Paath/Recitations</SelectItem>
-                            <SelectItem value="consultation">Consultations</SelectItem>
-                            <SelectItem value="wellness">Meditation & Yoga</SelectItem>
+                            <SelectItem value="pooja">🪔 Poojas</SelectItem>
+                            <SelectItem value="sanskar">🎊 Sanskars</SelectItem>
+                            <SelectItem value="paath">📿 Paath/Recitations</SelectItem>
+                            <SelectItem value="consultation">🔮 Consultations</SelectItem>
+                            <SelectItem value="wellness">🧘 Meditation & Yoga</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Pricing & Duration Section */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-accent/10 rounded-lg">
+                        <Clock size={20} className="text-primary" weight="fill" />
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Duration & Dakshina</h3>
+                        <p className="text-xs text-muted-foreground">Time and traditional offering details</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="duration" className="text-base">Duration *</Label>
+                        <Label htmlFor="duration" className="text-sm font-medium flex items-center gap-2">
+                          Duration <span className="text-destructive">*</span>
+                        </Label>
                         <Input
                           id="duration"
                           value={formData.duration}
                           onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                          placeholder="e.g., 2.5 hours"
-                          className="text-base"
+                          placeholder="e.g., 2-3 hours"
+                          className="h-12 bg-background border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="price" className="text-base">Price</Label>
+                        <Label htmlFor="dakshina" className="text-sm font-medium">
+                          Dakshina (दक्षिणा)
+                        </Label>
                         <Input
-                          id="price"
-                          value={formData.price || ''}
-                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                          id="dakshina"
+                          value={formData.dakshina || ''}
+                          onChange={(e) => setFormData({ ...formData, dakshina: e.target.value })}
                           placeholder="e.g., €150 or 'Contact for pricing'"
-                          className="text-base"
+                          className="h-12 bg-background border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         />
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span>🪔</span> Traditional offering amount for the ceremony
+                        </p>
                       </div>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="description" className="text-base">Short Description *</Label>
-                      <QuillEditor
-                        value={formData.description}
-                        onChange={(value) => setFormData({ ...formData, description: value })}
-                        placeholder="Brief description shown on service cards (1-2 sentences)..."
-                        minHeight="120px"
-                      />
-                      <p className="text-xs text-muted-foreground">This appears on the service card preview. Use formatting to highlight key points.</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="detailedDescription" className="text-base">Detailed Description</Label>
-                      <QuillEditor
-                        value={formData.detailedDescription || ''}
-                        onChange={(value) => setFormData({ ...formData, detailedDescription: value })}
-                        placeholder="Full description shown in the service modal. Add headings, lists, and formatting as needed..."
-                        minHeight="250px"
-                      />
-                      <p className="text-xs text-muted-foreground">Full description with rich formatting for the service detail modal</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Details & Lists Tab */}
-              <TabsContent value="details" className="space-y-6 mt-6">
-                <Card className="border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Benefits</CardTitle>
-                    <CardDescription>List the spiritual and practical benefits</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        value={benefitInput}
-                        onChange={(e) => setBenefitInput(e.target.value)}
-                        placeholder="Add a benefit..."
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && benefitInput.trim()) {
-                            setFormData({ ...formData, benefits: [...(formData.benefits || []), benefitInput.trim()] })
-                            setBenefitInput('')
-                            e.preventDefault()
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          if (benefitInput.trim()) {
-                            setFormData({ ...formData, benefits: [...(formData.benefits || []), benefitInput.trim()] })
-                            setBenefitInput('')
-                          }
-                        }}
-                      >
-                        <Plus size={16} />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 min-h-[60px] p-3 border rounded-lg bg-muted/30">
-                      {(formData.benefits || []).length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No benefits added yet</p>
-                      ) : (
-                        (formData.benefits || []).map((benefit, index) => (
-                          <Badge key={index} variant="secondary" className="py-2 px-3 text-sm">
-                            {benefit}
-                            <X
-                              size={14}
-                              className="ml-2 cursor-pointer hover:text-destructive"
-                              onClick={() => setFormData({
-                                ...formData,
-                                benefits: (formData.benefits || []).filter((_, i) => i !== index)
-                              })}
-                            />
-                          </Badge>
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-lg">What's Included</CardTitle>
-                    <CardDescription>Items and elements included in the service</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        value={includesInput}
-                        onChange={(e) => setIncludesInput(e.target.value)}
-                        placeholder="Add an included item..."
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && includesInput.trim()) {
-                            setFormData({ ...formData, includes: [...(formData.includes || []), includesInput.trim()] })
-                            setIncludesInput('')
-                            e.preventDefault()
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          if (includesInput.trim()) {
-                            setFormData({ ...formData, includes: [...(formData.includes || []), includesInput.trim()] })
-                            setIncludesInput('')
-                          }
-                        }}
-                      >
-                        <Plus size={16} />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 min-h-[60px] p-3 border rounded-lg bg-muted/30">
-                      {(formData.includes || []).length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No items added yet</p>
-                      ) : (
-                        (formData.includes || []).map((item, index) => (
-                          <Badge key={index} variant="secondary" className="py-2 px-3 text-sm">
-                            {item}
-                            <X
-                              size={14}
-                              className="ml-2 cursor-pointer hover:text-destructive"
-                              onClick={() => setFormData({
-                                ...formData,
-                                includes: (formData.includes || []).filter((_, i) => i !== index)
-                              })}
-                            />
-                          </Badge>
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Requirements</CardTitle>
-                      <CardDescription>What participants need to prepare</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex gap-2">
-                        <Input
-                          value={requirementInput}
-                          onChange={(e) => setRequirementInput(e.target.value)}
-                          placeholder="Add a requirement..."
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter' && requirementInput.trim()) {
-                              setFormData({ ...formData, requirements: [...(formData.requirements || []), requirementInput.trim()] })
-                              setRequirementInput('')
-                              e.preventDefault()
-                            }
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            if (requirementInput.trim()) {
-                              setFormData({ ...formData, requirements: [...(formData.requirements || []), requirementInput.trim()] })
-                              setRequirementInput('')
-                            }
-                          }}
-                        >
-                          <Plus size={16} />
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2 min-h-[60px] p-3 border rounded-lg bg-muted/30">
-                        {(formData.requirements || []).length === 0 ? (
-                          <p className="text-sm text-muted-foreground">No requirements added yet</p>
-                        ) : (
-                          (formData.requirements || []).map((req, index) => (
-                            <Badge key={index} variant="secondary" className="py-2 px-3 text-sm">
-                              {req}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer hover:text-destructive"
-                                onClick={() => setFormData({
-                                  ...formData,
-                                  requirements: (formData.requirements || []).filter((_, i) => i !== index)
-                                })}
-                              />
-                            </Badge>
-                          ))
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Best For (Tags)</CardTitle>
-                      <CardDescription>Suitable occasions or people</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex gap-2">
-                        <Input
-                          value={bestForInput}
-                          onChange={(e) => setBestForInput(e.target.value)}
-                          placeholder="Add a tag..."
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter' && bestForInput.trim()) {
-                              setFormData({ ...formData, bestFor: [...(formData.bestFor || []), bestForInput.trim()] })
-                              setBestForInput('')
-                              e.preventDefault()
-                            }
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            if (bestForInput.trim()) {
-                              setFormData({ ...formData, bestFor: [...(formData.bestFor || []), bestForInput.trim()] })
-                              setBestForInput('')
-                            }
-                          }}
-                        >
-                          <Plus size={16} />
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2 min-h-[60px] p-3 border rounded-lg bg-muted/30">
-                        {(formData.bestFor || []).length === 0 ? (
-                          <p className="text-sm text-muted-foreground">No tags added yet</p>
-                        ) : (
-                          (formData.bestFor || []).map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="py-2 px-3 text-sm">
-                              {tag}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer hover:text-destructive"
-                                onClick={() => setFormData({
-                                  ...formData,
-                                  bestFor: (formData.bestFor || []).filter((_, i) => i !== index)
-                                })}
-                              />
-                            </Badge>
-                          ))
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Pooja Samagri File Upload */}
-                <Card className="border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-lg">📋 Pooja Samagri (Materials List)</CardTitle>
-                    <CardDescription>Upload a PDF or DOCX file with the list of required materials for this pooja</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-col gap-4">
-                      {(formData.samagriFile || formData.samagriFileUrl || selectedSamagriFile) ? (
-                        <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
-                          <div className="flex items-center gap-3">
-                            {(selectedSamagriFile?.type || formData.samagriFile?.type || '').includes('pdf') || formData.samagriFileUrl?.endsWith('.pdf') ? (
-                              <FilePdf size={32} className="text-red-500" weight="fill" />
-                            ) : (
-                              <FileDoc size={32} className="text-blue-500" weight="fill" />
-                            )}
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{selectedSamagriFile?.name || formData.samagriFile?.name || 'Samagri List'}</p>
-                                {formData.samagriFileUrl && isSupabaseStorageUrl(formData.samagriFileUrl) && (
-                                  <span className="bg-primary/90 text-primary-foreground text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                                    <CloudArrowUp size={10} />
-                                    Stored
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {selectedSamagriFile 
-                                  ? `${(selectedSamagriFile.size / 1024).toFixed(0)} KB - Ready to upload`
-                                  : formData.samagriFileUrl 
-                                    ? 'Stored in cloud'
-                                    : formData.samagriFile?.data 
-                                      ? `${(formData.samagriFile.data.length * 0.75 / 1024).toFixed(0)} KB`
-                                      : ''
-                                }
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setFormData({ ...formData, samagriFile: undefined, samagriFileUrl: undefined })
-                                setSelectedSamagriFile(null)
-                              }}
-                            >
-                              <Trash size={16} className="text-destructive" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div 
-                          className="border-2 border-dashed rounded-lg p-8 text-center space-y-3 cursor-pointer hover:border-primary/50 transition-colors"
-                          onClick={() => samagriFileInputRef.current?.click()}
-                        >
-                          <input
-                            ref={samagriFileInputRef}
-                            type="file"
-                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) {
-                                if (file.size > 50 * 1024 * 1024) {
-                                  toast.error('File size must be less than 50MB')
-                                  return
-                                }
-                                setSelectedSamagriFile(file)
-                                toast.success('File selected! Save to upload.')
-                              }
-                            }}
-                            className="hidden"
-                            disabled={isSaving}
-                          />
-                          <div className="flex justify-center">
-                            <UploadSimple size={48} className="text-muted-foreground" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium mb-1">Click to Upload Samagri List</p>
-                            <p className="text-xs text-muted-foreground">PDF or DOCX files accepted (max 50MB)</p>
-                            <p className="text-xs text-primary mt-2">Files are stored securely in the cloud</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Spiritual Details Tab */}
-              <TabsContent value="comprehensive" className="space-y-6 mt-6">
-                <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-6 mb-6">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    💡 Spiritual & Scriptural Details
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    This section is for adding comprehensive spiritual information about the deity, scriptural references,
-                    when to perform the pooja, and why it's meaningful for families abroad. This creates a rich, educational
-                    experience that helps families understand the deeper significance of each service.
-                  </p>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p><strong>Formatting Tips:</strong></p>
-                    <p>• Use line breaks to separate paragraphs</p>
-                    <p>• For lists, enter one item per line</p>
-                    <p>• Use "–" (dash) to separate titles from descriptions in significance points</p>
-                    <p>• Keep language clear and accessible for all audiences</p>
-                    <p>• Leave fields empty if not applicable to this service</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Deity Information */}
-                  <Card className="border-amber-200 bg-linear-to-br from-amber-50/50 to-orange-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        🕉️ Deity Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="deity-name">Deity Name</Label>
-                        <Input
-                          id="deity-name"
-                          value={formData.details?.deity?.name || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              deity: {
-                                ...formData.details?.deity,
-                                name: e.target.value,
-                                description: formData.details?.deity?.description || '',
-                                significance: formData.details?.deity?.significance || ''
-                              }
-                            }
-                          })}
-                          placeholder="e.g., Sri Satyanarayana Swamy"
-                        />
+                {/* Descriptions Section */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-secondary/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-secondary/10 rounded-lg">
+                        <FileDoc size={20} className="text-primary" weight="fill" />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="deity-description">Description</Label>
-                        <Textarea
-                          id="deity-description"
-                          value={formData.details?.deity?.description || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              deity: {
-                                ...formData.details?.deity,
-                                name: formData.details?.deity?.name || '',
-                                description: e.target.value,
-                                significance: formData.details?.deity?.significance || ''
-                              }
-                            }
-                          })}
-                          placeholder="Brief introduction..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="deity-significance">Significance</Label>
-                        <Textarea
-                          id="deity-significance"
-                          value={formData.details?.deity?.significance || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              deity: {
-                                ...formData.details?.deity,
-                                name: formData.details?.deity?.name || '',
-                                description: formData.details?.deity?.description || '',
-                                significance: e.target.value
-                              }
-                            }
-                          })}
-                          placeholder="Deeper meaning..."
-                          rows={4}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Nature and Purpose */}
-                  <Card className="border-blue-200 bg-linear-to-br from-blue-50/50 to-indigo-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        📖 Nature & Purpose
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="nature">Nature of Pooja</Label>
-                        <Textarea
-                          id="nature"
-                          value={formData.details?.nature || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: { ...formData.details, nature: e.target.value }
-                          })}
-                          placeholder="What is this pooja about..."
-                          rows={4}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Purpose Points (one per line)</Label>
-                        <Textarea
-                          value={(formData.details?.purpose || []).join('\n')}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              purpose: e.target.value.split('\n').filter(line => line.trim())
-                            }
-                          })}
-                          placeholder="Health and long life&#10;Success in endeavours&#10;Prosperity"
-                          rows={6}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Significance */}
-                  <Card className="border-green-200 bg-linear-to-br from-green-50/50 to-emerald-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        ⭐ Significance & Benefits
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Label>Significance Points (one per line)</Label>
-                      <Textarea
-                        value={(formData.details?.significance || []).join('\n')}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          details: {
-                            ...formData.details,
-                            significance: e.target.value.split('\n').filter(line => line.trim())
-                          }
-                        })}
-                        placeholder="Removal of obstacles – Clears blockages&#10;Success – Supports goals"
-                        rows={10}
-                      />
-                      <p className="text-xs text-muted-foreground">Use "–" to separate title and description</p>
-                    </CardContent>
-                  </Card>
-
-                  {/* Scriptural Roots */}
-                  <Card className="border-purple-200 bg-linear-to-br from-purple-50/50 to-violet-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        📜 Scriptural Roots
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="scriptural-source">Source</Label>
-                        <Input
-                          id="scriptural-source"
-                          value={formData.details?.scripturalRoots?.source || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              scripturalRoots: {
-                                source: e.target.value,
-                                description: formData.details?.scripturalRoots?.description || ''
-                              }
-                            }
-                          })}
-                          placeholder="e.g., Skanda Purana"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="scriptural-description">Description</Label>
-                        <Textarea
-                          id="scriptural-description"
-                          value={formData.details?.scripturalRoots?.description || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            details: {
-                              ...formData.details,
-                              scripturalRoots: {
-                                source: formData.details?.scripturalRoots?.source || '',
-                                description: e.target.value
-                              }
-                            }
-                          })}
-                          placeholder="Scriptural background..."
-                          rows={7}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* When to Perform */}
-                  <Card className="border-cyan-200 bg-linear-to-br from-cyan-50/50 to-sky-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        📅 When to Perform
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Label>Auspicious Times (one per line)</Label>
-                      <Textarea
-                        value={(formData.details?.whenToPerform || []).join('\n')}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          details: {
-                            ...formData.details,
-                            whenToPerform: e.target.value.split('\n').filter(line => line.trim())
-                          }
-                        })}
-                        placeholder="Purnima (Full Moon)&#10;Ekadashi&#10;Life milestones"
-                        rows={10}
-                      />
-                    </CardContent>
-                  </Card>
-
-                  {/* Where and Who */}
-                  <Card className="border-pink-200 bg-linear-to-br from-pink-50/50 to-rose-50/50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        📍 Where & Who
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Label htmlFor="where-who">Description</Label>
-                      <Textarea
-                        id="where-who"
-                        value={formData.details?.whereAndWho || ''}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          details: { ...formData.details, whereAndWho: e.target.value }
-                        })}
-                        placeholder="Where pooja can be conducted and who can participate..."
-                        rows={10}
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Special for NRIs - Full Width */}
-                <Card className="border-orange-200 bg-linear-to-br from-orange-50/50 to-red-50/50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      ❤️ Special for NRIs / Families Abroad
-                    </CardTitle>
-                    <CardDescription>Why this service is meaningful for families living outside India</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Label>Reasons (one per line)</Label>
-                    <Textarea
-                      value={(formData.details?.specialForNRIs || []).join('\n')}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        details: {
-                          ...formData.details,
-                          specialForNRIs: e.target.value.split('\n').filter(line => line.trim())
-                        }
-                      })}
-                      placeholder="Simple to perform at home&#10;Brings family together&#10;Teaches children tradition"
-                      rows={8}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Preview Tab */}
-              <TabsContent value="preview" className="mt-6">
-                <Card className="border-primary/20">
-                  <CardHeader>
-                    <CardTitle>Service Preview</CardTitle>
-                    <CardDescription>How your service will appear to users</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="border rounded-lg p-6 bg-linear-to-br from-primary/5 to-accent/5">
-                      <div className="flex items-center gap-3 mb-4">
-                        <h3 className="text-2xl font-heading font-bold">{formData.name || 'Service Name'}</h3>
-                        <Badge>{categoryNames[formData.category]}</Badge>
-                      </div>
-                      <p className="text-muted-foreground mb-4">{formData.description || 'No description yet'}</p>
-                      <div className="flex gap-4 text-sm">
-                        <span>⏱️ {formData.duration || 'Duration not set'}</span>
-                        {formData.price && <span>💰 {formData.price}</span>}
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Descriptions</h3>
+                        <p className="text-xs text-muted-foreground">Tell devotees about this sacred service</p>
                       </div>
                     </div>
+                    
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                          Short Description <span className="text-destructive">*</span>
+                        </Label>
+                        <p className="text-xs text-muted-foreground mb-2">Brief overview shown on service cards (1-2 sentences)</p>
+                        <QuillEditor
+                          value={formData.description}
+                          onChange={(value) => setFormData({ ...formData, description: value })}
+                          placeholder="Brief description shown on service cards..."
+                          minHeight="120px"
+                        />
+                      </div>
 
-                    {(formData.benefits && formData.benefits.length > 0) && (
+                      <div className="space-y-2">
+                        <Label htmlFor="detailedDescription" className="text-sm font-medium">
+                          Detailed Description
+                        </Label>
+                        <p className="text-xs text-muted-foreground mb-2">Full description with rich formatting for the service page</p>
+                        <QuillEditor
+                          value={formData.detailedDescription || ''}
+                          onChange={(value) => setFormData({ ...formData, detailedDescription: value })}
+                          placeholder="Comprehensive details about this sacred ceremony..."
+                          minHeight="200px"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Details Tab */}
+              <TabsContent value="details" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+                {/* Benefits Card */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-green-500/10 rounded-lg">
+                        <span className="text-xl">✨</span>
+                      </div>
                       <div>
-                        <h4 className="font-semibold mb-3">Benefits</h4>
-                        <div className="space-y-2">
-                          {formData.benefits.map((benefit, i) => (
-                            <div key={i} className="flex items-start gap-2">
-                              <span className="text-primary">✓</span>
-                              <span className="text-sm">{benefit}</span>
-                            </div>
+                        <h3 className="font-heading font-semibold text-lg">Spiritual Benefits</h3>
+                        <p className="text-xs text-muted-foreground">What devotees gain from this service</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={benefitInput}
+                        onChange={(e) => setBenefitInput(e.target.value)}
+                        placeholder="e.g., Inner peace and harmony..."
+                        className="h-12 flex-1 bg-background"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && benefitInput.trim()) {
+                            setFormData({ ...formData, benefits: [...formData.benefits, benefitInput.trim()] })
+                            setBenefitInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        className="h-12 px-6 bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          if (benefitInput.trim()) {
+                            setFormData({ ...formData, benefits: [...formData.benefits, benefitInput.trim()] })
+                            setBenefitInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={18} weight="bold" />
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-4 min-h-[80px] p-4 border border-dashed border-green-500/30 rounded-xl bg-green-500/5">
+                      {formData.benefits.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Press Enter or click + to add benefits
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {formData.benefits.map((benefit, index) => (
+                            <Badge 
+                              key={index} 
+                              className="py-2 px-4 bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 hover:bg-green-500/20 transition-colors group"
+                            >
+                              <span className="mr-1">✓</span>
+                              {benefit}
+                              <X
+                                size={14}
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  benefits: formData.benefits.filter((_, i) => i !== index)
+                                })}
+                              />
+                            </Badge>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                    {formData.details?.deity && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <h4 className="font-semibold mb-2">🕉️ {formData.details.deity.name}</h4>
-                        <p className="text-sm text-muted-foreground">{formData.details.deity.description}</p>
+                {/* Includes Card */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-blue-500/10 rounded-lg">
+                        <span className="text-xl">📦</span>
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">What's Included</h3>
+                        <p className="text-xs text-muted-foreground">Items and services provided</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={includesInput}
+                        onChange={(e) => setIncludesInput(e.target.value)}
+                        placeholder="e.g., All pooja samagri included..."
+                        className="h-12 flex-1 bg-background"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && includesInput.trim()) {
+                            setFormData({ ...formData, includes: [...formData.includes, includesInput.trim()] })
+                            setIncludesInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        className="h-12 px-6 bg-blue-600 hover:bg-blue-700"
+                        onClick={() => {
+                          if (includesInput.trim()) {
+                            setFormData({ ...formData, includes: [...formData.includes, includesInput.trim()] })
+                            setIncludesInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={18} weight="bold" />
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-4 min-h-[80px] p-4 border border-dashed border-blue-500/30 rounded-xl bg-blue-500/5">
+                      {formData.includes.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Press Enter or click + to add included items
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {formData.includes.map((item, index) => (
+                            <Badge 
+                              key={index} 
+                              className="py-2 px-4 bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 hover:bg-blue-500/20 transition-colors group"
+                            >
+                              <span className="mr-1">📌</span>
+                              {item}
+                              <X
+                                size={14}
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  includes: formData.includes.filter((_, i) => i !== index)
+                                })}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Requirements Card */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-amber-500/10 rounded-lg">
+                        <span className="text-xl">📋</span>
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Requirements</h3>
+                        <p className="text-xs text-muted-foreground">What devotees need to prepare</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={requirementInput}
+                        onChange={(e) => setRequirementInput(e.target.value)}
+                        placeholder="e.g., Clean pooja area..."
+                        className="h-12 flex-1 bg-background"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && requirementInput.trim()) {
+                            setFormData({ ...formData, requirements: [...formData.requirements, requirementInput.trim()] })
+                            setRequirementInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        className="h-12 px-6 bg-amber-600 hover:bg-amber-700"
+                        onClick={() => {
+                          if (requirementInput.trim()) {
+                            setFormData({ ...formData, requirements: [...formData.requirements, requirementInput.trim()] })
+                            setRequirementInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={18} weight="bold" />
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-4 min-h-[80px] p-4 border border-dashed border-amber-500/30 rounded-xl bg-amber-500/5">
+                      {formData.requirements.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Press Enter or click + to add requirements
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {formData.requirements.map((req, index) => (
+                            <Badge 
+                              key={index} 
+                              className="py-2 px-4 bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 transition-colors group"
+                            >
+                              <span className="mr-1">⚡</span>
+                              {req}
+                              <X
+                                size={14}
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  requirements: formData.requirements.filter((_, i) => i !== index)
+                                })}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Media & Files Tab */}
+              <TabsContent value="media" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+                {/* Service Image */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-purple-500/10 rounded-lg">
+                        <ImageIcon size={20} className="text-purple-600" weight="fill" />
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Service Image</h3>
+                        <p className="text-xs text-muted-foreground">Visual representation of your service</p>
+                      </div>
+                    </div>
+                    
+                    {formData.imageUrl ? (
+                      <div className="space-y-4">
+                        <div className="relative group rounded-xl overflow-hidden border-2 border-purple-500/20 max-w-md">
+                          <img
+                            src={formData.imageUrl}
+                            alt="Service"
+                            className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="flex-1 bg-white/90 hover:bg-white"
+                              onClick={() => setShowImagePicker(true)}
+                            >
+                              <PencilSimple size={14} className="mr-2" />
+                              Change
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                            >
+                              <Trash size={14} />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        className="border-2 border-dashed border-purple-500/30 rounded-xl p-12 text-center cursor-pointer hover:border-purple-500/50 hover:bg-purple-500/5 transition-all duration-300 group"
+                        onClick={() => setShowImagePicker(true)}
+                      >
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <ImageIcon size={32} className="text-purple-500" weight="duotone" />
+                        </div>
+                        <p className="font-medium text-foreground mb-1">Select Image from Library</p>
+                        <p className="text-sm text-muted-foreground">Click to browse your media collection</p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+
+                {/* Samagri File Upload */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-rose-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-rose-500/10 rounded-lg">
+                        <FilePdf size={20} className="text-rose-600" weight="fill" />
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Pooja Samagri List</h3>
+                        <p className="text-xs text-muted-foreground">Upload PDF or DOCX file (max 50MB)</p>
+                      </div>
+                    </div>
+                    
+                    {(formData.samagriFile || formData.samagriFileUrl || selectedSamagriFile) ? (
+                      <div className="border border-rose-500/20 rounded-xl p-5 bg-gradient-to-r from-rose-500/5 to-transparent">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-rose-500/10 rounded-xl">
+                            {(selectedSamagriFile?.type || formData.samagriFile?.type || '').includes('pdf') || formData.samagriFileUrl?.endsWith('.pdf') ? (
+                              <FilePdf size={36} className="text-rose-500" weight="fill" />
+                            ) : (
+                              <FileDoc size={36} className="text-blue-500" weight="fill" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">
+                              {selectedSamagriFile?.name || formData.samagriFile?.name || 'Samagri List'}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedSamagriFile
+                                ? `${(selectedSamagriFile.size / 1024).toFixed(0)} KB • Ready to upload`
+                                : '✓ Stored in cloud'
+                              }
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => {
+                              setFormData({ ...formData, samagriFile: undefined, samagriFileUrl: undefined })
+                              setSelectedSamagriFile(null)
+                            }}
+                          >
+                            <Trash size={18} />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="border-2 border-dashed border-rose-500/30 rounded-xl p-12 text-center cursor-pointer hover:border-rose-500/50 hover:bg-rose-500/5 transition-all duration-300 group"
+                        onClick={() => samagriFileInputRef.current?.click()}
+                      >
+                        <input
+                          ref={samagriFileInputRef}
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              if (file.size > 50 * 1024 * 1024) {
+                                toast.error('File size must be less than 50MB')
+                                return
+                              }
+                              setSelectedSamagriFile(file)
+                              toast.success('File selected! Save to upload.')
+                            }
+                          }}
+                          className="hidden"
+                          disabled={isSaving}
+                        />
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <CloudArrowUp size={32} className="text-rose-500" weight="duotone" />
+                        </div>
+                        <p className="font-medium text-foreground mb-1">Upload Samagri Document</p>
+                        <p className="text-sm text-muted-foreground">PDF or DOCX • Drag & drop or click to browse</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
 
-          <div className="flex gap-3 justify-end pt-4 border-t bg-background">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
-              <X size={18} className="mr-2" />
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="min-w-[120px]" disabled={isSaving}>
-              {isSaving ? (
-                <>
-                  <Spinner className="mr-2 animate-spin" size={18} />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <FloppyDisk size={18} className="mr-2" />
-                  Save Service
-                </>
-              )}
-            </Button>
+          {/* Stunning Footer */}
+          <div className="relative px-8 py-5 border-t bg-muted/50">
+            <div className="relative flex items-center justify-between">
+              <div className="text-sm text-muted-foreground hidden sm:block">
+                {currentTab === 'basic' && '📝 Fill in the essential service details'}
+                {currentTab === 'details' && '✨ Add benefits, includes, and requirements'}
+                {currentTab === 'media' && '🖼️ Upload images and documents'}
+              </div>
+              <div className="flex gap-3 ml-auto">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)} 
+                  disabled={isSaving}
+                  className="px-6"
+                >
+                  <X size={18} className="mr-2" />
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSave} 
+                  className="min-w-[140px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Spinner className="mr-2 animate-spin" size={18} />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FloppyDisk size={18} className="mr-2" />
+                      Save Service
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
+
+          {/* Image Picker Modal */}
+          {showImagePicker && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+              <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="p-5 border-b flex items-center justify-between bg-gradient-to-r from-primary/5 to-accent/5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <ImageIcon size={20} className="text-primary" weight="fill" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-semibold text-lg">Select Image</h3>
+                      <p className="text-xs text-muted-foreground">Choose from your media library</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowImagePicker(false)} className="rounded-full">
+                    <X size={20} />
+                  </Button>
+                </div>
+                <div className="p-5 overflow-y-auto">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {photos.map((photo) => (
+                      <div
+                        key={photo.id}
+                        className="cursor-pointer group relative aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg"
+                        onClick={() => {
+                          setFormData({ ...formData, imageUrl: photo.url })
+                          setShowImagePicker(false)
+                          toast.success('Image selected')
+                        }}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <div className="bg-white text-primary font-semibold px-4 py-2 rounded-full text-sm shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                            Select
+                          </div>
+                        </div>
+                        <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <p className="text-white text-xs font-medium truncate drop-shadow-lg">{photo.title}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
