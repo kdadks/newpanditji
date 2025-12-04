@@ -302,11 +302,40 @@ export default function HomePageEditor({ content, setContent, onSave, isSaving }
           <CardDescription>Cards showcasing temples and sacred locations</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {content.sacredSpaces?.map((space, idx) => (
+          {/* Section Header Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 border-b">
+            <div className="space-y-2">
+              <Label>Section Badge</Label>
+              <Input
+                value={content.sacredSpaces?.badge || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, badge: e.target.value } as typeof prev.sacredSpaces }))}
+                placeholder="Sacred Spaces"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={content.sacredSpaces?.title || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, title: e.target.value } as typeof prev.sacredSpaces }))}
+                placeholder="Divine Temples & Sacred Altars"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Section Description</Label>
+              <Input
+                value={content.sacredSpaces?.description || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, description: e.target.value } as typeof prev.sacredSpaces }))}
+                placeholder="Experience the beauty and serenity..."
+              />
+            </div>
+          </div>
+          
+          {/* Space Cards */}
+          {content.sacredSpaces?.spaces?.map((space, idx) => (
             <div key={idx} className="border rounded-lg p-4 space-y-3 bg-muted/20">
               <div className="flex justify-between items-center">
                 <Badge variant="secondary">Space {idx + 1}</Badge>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setContent(prev => ({ ...prev, sacredSpaces: prev.sacredSpaces?.filter((_, i) => i !== idx) || [] }))}>
+                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, spaces: prev.sacredSpaces?.spaces?.filter((_, i) => i !== idx) || [] } as typeof prev.sacredSpaces }))}>
                   <Trash size={14} />
                 </Button>
               </div>
@@ -315,27 +344,27 @@ export default function HomePageEditor({ content, setContent, onSave, isSaving }
                   <Label>Title</Label>
                   <Input
                     value={space.title}
-                    onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: prev.sacredSpaces?.map((s, i) => i === idx ? { ...s, title: e.target.value } : s) || [] }))}
+                    onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, spaces: prev.sacredSpaces?.spaces?.map((s, i) => i === idx ? { ...s, title: e.target.value } : s) || [] } as typeof prev.sacredSpaces }))}
                     placeholder="Temple name..."
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Location</Label>
+                  <Label>Subtitle</Label>
                   <Input
-                    value={space.location || ''}
-                    onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: prev.sacredSpaces?.map((s, i) => i === idx ? { ...s, location: e.target.value } : s) || [] }))}
-                    placeholder="Location..."
+                    value={space.subtitle || ''}
+                    onChange={(e) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, spaces: prev.sacredSpaces?.spaces?.map((s, i) => i === idx ? { ...s, subtitle: e.target.value } : s) || [] } as typeof prev.sacredSpaces }))}
+                    placeholder="Description..."
                   />
                 </div>
               </div>
               <MediaPickerInput
                 label="Image"
                 value={space.image}
-                onChange={(url) => setContent(prev => ({ ...prev, sacredSpaces: prev.sacredSpaces?.map((s, i) => i === idx ? { ...s, image: url } : s) || [] }))}
+                onChange={(url) => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, spaces: prev.sacredSpaces?.spaces?.map((s, i) => i === idx ? { ...s, image: url } : s) || [] } as typeof prev.sacredSpaces }))}
               />
             </div>
           ))}
-          <Button variant="outline" size="sm" onClick={() => setContent(prev => ({ ...prev, sacredSpaces: [...(prev.sacredSpaces || []), { title: '', image: '', location: '' }] }))}>
+          <Button variant="outline" size="sm" onClick={() => setContent(prev => ({ ...prev, sacredSpaces: { ...prev.sacredSpaces, spaces: [...(prev.sacredSpaces?.spaces || []), { title: '', image: '', subtitle: '' }] } as typeof prev.sacredSpaces }))}>
             <Plus size={14} className="mr-2" />
             Add Sacred Space
           </Button>

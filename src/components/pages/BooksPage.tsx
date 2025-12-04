@@ -5,6 +5,7 @@ import { Button } from '../ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { BookOpen, BookBookmark, FlowerLotus, Atom, GraduationCap, Lightbulb, Sparkle, Heart, Calendar, Users } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useBooksPageContent } from '../../hooks/useCmsContent'
 
 interface Book {
   id: number
@@ -24,6 +25,9 @@ interface Book {
 export default function BooksPage() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+
+  // CMS Content
+  const { content: cmsContent } = useBooksPageContent()
 
   // SEO Configuration
   usePageSEO({

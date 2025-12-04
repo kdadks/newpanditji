@@ -1,5 +1,6 @@
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useCharity } from '../../hooks/useCharity'
+import { useCharityContent } from '../../hooks/useCmsContent'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -29,6 +30,9 @@ const getYouTubeEmbedUrl = (url: string) => {
 }
 
 export default function CharityPage() {
+  // CMS Content
+  const { content: cmsContent } = useCharityContent()
+
   usePageSEO({
     title: 'Hindu Community Charity Work & Social Service | Pandit Rajesh Joshi',
     description: 'Explore our Hindu community charity initiatives, spiritual education programs, and social service projects. Supporting communities in Ireland, UK, and Northern Ireland.',
@@ -48,13 +52,13 @@ export default function CharityPage() {
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
             <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src={cmsContent.hero.backgroundImages[1] || "/images/Golden Temples of Devotion.png"} alt="" className="h-full w-auto object-cover opacity-40" />
             <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
             <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src={cmsContent.hero.backgroundImages[0] || "/images/South Asian Temple Complex.png"} alt="" className="h-full w-auto object-cover opacity-40" />
+            <img src={cmsContent.hero.backgroundImages[1] || "/images/Golden Temples of Devotion.png"} alt="" className="h-full w-auto object-cover opacity-40" />
             <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
             <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
           </div>
@@ -82,35 +86,27 @@ export default function CharityPage() {
 
             <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
               <Target size={16} />
-              Service to Humanity
+              {cmsContent.hero.badge}
             </div>
 
             <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Charity <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">& Compassion</span>
+              {cmsContent.hero.title} <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{cmsContent.hero.subtitle}</span>
             </h1>
 
             <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              Serving humanity through spiritual education and community initiatives,
-              making sacred wisdom accessible to all who seek enlightenment and peace.
+              {cmsContent.hero.description}
             </p>
 
             {/* Stats - Compact inline version */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">1000+</span> Gitas Distributed
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">50+</span> Communities
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">25+</span> Rotary Clubs
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">24/7</span> Support
-              </span>
+              {cmsContent.statistics.map((stat, index) => (
+                <span key={index}>
+                  {index > 0 && <span className="text-white/50 mr-6">•</span>}
+                  <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                    <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
+                  </span>
+                </span>
+              ))}
             </div>
           </div>
         </div>

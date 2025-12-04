@@ -6,6 +6,7 @@ import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/re
 import { services, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useServices } from '../../hooks/useServices'
+import { useHomeContent } from '../../hooks/useCmsContent'
 
 interface HomePageProps {
   onNavigate: (pageOrData: Page | NavigationData) => void
@@ -16,6 +17,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   // Use database services if available, otherwise fall back to defaults
   const allServices = (dbServices && dbServices.length > 0) ? dbServices : services
   const featuredServices = allServices.slice(0, 12) // Get more services for the carousel
+  
+  // CMS Content from database
+  const { content: cmsContent, isLoading: cmsLoading } = useHomeContent()
   
   // Service carousel pause state on hover
   const [isPaused, setIsPaused] = useState(false)
@@ -34,48 +38,24 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
-            <img 
-              src="/images/South Asian Temple Complex.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/Golden Temples of Devotion.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/Traditional Altar with Marigold Flowers.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img 
+                key={`bg-1-${index}`}
+                src={img} 
+                alt="" 
+                className="h-full w-auto object-cover opacity-40"
+              />
+            ))}
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img 
-              src="/images/South Asian Temple Complex.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/Golden Temples of Devotion.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/Traditional Altar with Marigold Flowers.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img 
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" 
-              alt="" 
-              className="h-full w-auto object-cover opacity-40"
-            />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img 
+                key={`bg-2-${index}`}
+                src={img} 
+                alt="" 
+                className="h-full w-auto object-cover opacity-40"
+              />
+            ))}
           </div>
         </div>
         
@@ -95,7 +75,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
-                  src="/images/Logo/Raj ji.png"
+                  src={cmsContent.hero.profileImage}
                   alt="Pandit Rajesh Joshi"
                   className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
                   style={{
@@ -113,49 +93,50 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             <div className="order-2 lg:order-2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
                 <FlowerLotus size={16} weight="fill" />
-                Traditional Hindu Priest & Spiritual Guide
+                {cmsContent.hero.subtitle}
               </div>
 
               <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                Experience <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Authentic</span> Hindu Ceremonies
+                {cmsContent.hero.title.split(' ').map((word, i) => 
+                  word.toLowerCase() === 'authentic' ? (
+                    <span key={i} className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{word} </span>
+                  ) : (
+                    <span key={i}>{word} </span>
+                  )
+                )}
               </h1>
 
               <p className="text-lg md:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.
+                {cmsContent.hero.description}
               </p>
 
               {/* Statistics - Compact inline version */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">500+</span> Poojas
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">250+</span> Clients
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">15+</span> Years
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">5</span> Books
-                </span>
+                {cmsContent.hero.statistics.map((stat, index) => (
+                  <span key={index}>
+                    {index > 0 && <span className="text-white/50 mr-6">•</span>}
+                    <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                      <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
+                    </span>
+                  </span>
+                ))}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button size="lg" onClick={() => onNavigate('about')} className="text-base px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Users className="mr-2" size={20} />
-                  About Us
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate('why-choose-us')} className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-                  <Sparkle className="mr-2" size={20} weight="fill" />
-                  Why Choose Us
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate('services')} className="text-base px-8 py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all duration-300">
-                  <BookOpen className="mr-2" size={20} />
-                  Explore Services
-                </Button>
+                {cmsContent.hero.ctaButtons.map((btn, index) => (
+                  <Button 
+                    key={index}
+                    size="lg" 
+                    variant={btn.variant === 'primary' ? 'default' : 'outline'}
+                    onClick={() => onNavigate(btn.link.replace('/', '') as Page || 'home')} 
+                    className={`text-base px-8 py-3 ${btn.variant === 'primary' ? 'shadow-lg hover:shadow-xl' : 'border-2 hover:bg-primary hover:text-primary-foreground'} transition-all duration-300`}
+                  >
+                    {index === 0 && <Users className="mr-2" size={20} />}
+                    {index === 1 && <Sparkle className="mr-2" size={20} weight="fill" />}
+                    {index === 2 && <BookOpen className="mr-2" size={20} />}
+                    {btn.text}
+                  </Button>
+                ))}
               </div>
             </div>
           </div>
@@ -166,20 +147,14 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <div className="relative w-full h-48 md:h-64 z-20 overflow-hidden">
         <div className="absolute inset-0 flex gap-4">
           <div className="flex gap-4 animate-scroll-left">
-            <img src="/images/Raj 1.jpg" alt="Sacred Ceremony" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 1.jpg" alt="Traditional Pooja" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            {cmsContent.photoGallery.images.map((img, index) => (
+              <img key={`gallery-1-${index}`} src={img} alt="Sacred Ceremony" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            ))}
           </div>
           <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
-            <img src="/images/Raj 1.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 1.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Raj 2.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 2.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Raj 3.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
-            <img src="/images/Pooja 3.jpg" alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            {cmsContent.photoGallery.images.map((img, index) => (
+              <img key={`gallery-2-${index}`} src={img} alt="" className="h-48 md:h-64 w-auto object-cover rounded-lg shadow-2xl" />
+            ))}
           </div>
         </div>
       </div>
@@ -189,12 +164,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
               <FlowerLotus size={16} weight="fill" />
-              Our Sacred Services
+              {cmsContent.services.badge}
             </div>
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Comprehensive Spiritual Services</h2>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">{cmsContent.services.title}</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From birth ceremonies to final rites, we provide authentic Hindu rituals and spiritual guidance
-              for every sacred moment in life.
+              {cmsContent.services.description}
             </p>
           </div>
         </div>
@@ -297,7 +271,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               className="px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <BookOpen className="mr-2" size={20} />
-              View All 40+ Services
+              {cmsContent.services.buttonText}
             </Button>
           </div>
         </div>
@@ -309,74 +283,31 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-3">
               <FlowerLotus size={16} weight="fill" />
-              Sacred Spaces
+              {cmsContent.sacredSpaces.badge}
             </div>
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-2">Divine Temples & Sacred Altars</h2>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-2">{cmsContent.sacredSpaces.title}</h2>
             <p className="text-muted-foreground text-base max-w-2xl mx-auto">
-              Experience the beauty and serenity of traditional Hindu temples and ceremonial spaces
+              {cmsContent.sacredSpaces.description}
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
-                  alt="Divine Vaidyanath Temple"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-semibold text-lg mb-1">Divine Vaidyanath Temple</h3>
-                  <p className="text-white/80 text-xs">Sacred Hindu Architecture</p>
+            {cmsContent.sacredSpaces.spaces.map((space, index) => (
+              <Card key={index} className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+                <div className="relative h-56 overflow-hidden">
+                  <img
+                    src={space.image}
+                    alt={space.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-white font-semibold text-lg mb-1">{space.title}</h3>
+                    <p className="text-white/80 text-xs">{space.subtitle}</p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-            
-            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="/images/Golden Temples of Devotion.png"
-                  alt="Golden Temples"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-semibold text-lg mb-1">Golden Temples</h3>
-                  <p className="text-white/80 text-xs">Places of Worship & Devotion</p>
-                </div>
-              </div>
-            </Card>
-            
-            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="/images/South Asian Temple Complex.png"
-                  alt="South Asian Temple Complex"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-semibold text-lg mb-1">Temple Complex</h3>
-                  <p className="text-white/80 text-xs">Traditional Sacred Grounds</p>
-                </div>
-              </div>
-            </Card>
-            
-            <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="/images/Traditional Altar with Marigold Flowers.png"
-                  alt="Traditional Altar"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-semibold text-lg mb-1">Sacred Altar</h3>
-                  <p className="text-white/80 text-xs">Adorned with Marigold Flowers</p>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -384,47 +315,37 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="py-10 md:py-16 bg-muted/30">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <BookOpen className="mx-auto mb-3 text-primary" size={40} />
-                <h3 className="font-heading font-semibold text-lg mb-2">Deep Knowledge</h3>
-                <p className="text-muted-foreground text-sm">
-                  Extensive understanding of Hindu scriptures, rituals, and traditions passed through generations
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <Heart className="mx-auto mb-3 text-primary" size={40} weight="fill" />
-                <h3 className="font-heading font-semibold text-lg mb-2">Devotional Service</h3>
-                <p className="text-muted-foreground text-sm">
-                  Every ceremony performed with genuine devotion, care, and respect for sacred traditions
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <Users className="mx-auto mb-3 text-primary" size={40} weight="fill" />
-                <h3 className="font-heading font-semibold text-lg mb-2">Community Focused</h3>
-                <p className="text-muted-foreground text-sm">
-                  Dedicated to serving families and communities with accessible spiritual guidance
-                </p>
-              </CardContent>
-            </Card>
+            {cmsContent.featureCards.map((card, index) => {
+              // Icon mapping for feature cards
+              const iconMap: Record<string, React.ReactNode> = {
+                'BookOpen': <BookOpen className="mx-auto mb-3 text-primary" size={40} />,
+                'Heart': <Heart className="mx-auto mb-3 text-primary" size={40} weight="fill" />,
+                'Users': <Users className="mx-auto mb-3 text-primary" size={40} weight="fill" />
+              }
+              return (
+                <Card key={index} className="text-center">
+                  <CardContent className="p-6">
+                    {iconMap[card.icon] || <FlowerLotus className="mx-auto mb-3 text-primary" size={40} weight="fill" />}
+                    <h3 className="font-heading font-semibold text-lg mb-2">{card.title}</h3>
+                    <p className="text-muted-foreground text-sm">
+                      {card.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
 
       <section className="py-10 md:py-16">
         <div className="container mx-auto px-4 max-w-7xl text-center">
-          <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-4">Ready to Begin Your Spiritual Journey?</h2>
+          <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-4">{cmsContent.ctaSection.title}</h2>
           <p className="text-muted-foreground text-base mb-6 max-w-2xl mx-auto">
-            Contact us to discuss your ceremony needs or for spiritual consultation
+            {cmsContent.ctaSection.description}
           </p>
           <Button size="lg" onClick={() => onNavigate('contact')}>
-            Get in Touch
+            {cmsContent.ctaSection.ctaButtons[0]?.text || 'Get in Touch'}
           </Button>
         </div>
       </section>

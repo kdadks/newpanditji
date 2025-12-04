@@ -53,12 +53,17 @@ export const defaultHomeContent: HomePageContent = {
     description: 'From birth ceremonies to final rites, we provide authentic Hindu rituals and spiritual guidance for every sacred moment in life.',
     buttonText: 'View All 40+ Services'
   },
-  sacredSpaces: [
-    { image: '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png', title: 'Divine Vaidyanath Temple', location: 'Sacred Hindu Architecture' },
-    { image: '/images/Golden Temples of Devotion.png', title: 'Golden Temples', location: 'Places of Worship & Devotion' },
-    { image: '/images/South Asian Temple Complex.png', title: 'Temple Complex', location: 'Traditional Sacred Grounds' },
-    { image: '/images/Traditional Altar with Marigold Flowers.png', title: 'Sacred Altar', location: 'Adorned with Marigold Flowers' }
-  ],
+  sacredSpaces: {
+    badge: 'Sacred Spaces',
+    title: 'Divine Temples & Sacred Altars',
+    description: 'Experience the beauty and serenity of traditional Hindu temples and ceremonial spaces',
+    spaces: [
+      { image: '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png', title: 'Divine Vaidyanath Temple', subtitle: 'Sacred Hindu Architecture' },
+      { image: '/images/Golden Temples of Devotion.png', title: 'Golden Temples', subtitle: 'Places of Worship & Devotion' },
+      { image: '/images/South Asian Temple Complex.png', title: 'Temple Complex', subtitle: 'Traditional Sacred Grounds' },
+      { image: '/images/Traditional Altar with Marigold Flowers.png', title: 'Sacred Altar', subtitle: 'Adorned with Marigold Flowers' }
+    ]
+  },
   featureCards: [
     { title: 'Deep Knowledge', description: 'Extensive understanding of Hindu scriptures, rituals, and traditions passed through generations', icon: 'BookOpenText' },
     { title: 'Devotional Service', description: 'Every ceremony performed with genuine devotion, care, and respect for sacred traditions', icon: 'Heart' },

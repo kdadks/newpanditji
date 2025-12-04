@@ -3,6 +3,7 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil, Briefcase, HandHeart, Lightbulb, MedalMilitary, BookOpen, Atom, ArrowRight, ChatCircleDots } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useAboutContent } from '../../hooks/useCmsContent'
 import { Page } from '../../App'
 
 interface AboutPageProps {
@@ -10,6 +11,9 @@ interface AboutPageProps {
 }
 
 export default function AboutPage({ onNavigate }: AboutPageProps) {
+  // CMS Content
+  const { content: cmsContent } = useAboutContent()
+
   // SEO Configuration
   usePageSEO({
     title: 'About Rajesh Joshi "eYogi Raj" | Industrialist, Scholar, Pandit & Author',
@@ -25,48 +29,14 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
-            <img
-              src="/images/South Asian Temple Complex.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Golden Temples of Devotion.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Traditional Altar with Marigold Flowers.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img
-              src="/images/South Asian Temple Complex.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Golden Temples of Devotion.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Traditional Altar with Marigold Flowers.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
         </div>
         
@@ -86,7 +56,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
                 <img
-                  src="/images/Logo/Raj ji.png"
+                  src={cmsContent.profileImage}
                   alt="Pandit Rajesh Joshi"
                   className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
                   style={{
@@ -104,34 +74,27 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
             <div className="order-2 lg:order-2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
                 <FlowerLotus size={16} weight="fill" />
-                Hindu Scholar & Spiritual Guide
+                {cmsContent.badge}
               </div>
 
               <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                Meet <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Rajesh Joshi</span> "eYogi Raj"
+                {cmsContent.hero.title} <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{cmsContent.name}</span> {cmsContent.title}
               </h1>
 
               <p className="text-base md:text-lg lg:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker bridging ancient wisdom with modern life.
+                {cmsContent.shortBio}
               </p>
 
               {/* Statistics - Compact inline version */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">200+</span> Poojas
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">100+</span> Poems
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">10+</span> Years Teaching
-                </span>
-                <span className="text-white/50">•</span>
-                <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  <span className="font-bold text-amber-400">6</span> Books
-                </span>
+                {cmsContent.statistics.map((stat, index) => (
+                  <span key={index}>
+                    {index > 0 && <span className="text-white/50 mr-6">•</span>}
+                    <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                      <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
+                    </span>
+                  </span>
+                ))}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
@@ -156,30 +119,6 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
       {/* Content Section */}
       <section className="pt-12 md:pt-16 pb-8 md:pb-12 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
-
-        {/* Quick Stats Cards - Removed as stats are now in hero */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 hidden">
-          <div className="text-center p-4 rounded-lg bg-linear-to-br from-primary/5 to-primary/10">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">200+</div>
-            <div className="text-sm text-muted-foreground font-medium">Poojas Performed</div>
-            <div className="text-xs text-muted-foreground/70 mt-1">Since 2001</div>
-          </div>
-          <div className="text-center p-4 rounded-lg bg-linear-to-br from-accent/5 to-accent/10">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">100+</div>
-            <div className="text-sm text-muted-foreground font-medium">Poems Composed</div>
-            <div className="text-xs text-muted-foreground/70 mt-1">Hindi Poetry</div>
-          </div>
-          <div className="text-center p-4 rounded-lg bg-linear-to-br from-secondary/5 to-secondary/10">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">10+</div>
-            <div className="text-sm text-muted-foreground font-medium">Years Teaching</div>
-            <div className="text-xs text-muted-foreground/70 mt-1">eYogi Gurukul</div>
-          </div>
-          <div className="text-center p-4 rounded-lg bg-linear-to-br from-primary/5 to-accent/5">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">5+</div>
-            <div className="text-sm text-muted-foreground font-medium">Published Books</div>
-            <div className="text-xs text-muted-foreground/70 mt-1">On Hinduism</div>
-          </div>
-        </div>
 
         {/* Main Content Grid - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">

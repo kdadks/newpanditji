@@ -2,8 +2,12 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Heart, GraduationCap, FlowerLotus, ListChecks, UsersFour, Globe, Sparkle, BookOpen, CheckCircle } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useWhyChooseContent } from '../../hooks/useCmsContent'
 
 export default function WhyChooseUsPage() {
+  // CMS Content
+  const { content: cmsContent } = useWhyChooseContent()
+
   // SEO Configuration
   usePageSEO({
     title: 'Why Choose Rajesh Joshi | Authentic Vedic Poojas with Heart & Knowledge',
@@ -117,16 +121,14 @@ export default function WhyChooseUsPage() {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
         </div>
         
@@ -143,39 +145,35 @@ export default function WhyChooseUsPage() {
           {/* Hero Content */}
           <div className="text-center mb-8">
             <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Why Choose <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Pandit Rajesh Joshi</span>
+              {cmsContent.hero.title.includes('Pandit') ? (
+                <>Why Choose <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Pandit Rajesh Joshi</span></>
+              ) : (
+                cmsContent.hero.title
+              )}
             </h1>
             <p className="text-lg text-white/95 max-w-2xl mx-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              Experience the perfect blend of authentic Vedic traditions, scholarly wisdom, and heartfelt devotion
+              {cmsContent.hero.subtitle}
             </p>
           </div>
 
           {/* Quick Benefits Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <Heart className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Genuine Bhakti</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <GraduationCap className="mx-auto mb-2 text-amber-400" size={32} />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">20+ Years</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <FlowerLotus className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">100% Vedic</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <ListChecks className="mx-auto mb-2 text-amber-400" size={32} />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">30+ Poojas</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <UsersFour className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Personalized</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-              <Globe className="mx-auto mb-2 text-amber-400" size={32} />
-              <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">E-Pooja</p>
-            </div>
+            {cmsContent.quickBenefits.map((benefit, index) => {
+              const iconMap: Record<string, React.ReactNode> = {
+                'Heart': <Heart className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />,
+                'GraduationCap': <GraduationCap className="mx-auto mb-2 text-amber-400" size={32} />,
+                'FlowerLotus': <FlowerLotus className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />,
+                'ListChecks': <ListChecks className="mx-auto mb-2 text-amber-400" size={32} />,
+                'UsersFour': <UsersFour className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />,
+                'Globe': <Globe className="mx-auto mb-2 text-amber-400" size={32} />
+              }
+              return (
+                <div key={index} className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+                  {iconMap[benefit.icon] || <Sparkle className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />}
+                  <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{benefit.label}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>

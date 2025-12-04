@@ -3,21 +3,24 @@ import { FileText, Article as HeaderIcon } from '@phosphor-icons/react'
 import { Card, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { toast } from 'sonner'
-import { useSiteSettings } from '../../hooks/useSiteSettings'
 import { useMenuItems } from '../../hooks/useMenus'
+
+// Import CMS content hooks
+import {
+  useHomeContent,
+  useAboutContent,
+  useWhyChooseContent,
+  useBooksPageContent,
+  useContactContent,
+  useCharityContent,
+  useHeaderContent,
+  useFooterContent
+} from '../../hooks/useCmsContent'
 
 // Import types
 import type {
   PageKey,
   SectionKey,
-  HomePageContent,
-  AboutPageContent,
-  WhyChooseContent,
-  BooksPageContent,
-  ContactPageContent,
-  CharityPageContent,
-  HeaderContent,
-  FooterContent,
   MenuItem
 } from './types/cms-types'
 
@@ -34,114 +37,70 @@ import {
   MenuEditor
 } from './editors'
 
-// Import shared utilities
-import { getPageTitle } from './editors/shared/EditorUtils'
-
-// Default content imports
-import {
-  defaultHomeContent,
-  defaultAboutContent,
-  defaultWhyChooseContent,
-  defaultBooksContent,
-  defaultContactContent,
-  defaultCharityContent,
-  defaultHeaderContent,
-  defaultFooterContent,
-  defaultMenuItems
-} from './defaults/cms-defaults'
+// Default menu items as fallback
+import { defaultMenuItems } from './defaults/cms-defaults'
 
 export default function AdminContent() {
-  const [isSaving, setIsSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<'pages' | 'sections'>('pages')
   const [activePageTab, setActivePageTab] = useState<PageKey>('home')
   const [activeSectionTab, setActiveSectionTab] = useState<SectionKey>('header')
 
-  // Database hooks
-  const { settings, updateSettings, isUpdating: settingsUpdating } = useSiteSettings()
+  // Database hooks for CMS content
+  const homeContent = useHomeContent()
+  const aboutContent = useAboutContent()
+  const whyChooseContent = useWhyChooseContent()
+  const booksContent = useBooksPageContent()
+  const contactContent = useContactContent()
+  const charityContent = useCharityContent()
+  const headerContentHook = useHeaderContent()
+  const footerContentHook = useFooterContent()
+
+  // Menu items from database
   const headerMenuItems = useMenuItems('header')
 
-  // Page content state
-  const [homeContent, setHomeContent] = useState<HomePageContent>(() => {
-    const saved = localStorage.getItem('cms_home')
-    if (saved) return JSON.parse(saved)
-    return defaultHomeContent
-  })
+  // Local state for editors (synced with database)
+  const [homeState, setHomeState] = useState(homeContent.content)
+  const [aboutState, setAboutState] = useState(aboutContent.content)
+  const [whyChooseState, setWhyChooseState] = useState(whyChooseContent.content)
+  const [booksState, setBooksState] = useState(booksContent.content)
+  const [contactState, setContactState] = useState(contactContent.content)
+  const [charityState, setCharityState] = useState(charityContent.content)
+  const [headerState, setHeaderState] = useState(headerContentHook.content)
+  const [footerState, setFooterState] = useState(footerContentHook.content)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems)
 
-  const [aboutContent, setAboutContent] = useState<AboutPageContent>(() => {
-    const saved = localStorage.getItem('cms_about')
-    if (saved) return JSON.parse(saved)
-    return defaultAboutContent
-  })
-
-  const [whyChooseContent, setWhyChooseContent] = useState<WhyChooseContent>(() => {
-    const saved = localStorage.getItem('cms_whyChoose')
-    if (saved) return JSON.parse(saved)
-    return defaultWhyChooseContent
-  })
-
-  const [booksContent, setBooksContent] = useState<BooksPageContent>(() => {
-    const saved = localStorage.getItem('cms_books')
-    if (saved) return JSON.parse(saved)
-    return defaultBooksContent
-  })
-
-  const [contactContent, setContactContent] = useState<ContactPageContent>(() => {
-    const saved = localStorage.getItem('cms_contact')
-    if (saved) return JSON.parse(saved)
-    return defaultContactContent
-  })
-
-  const [charityContent, setCharityContent] = useState<CharityPageContent>(() => {
-    const saved = localStorage.getItem('cms_charity')
-    if (saved) return JSON.parse(saved)
-    return defaultCharityContent
-  })
-
-  // Section content state
-  const [headerContent, setHeaderContent] = useState<HeaderContent>(() => {
-    const saved = localStorage.getItem('cms_header')
-    if (saved) return JSON.parse(saved)
-    return defaultHeaderContent
-  })
-
-  const [footerContent, setFooterContent] = useState<FooterContent>(() => {
-    const saved = localStorage.getItem('cms_footer')
-    if (saved) return JSON.parse(saved)
-    return defaultFooterContent
-  })
-
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
-    const saved = localStorage.getItem('cms_menu')
-    if (saved) return JSON.parse(saved)
-    return defaultMenuItems
-  })
-
-  // Load data from database when available
+  // Sync local state when database content loads
   useEffect(() => {
-    if (settings) {
-      setHeaderContent(prev => ({
-        ...prev,
-        logoUrl: settings.site_logo_url || prev.logoUrl
-      }))
-      setFooterContent(prev => ({
-        ...prev,
-        description: settings.footer_text || prev.description,
-        copyrightText: settings.copyright_text || prev.copyrightText,
-        facebookUrl: settings.facebook_page_url || prev.facebookUrl,
-        instagramUrl: settings.instagram_url || prev.instagramUrl,
-        youtubeUrl: settings.youtube_channel_url || prev.youtubeUrl,
-        linkedinUrl: settings.linkedin_url || prev.linkedinUrl,
-        twitterUrl: settings.twitter_url || prev.twitterUrl
-      }))
-      setContactContent(prev => ({
-        ...prev,
-        email: settings.primary_email || prev.email,
-        phone: settings.primary_phone || prev.phone,
-        whatsapp: settings.whatsapp_number || prev.whatsapp,
-        address: settings.address || prev.address
-      }))
-    }
-  }, [settings])
+    if (!homeContent.isLoading) setHomeState(homeContent.content)
+  }, [homeContent.content, homeContent.isLoading])
+
+  useEffect(() => {
+    if (!aboutContent.isLoading) setAboutState(aboutContent.content)
+  }, [aboutContent.content, aboutContent.isLoading])
+
+  useEffect(() => {
+    if (!whyChooseContent.isLoading) setWhyChooseState(whyChooseContent.content)
+  }, [whyChooseContent.content, whyChooseContent.isLoading])
+
+  useEffect(() => {
+    if (!booksContent.isLoading) setBooksState(booksContent.content)
+  }, [booksContent.content, booksContent.isLoading])
+
+  useEffect(() => {
+    if (!contactContent.isLoading) setContactState(contactContent.content)
+  }, [contactContent.content, contactContent.isLoading])
+
+  useEffect(() => {
+    if (!charityContent.isLoading) setCharityState(charityContent.content)
+  }, [charityContent.content, charityContent.isLoading])
+
+  useEffect(() => {
+    if (!headerContentHook.isLoading) setHeaderState(headerContentHook.content)
+  }, [headerContentHook.content, headerContentHook.isLoading])
+
+  useEffect(() => {
+    if (!footerContentHook.isLoading) setFooterState(footerContentHook.content)
+  }, [footerContentHook.content, footerContentHook.isLoading])
 
   // Load menu items from database
   useEffect(() => {
@@ -157,69 +116,79 @@ export default function AdminContent() {
 
   // Save handlers
   const handleSavePageContent = async (pageKey: PageKey) => {
-    setIsSaving(true)
     try {
-      let content: unknown
       switch (pageKey) {
-        case 'home': content = homeContent; break
-        case 'about': content = aboutContent; break
-        case 'whyChoose': content = whyChooseContent; break
-        case 'books': content = booksContent; break
-        case 'contact': content = contactContent; break
-        case 'charity': content = charityContent; break
+        case 'home':
+          await homeContent.save(homeState)
+          break
+        case 'about':
+          await aboutContent.save(aboutState)
+          break
+        case 'whyChoose':
+          await whyChooseContent.save(whyChooseState)
+          break
+        case 'books':
+          await booksContent.save(booksState)
+          break
+        case 'contact':
+          await contactContent.save(contactState)
+          break
+        case 'charity':
+          await charityContent.save(charityState)
+          break
       }
-      localStorage.setItem(`cms_${pageKey}`, JSON.stringify(content))
-      toast.success(`${getPageTitle(pageKey)} content saved successfully`)
     } catch (error) {
-      toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsSaving(false)
+      // Error already handled by hook
+      console.error(`Failed to save ${pageKey}:`, error)
     }
   }
 
   const handleSaveHeader = async () => {
-    setIsSaving(true)
     try {
-      await updateSettings({ site_logo_url: headerContent.logoUrl })
-      localStorage.setItem('cms_header', JSON.stringify(headerContent))
-      toast.success('Header settings saved')
+      await headerContentHook.save(headerState)
     } catch (error) {
-      toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsSaving(false)
+      console.error('Failed to save header:', error)
     }
   }
 
   const handleSaveFooter = async () => {
-    setIsSaving(true)
     try {
-      await updateSettings({
-        footer_text: footerContent.description,
-        copyright_text: footerContent.copyrightText,
-        facebook_page_url: footerContent.facebookUrl,
-        instagram_url: footerContent.instagramUrl,
-        youtube_channel_url: footerContent.youtubeUrl,
-        linkedin_url: footerContent.linkedinUrl,
-        twitter_url: footerContent.twitterUrl
-      })
-      localStorage.setItem('cms_footer', JSON.stringify(footerContent))
-      toast.success('Footer settings saved')
+      await footerContentHook.save(footerState)
     } catch (error) {
-      toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsSaving(false)
+      console.error('Failed to save footer:', error)
     }
   }
 
   const handleSaveMenu = async () => {
-    setIsSaving(true)
     try {
-      localStorage.setItem('cms_menu', JSON.stringify(menuItems))
+      // Menu items are managed by useMenuItems hook
       toast.success('Menu saved')
     } catch (error) {
       toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsSaving(false)
+    }
+  }
+
+  // Check if any content is loading
+  const isAnyLoading = 
+    homeContent.isLoading || 
+    aboutContent.isLoading || 
+    whyChooseContent.isLoading ||
+    booksContent.isLoading ||
+    contactContent.isLoading ||
+    charityContent.isLoading ||
+    headerContentHook.isLoading ||
+    footerContentHook.isLoading
+
+  // Get saving state for current page
+  const getSavingState = (pageKey: PageKey): boolean => {
+    switch (pageKey) {
+      case 'home': return homeContent.isSaving
+      case 'about': return aboutContent.isSaving
+      case 'whyChoose': return whyChooseContent.isSaving
+      case 'books': return booksContent.isSaving
+      case 'contact': return contactContent.isSaving
+      case 'charity': return charityContent.isSaving
+      default: return false
     }
   }
 
@@ -230,6 +199,7 @@ export default function AdminContent() {
           <CardTitle className="text-2xl font-heading">Content Management System</CardTitle>
           <CardDescription className="mt-2">
             Manage pages, images, header, footer, and navigation menu
+            {isAnyLoading && <span className="ml-2 text-muted-foreground">(Loading...)</span>}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -259,50 +229,50 @@ export default function AdminContent() {
 
             <TabsContent value="home" className="mt-6">
               <HomePageEditor
-                content={homeContent}
-                setContent={setHomeContent}
+                content={homeState}
+                setContent={setHomeState}
                 onSave={() => handleSavePageContent('home')}
-                isSaving={isSaving}
+                isSaving={getSavingState('home')}
               />
             </TabsContent>
             <TabsContent value="about" className="mt-6">
               <AboutPageEditor
-                content={aboutContent}
-                setContent={setAboutContent}
+                content={aboutState}
+                setContent={setAboutState}
                 onSave={() => handleSavePageContent('about')}
-                isSaving={isSaving}
+                isSaving={getSavingState('about')}
               />
             </TabsContent>
             <TabsContent value="whyChoose" className="mt-6">
               <WhyChoosePageEditor
-                content={whyChooseContent}
-                setContent={setWhyChooseContent}
+                content={whyChooseState}
+                setContent={setWhyChooseState}
                 onSave={() => handleSavePageContent('whyChoose')}
-                isSaving={isSaving}
+                isSaving={getSavingState('whyChoose')}
               />
             </TabsContent>
             <TabsContent value="books" className="mt-6">
               <BooksPageEditor
-                content={booksContent}
-                setContent={setBooksContent}
+                content={booksState}
+                setContent={setBooksState}
                 onSave={() => handleSavePageContent('books')}
-                isSaving={isSaving}
+                isSaving={getSavingState('books')}
               />
             </TabsContent>
             <TabsContent value="contact" className="mt-6">
               <ContactPageEditor
-                content={contactContent}
-                setContent={setContactContent}
+                content={contactState}
+                setContent={setContactState}
                 onSave={() => handleSavePageContent('contact')}
-                isSaving={isSaving}
+                isSaving={getSavingState('contact')}
               />
             </TabsContent>
             <TabsContent value="charity" className="mt-6">
               <CharityPageEditor
-                content={charityContent}
-                setContent={setCharityContent}
+                content={charityState}
+                setContent={setCharityState}
                 onSave={() => handleSavePageContent('charity')}
-                isSaving={isSaving}
+                isSaving={getSavingState('charity')}
               />
             </TabsContent>
           </Tabs>
@@ -318,18 +288,18 @@ export default function AdminContent() {
 
             <TabsContent value="header" className="mt-6">
               <HeaderEditor
-                content={headerContent}
-                setContent={setHeaderContent}
+                content={headerState}
+                setContent={setHeaderState}
                 onSave={handleSaveHeader}
-                isSaving={isSaving || settingsUpdating}
+                isSaving={headerContentHook.isSaving}
               />
             </TabsContent>
             <TabsContent value="footer" className="mt-6">
               <FooterEditor
-                content={footerContent}
-                setContent={setFooterContent}
+                content={footerState}
+                setContent={setFooterState}
                 onSave={handleSaveFooter}
-                isSaving={isSaving || settingsUpdating}
+                isSaving={footerContentHook.isSaving}
               />
             </TabsContent>
             <TabsContent value="menu" className="mt-6">
@@ -337,7 +307,7 @@ export default function AdminContent() {
                 items={menuItems}
                 setItems={setMenuItems}
                 onSave={handleSaveMenu}
-                isSaving={isSaving}
+                isSaving={false}
               />
             </TabsContent>
           </Tabs>

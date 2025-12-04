@@ -71,10 +71,15 @@ export interface HomePageContent {
     buttonText: string
   }
   sacredSpaces: {
+    badge: string
     title: string
-    image: string
-    location?: string
-  }[]
+    description: string
+    spaces: {
+      title: string
+      image: string
+      subtitle?: string
+    }[]
+  }
   featureCards: {
     title: string
     description: string

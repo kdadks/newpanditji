@@ -11,8 +11,12 @@ import { EnvelopeSimple, Phone, WhatsappLogo, MapPin, Clock, Shield, Heart, Spar
 import { toast } from 'sonner'
 import { categoryNames } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
+import { useContactContent } from '../../hooks/useCmsContent'
 
 export default function ContactPage() {
+  // CMS Content
+  const { content: cmsContent } = useContactContent()
+
   // SEO Configuration
   usePageSEO({
     title: 'Contact Pandit Rajesh Joshi | Book Hindu Pooja Services in Ireland, UK, Northern Ireland',
@@ -53,16 +57,14 @@ export default function ContactPage() {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 flex">
           <div className="flex animate-scroll-left">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
           <div className="flex animate-scroll-left" aria-hidden="true">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            ))}
           </div>
         </div>
         
@@ -80,16 +82,21 @@ export default function ContactPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
               <Heart size={16} weight="fill" />
-              Connect With Us
+              {cmsContent.hero.subtitle}
             </div>
 
             <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Let's Begin Your <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Sacred Journey</span>
+              {cmsContent.hero.title.split(' ').map((word, i) => 
+                word.toLowerCase() === 'sacred' ? (
+                  <span key={i}><span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{word}</span> </span>
+                ) : (
+                  <span key={i}>{word} </span>
+                )
+              )}
             </h1>
 
             <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              Whether you're planning a traditional ceremony or seeking spiritual guidance,
-              we're here to serve your family's sacred needs with devotion and expertise.
+              {cmsContent.hero.description}
             </p>
 
             {/* Stats - Compact inline version */}
