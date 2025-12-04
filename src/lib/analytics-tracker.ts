@@ -97,19 +97,25 @@ export async function trackPageView(pagePath: string, pageTitle?: string) {
 
     // Track referrer source if exists
     if (document.referrer) {
-      const referrerUrl = new URL(document.referrer)
-      const domain = referrerUrl.hostname
+      try {
+        const referrerUrl = new URL(document.referrer)
+        const domain = referrerUrl.hostname
 
-      await supabase.rpc('upsert_referrer_source', {
-        p_source_url: document.referrer,
-        p_source_domain: domain,
-      }).catch(() => {
-        // Fallback if RPC doesn't exist
-        supabase.from('referrer_sources').insert({
-          source_url: document.referrer,
-          source_domain: domain,
+        const { error } = await supabase.rpc('upsert_referrer_source', {
+          p_source_url: document.referrer,
+          p_source_domain: domain,
         })
-      })
+        
+        if (error) {
+          // Fallback if RPC doesn't exist - ignore errors
+          await supabase.from('referrer_sources').insert({
+            source_url: document.referrer,
+            source_domain: domain,
+          })
+        }
+      } catch {
+        // Ignore referrer tracking errors
+      }
     }
   } catch (error) {
     console.error('Error tracking page view:', error)

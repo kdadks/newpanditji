@@ -2,18 +2,24 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface AnalyticsSummary {
+  id: string
   date: string
-  total_views: number
-  unique_sessions: number
-  countries_count: number
-  mobile_views: number
-  desktop_views: number
-  tablet_views: number
+  total_page_views: number
+  unique_visitors: number
+  total_sessions: number
+  avg_session_duration_seconds: number | null
+  bounce_rate: number | null
+  top_pages: Record<string, number> | null
+  traffic_sources: Record<string, number> | null
+  device_breakdown: Record<string, number> | null
+  browser_breakdown: Record<string, number> | null
+  top_countries: Record<string, number> | null
+  top_referrers: Record<string, number> | null
 }
 
 export interface PopularPage {
-  page_path: string
-  page_title: string
+  page_slug: string
+  page_title: string | null
   view_count: number
   unique_visitors: number
   last_viewed: string
@@ -31,24 +37,24 @@ export interface LocationStat {
   country: string
   visit_count: number
   unique_visitors: number
-  cities_count: number
 }
 
 export interface TopReferrer {
-  source_domain: string
+  referrer_domain: string
   total_visits: number
   last_visit: string
 }
 
 export interface PageView {
   id: string
-  page_path: string
+  page_slug: string
   page_title: string | null
-  referrer: string | null
+  referrer_url: string | null
+  referrer_domain: string | null
   country: string | null
   city: string | null
   device_type: string | null
-  created_at: string
+  viewed_at: string
 }
 
 // Fetch analytics summary for the last 30 days
@@ -61,83 +67,185 @@ async function fetchAnalyticsSummary(): Promise<AnalyticsSummary[]> {
 
   if (error) {
     console.error('Error fetching analytics summary:', error)
-    throw error
+    // Return empty array instead of throwing to prevent UI crashes
+    return []
   }
 
   return data || []
 }
 
-// Fetch popular pages
+// Fetch popular pages by aggregating page_views
 async function fetchPopularPages(): Promise<PopularPage[]> {
-  const { data, error } = await supabase
-    .from('popular_pages')
-    .select('*')
-    .limit(10)
+  try {
+    const { data, error } = await supabase
+      .from('page_views')
+      .select('page_slug, page_title, session_id, viewed_at')
+      .order('viewed_at', { ascending: false })
+      .limit(500)
 
-  if (error) {
-    console.error('Error fetching popular pages:', error)
-    throw error
+    if (error) {
+      console.error('Error fetching page views for popular pages:', error)
+      return []
+    }
+
+    // Aggregate by page_slug
+    const pageStats = new Map<string, { 
+      page_title: string | null
+      view_count: number
+      sessions: Set<string>
+      last_viewed: string 
+    }>()
+
+    for (const view of data || []) {
+      const existing = pageStats.get(view.page_slug)
+      if (existing) {
+        existing.view_count++
+        if (view.session_id) existing.sessions.add(view.session_id)
+        if (view.viewed_at > existing.last_viewed) {
+          existing.last_viewed = view.viewed_at
+        }
+      } else {
+        pageStats.set(view.page_slug, {
+          page_title: view.page_title,
+          view_count: 1,
+          sessions: view.session_id ? new Set([view.session_id]) : new Set(),
+          last_viewed: view.viewed_at
+        })
+      }
+    }
+
+    return Array.from(pageStats.entries())
+      .map(([page_slug, stats]) => ({
+        page_slug,
+        page_title: stats.page_title,
+        view_count: stats.view_count,
+        unique_visitors: stats.sessions.size,
+        last_viewed: stats.last_viewed
+      }))
+      .sort((a, b) => b.view_count - a.view_count)
+      .slice(0, 10)
+  } catch (err) {
+    console.error('Error in fetchPopularPages:', err)
+    return []
   }
-
-  return data || []
 }
 
-// Fetch popular services
+// Fetch popular services - placeholder since service_views may not exist
 async function fetchPopularServices(): Promise<PopularService[]> {
-  const { data, error } = await supabase
-    .from('popular_services')
-    .select('*')
-    .limit(10)
-
-  if (error) {
-    console.error('Error fetching popular services:', error)
-    throw error
-  }
-
-  return data || []
+  // Return empty array - service tracking can be implemented later
+  return []
 }
 
-// Fetch location statistics
+// Fetch location statistics by aggregating page_views
 async function fetchLocationStats(): Promise<LocationStat[]> {
-  const { data, error } = await supabase
-    .from('location_stats')
-    .select('*')
-    .limit(20)
+  try {
+    const { data, error } = await supabase
+      .from('page_views')
+      .select('country, session_id')
+      .not('country', 'is', null)
+      .limit(1000)
 
-  if (error) {
-    console.error('Error fetching location stats:', error)
-    throw error
+    if (error) {
+      console.error('Error fetching location stats:', error)
+      return []
+    }
+
+    // Aggregate by country
+    const countryStats = new Map<string, { 
+      visit_count: number
+      sessions: Set<string>
+    }>()
+
+    for (const view of data || []) {
+      if (!view.country) continue
+      const existing = countryStats.get(view.country)
+      if (existing) {
+        existing.visit_count++
+        if (view.session_id) existing.sessions.add(view.session_id)
+      } else {
+        countryStats.set(view.country, {
+          visit_count: 1,
+          sessions: view.session_id ? new Set([view.session_id]) : new Set()
+        })
+      }
+    }
+
+    return Array.from(countryStats.entries())
+      .map(([country, stats]) => ({
+        country,
+        visit_count: stats.visit_count,
+        unique_visitors: stats.sessions.size
+      }))
+      .sort((a, b) => b.visit_count - a.visit_count)
+      .slice(0, 20)
+  } catch (err) {
+    console.error('Error in fetchLocationStats:', err)
+    return []
   }
-
-  return data || []
 }
 
-// Fetch top referrers
+// Fetch top referrers by aggregating page_views
 async function fetchTopReferrers(): Promise<TopReferrer[]> {
-  const { data, error } = await supabase
-    .from('top_referrers')
-    .select('*')
-    .limit(10)
+  try {
+    const { data, error } = await supabase
+      .from('page_views')
+      .select('referrer_domain, viewed_at')
+      .not('referrer_domain', 'is', null)
+      .order('viewed_at', { ascending: false })
+      .limit(500)
 
-  if (error) {
-    console.error('Error fetching top referrers:', error)
-    throw error
+    if (error) {
+      console.error('Error fetching top referrers:', error)
+      return []
+    }
+
+    // Aggregate by referrer_domain
+    const referrerStats = new Map<string, { 
+      total_visits: number
+      last_visit: string 
+    }>()
+
+    for (const view of data || []) {
+      if (!view.referrer_domain) continue
+      const existing = referrerStats.get(view.referrer_domain)
+      if (existing) {
+        existing.total_visits++
+        if (view.viewed_at > existing.last_visit) {
+          existing.last_visit = view.viewed_at
+        }
+      } else {
+        referrerStats.set(view.referrer_domain, {
+          total_visits: 1,
+          last_visit: view.viewed_at
+        })
+      }
+    }
+
+    return Array.from(referrerStats.entries())
+      .map(([referrer_domain, stats]) => ({
+        referrer_domain,
+        total_visits: stats.total_visits,
+        last_visit: stats.last_visit
+      }))
+      .sort((a, b) => b.total_visits - a.total_visits)
+      .slice(0, 10)
+  } catch (err) {
+    console.error('Error in fetchTopReferrers:', err)
+    return []
   }
-
-  return data || []
 }
 
 // Fetch recent page views
 async function fetchRecentPageViews(limit: number = 50): Promise<PageView[]> {
   const { data, error } = await supabase
     .from('page_views')
-    .select('id, page_path, page_title, referrer, country, city, device_type, created_at')
-    .order('created_at', { ascending: false })
+    .select('id, page_slug, page_title, referrer_url, referrer_domain, country, city, device_type, viewed_at')
+    .order('viewed_at', { ascending: false })
     .limit(limit)
 
   if (error) {
     console.error('Error fetching recent page views:', error)
-    throw error
+    return []
   }
 
   return data || []
@@ -148,31 +256,35 @@ async function fetchTotalStats() {
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-  const [pageViewsResult, serviceViewsResult, uniqueVisitorsResult] = await Promise.all([
-    supabase
-      .from('page_views')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', thirtyDaysAgo.toISOString()),
+  try {
+    const [pageViewsResult, uniqueVisitorsResult] = await Promise.all([
+      supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('viewed_at', thirtyDaysAgo.toISOString()),
 
-    supabase
-      .from('service_views')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', thirtyDaysAgo.toISOString()),
+      supabase
+        .from('page_views')
+        .select('session_id')
+        .gte('viewed_at', thirtyDaysAgo.toISOString())
+    ])
 
-    supabase
-      .from('page_views')
-      .select('session_id')
-      .gte('created_at', thirtyDaysAgo.toISOString())
-  ])
+    const uniqueSessions = new Set(
+      (uniqueVisitorsResult.data || []).map(v => v.session_id).filter(Boolean)
+    ).size
 
-  const uniqueSessions = new Set(
-    (uniqueVisitorsResult.data || []).map(v => v.session_id).filter(Boolean)
-  ).size
-
-  return {
-    totalPageViews: pageViewsResult.count || 0,
-    totalServiceViews: serviceViewsResult.count || 0,
-    uniqueVisitors: uniqueSessions,
+    return {
+      totalPageViews: pageViewsResult.count || 0,
+      totalServiceViews: 0, // Service views tracking not implemented
+      uniqueVisitors: uniqueSessions,
+    }
+  } catch (err) {
+    console.error('Error in fetchTotalStats:', err)
+    return {
+      totalPageViews: 0,
+      totalServiceViews: 0,
+      uniqueVisitors: 0,
+    }
   }
 }
 

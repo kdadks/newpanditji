@@ -45,17 +45,27 @@ export default function AdminAnalytics() {
   }
 
   // Calculate totals from summary
-  const totalViews = summary?.reduce((sum, day) => sum + day.total_views, 0) || 0
-  const totalSessions = summary?.reduce((sum, day) => sum + day.unique_sessions, 0) || 0
-  const mobilePercentage = summary ?
-    Math.round((summary.reduce((sum, day) => sum + day.mobile_views, 0) / totalViews) * 100) || 0 : 0
-  const desktopPercentage = summary ?
-    Math.round((summary.reduce((sum, day) => sum + day.desktop_views, 0) / totalViews) * 100) || 0 : 0
+  const totalViews = summary?.reduce((sum, day) => sum + (day.total_page_views || 0), 0) || 0
+  const totalSessions = summary?.reduce((sum, day) => sum + (day.total_sessions || 0), 0) || 0
+  
+  // Device breakdown from summary
+  const deviceBreakdown = summary?.reduce((acc, day) => {
+    if (day.device_breakdown) {
+      Object.entries(day.device_breakdown).forEach(([device, count]) => {
+        acc[device] = (acc[device] || 0) + (count as number)
+      })
+    }
+    return acc
+  }, {} as Record<string, number>) || {}
+  
+  const totalDeviceViews = Object.values(deviceBreakdown).reduce((sum, count) => sum + count, 0) || 1
+  const mobilePercentage = Math.round(((deviceBreakdown.mobile || 0) / totalDeviceViews) * 100)
+  const desktopPercentage = Math.round(((deviceBreakdown.desktop || 0) / totalDeviceViews) * 100)
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -200,14 +210,14 @@ export default function AdminAnalytics() {
               ) : popularPages && popularPages.length > 0 ? (
                 <div className="space-y-3">
                   {popularPages.map((page, index) => (
-                    <div key={page.page_path} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div key={page.page_slug} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-4 flex-1">
                         <Badge variant="secondary" className="font-mono">
                           #{index + 1}
                         </Badge>
                         <div className="flex-1">
-                          <p className="font-medium">{page.page_title || page.page_path}</p>
-                          <p className="text-xs text-muted-foreground">{page.page_path}</p>
+                          <p className="font-medium">{page.page_title || page.page_slug}</p>
+                          <p className="text-xs text-muted-foreground">{page.page_slug}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6 text-sm">
@@ -306,10 +316,6 @@ export default function AdminAnalytics() {
                           <p className="font-semibold">{location.unique_visitors.toLocaleString()}</p>
                           <p className="text-xs text-muted-foreground">visitors</p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold">{location.cities_count}</p>
-                          <p className="text-xs text-muted-foreground">cities</p>
-                        </div>
                       </div>
                     </div>
                   ))}
@@ -339,12 +345,12 @@ export default function AdminAnalytics() {
               ) : topReferrers && topReferrers.length > 0 ? (
                 <div className="space-y-3">
                   {topReferrers.map((referrer, index) => (
-                    <div key={referrer.source_domain} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div key={referrer.referrer_domain} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-4 flex-1">
                         <Badge variant="secondary" className="font-mono">
                           #{index + 1}
                         </Badge>
-                        <p className="font-medium flex-1">{referrer.source_domain || 'Direct Traffic'}</p>
+                        <p className="font-medium flex-1">{referrer.referrer_domain || 'Direct Traffic'}</p>
                       </div>
                       <div className="flex items-center gap-6 text-sm">
                         <div className="text-right">
@@ -382,7 +388,7 @@ export default function AdminAnalytics() {
                     <Badge variant="outline" className="text-xs">
                       {view.device_type || 'unknown'}
                     </Badge>
-                    <p className="flex-1 truncate">{view.page_title || view.page_path}</p>
+                    <p className="flex-1 truncate">{view.page_title || view.page_slug}</p>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     {view.country && (
@@ -391,7 +397,7 @@ export default function AdminAnalytics() {
                         {view.city ? `${view.city}, ${view.country}` : view.country}
                       </span>
                     )}
-                    <span>{new Date(view.created_at).toLocaleTimeString()}</span>
+                    <span>{new Date(view.viewed_at).toLocaleTimeString()}</span>
                   </div>
                 </div>
               ))}

@@ -105,7 +105,7 @@ export default function AdminServicesNew() {
       id: service.id,
       name: service.name,
       category: service.category,
-      duration: service.duration,
+      duration: service.duration || '',
       description: service.description,
       detailedDescription: service.detailed_description || '',
       benefits: service.benefits || [],
@@ -224,7 +224,7 @@ export default function AdminServicesNew() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -372,14 +372,14 @@ export default function AdminServicesNew() {
 
       {/* Edit/Add Dialog - Modern Stunning UX */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 !bg-background border shadow-2xl">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
           {/* Stunning Header */}
-          <DialogHeader className="relative px-8 pt-8 pb-6 bg-gradient-to-r from-primary/10 via-accent/5 to-secondary/10 border-b bg-background">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+          <DialogHeader className="relative px-8 pt-8 pb-6 bg-linear-to-r from-primary/10 via-accent/5 to-secondary/10 border-b bg-background">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-linear-to-tr from-accent/20 to-transparent rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
             
             <div className="relative flex items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg shadow-primary/25">
+              <div className="p-4 bg-linear-to-br from-primary to-primary/80 rounded-2xl shadow-lg shadow-primary/25">
                 {editingService ? (
                   <PencilSimple size={28} className="text-white" weight="bold" />
                 ) : (
@@ -387,7 +387,7 @@ export default function AdminServicesNew() {
                 )}
               </div>
               <div>
-                <DialogTitle className="text-2xl font-heading font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                <DialogTitle className="text-2xl font-heading font-bold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
                   {editingService ? 'Edit Service' : 'Create New Service'}
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -442,7 +442,7 @@ export default function AdminServicesNew() {
               <TabsContent value="basic" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
                 {/* Service Identity Section */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-primary/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-primary/10 rounded-lg">
@@ -494,7 +494,7 @@ export default function AdminServicesNew() {
 
                 {/* Pricing & Duration Section */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-linear-to-br from-accent/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-accent/10 rounded-lg">
@@ -541,7 +541,7 @@ export default function AdminServicesNew() {
 
                 {/* Descriptions Section */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-secondary/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-linear-to-tl from-secondary/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-secondary/10 rounded-lg">
@@ -588,7 +588,7 @@ export default function AdminServicesNew() {
               <TabsContent value="details" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
                 {/* Benefits Card */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-green-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-2 bg-green-500/10 rounded-lg">
@@ -660,7 +660,7 @@ export default function AdminServicesNew() {
 
                 {/* Includes Card */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-linear-to-br from-blue-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -732,7 +732,7 @@ export default function AdminServicesNew() {
 
                 {/* Requirements Card */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-linear-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-2 bg-amber-500/10 rounded-lg">
@@ -807,7 +807,7 @@ export default function AdminServicesNew() {
               <TabsContent value="media" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
                 {/* Service Image */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-purple-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -827,7 +827,7 @@ export default function AdminServicesNew() {
                             alt="Service"
                             className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                             <Button
                               variant="secondary"
@@ -865,7 +865,7 @@ export default function AdminServicesNew() {
 
                 {/* Samagri File Upload */}
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
-                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-rose-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-linear-to-tr from-rose-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-rose-500/10 rounded-lg">
@@ -878,7 +878,7 @@ export default function AdminServicesNew() {
                     </div>
                     
                     {(formData.samagriFile || formData.samagriFileUrl || selectedSamagriFile) ? (
-                      <div className="border border-rose-500/20 rounded-xl p-5 bg-gradient-to-r from-rose-500/5 to-transparent">
+                      <div className="border border-rose-500/20 rounded-xl p-5 bg-linear-to-r from-rose-500/5 to-transparent">
                         <div className="flex items-center gap-4">
                           <div className="p-3 bg-rose-500/10 rounded-xl">
                             {(selectedSamagriFile?.type || formData.samagriFile?.type || '').includes('pdf') || formData.samagriFileUrl?.endsWith('.pdf') ? (
@@ -967,7 +967,7 @@ export default function AdminServicesNew() {
                 </Button>
                 <Button 
                   onClick={handleSave} 
-                  className="min-w-[140px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
+                  className="min-w-[140px] bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
                   disabled={isSaving}
                 >
                   {isSaving ? (
@@ -990,7 +990,7 @@ export default function AdminServicesNew() {
           {showImagePicker && (
             <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
               <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
-                <div className="p-5 border-b flex items-center justify-between bg-gradient-to-r from-primary/5 to-accent/5">
+                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-primary/5 to-accent/5">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <ImageIcon size={20} className="text-primary" weight="fill" />
@@ -1021,7 +1021,7 @@ export default function AdminServicesNew() {
                           alt={photo.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                           <div className="bg-white text-primary font-semibold px-4 py-2 rounded-full text-sm shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
                             Select

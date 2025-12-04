@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug, type ServiceRow, type ServiceInsert, type ServiceUpdate, type AdminServiceRow } from '../lib/supabase'
 import { toast } from 'sonner'
-import type { Service } from '../lib/data'
+import type { Service, ServiceDetail } from '../lib/data'
 
 // Query keys
 const SERVICES_KEY = ['services']
@@ -32,15 +32,15 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     price: row.price || undefined,
     bestFor: row.best_for || undefined,
     details: {
-      deity: row.deity_info as Service['details']['deity'] | undefined,
+      deity: row.deity_info as ServiceDetail['deity'] | undefined,
       nature: row.nature || undefined,
       purpose: row.purpose || undefined,
       significance: row.significance || undefined,
-      scripturalRoots: row.scriptural_roots as Service['details']['scripturalRoots'] | undefined,
+      scripturalRoots: row.scriptural_roots as ServiceDetail['scripturalRoots'] | undefined,
       whenToPerform: row.when_to_perform || undefined,
       whereAndWho: row.where_and_who || undefined,
       specialForNRIs: row.special_notes || undefined,
-      coreAspects: row.core_aspects as Service['details']['coreAspects'] | undefined,
+      coreAspects: row.core_aspects as ServiceDetail['coreAspects'] | undefined,
     },
     // Map samagri file URL to the format expected by UI
     samagriFile: row.samagri_file_url ? {

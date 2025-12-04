@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useVideos, convertLegacyVideo } from '../../hooks/useVideos'
+import { useVideos, convertLegacyVideo, type Video } from '../../hooks/useVideos'
 import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Video as VideoIcon } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -8,9 +8,8 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
-import type { VideoRow } from '../../lib/supabase'
 
-type VideoCategory = 'educational' | 'poetry' | 'charity' | 'podcast' | 'other'
+type VideoCategory = 'educational' | 'poetry' | 'charity' | 'podcast' | 'ceremony' | 'other'
 
 interface VideoFormData {
   id: string
@@ -21,7 +20,7 @@ interface VideoFormData {
 
 export default function AdminVideos() {
   const { videos, isLoading, createVideo, updateVideo, deleteVideo, isCreating, isUpdating, isDeleting } = useVideos()
-  const [editingVideo, setEditingVideo] = useState<VideoRow | null>(null)
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState<VideoFormData>({
     id: '',
@@ -41,12 +40,12 @@ export default function AdminVideos() {
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (video: VideoRow) => {
+  const handleEdit = (video: Video) => {
     setFormData({
       id: video.id,
       title: video.title,
       category: video.category,
-      url: video.youtube_url
+      url: video.url
     })
     setEditingVideo(video)
     setIsDialogOpen(true)
@@ -68,8 +67,7 @@ export default function AdminVideos() {
         await updateVideo({
           id: editingVideo.id,
           title: legacyData.title,
-          youtube_url: legacyData.youtube_url,
-          youtube_id: legacyData.youtube_id,
+          video_url: legacyData.video_url,
           thumbnail_url: legacyData.thumbnail_url,
           category: legacyData.category
         })
@@ -149,7 +147,7 @@ export default function AdminVideos() {
                               {video.category}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground break-all">{video.youtube_url}</p>
+                          <p className="text-xs text-muted-foreground break-all">{video.url}</p>
                         </div>
                       </div>
                       <div className="flex gap-2">

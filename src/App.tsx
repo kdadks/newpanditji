@@ -46,9 +46,11 @@ function App() {
   useEffect(() => {
     const checkURLPath = () => {
       const path = window.location.pathname.slice(1) // Remove leading slash
-      if (path === 'admin') {
+      if (path === '' || path === 'home') {
+        setCurrentPage('home')
+      } else if (path === 'admin') {
         setCurrentPage('admin')
-      } else if (path && ['home', 'services', 'about', 'why-choose-us', 'gallery', 'blog', 'books', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
+      } else if (['services', 'about', 'why-choose-us', 'gallery', 'blog', 'books', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
         setCurrentPage(path as Page)
       }
     }

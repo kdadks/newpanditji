@@ -51,7 +51,7 @@ export default function AdminBlogs() {
       id: blog.id,
       title: blog.title,
       excerpt: blog.excerpt,
-      category: blog.category,
+      category: 'Spiritual Practice', // category_id is used in DB, default for UI
       content: blog.content
     })
     setEditingBlog(blog)
@@ -72,7 +72,7 @@ export default function AdminBlogs() {
           title: formData.title,
           excerpt: formData.excerpt,
           content: formData.content || formData.excerpt,
-          category: formData.category
+          category_id: formData.category || null
         })
       } else {
         const newBlog = convertLegacyBlog({
@@ -137,9 +137,9 @@ export default function AdminBlogs() {
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-heading font-semibold text-lg">{blog.title}</h3>
                           <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
-                            {blog.category}
+                            Article
                           </span>
-                          {blog.is_published ? (
+                          {blog.status === 'published' ? (
                             <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
                               Published
                             </span>
@@ -150,9 +150,9 @@ export default function AdminBlogs() {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">{blog.excerpt}</p>
-                        {blog.read_time_minutes && (
+                        {blog.reading_time_minutes && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            {blog.read_time_minutes} min read
+                            {blog.reading_time_minutes} min read
                           </p>
                         )}
                       </div>
@@ -180,9 +180,9 @@ export default function AdminBlogs() {
 
       {/* Modern Redesigned Blog Modal */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 !bg-background">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 bg-background!">
           {/* Gradient Header */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-6">
+          <div className="relative overflow-hidden bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-6">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -227,7 +227,7 @@ export default function AdminBlogs() {
               {currentTab === 'basic' && (
                 <div className="space-y-5">
                   {/* Title Field */}
-                  <Card className="border-2 border-blue-100 !bg-background">
+                  <Card className="border-2 border-blue-100 bg-background!">
                     <CardContent className="pt-5 space-y-4">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
@@ -281,7 +281,7 @@ export default function AdminBlogs() {
                   </Card>
                   
                   {/* Excerpt Field */}
-                  <Card className="border-2 border-purple-100 !bg-background">
+                  <Card className="border-2 border-purple-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
@@ -315,7 +315,7 @@ export default function AdminBlogs() {
               {/* Content Tab */}
               {currentTab === 'content' && (
                 <div className="space-y-5">
-                  <Card className="border-2 border-indigo-100 !bg-background">
+                  <Card className="border-2 border-indigo-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
@@ -348,7 +348,7 @@ export default function AdminBlogs() {
                   </Card>
                   
                   {/* Writing Tips */}
-                  <div className="rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 p-4 border border-indigo-100">
+                  <div className="rounded-xl bg-linear-to-r from-indigo-50 to-purple-50 p-4 border border-indigo-100">
                     <h4 className="font-medium text-indigo-800 text-sm mb-2">✨ Writing Tips</h4>
                     <ul className="text-xs text-indigo-700 space-y-1">
                       <li>• Use H2 and H3 headings to structure your content</li>
@@ -388,7 +388,7 @@ export default function AdminBlogs() {
                     <Button
                       type="button"
                       onClick={() => setCurrentTab('content')}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                      className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                     >
                       Continue to Content →
                     </Button>
@@ -396,7 +396,7 @@ export default function AdminBlogs() {
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving || formData.content.replace(/<[^>]*>/g, '').length > 10000}
-                      className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                      className="gap-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                     >
                       {isSaving ? (
                         <Spinner className="h-4 w-4 animate-spin" />

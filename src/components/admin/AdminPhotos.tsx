@@ -378,7 +378,7 @@ export default function AdminPhotos() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -543,9 +543,9 @@ export default function AdminPhotos() {
           setSelectedFiles([])
         }
       }}>
-        <DialogContent className={`max-h-[90vh] overflow-hidden p-0 !bg-background ${isBulkMode ? 'max-w-4xl' : 'max-w-3xl'}`}>
+        <DialogContent className={`max-h-[90vh] overflow-hidden p-0 bg-background! ${isBulkMode ? 'max-w-4xl' : 'max-w-3xl'}`}>
           {/* Gradient Header */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 px-6 py-6">
+          <div className="relative overflow-hidden bg-linear-to-r from-teal-500 via-cyan-500 to-blue-500 px-6 py-6">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -600,7 +600,7 @@ export default function AdminPhotos() {
               {isBulkMode ? (
                 <div className="space-y-5">
                   {/* Category Selection for Bulk */}
-                  <Card className="border-2 border-indigo-100 !bg-background">
+                  <Card className="border-2 border-indigo-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
@@ -632,7 +632,7 @@ export default function AdminPhotos() {
                   </Card>
 
                   {/* Bulk Upload Area */}
-                  <Card className="border-2 border-teal-100 !bg-background">
+                  <Card className="border-2 border-teal-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
@@ -682,7 +682,7 @@ export default function AdminPhotos() {
 
                   {/* Upload Queue */}
                   {selectedFiles.length > 0 && (
-                    <Card className="border-2 border-cyan-100 !bg-background">
+                    <Card className="border-2 border-cyan-100 bg-background!">
                       <CardContent className="pt-5">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
@@ -788,7 +788,7 @@ export default function AdminPhotos() {
                   {currentTab === 'upload' && (
                     <div className="space-y-5">
                       {/* Image Upload Area */}
-                      <Card className="border-2 border-teal-100 !bg-background">
+                      <Card className="border-2 border-teal-100 bg-background!">
                         <CardContent className="pt-5">
                           <div className="flex items-center gap-2 mb-4">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
@@ -849,7 +849,7 @@ export default function AdminPhotos() {
                       </Card>
                       
                       {/* Or use URL */}
-                      <Card className="border-2 border-blue-100 !bg-background">
+                      <Card className="border-2 border-blue-100 bg-background!">
                         <CardContent className="pt-5">
                           <div className="flex items-center gap-2 mb-4">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
@@ -890,7 +890,7 @@ export default function AdminPhotos() {
                   {currentTab === 'details' && (
                     <div className="space-y-5">
                       {/* Photo Title */}
-                      <Card className="border-2 border-cyan-100 !bg-background">
+                      <Card className="border-2 border-cyan-100 bg-background!">
                         <CardContent className="pt-5">
                           <div className="flex items-center gap-2 mb-4">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100">
@@ -919,7 +919,7 @@ export default function AdminPhotos() {
                       </Card>
                       
                       {/* Category Selection */}
-                      <Card className="border-2 border-indigo-100 !bg-background">
+                      <Card className="border-2 border-indigo-100 bg-background!">
                         <CardContent className="pt-5">
                           <div className="flex items-center gap-2 mb-4">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
@@ -974,7 +974,7 @@ export default function AdminPhotos() {
                       
                       {/* Preview */}
                       {previewUrl && formData.title && (
-                        <div className="rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 p-4 border border-cyan-200">
+                        <div className="rounded-xl bg-linear-to-r from-cyan-50 to-blue-50 p-4 border border-cyan-200">
                           <h4 className="font-medium text-cyan-800 text-sm mb-3">👁️ Preview</h4>
                           <div className="bg-white rounded-lg p-4 shadow-sm">
                             <div className="flex gap-4">
@@ -1040,7 +1040,7 @@ export default function AdminPhotos() {
                     <Button 
                       onClick={handleBulkUpload} 
                       disabled={isUploading || selectedFiles.filter(f => f.status === 'pending').length === 0}
-                      className="gap-2 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
+                      className="gap-2 bg-linear-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
                     >
                       {isUploading ? (
                         <>
@@ -1058,7 +1058,7 @@ export default function AdminPhotos() {
                     <Button
                       type="button"
                       onClick={() => setCurrentTab('details')}
-                      className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
+                      className="bg-linear-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
                       disabled={!previewUrl && !formData.url}
                     >
                       Continue to Details →
@@ -1067,7 +1067,7 @@ export default function AdminPhotos() {
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving}
-                      className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                      className="gap-2 bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                     >
                       {isSaving ? (
                         <Spinner className="h-4 w-4 animate-spin" />

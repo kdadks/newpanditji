@@ -150,7 +150,7 @@ export default function AdminTestimonials() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -244,9 +244,9 @@ export default function AdminTestimonials() {
 
       {/* Modern Redesigned Testimonial Modal */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 !bg-background">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 bg-background!">
           {/* Gradient Header */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 px-6 py-6">
+          <div className="relative overflow-hidden bg-linear-to-r from-amber-500 via-orange-500 to-rose-500 px-6 py-6">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -291,7 +291,7 @@ export default function AdminTestimonials() {
               {currentTab === 'customer' && (
                 <div className="space-y-5">
                   {/* Customer Details */}
-                  <Card className="border-2 border-amber-100 !bg-background">
+                  <Card className="border-2 border-amber-100 bg-background!">
                     <CardContent className="pt-5 space-y-4">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
@@ -364,7 +364,7 @@ export default function AdminTestimonials() {
                   </Card>
                   
                   {/* Verification Status */}
-                  <Card className="border-2 border-green-100 !bg-background">
+                  <Card className="border-2 border-green-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100">
@@ -396,7 +396,7 @@ export default function AdminTestimonials() {
               {currentTab === 'review' && (
                 <div className="space-y-5">
                   {/* Rating */}
-                  <Card className="border-2 border-yellow-100 !bg-background">
+                  <Card className="border-2 border-yellow-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100">
@@ -438,7 +438,7 @@ export default function AdminTestimonials() {
                   </Card>
                   
                   {/* Review Content */}
-                  <Card className="border-2 border-orange-100 !bg-background">
+                  <Card className="border-2 border-orange-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100">
@@ -470,7 +470,7 @@ export default function AdminTestimonials() {
                   
                   {/* Preview */}
                   {formData.name && formData.content && (
-                    <div className="rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 p-4 border border-amber-200">
+                    <div className="rounded-xl bg-linear-to-r from-amber-50 to-orange-50 p-4 border border-amber-200">
                       <h4 className="font-medium text-amber-800 text-sm mb-3">👁️ Preview</h4>
                       <div className="bg-white rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
@@ -526,7 +526,7 @@ export default function AdminTestimonials() {
                     <Button
                       type="button"
                       onClick={() => setCurrentTab('review')}
-                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                      className="bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
                     >
                       Continue to Review →
                     </Button>
@@ -534,7 +534,7 @@ export default function AdminTestimonials() {
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving}
-                      className="gap-2 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600"
+                      className="gap-2 bg-linear-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600"
                     >
                       {isSaving ? (
                         <Spinner className="h-4 w-4 animate-spin" />

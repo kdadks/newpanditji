@@ -115,7 +115,7 @@ export default function BlogPage() {
                   <div className="p-8 lg:p-12 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-4">
                       <Badge className="bg-primary/20 text-primary border-primary/30">
-                        {blogArticles[0].category}
+                        {'category' in blogArticles[0] ? blogArticles[0].category : 'Article'}
                       </Badge>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar size={14} />

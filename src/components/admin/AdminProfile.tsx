@@ -51,7 +51,7 @@ export default function AdminProfile() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
         <CardHeader>
           <CardTitle className="text-2xl font-heading">Profile Management</CardTitle>
           <CardDescription className="mt-2">

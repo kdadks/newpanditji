@@ -48,10 +48,10 @@ export default function AdminCharity() {
   const handleEdit = (project: CharityProjectRow) => {
     setFormData({
       id: project.id,
-      title: project.name,
-      description: project.full_description,
+      title: project.title,
+      description: project.full_description || '',
       videoUrl: project.video_url || '',
-      category: project.category
+      category: project.category || 'Community Service'
     })
     setEditingProject(project)
     setCurrentTab('basic')
@@ -68,7 +68,7 @@ export default function AdminCharity() {
       if (editingProject) {
         await updateProject({
           id: editingProject.id,
-          name: formData.title,
+          title: formData.title,
           short_description: formData.description.substring(0, 200),
           full_description: formData.description,
           video_url: formData.videoUrl || null,
@@ -135,11 +135,11 @@ export default function AdminCharity() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-heading font-semibold text-lg">{project.name}</h3>
+                          <h3 className="font-heading font-semibold text-lg">{project.title}</h3>
                           <span className="text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
-                            {project.category}
+                            {project.category || 'Project'}
                           </span>
-                          {project.is_active ? (
+                          {project.is_published ? (
                             <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
                               Active
                             </span>
@@ -177,9 +177,9 @@ export default function AdminCharity() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 !bg-background">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0 bg-background!">
           {/* Gradient Header */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 px-6 py-6">
+          <div className="relative overflow-hidden bg-linear-to-r from-rose-500 via-pink-500 to-fuchsia-500 px-6 py-6">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -224,7 +224,7 @@ export default function AdminCharity() {
               {currentTab === 'basic' && (
                 <div className="space-y-5">
                   {/* Project Title */}
-                  <Card className="border-2 border-rose-100 !bg-background">
+                  <Card className="border-2 border-rose-100 bg-background!">
                     <CardContent className="pt-5 space-y-4">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100">
@@ -278,7 +278,7 @@ export default function AdminCharity() {
                   </Card>
                   
                   {/* Video URL */}
-                  <Card className="border-2 border-fuchsia-100 !bg-background">
+                  <Card className="border-2 border-fuchsia-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-fuchsia-100">
@@ -311,7 +311,7 @@ export default function AdminCharity() {
               {/* Description Tab */}
               {currentTab === 'description' && (
                 <div className="space-y-5">
-                  <Card className="border-2 border-pink-100 !bg-background">
+                  <Card className="border-2 border-pink-100 bg-background!">
                     <CardContent className="pt-5">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100">
@@ -344,7 +344,7 @@ export default function AdminCharity() {
                   </Card>
                   
                   {/* Writing Tips */}
-                  <div className="rounded-xl bg-gradient-to-r from-rose-50 to-pink-50 p-4 border border-rose-100">
+                  <div className="rounded-xl bg-linear-to-r from-rose-50 to-pink-50 p-4 border border-rose-100">
                     <h4 className="font-medium text-rose-800 text-sm mb-2">💡 Tips for a Great Description</h4>
                     <ul className="text-xs text-rose-700 space-y-1">
                       <li>• Explain the purpose and mission of the project</li>
@@ -383,7 +383,7 @@ export default function AdminCharity() {
                     <Button
                       type="button"
                       onClick={() => setCurrentTab('description')}
-                      className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
+                      className="bg-linear-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
                     >
                       Continue to Description →
                     </Button>
@@ -391,7 +391,7 @@ export default function AdminCharity() {
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving || formData.description.replace(/<[^>]*>/g, '').length > 5000}
-                      className="gap-2 bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600"
+                      className="gap-2 bg-linear-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600"
                     >
                       {isSaving ? (
                         <Spinner className="h-4 w-4 animate-spin" />
