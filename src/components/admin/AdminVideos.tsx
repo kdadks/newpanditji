@@ -8,6 +8,7 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { toast } from 'sonner'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 type VideoCategory = 'educational' | 'poetry' | 'charity' | 'podcast' | 'ceremony' | 'other'
 
@@ -22,6 +23,8 @@ export default function AdminVideos() {
   const { videos, isLoading, createVideo, updateVideo, deleteVideo, isCreating, isUpdating, isDeleting } = useVideos()
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [videoToDelete, setVideoToDelete] = useState<Video | null>(null)
   const [formData, setFormData] = useState<VideoFormData>({
     id: '',
     title: '',
@@ -86,13 +89,19 @@ export default function AdminVideos() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this video?')) {
-      try {
-        await deleteVideo(id)
-      } catch {
-        // Error toast is handled by the hook
-      }
+  const openDeleteDialog = (video: Video) => {
+    setVideoToDelete(video)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!videoToDelete) return
+    try {
+      await deleteVideo(videoToDelete.id)
+      setDeleteDialogOpen(false)
+      setVideoToDelete(null)
+    } catch {
+      // Error toast is handled by the hook
     }
   }
 
@@ -157,7 +166,7 @@ export default function AdminVideos() {
                         <Button 
                           variant="destructive" 
                           size="sm" 
-                          onClick={() => handleDelete(video.id)}
+                          onClick={() => openDeleteDialog(video)}
                           disabled={isDeleting}
                         >
                           <Trash size={16} />
@@ -239,6 +248,15 @@ export default function AdminVideos() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Video"
+        itemName={videoToDelete?.title}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

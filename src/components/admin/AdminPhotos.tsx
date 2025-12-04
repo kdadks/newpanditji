@@ -11,6 +11,7 @@ import { Badge } from '../ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Progress } from '../ui/progress'
 import { toast } from 'sonner'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 interface PhotoFormData {
   id: string
@@ -48,6 +49,8 @@ export default function AdminPhotos() {
   const [bulkCategory, setBulkCategory] = useState('gallery')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadingCount, setUploadingCount] = useState({ current: 0, total: 0 })
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
@@ -342,13 +345,18 @@ export default function AdminPhotos() {
     }
   }
 
-  const handleDelete = async (photo: Photo) => {
-    if (!confirm('Are you sure you want to delete this photo?')) return
+  const openDeleteDialog = (photo: Photo) => {
+    setPhotoToDelete(photo)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!photoToDelete) return
 
     try {
       // Delete file from storage if it's a Supabase Storage file
-      if (isSupabaseStorageUrl(photo.url)) {
-        const path = extractPathFromUrl(photo.url, BUCKETS.MEDIA)
+      if (isSupabaseStorageUrl(photoToDelete.url)) {
+        const path = extractPathFromUrl(photoToDelete.url, BUCKETS.MEDIA)
         if (path) {
           try {
             await deleteFile(BUCKETS.MEDIA, path)
@@ -358,7 +366,9 @@ export default function AdminPhotos() {
         }
       }
 
-      await deletePhoto(photo.id)
+      await deletePhoto(photoToDelete.id)
+      setDeleteDialogOpen(false)
+      setPhotoToDelete(null)
     } catch {
       // Error toast is handled by the hook
     }
@@ -518,7 +528,7 @@ export default function AdminPhotos() {
                           variant="destructive"
                           size="sm"
                           className="flex-1"
-                          onClick={() => handleDelete(photo)}
+                          onClick={() => openDeleteDialog(photo)}
                           disabled={isDeleting}
                         >
                           <Trash size={16} className="mr-2" />
@@ -1083,6 +1093,15 @@ export default function AdminPhotos() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Photo"
+        itemName={photoToDelete?.title}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

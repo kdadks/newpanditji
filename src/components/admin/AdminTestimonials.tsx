@@ -10,6 +10,7 @@ import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import { useTestimonials, useCreateTestimonial, useUpdateTestimonial, useDeleteTestimonial } from '../../hooks/useTestimonials'
 import { TestimonialRow } from '../../lib/supabase'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 interface TestimonialFormData {
   id: string
@@ -32,6 +33,8 @@ export default function AdminTestimonials() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [currentTab, setCurrentTab] = useState('customer')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [testimonialToDelete, setTestimonialToDelete] = useState<TestimonialRow | null>(null)
   const [formData, setFormData] = useState<TestimonialFormData>({
     id: '',
     name: '',
@@ -120,12 +123,19 @@ export default function AdminTestimonials() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this testimonial?')) return
+  const openDeleteDialog = (testimonial: TestimonialRow) => {
+    setTestimonialToDelete(testimonial)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!testimonialToDelete) return
 
     try {
-      await deleteTestimonialMutation.mutateAsync(id)
+      await deleteTestimonialMutation.mutateAsync(testimonialToDelete.id)
       toast.success('Testimonial deleted successfully')
+      setDeleteDialogOpen(false)
+      setTestimonialToDelete(null)
     } catch (error) {
       toast.error('Failed to delete testimonial')
       console.error('Error deleting testimonial:', error)
@@ -230,7 +240,7 @@ export default function AdminTestimonials() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(testimonial.id)}
+                      onClick={() => openDeleteDialog(testimonial)}
                     >
                       <Trash size={16} />
                     </Button>
@@ -550,6 +560,15 @@ export default function AdminTestimonials() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Testimonial"
+        itemName={testimonialToDelete?.client_name}
+        isDeleting={deleteTestimonialMutation.isPending}
+      />
     </div>
   )
 }

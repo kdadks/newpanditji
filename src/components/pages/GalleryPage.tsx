@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { usePageSEO } from '../../hooks/usePageSEO'
-import { useVideos } from '../../hooks/useVideos'
+import { useVideos, type Video } from '../../hooks/useVideos'
 import { usePhotos } from '../../hooks/usePhotos'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
@@ -14,13 +14,6 @@ interface Photo {
   url: string
   title: string
   category: string
-}
-
-interface Video {
-  id: string
-  title: string
-  category: 'educational' | 'poetry' | 'charity' | 'podcast'
-  url: string
 }
 
 const defaultPhotos: Photo[] = [
@@ -76,7 +69,7 @@ export default function GalleryPage() {
   // Use database data if available, otherwise fall back to defaults
   const videos = (dbVideos && dbVideos.length > 0) ? dbVideos : defaultVideos as Video[]
   const photos = (dbPhotos && dbPhotos.length > 0) ? dbPhotos : defaultPhotos
-  const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | 'educational' | 'poetry' | 'charity' | 'podcast'>('all')
+  const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
 
@@ -86,15 +79,41 @@ export default function GalleryPage() {
 
   const getYouTubeEmbedUrl = (url: string | undefined) => {
     if (!url) return ''
-    const videoId = url.split('youtu.be/')[1] || url.split('v=')[1]?.split('&')[0]
+    
+    // Handle various YouTube URL formats
+    let videoId = ''
+    
+    // youtu.be/VIDEO_ID
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0] || ''
+    }
+    // youtube.com/watch?v=VIDEO_ID
+    else if (url.includes('v=')) {
+      videoId = url.split('v=')[1]?.split('&')[0] || ''
+    }
+    // youtube.com/embed/VIDEO_ID
+    else if (url.includes('/embed/')) {
+      videoId = url.split('/embed/')[1]?.split('?')[0] || ''
+    }
+    // youtube.com/v/VIDEO_ID
+    else if (url.includes('/v/')) {
+      videoId = url.split('/v/')[1]?.split('?')[0] || ''
+    }
+    // youtube.com/shorts/VIDEO_ID
+    else if (url.includes('/shorts/')) {
+      videoId = url.split('/shorts/')[1]?.split('?')[0] || ''
+    }
+    
     return videoId ? `https://www.youtube.com/embed/${videoId}` : ''
   }
 
-  const categoryColors = {
+  const categoryColors: Record<string, string> = {
     educational: 'bg-blue-100 text-blue-800 border-blue-200',
     poetry: 'bg-purple-100 text-purple-800 border-purple-200',
     charity: 'bg-green-100 text-green-800 border-green-200',
-    podcast: 'bg-orange-100 text-orange-800 border-orange-200'
+    podcast: 'bg-orange-100 text-orange-800 border-orange-200',
+    ceremony: 'bg-amber-100 text-amber-800 border-amber-200',
+    other: 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
   return (
@@ -223,6 +242,14 @@ export default function GalleryPage() {
                 Educational ({videos.filter(v => v.category === 'educational').length})
               </Button>
               <Button
+                variant={selectedVideoCategory === 'ceremony' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedVideoCategory('ceremony')}
+                className="rounded-full"
+              >
+                Ceremony ({videos.filter(v => v.category === 'ceremony').length})
+              </Button>
+              <Button
                 variant={selectedVideoCategory === 'poetry' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedVideoCategory('poetry')}
@@ -254,27 +281,34 @@ export default function GalleryPage() {
                 <CircleNotch className="animate-spin text-primary" size={48} />
               </div>
             ) : (
-            <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            <div className={`grid gap-6 overflow-hidden ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredVideos.map((video, index) => {
                 const embedUrl = getYouTubeEmbedUrl(video.url)
+                const videoId = embedUrl ? embedUrl.split('/embed/')[1] : ''
+                const thumbnailUrl = video.thumbnail_url || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '')
+                
                 return (
-                <Card key={video.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
+                <Card key={video.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80">
                   <CardContent className="p-0">
-                    <div className="aspect-video relative overflow-hidden">
-                      {embedUrl ? (
-                        <iframe
-                          src={embedUrl}
-                          title={video.title}
-                          className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
+                    <div className="aspect-video relative overflow-hidden cursor-pointer" onClick={() => video.url && window.open(video.url, '_blank')}>
+                      {thumbnailUrl ? (
+                        <>
+                          <img 
+                            src={thumbnailUrl} 
+                            alt={video.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors duration-300">
+                            <div className="bg-red-600 rounded-full p-4 shadow-xl transform group-hover:scale-110 transition-transform duration-300">
+                              <PlayCircle size={40} weight="fill" className="text-white" />
+                            </div>
+                          </div>
+                        </>
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
                           <PlayCircle size={48} className="text-muted-foreground" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                       <div className="absolute top-3 left-3">
                         <Badge className={`${categoryColors[video.category] || 'bg-gray-100 text-gray-800 border-gray-200'} border`}>
                           {video.category}
@@ -294,9 +328,12 @@ export default function GalleryPage() {
                           <PlayCircle size={14} className="text-primary" />
                           Watch on YouTube
                         </div>
-                        <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-0 h-auto">
+                        <button 
+                          className="text-primary hover:text-primary/80 cursor-pointer text-sm font-medium transition-colors duration-200"
+                          onClick={() => video.url && window.open(video.url, '_blank')}
+                        >
                           Watch →
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </CardContent>

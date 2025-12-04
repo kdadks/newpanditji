@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import { categoryNames } from '../../lib/data'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 import type { AdminServiceRow } from '../../lib/supabase'
 import { generateSlug } from '../../lib/supabase'
 
@@ -47,6 +48,8 @@ export default function AdminServicesNew() {
   const [isUploading, setIsUploading] = useState(false)
   const [selectedSamagriFile, setSelectedSamagriFile] = useState<File | null>(null)
   const [showImagePicker, setShowImagePicker] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [serviceToDelete, setServiceToDelete] = useState<AdminServiceRow | null>(null)
   const samagriFileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<ServiceFormData>({
@@ -200,13 +203,19 @@ export default function AdminServicesNew() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
-      try {
-        await deleteService(id)
-      } catch {
-        // Error toast is handled by the hook
-      }
+  const openDeleteDialog = (service: AdminServiceRow) => {
+    setServiceToDelete(service)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!serviceToDelete) return
+    try {
+      await deleteService(serviceToDelete.id)
+      setDeleteDialogOpen(false)
+      setServiceToDelete(null)
+    } catch {
+      // Error toast is handled by the hook
     }
   }
 
@@ -358,7 +367,7 @@ export default function AdminServicesNew() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(service.id)}
+                    onClick={() => openDeleteDialog(service)}
                     disabled={isDeleting}
                   >
                     <Trash size={16} />
@@ -1039,6 +1048,15 @@ export default function AdminServicesNew() {
           )}
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Service"
+        itemName={serviceToDelete?.name}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

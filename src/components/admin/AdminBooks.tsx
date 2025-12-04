@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 interface BookFormData {
   id: string
@@ -40,6 +41,8 @@ export default function AdminBooks() {
   const [isSaving, setIsSaving] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [currentTab, setCurrentTab] = useState('basic')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [bookToDelete, setBookToDelete] = useState<BookRow | null>(null)
 
   const [formData, setFormData] = useState<BookFormData>({
     id: '',
@@ -159,12 +162,19 @@ export default function AdminBooks() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this book?')) return
+  const openDeleteDialog = (book: BookRow) => {
+    setBookToDelete(book)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!bookToDelete) return
 
     try {
-      await deleteBookMutation.mutateAsync(id)
+      await deleteBookMutation.mutateAsync(bookToDelete.id)
       toast.success('Book deleted successfully')
+      setDeleteDialogOpen(false)
+      setBookToDelete(null)
     } catch (error) {
       toast.error('Failed to delete book')
       console.error('Error deleting book:', error)
@@ -250,7 +260,7 @@ export default function AdminBooks() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(book.id)}
+                    onClick={() => openDeleteDialog(book)}
                   >
                     <Trash size={16} />
                   </Button>
@@ -759,7 +769,7 @@ export default function AdminBooks() {
                       {photos.filter(photo => photo.category === 'books').map((photo) => (
                         <div
                           key={photo.id}
-                          className="cursor-pointer group relative aspect-[2/3] rounded-xl overflow-hidden border-2 border-transparent hover:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-lg"
+                          className="cursor-pointer group relative aspect-2/3 rounded-xl overflow-hidden border-2 border-transparent hover:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-lg"
                           onClick={() => {
                             setFormData({ ...formData, coverImage: photo.url })
                             setShowImagePicker(false)
@@ -800,6 +810,15 @@ export default function AdminBooks() {
           )}
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Book"
+        itemName={bookToDelete?.title}
+        isDeleting={deleteBookMutation.isPending}
+      />
     </div>
   )
 }

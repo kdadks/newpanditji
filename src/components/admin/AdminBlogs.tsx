@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { QuillEditor } from '../ui/quill-editor'
 import { toast } from 'sonner'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 import type { BlogPostRow } from '../../lib/supabase'
 
 interface BlogFormData {
@@ -25,6 +26,8 @@ export default function AdminBlogs() {
   const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentTab, setCurrentTab] = useState('basic')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [blogToDelete, setBlogToDelete] = useState<BlogPostRow | null>(null)
   const [formData, setFormData] = useState<BlogFormData>({
     id: '',
     title: '',
@@ -90,13 +93,19 @@ export default function AdminBlogs() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this blog article?')) {
-      try {
-        await deleteBlog(id)
-      } catch {
-        // Error toast is handled by the hook
-      }
+  const openDeleteDialog = (blog: BlogPostRow) => {
+    setBlogToDelete(blog)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!blogToDelete) return
+    try {
+      await deleteBlog(blogToDelete.id)
+      setDeleteDialogOpen(false)
+      setBlogToDelete(null)
+    } catch {
+      // Error toast is handled by the hook
     }
   }
 
@@ -163,7 +172,7 @@ export default function AdminBlogs() {
                         <Button 
                           variant="destructive" 
                           size="sm" 
-                          onClick={() => handleDelete(blog.id)}
+                          onClick={() => openDeleteDialog(blog)}
                           disabled={isDeleting}
                         >
                           <Trash size={16} />
@@ -412,6 +421,15 @@ export default function AdminBlogs() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Blog Article"
+        itemName={blogToDelete?.title}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }
