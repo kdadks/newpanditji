@@ -91,12 +91,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
-                <FlowerLotus size={16} weight="fill" />
+              <div className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-base md:text-lg font-medium mb-6 shadow-xl">
+                <FlowerLotus size={20} weight="fill" />
                 {cmsContent.hero.subtitle}
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              <h1 className="font-aptos font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 {cmsContent.hero.title.split(' ').map((word, i) => 
                   word.toLowerCase() === 'authentic' ? (
                     <span key={i} className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{word} </span>
@@ -106,16 +106,16 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 )}
               </h1>
 
-              <p className="text-lg md:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <p className="text-xl md:text-2xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 {cmsContent.hero.description}
               </p>
 
               {/* Statistics - Compact inline version */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 mb-6">
                 {cmsContent.hero.statistics.map((stat, index) => (
                   <span key={index}>
                     {index > 0 && <span className="text-white/50 mr-6">•</span>}
-                    <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                    <span className="text-base md:text-lg text-white/95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                       <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
                     </span>
                   </span>
@@ -325,7 +325,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               return (
                 <Card key={index} className="text-center">
                   <CardContent className="p-6">
-                    {iconMap[card.icon] || <FlowerLotus className="mx-auto mb-3 text-primary" size={40} weight="fill" />}
+                    {(card.icon && iconMap[card.icon]) || <FlowerLotus className="mx-auto mb-3 text-primary" size={40} weight="fill" />}
                     <h3 className="font-heading font-semibold text-lg mb-2">{card.title}</h3>
                     <p className="text-muted-foreground text-sm">
                       {card.description}

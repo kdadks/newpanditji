@@ -13,6 +13,7 @@ const AboutPage = lazy(() => import('./components/pages/AboutPage'))
 const WhyChooseUsPage = lazy(() => import('./components/pages/WhyChooseUsPage'))
 const GalleryPage = lazy(() => import('./components/pages/GalleryPage'))
 const BlogPage = lazy(() => import('./components/pages/BlogPage'))
+const BlogDetailPage = lazy(() => import('./components/pages/BlogDetailPage'))
 const BooksPage = lazy(() => import('./components/pages/BooksPage'))
 const CharityPage = lazy(() => import('./components/pages/CharityPage'))
 const TestimonialsPage = lazy(() => import('./components/pages/TestimonialsPage'))
@@ -31,16 +32,18 @@ const PageLoader = () => (
   </div>
 )
 
-export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
+export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'blog-detail' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
 
 export type NavigationData = {
   page: Page
   category?: string
+  blogId?: string
 }
 
 function App() {
   const [currentPage, setCurrentPage] = useLocalStorage<Page>('currentPage', 'home')
   const [currentCategory, setCurrentCategory] = useLocalStorage<string>('currentCategory', 'all')
+  const [currentBlogId, setCurrentBlogId] = useLocalStorage<string>('currentBlogId', '')
 
   // Check URL path on mount and when URL changes
   useEffect(() => {
@@ -50,6 +53,11 @@ function App() {
         setCurrentPage('home')
       } else if (path === 'admin') {
         setCurrentPage('admin')
+      } else if (path.startsWith('blog/') && path.length > 5) {
+        // Handle blog detail URLs like /blog/some-blog-id
+        const blogId = path.slice(5)
+        setCurrentBlogId(blogId)
+        setCurrentPage('blog-detail')
       } else if (['services', 'about', 'why-choose-us', 'gallery', 'blog', 'books', 'charity', 'testimonials', 'contact', 'terms', 'privacy'].includes(path)) {
         setCurrentPage(path as Page)
       }
@@ -69,17 +77,20 @@ function App() {
 
     updateMetaTags({
       ...seoConfig,
-      canonicalUrl: `https://panditrajesh.com/${page === 'home' ? '' : page}`,
+      canonicalUrl: `https://panditrajesh.com/${page === 'home' ? '' : page === 'blog-detail' ? `blog/${currentBlogId}` : page}`,
       schema: generateOrganizationSchema(),
       robots: 'index, follow'
     })
 
     // Update URL without page reload (for deep linking)
-    const newPath = page === 'home' ? '/' : `/${page}`
+    let newPath = page === 'home' ? '/' : `/${page}`
+    if (page === 'blog-detail' && currentBlogId) {
+      newPath = `/blog/${currentBlogId}`
+    }
     if (window.location.pathname !== newPath) {
       window.history.pushState({}, '', newPath)
     }
-  }, [currentPage])
+  }, [currentPage, currentBlogId])
   
   const handleNavigate = (pageOrData: Page | NavigationData) => {
     if (typeof pageOrData === 'string') {
@@ -91,6 +102,9 @@ function App() {
       setCurrentPage(pageOrData.page)
       if (pageOrData.category) {
         setCurrentCategory(pageOrData.category)
+      }
+      if (pageOrData.blogId) {
+        setCurrentBlogId(pageOrData.blogId)
       }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -110,7 +124,9 @@ function App() {
       case 'gallery':
         return <GalleryPage />
       case 'blog':
-        return <BlogPage />
+        return <BlogPage onNavigate={handleNavigate} />
+      case 'blog-detail':
+        return <BlogDetailPage blogId={currentBlogId} onNavigate={handleNavigate} />
       case 'books':
         return <BooksPage />
       case 'charity':

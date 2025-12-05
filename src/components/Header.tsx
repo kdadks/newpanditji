@@ -30,6 +30,7 @@ const navItems: { page: Page; label: string; submenu?: { page: Page; label: stri
   },
   { page: 'services', label: 'Services' },
   { page: 'gallery', label: 'Gallery' },
+  { page: 'blog', label: 'Blog' },
   { page: 'testimonials', label: 'Testimonials' },
   { page: 'contact', label: 'Contact' }
 ]
@@ -71,7 +72,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
         >
           <img src="/Raj ji.jpg" alt="Pandit Rajesh Joshi" className="w-10 h-10 rounded-full object-cover border-2 border-primary" />
           <div className="flex flex-col items-start">
-            <span className="font-heading font-bold text-xl text-primary">Pandit Rajesh Joshi</span>
+            <span className="font-heading font-medium text-xl text-primary">Pandit Rajesh Joshi</span>
             <span className="text-xs text-muted-foreground hidden sm:block">Hindu Priest & Spiritual Guide</span>
           </div>
         </button>

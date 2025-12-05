@@ -124,8 +124,9 @@
   --radius-2xl: calc(var(--radius) * 3);
   --radius-full: 9999px;
   
-  --font-heading: 'Crimson Text', serif;
+  --font-heading: 'Aptos', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', sans-serif;
+  --font-aptos: 'Aptos', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
@@ -134,6 +135,10 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+}
+
+.font-aptos {
+  font-family: var(--font-aptos);
 }
 
 @keyframes scroll-left {

@@ -5,6 +5,7 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch } from '@phosphor-icons/react'
 import { blogArticles as defaultBlogs } from '../../lib/data'
+import { Page, NavigationData } from '../../App'
 
 interface BlogArticle {
   id: string
@@ -12,9 +13,16 @@ interface BlogArticle {
   excerpt: string
   category: string
   content?: string
+  featured_image_url?: string | null
+  reading_time_minutes?: number | null
+  published_at?: string | null
 }
 
-export default function BlogPage() {
+interface BlogPageProps {
+  onNavigate: (pageOrData: Page | NavigationData) => void
+}
+
+export default function BlogPage({ onNavigate }: BlogPageProps) {
   usePageSEO({
     title: 'Hindu Spirituality & Philosophy | Blog on Rituals, Traditions & Vedic Wisdom',
     description: 'Discover insights on Hindu spirituality, pooja significance, and Vedic traditions. Learn about spiritual practices and sacred rituals in modern life.',
@@ -23,8 +31,26 @@ export default function BlogPage() {
   })
 
   const { blogs: dbBlogs, isLoading } = useBlogs()
-  // Use database blogs if available, otherwise fall back to defaults
-  const blogArticles = (dbBlogs && dbBlogs.length > 0) ? dbBlogs : defaultBlogs
+  
+  // Transform database blogs to BlogArticle format, or use defaults
+  const blogArticles: BlogArticle[] = (dbBlogs && dbBlogs.length > 0) 
+    ? dbBlogs.map(blog => ({
+        id: blog.id,
+        title: blog.title,
+        excerpt: blog.excerpt,
+        category: blog.category_name || 'Article',
+        content: blog.content,
+        featured_image_url: blog.featured_image_url,
+        reading_time_minutes: blog.reading_time_minutes,
+        published_at: blog.published_at
+      }))
+    : defaultBlogs.map(blog => ({
+        ...blog,
+        content: undefined,
+        featured_image_url: null,
+        reading_time_minutes: null,
+        published_at: null
+      }))
 
   // Get unique categories (filter out undefined/null values)
   const categories = [...new Set(blogArticles.map(article => article.category).filter((c): c is string => Boolean(c)))]
@@ -131,18 +157,29 @@ export default function BlogPage() {
                       {blogArticles[0].excerpt}
                     </p>
 
-                    <Button className="w-fit shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button 
+                      className="w-fit shadow-lg hover:shadow-xl transition-all duration-300"
+                      onClick={() => onNavigate({ page: 'blog-detail', blogId: blogArticles[0].id })}
+                    >
                       <BookOpen className="mr-2" size={18} />
                       Read Full Article
                       <CaretRight className="ml-2" size={16} />
                     </Button>
                   </div>
 
-                  <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12">
-                    <div className="text-center">
-                      <BookOpen className="text-primary/60 mx-auto mb-4" size={80} />
-                      <p className="text-primary/60 font-medium">Spiritual Wisdom</p>
-                    </div>
+                  <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12 min-h-[300px]">
+                    {blogArticles[0].featured_image_url ? (
+                      <img 
+                        src={blogArticles[0].featured_image_url} 
+                        alt={blogArticles[0].title}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <BookOpen className="text-primary/60 mx-auto mb-4" size={80} />
+                        <p className="text-primary/60 font-medium">Spiritual Wisdom</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -153,8 +190,28 @@ export default function BlogPage() {
         {/* Article Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {blogArticles.slice(1).map((article, index) => (
-            <Card key={article.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105">
+            <Card 
+              key={article.id} 
+              className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
+              onClick={() => onNavigate({ page: 'blog-detail', blogId: article.id })}
+            >
               <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              {/* Blog Image */}
+              {article.featured_image_url ? (
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={article.featured_image_url} 
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
+                </div>
+              ) : (
+                <div className="h-32 bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                  <BookOpen className="text-primary/40" size={40} />
+                </div>
+              )}
 
               <CardContent className="relative p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -179,7 +236,15 @@ export default function BlogPage() {
                     <User size={14} />
                     Pandit Rajesh Joshi
                   </div>
-                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-0 h-auto font-medium group-hover:translate-x-1 transition-transform duration-300">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-primary hover:text-primary/80 p-0 h-auto font-medium group-hover:translate-x-1 transition-transform duration-300"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onNavigate({ page: 'blog-detail', blogId: article.id })
+                    }}
+                  >
                     Read More →
                   </Button>
                 </div>

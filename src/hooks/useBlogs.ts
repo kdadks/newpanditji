@@ -5,13 +5,23 @@ import { toast } from 'sonner'
 // Query keys
 const BLOGS_KEY = ['blog_posts']
 
+// Extended type with category name from join
+export interface BlogPostWithCategory extends BlogPostRow {
+  category_name?: string | null
+}
+
 /**
- * Fetch all blog posts from Supabase
+ * Fetch all blog posts from Supabase with category names
  */
-async function fetchBlogs(): Promise<BlogPostRow[]> {
+async function fetchBlogs(): Promise<BlogPostWithCategory[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('*')
+    .select(`
+      *,
+      blog_categories (
+        name
+      )
+    `)
     .eq('status', 'published')
     .order('published_at', { ascending: false })
 
@@ -20,7 +30,12 @@ async function fetchBlogs(): Promise<BlogPostRow[]> {
     throw error
   }
 
-  return data || []
+  // Transform the data to flatten the category name
+  return (data || []).map(blog => ({
+    ...blog,
+    category_name: blog.blog_categories?.name || null,
+    blog_categories: undefined
+  })) as BlogPostWithCategory[]
 }
 
 /**
