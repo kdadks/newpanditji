@@ -76,7 +76,7 @@ export default function AdminProfile() {
                   <User size={48} className="text-primary" />
                 )}
               </div>
-              <button className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors">
+              <button className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors cursor-pointer">
                 <Camera size={16} />
               </button>
             </div>

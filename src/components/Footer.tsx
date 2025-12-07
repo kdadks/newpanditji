@@ -27,37 +27,37 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-heading font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigate('services')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('services')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Services
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('about')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   About Pandit Ji
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('gallery')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('gallery')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Gallery
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('blog')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('blog')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Blog
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('books')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('books')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Books
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('testimonials')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('testimonials')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Testimonials
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('charity')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('charity')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Charity Work
                 </button>
               </li>
@@ -68,12 +68,12 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-heading font-semibold text-lg mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigate('terms')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('terms')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Terms & Conditions
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('privacy')} className="text-sm hover:text-accent transition-colors">
+                <button onClick={() => onNavigate('privacy')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Privacy Policy
                 </button>
               </li>
@@ -85,7 +85,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm">
                 <EnvelopeSimple size={18} className="mt-0.5 shrink-0" />
-                <a href="mailto:panditjoshirajesh@gmail.com" className="hover:text-accent transition-colors">
+                <a href="mailto:panditjoshirajesh@gmail.com" className="hover:text-accent transition-colors cursor-pointer">
                   panditjoshirajesh@gmail.com
                 </a>
               </li>
@@ -99,22 +99,22 @@ export default function Footer({ onNavigate }: FooterProps) {
           <div>
             <h3 className="font-heading font-semibold text-lg mb-4">Follow Us</h3>
             <div className="flex flex-wrap gap-3">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <FacebookLogo size={24} weight="fill" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <InstagramLogo size={24} weight="fill" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <YoutubeLogo size={24} weight="fill" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <LinkedinLogo size={24} weight="fill" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <TwitterLogo size={24} weight="fill" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                 <PinterestLogo size={24} weight="fill" />
               </a>
             </div>

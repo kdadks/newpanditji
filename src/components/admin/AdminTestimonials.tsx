@@ -281,7 +281,7 @@ export default function AdminTestimonials() {
                 <button
                   key={step.id}
                   onClick={() => setCurrentTab(step.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     currentTab === step.id
                       ? 'bg-white text-orange-700 shadow-lg'
                       : 'bg-white/20 text-white hover:bg-white/30'
@@ -423,7 +423,7 @@ export default function AdminTestimonials() {
                               key={star}
                               type="button"
                               onClick={() => setFormData({ ...formData, rating: star })}
-                              className={`p-2 rounded-lg transition-all ${
+                              className={`cursor-pointer p-2 rounded-lg transition-all ${
                                 star <= formData.rating 
                                   ? 'bg-yellow-100 text-yellow-500 scale-110' 
                                   : 'bg-gray-100 text-gray-300 hover:bg-yellow-50'

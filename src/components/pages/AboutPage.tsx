@@ -58,7 +58,7 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
                 <img
                   src={cmsContent.profileImage}
                   alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
+                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
                   style={{
                     imageRendering: '-webkit-optimize-contrast',
                     backfaceVisibility: 'hidden',

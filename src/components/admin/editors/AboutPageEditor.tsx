@@ -135,7 +135,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
             <Label className="text-base font-semibold mb-3 block">Meditation Programs</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {content.spiritualJourney?.meditationPrograms?.map((prog, idx) => (
-                <Badge key={idx} variant="outline" className="py-1.5 px-3">{prog}<button onClick={() => setContent(prev => ({ ...prev, spiritualJourney: { ...prev.spiritualJourney, meditationPrograms: prev.spiritualJourney?.meditationPrograms?.filter((_, i) => i !== idx) || [] } }))} className="ml-2 text-destructive"><Trash size={12} /></button></Badge>
+                <Badge key={idx} variant="outline" className="py-1.5 px-3">{prog}<button onClick={() => setContent(prev => ({ ...prev, spiritualJourney: { ...prev.spiritualJourney, meditationPrograms: prev.spiritualJourney?.meditationPrograms?.filter((_, i) => i !== idx) || [] } }))} className="ml-2 text-destructive cursor-pointer"><Trash size={12} /></button></Badge>
               ))}
             </div>
             <div className="flex gap-2">
@@ -152,7 +152,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
               <Textarea value={content.spiritualJourney?.literaryContributions?.description || ''} onChange={(e) => setContent(prev => ({ ...prev, spiritualJourney: { ...prev.spiritualJourney, literaryContributions: { ...prev.spiritualJourney?.literaryContributions, description: e.target.value } } }))} rows={2} placeholder="Description" />
               <div className="flex flex-wrap gap-2">
                 {content.spiritualJourney?.literaryContributions?.books?.map((book, idx) => (
-                  <Badge key={idx} variant="secondary" className="py-1">{book}<button onClick={() => setContent(prev => ({ ...prev, spiritualJourney: { ...prev.spiritualJourney, literaryContributions: { ...prev.spiritualJourney?.literaryContributions, books: prev.spiritualJourney?.literaryContributions?.books?.filter((_, i) => i !== idx) || [] } } }))} className="ml-2 text-destructive"><Trash size={12} /></button></Badge>
+                  <Badge key={idx} variant="secondary" className="py-1">{book}<button onClick={() => setContent(prev => ({ ...prev, spiritualJourney: { ...prev.spiritualJourney, literaryContributions: { ...prev.spiritualJourney?.literaryContributions, books: prev.spiritualJourney?.literaryContributions?.books?.filter((_, i) => i !== idx) || [] } } }))} className="ml-2 text-destructive cursor-pointer"><Trash size={12} /></button></Badge>
                 ))}
               </div>
               <div className="flex gap-2">
@@ -184,7 +184,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
             <Label className="text-base font-semibold">Areas of Interest & Expertise</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {content.expertiseAreas?.map((area, idx) => (
-                <Badge key={idx} variant="outline" className="py-1.5">{area}<button onClick={() => setContent(prev => ({ ...prev, expertiseAreas: prev.expertiseAreas?.filter((_, i) => i !== idx) || [] }))} className="ml-2 text-destructive"><Trash size={12} /></button></Badge>
+                <Badge key={idx} variant="outline" className="py-1.5">{area}<button onClick={() => setContent(prev => ({ ...prev, expertiseAreas: prev.expertiseAreas?.filter((_, i) => i !== idx) || [] }))} className="ml-2 text-destructive cursor-pointer"><Trash size={12} /></button></Badge>
               ))}
             </div>
             <div className="flex gap-2">

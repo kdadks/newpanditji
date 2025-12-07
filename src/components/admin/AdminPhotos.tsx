@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react'
 import { usePhotos, convertLegacyPhoto, type Photo } from '../../hooks/usePhotos'
 import { uploadImage, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl, fileToBase64 } from '../../lib/storage'
-import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, FunnelSimple, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images } from '@phosphor-icons/react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
+import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images, Eye } from '@phosphor-icons/react'
+import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -51,6 +51,7 @@ export default function AdminPhotos() {
   const [uploadingCount, setUploadingCount] = useState({ current: 0, total: 0 })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null)
+  const [previewPhoto, setPreviewPhoto] = useState<Photo | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
@@ -300,7 +301,7 @@ export default function AdminPhotos() {
 
       // Upload new file if selected
       if (selectedFile) {
-        const result = await uploadImage(selectedFile, 'gallery')
+        const result = await uploadImage(selectedFile, formData.category || 'gallery')
         imageUrl = result.url
 
         // Delete old file from storage if it was a Supabase Storage file
@@ -388,161 +389,129 @@ export default function AdminPhotos() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <CardTitle className="text-2xl font-heading">Photo Gallery</CardTitle>
-              <CardDescription className="mt-2">
-                All images from books, gallery, and other sources
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleBulkAdd} variant="outline" className="gap-2 shadow-md hover:shadow-lg transition-all">
-                <Images size={20} weight="bold" />
-                Bulk Upload
-              </Button>
-              <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
-                <Plus size={20} weight="bold" />
-                Add Photo
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-heading font-semibold">Photo Gallery</h2>
+          <p className="text-sm text-muted-foreground">{photos.length} photos</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={handleBulkAdd} variant="outline" size="sm" className="gap-1.5">
+            <Images size={16} weight="bold" />
+            Bulk
+          </Button>
+          <Button onClick={handleAdd} size="sm" className="gap-1.5">
+            <Plus size={16} weight="bold" />
+            Add
+          </Button>
+        </div>
+      </div>
 
       {/* Search and Filter */}
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-              <Input
-                placeholder="Search photos by title..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="w-full md:w-56">
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger>
-                  <div className="flex items-center gap-2">
-                    <FunnelSimple size={16} />
-                    <SelectValue placeholder="All Categories" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{filteredPhotos.length}</span> of{' '}
-              <span className="font-semibold text-foreground">{photos.length}</span> photos
-            </div>
-            {categories.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {categories.slice(0, 5).map((cat) => (
-                  <Badge key={cat} variant="outline" className="text-xs">
-                    {cat}
-                  </Badge>
-                ))}
-                {categories.length > 5 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{categories.length - 5} more
-                  </Badge>
-                )}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex-1 relative">
+          <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <Input
+            placeholder="Search photos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 h-9"
+          />
+        </div>
+        <Select value={filterCategory} onValueChange={setFilterCategory}>
+          <SelectTrigger className="w-full sm:w-40 h-9">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Photos Grid */}
-      <Card>
-        <CardContent className="p-6">
-          {filteredPhotos.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              {photos.length === 0 ? (
-                <>
-                  <Upload size={48} className="mx-auto mb-4" />
-                  <p>No photos yet. Click "Add Photo" to get started.</p>
-                </>
-              ) : (
-                <>
-                  <Package size={48} className="mx-auto mb-4" />
-                  <p className="mb-4">No photos found matching your criteria</p>
-                  <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline">
-                    Clear Filters
-                  </Button>
-                </>
-              )}
-            </div>
+      {filteredPhotos.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          {photos.length === 0 ? (
+            <>
+              <Upload size={32} className="mx-auto mb-2" />
+              <p className="text-sm">No photos yet. Click "Add" to get started.</p>
+            </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredPhotos.map((photo) => (
-                <Card key={photo.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="aspect-video bg-muted relative">
-                      <img 
-                        src={photo.url} 
-                        alt={photo.title || ''} 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Image+Not+Found'
-                        }}
-                      />
-                      {isSupabaseStorageUrl(photo.url) && (
-                        <div className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                          <CloudArrowUp size={12} />
-                          Stored
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold mb-1 truncate">{photo.title}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-xs">
-                          {photo.category}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-2 mt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleEdit(photo)}
-                        >
-                          <PencilSimple size={16} className="mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => openDeleteDialog(photo)}
-                          disabled={isDeleting}
-                        >
-                          <Trash size={16} className="mr-2" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <>
+              <Package size={32} className="mx-auto mb-2" />
+              <p className="text-sm mb-2">No photos found</p>
+              <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline" size="sm">
+                Clear Filters
+              </Button>
+            </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          {filteredPhotos.map((photo) => (
+            <div 
+              key={photo.id} 
+              className="group relative rounded-lg overflow-hidden border bg-card cursor-pointer"
+              onClick={() => setPreviewPhoto(photo)}
+            >
+              <div className="aspect-square bg-muted">
+                <img 
+                  src={photo.url} 
+                  alt={photo.title || ''} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://placehold.co/200x200?text=Error'
+                  }}
+                />
+              </div>
+              {/* Hover overlay with actions */}
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 pointer-events-none group-hover:pointer-events-auto">
+                <div className="flex justify-end gap-1">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7 cursor-pointer"
+                    onClick={(e) => { e.stopPropagation(); setPreviewPhoto(photo); }}
+                    title="Preview"
+                  >
+                    <Eye size={14} />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7 cursor-pointer"
+                    onClick={(e) => { e.stopPropagation(); handleEdit(photo); }}
+                    title="Edit"
+                  >
+                    <PencilSimple size={14} />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-7 w-7 cursor-pointer"
+                    onClick={(e) => { e.stopPropagation(); openDeleteDialog(photo); }}
+                    disabled={isDeleting}
+                    title="Delete"
+                  >
+                    <Trash size={14} />
+                  </Button>
+                </div>
+                <div className="text-white text-xs truncate">{photo.title}</div>
+              </div>
+              {/* Category badge */}
+              <div className="absolute bottom-1.5 left-1.5 group-hover:opacity-0 transition-opacity pointer-events-none">
+                <span className="bg-white/90 text-gray-800 text-[10px] font-medium px-1.5 py-0.5 rounded truncate block">
+                  {photo.category ? photo.category.charAt(0).toUpperCase() + photo.category.slice(1) : ''}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Modern Redesigned Photo Modal */}
       <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -1090,6 +1059,42 @@ export default function AdminPhotos() {
                 </div>
               </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Preview Modal */}
+      <Dialog open={!!previewPhoto} onOpenChange={(open) => !open && setPreviewPhoto(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10 h-8 w-8 bg-black/50 hover:bg-black/70 text-white cursor-pointer"
+              onClick={() => setPreviewPhoto(null)}
+            >
+              <X size={18} />
+            </Button>
+            {previewPhoto && (
+              <>
+                <div className="flex items-center justify-center bg-black min-h-[300px] max-h-[70vh]">
+                  <img
+                    src={previewPhoto.url}
+                    alt={previewPhoto.title || ''}
+                    className="max-w-full max-h-[70vh] object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://placehold.co/800x600?text=Image+Not+Found'
+                    }}
+                  />
+                </div>
+                <div className="p-4 bg-background">
+                  <h3 className="font-semibold">{previewPhoto.title}</h3>
+                  <span className="bg-white/90 text-gray-800 text-xs font-medium px-2 py-0.5 rounded mt-2 inline-block border">
+                    {previewPhoto.category ? previewPhoto.category.charAt(0).toUpperCase() + previewPhoto.category.slice(1) : ''}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

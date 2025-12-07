@@ -68,7 +68,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-7xl">
         <button
           onClick={() => handleNavClick('home')}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
         >
           <img src="/Raj ji.jpg" alt="Pandit Rajesh Joshi" className="w-10 h-10 rounded-full object-cover border-2 border-primary" />
           <div className="flex flex-col items-start">
