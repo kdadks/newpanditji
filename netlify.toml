@@ -5,13 +5,23 @@
   # Build command
   command = "npm run build"
 
-  # Directory with the build output (Vite default)
-  publish = "dist"
+  # Directory with the build output (Next.js default)
+  publish = ".next"
 
   # Node version
   environment = { NODE_VERSION = "20" }
 
-# Redirect rules for SPA client-side routing
+# Environment variables (reference only - set in Netlify UI)
+# NEXT_PUBLIC_SUPABASE_URL
+# NEXT_PUBLIC_SUPABASE_ANON_KEY
+# SUPABASE_SERVICE_ROLE_KEY (server-side only)
+
+# Redirect rules for Next.js routing
+[[redirects]]
+  from = "/_next/*"
+  to = "/_next/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
