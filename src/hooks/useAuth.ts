@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { authService, type AuthUser } from '../services/auth'
 

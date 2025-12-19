@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, extractYouTubeId, type VideoRow, type VideoInsert, type VideoUpdate } from '../lib/supabase'
 import { toast } from 'sonner'

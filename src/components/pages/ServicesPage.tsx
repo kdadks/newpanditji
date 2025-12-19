@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { useServices } from '../../hooks/useServices'
 import { Card, CardContent } from '../ui/card'
@@ -9,11 +11,11 @@ import { Input } from '../ui/input'
 import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch } from '@phosphor-icons/react'
 import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
-import { Page, NavigationData } from '../../App'
+import { AppPage, AppNavigationData } from '../../lib/types'
 
 interface ServicesPageProps {
   initialCategory?: string
-  onNavigate?: (pageOrData: Page | NavigationData) => void
+  onNavigate?: (pageOrData: AppPage | AppNavigationData) => void
 }
 
 export default function ServicesPage({ initialCategory = 'all', onNavigate }: ServicesPageProps) {
@@ -59,98 +61,51 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   return (
     <div className="w-full">
-      {/* Hero Section with Rolling Background */}
-      <section className="relative pt-16 md:pt-20 pb-12 md:pb-16 overflow-hidden">
-        {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
-            <img
-              src="/images/Traditional Altar with Marigold Flowers.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/South Asian Temple Complex.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Golden Temples of Devotion.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
-            <img
-              src="/images/Traditional Altar with Marigold Flowers.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/South Asian Temple Complex.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/Golden Temples of Devotion.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
-            <img
-              src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png"
-              alt=""
-              className="h-full w-auto object-cover opacity-40"
-            />
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
+        {/* Background decoration with animated rolling images - Service Related */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
+            {['/images/Pooja 1.jpg', '/images/Pooja 2.jpg', '/images/Pooja 3.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+            ))}
+            {['/images/Pooja 1.jpg', '/images/Pooja 2.jpg', '/images/Pooja 3.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+            ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          <div className="lg:flex lg:justify-between lg:items-start">
-            <div className="text-center lg:flex-1">
-              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                Our Services
-              </h1>
-              <p className="text-lg md:text-xl text-white/95 font-medium max-w-2xl mx-auto mb-6 lg:mb-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
-              </p>
-
-              {/* Why Choose Us CTA Button - Centered on Mobile */}
-              <div className="lg:hidden flex justify-center">
-                <Button
-                  size="default"
-                  variant="outline"
-                  onClick={() => onNavigate?.('why-choose-us')}
-                  className="text-base px-6 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-                >
-                  <Sparkle className="mr-2" size={20} weight="fill" />
-                  Why Choose Us
-                </Button>
-              </div>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <FlowerLotus size={18} weight="fill" className="animate-pulse" />
+              Sacred Services & Ceremonies
             </div>
 
-            {/* Why Choose Us CTA Button - Right Aligned on Desktop */}
-            <div className="hidden lg:block ml-4">
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              Our <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Services</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
+              Discover our comprehensive range of traditional Hindu religious services, ceremonies, and spiritual guidance offerings
+            </p>
+
+            <div className="flex justify-center">
               <Button
                 size="lg"
-                variant="outline"
                 onClick={() => onNavigate?.('why-choose-us')}
-                className="text-base px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
               >
-                <Sparkle className="mr-2" size={20} weight="fill" />
+                <Sparkle className="mr-3 group-hover:scale-110 transition-transform" size={20} weight="fill" />
                 Why Choose Us
               </Button>
             </div>
@@ -221,34 +176,78 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {!isLoading && filteredServices.map(service => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {!isLoading && filteredServices.map((service, index) => (
             <Card
               key={service.id}
-              className="hover:shadow-lg transition-all hover:border-primary/30 hover:-translate-y-1 cursor-pointer"
+              className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 bg-gradient-to-br from-white via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-amber-950/30 flex flex-col"
               onClick={() => handleServiceClick(service)}
             >
-              <CardContent className="p-6">
-                <div className="mb-3">
-                  <span className="text-xs font-medium text-accent bg-accent/10 px-3 py-1 rounded-full">
+              {/* Image Section */}
+              <div className="relative h-64 overflow-hidden bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                <img 
+                  src={`/images/Pooja ${(index % 3) + 1}.jpg`}
+                  alt={service.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/images/Traditional Altar with Marigold Flowers.png';
+                  }}
+                />
+                {/* Category Badge */}
+                <div className="absolute top-4 left-4 z-20">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
+                    <FlowerLotus size={14} weight="fill" />
                     {categoryNames[service.category]}
                   </span>
                 </div>
-                <h3 className="font-heading font-semibold text-xl mb-3">{service.name}</h3>
+                {/* Number Badge */}
+                <div className="absolute top-4 right-4 z-20">
+                  <div className="w-10 h-10 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center font-black text-amber-700 dark:text-amber-400 shadow-lg border border-amber-200 dark:border-amber-800">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+                </div>
+                {/* Duration Badge */}
+                <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg border border-white/40">
+                  <Clock className="text-amber-600" size={14} weight="fill" />
+                  <span className="text-xs font-bold text-gray-700 dark:text-gray-200">{service.duration}</span>
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <CardContent className="p-6 relative flex flex-col flex-grow">
+                {/* Decorative corner */}
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-amber-100/50 to-transparent dark:from-amber-900/20 rounded-bl-full"></div>
+                
+                <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors duration-300 leading-tight">
+                  {service.name}
+                </h3>
+                
                 <div
-                  className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-3 prose prose-sm max-w-none"
+                  className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3 prose prose-sm max-w-none flex-grow"
                   dangerouslySetInnerHTML={{ __html: service.description }}
                 />
-                <div className="flex items-center justify-between pt-3 border-t border-border">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Clock className="mr-2" size={16} />
-                    <span className="font-medium">{service.duration}</span>
+                
+                {/* Action Button */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                      <FlowerLotus className="text-amber-700 dark:text-amber-400" size={18} weight="fill" />
+                    </div>
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Sacred Ritual</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-primary">
-                    View Details →
-                  </Button>
+                  <div className="flex items-center gap-1 text-amber-700 dark:text-amber-400 font-bold text-sm group-hover:gap-2 transition-all duration-300 whitespace-nowrap">
+                    <span>View Details</span>
+                    <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform duration-300" />
+                  </div>
                 </div>
               </CardContent>
+
+              {/* Hover Glow Effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-t from-amber-500/10 via-transparent to-transparent"></div>
+              </div>
             </Card>
           ))}
         </div>

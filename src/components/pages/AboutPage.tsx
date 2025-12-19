@@ -1,16 +1,23 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil, Briefcase, HandHeart, Lightbulb, MedalMilitary, BookOpen, Atom, ArrowRight, ChatCircleDots } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useAboutContent } from '../../hooks/useCmsContent'
-import { Page } from '../../App'
+import { AppPage } from '../../lib/types'
 
 interface AboutPageProps {
-  onNavigate?: (page: Page) => void
 }
 
-export default function AboutPage({ onNavigate }: AboutPageProps) {
+export default function AboutPage({ }: AboutPageProps) {
+  const router = useRouter()
+
+  const handleNavigate = (page: AppPage) => {
+    router.push(page === 'home' ? '/' : `/${page}`)
+  }
   // CMS Content
   const { content: cmsContent } = useAboutContent()
 
@@ -24,41 +31,39 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
 
   return (
     <div className="w-full">
-      {/* Hero Section with Rolling Background */}
-      <section className="relative pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
             ))}
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
             ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left side - Image */}
             <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
                 <img
                   src={cmsContent.profileImage}
                   alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
+                  className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
                   style={{
                     imageRendering: '-webkit-optimize-contrast',
                     backfaceVisibility: 'hidden',
@@ -72,16 +77,16 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
-                <FlowerLotus size={16} weight="fill" />
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+                <FlowerLotus size={18} weight="fill" className="animate-pulse" />
                 {cmsContent.badge}
               </div>
 
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {cmsContent.hero.title} <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{cmsContent.name}</span> {cmsContent.title}
+              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+                {cmsContent.hero.title} <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
               </h1>
 
-              <p className="text-base md:text-lg lg:text-xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <p className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 {cmsContent.shortBio}
               </p>
 
@@ -98,15 +103,15 @@ export default function AboutPage({ onNavigate }: AboutPageProps) {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
-                <Button size="lg" onClick={() => onNavigate?.('books')} className="text-sm md:text-base px-6 md:px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+                <Button size="lg" onClick={() => handleNavigate('books')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-amber-700/30">
                   <BookOpen className="mr-2" size={18} weight="fill" />
                   Published Books
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate?.('charity')} className="text-sm md:text-base px-6 md:px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 w-full sm:w-auto">
+                <Button size="lg" onClick={() => handleNavigate('charity')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
                   <HandHeart className="mr-2" size={18} weight="fill" />
                   Charity Work
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate?.('testimonials')} className="text-sm md:text-base px-6 md:px-8 py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all duration-300 w-full sm:w-auto">
+                <Button size="lg" onClick={() => handleNavigate('testimonials')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
                   <ChatCircleDots className="mr-2" size={18} weight="fill" />
                   Testimonials
                 </Button>

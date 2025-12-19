@@ -1,13 +1,30 @@
-import { Page, NavigationData } from '../App'
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { AppPage, AppNavigationData } from '../lib/types'
 import { FlowerLotus, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react'
 import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo, PinterestLogo } from '@phosphor-icons/react'
 
 interface FooterProps {
-  onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
-export default function Footer({ onNavigate }: FooterProps) {
+export default function Footer({ }: FooterProps) {
+  const router = useRouter()
   const currentYear = new Date().getFullYear()
+
+  const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
+    if (typeof pageOrData === 'string') {
+      router.push(pageOrData === 'home' ? '/' : `/${pageOrData}`)
+    } else {
+      // Handle AppNavigationData object
+      const { page, blogSlug } = pageOrData
+      if (page === 'blog-detail' && blogSlug) {
+        router.push(`/blog/${blogSlug}`)
+      } else {
+        router.push(page === 'home' ? '/' : `/${page}`)
+      }
+    }
+  }
 
   return (
     <footer className="bg-secondary text-secondary-foreground">
@@ -27,37 +44,37 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-heading font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigate('services')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('services')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Services
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('about')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   About Pandit Ji
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('gallery')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('gallery')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Gallery
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('blog')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('blog')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Blog
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('books')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('books')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Books
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('testimonials')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('testimonials')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Testimonials
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('charity')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('charity')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Charity Work
                 </button>
               </li>
@@ -68,12 +85,12 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-heading font-semibold text-lg mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigate('terms')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('terms')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Terms & Conditions
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('privacy')} className="text-sm hover:text-accent transition-colors cursor-pointer">
+                <button onClick={() => handleNavigate('privacy')} className="text-sm hover:text-accent transition-colors cursor-pointer">
                   Privacy Policy
                 </button>
               </li>

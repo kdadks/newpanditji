@@ -119,39 +119,42 @@ export default function WhyChooseUsPage() {
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
             ))}
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
             ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <Sparkle size={18} weight="fill" className="animate-pulse" />
+              Excellence in Service
+            </div>
+
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {cmsContent.hero.title.includes('Pandit') ? (
-                <>Why Choose <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Pandit Rajesh Joshi</span></>
+                <>Why Choose <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Pandit Rajesh Joshi</span></>
               ) : (
                 cmsContent.hero.title
               )}
             </h1>
-            <p className="text-lg text-white/95 max-w-2xl mx-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium mb-8">
               {cmsContent.hero.subtitle}
             </p>
           </div>

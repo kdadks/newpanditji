@@ -4,12 +4,10 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "kill": "fuser -k 5000/tcp",
-        "build": "tsc -b --noCheck && vite build",
-        "lint": "eslint .",
-        "optimize": "vite optimize",
-        "preview": "vite preview",
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
         "migrate": "tsx scripts/migrate-data.ts",
         "migrate:images": "tsx scripts/migrate-images-to-supabase.ts"
     },
@@ -50,6 +48,7 @@
         "@tanstack/react-query": "^5.83.1",
         "@tiptap/react": "^3.11.0",
         "@tiptap/starter-kit": "^3.11.0",
+        "autoprefixer": "^10.4.23",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -60,6 +59,7 @@
         "input-otp": "^1.4.2",
         "lucide-react": "^0.484.0",
         "marked": "^15.0.7",
+        "next": "^16.1.0",
         "next-themes": "^0.4.6",
         "react": "^19.0.0",
         "react-day-picker": "^9.6.7",
@@ -78,11 +78,10 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
-        "@tailwindcss/postcss": "^4.1.8",
+        "@tailwindcss/postcss": "^4.1.18",
+        "@types/node": "^22.0.0",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
-        "@vitejs/plugin-react": "^4.3.4",
-        "@vitejs/plugin-react-swc": "^3.10.1",
         "dotenv": "^17.2.3",
         "eslint": "^9.28.0",
         "eslint-plugin-react-hooks": "^5.2.0",
@@ -91,8 +90,7 @@
         "tailwindcss": "^4.1.11",
         "tsx": "^4.21.0",
         "typescript": "~5.7.2",
-        "typescript-eslint": "^8.38.0",
-        "vite": "^6.3.5"
+        "typescript-eslint": "^8.38.0"
     },
     "workspaces": {
         "packages": [

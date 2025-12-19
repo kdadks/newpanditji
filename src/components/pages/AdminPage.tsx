@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { Shield, Key, Spinner } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'

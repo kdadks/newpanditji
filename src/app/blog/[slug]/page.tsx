@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { Suspense } from 'react'
-import ServicesPage from '../../components/pages/ServicesPage'
-import { AppPage, AppNavigationData } from '../../lib/types'
+import BlogDetailPage from '../../../components/pages/BlogDetailPage'
+import { AppPage, AppNavigationData } from '../../../lib/types'
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -15,14 +15,20 @@ const PageLoader = () => (
   </div>
 )
 
-export default function Services() {
+interface BlogDetailProps {
+  params: {
+    slug: string
+  }
+}
+
+export default function BlogDetail({ params }: BlogDetailProps) {
   const router = useRouter()
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
       router.push(pageOrData === 'home' ? '/' : `/${pageOrData}`)
     } else {
-      // Handle NavigationData object
+      // Handle AppNavigationData object
       const { page, blogSlug } = pageOrData
       if (page === 'blog-detail' && blogSlug) {
         router.push(`/blog/${blogSlug}`)
@@ -34,7 +40,7 @@ export default function Services() {
 
   return (
     <Suspense fallback={<PageLoader />}>
-      <ServicesPage onNavigate={handleNavigate} />
+      <BlogDetailPage blogId={params.slug} onNavigate={handleNavigate} />
     </Suspense>
   )
 }

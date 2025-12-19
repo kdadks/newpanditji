@@ -117,89 +117,144 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen">
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-cover opacity-40" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-cover opacity-40" />
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
+            {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+            ))}
+            {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+            ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          {/* Hero Section */}
+          {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
-              <Sparkle size={16} weight="fill" />
-              Sacred Moments & Wisdom
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <Images size={18} weight="fill" className="animate-pulse" />
+              Divine Moments
             </div>
 
-            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Our <span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Gallery</span>
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              Sacred <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Gallery</span>
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              Explore our collection of ceremony memories, educational content, and spiritual insights
-              that capture the essence of Hindu traditions and wisdom.
+            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
+              Immerse yourself in the divine beauty of Hindu ceremonies, pooja rituals, and spiritual moments captured in sacred time
             </p>
 
-            {/* Stats - Compact inline version */}
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">{videos.length}+</span> Videos
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">{photos.length}</span> Photos
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">500+</span> Families
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">24/7</span> Support
-              </span>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                onClick={() => setActiveTab('videos')}
+                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 text-white hover:from-slate-800 hover:via-slate-900 hover:to-black shadow-2xl hover:shadow-3xl shadow-slate-900/50 transition-all duration-300 hover:scale-105 border-2 border-slate-600/40"
+              >
+                <PlayCircle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                Watch Sacred Videos
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => setActiveTab('photos')}
+                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 shadow-2xl hover:shadow-3xl shadow-orange-800/50 transition-all duration-300 hover:scale-105 border-2 border-orange-600/40"
+              >
+                <Images size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                View Divine Photos
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <div className="py-8 md:py-12">
+      {/* Stats Section */}
+      <section className="py-8 md:py-12 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">200+</div>
+              <div className="text-sm text-muted-foreground font-medium">Ceremonies</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">50+</div>
+              <div className="text-sm text-muted-foreground font-medium">Videos</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">1000+</div>
+              <div className="text-sm text-muted-foreground font-medium">Photos</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">15+</div>
+              <div className="text-sm text-muted-foreground font-medium">Years</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-4 sm:mb-0">
-              <TabsTrigger value="videos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
-                <PlayCircle size={18} />
-                Videos
-              </TabsTrigger>
-              <TabsTrigger value="photos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
-                <Images size={18} />
-                Photos
-              </TabsTrigger>
-            </TabsList>
+      {/* Main Gallery Content */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Enhanced Tabs Section */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Tab Navigation with Enhanced Design */}
+            <div className="flex flex-col items-center mb-12">
+              <TabsList className="grid w-full max-w-lg grid-cols-2 h-14 p-1 bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
+                <TabsTrigger
+                  value="videos"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                >
+                  <PlayCircle size={20} weight="fill" />
+                  Sacred Videos
+                  <Badge variant="secondary" className="ml-2 bg-white/20 text-white border-0">
+                    {videos.length}
+                  </Badge>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="photos"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent data-[state=active]:to-accent/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                >
+                  <Images size={20} weight="fill" />
+                  Divine Photos
+                  <Badge variant="secondary" className="ml-2 bg-white/20 text-white border-0">
+                    {photos.length}
+                  </Badge>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-2 mt-6 p-1 bg-white/60 backdrop-blur-sm border border-white/20 rounded-lg shadow-sm">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="px-4 py-2"
+                >
+                  <SquaresFour size={16} className="mr-2" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="px-4 py-2"
+                >
+                  <List size={16} className="mr-2" />
+                  List
+                </Button>
+              </div>
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
@@ -219,7 +274,6 @@ export default function GalleryPage() {
                 <List size={16} />
               </Button>
             </div>
-          </div>
 
           <TabsContent value="videos" className="space-y-8">
             {/* Video Filters */}
@@ -415,6 +469,7 @@ export default function GalleryPage() {
           </TabsContent>
         </Tabs>
       </div>
+      </section>
     </div>
   )
 }

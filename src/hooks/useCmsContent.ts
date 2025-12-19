@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, type PageRow, type PageSectionRow } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -10,6 +12,7 @@ import type {
   BooksPageContent,
   ContactPageContent,
   CharityPageContent,
+  DakshinaPageContent,
   HeaderContent,
   FooterContent
 } from '../components/admin/types/cms-types'
@@ -22,6 +25,7 @@ import {
   defaultBooksContent,
   defaultContactContent,
   defaultCharityContent,
+  defaultDakshinaContent,
   defaultHeaderContent,
   defaultFooterContent
 } from '../components/admin/defaults/cms-defaults'
@@ -31,7 +35,7 @@ const CMS_PAGES_KEY = ['cms_pages']
 const CMS_SECTIONS_KEY = ['cms_sections']
 
 // Page slug mapping
-export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity'
+export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina'
 
 // ============================================================================
 // Database Operations
@@ -772,6 +776,108 @@ export function useCharityContent() {
     sectionsToCharityContent,
     charityContentToSections,
     defaultCharityContent
+  )
+}
+
+/**
+ * Convert database sections to DakshinaPageContent
+ */
+function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageContent {
+  const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
+  
+  const heroSection = getSection('hero') as Record<string, unknown>
+  const whatIsDakshinaSection = getSection('what_is_dakshina') as Record<string, unknown>
+  const pricingSection = getSection('pricing_section') as Record<string, unknown>
+  const ctaSection = getSection('cta_section') as Record<string, unknown>
+  
+  return {
+    pageMetadata: getSection('page_metadata') as DakshinaPageContent['pageMetadata'] || defaultDakshinaContent.pageMetadata,
+    hero: {
+      subtitle: (heroSection.subtitle as string) || defaultDakshinaContent.hero.subtitle,
+      title: (heroSection.title as string) || defaultDakshinaContent.hero.title,
+      description: (heroSection.description as string) || defaultDakshinaContent.hero.description,
+      backgroundImages: (heroSection.backgroundImages as string[]) || defaultDakshinaContent.hero.backgroundImages,
+    },
+    whatIsDakshina: {
+      title: (whatIsDakshinaSection.title as string) || defaultDakshinaContent.whatIsDakshina.title,
+      subtitle: (whatIsDakshinaSection.subtitle as string) || defaultDakshinaContent.whatIsDakshina.subtitle,
+      content: (whatIsDakshinaSection.content as string) || defaultDakshinaContent.whatIsDakshina.content,
+      keyPoints: (whatIsDakshinaSection.keyPoints as typeof defaultDakshinaContent.whatIsDakshina.keyPoints) || defaultDakshinaContent.whatIsDakshina.keyPoints,
+    },
+    pricingSection: {
+      badge: (pricingSection.badge as string) || defaultDakshinaContent.pricingSection.badge,
+      title: (pricingSection.title as string) || defaultDakshinaContent.pricingSection.title,
+      description: (pricingSection.description as string) || defaultDakshinaContent.pricingSection.description,
+      services: (pricingSection.services as typeof defaultDakshinaContent.pricingSection.services) || defaultDakshinaContent.pricingSection.services,
+      notes: (pricingSection.notes as string[]) || defaultDakshinaContent.pricingSection.notes,
+    },
+    ctaSection: {
+      title: (ctaSection.title as string) || defaultDakshinaContent.ctaSection.title,
+      description: (ctaSection.description as string) || defaultDakshinaContent.ctaSection.description,
+      primaryButtonText: (ctaSection.primaryButtonText as string) || defaultDakshinaContent.ctaSection.primaryButtonText,
+      secondaryButtonText: (ctaSection.secondaryButtonText as string) || defaultDakshinaContent.ctaSection.secondaryButtonText,
+    },
+  }
+}
+
+/**
+ * Convert DakshinaPageContent to database sections
+ */
+function dakshinaContentToSections(content: DakshinaPageContent): { sectionKey: string; content: Record<string, unknown> }[] {
+  return [
+    {
+      sectionKey: 'page_metadata',
+      content: content.pageMetadata || {}
+    },
+    {
+      sectionKey: 'hero',
+      content: {
+        subtitle: content.hero.subtitle,
+        title: content.hero.title,
+        description: content.hero.description,
+        backgroundImages: content.hero.backgroundImages,
+      }
+    },
+    {
+      sectionKey: 'what_is_dakshina',
+      content: {
+        title: content.whatIsDakshina.title,
+        subtitle: content.whatIsDakshina.subtitle,
+        content: content.whatIsDakshina.content,
+        keyPoints: content.whatIsDakshina.keyPoints,
+      }
+    },
+    {
+      sectionKey: 'pricing_section',
+      content: {
+        badge: content.pricingSection.badge,
+        title: content.pricingSection.title,
+        description: content.pricingSection.description,
+        services: content.pricingSection.services,
+        notes: content.pricingSection.notes,
+      }
+    },
+    {
+      sectionKey: 'cta_section',
+      content: {
+        title: content.ctaSection.title,
+        description: content.ctaSection.description,
+        primaryButtonText: content.ctaSection.primaryButtonText,
+        secondaryButtonText: content.ctaSection.secondaryButtonText,
+      }
+    }
+  ]
+}
+
+/**
+ * Hook for Dakshina page content
+ */
+export function useDakshinaContent() {
+  return useCmsContent(
+    'dakshina',
+    sectionsToDakshinaContent,
+    dakshinaContentToSections,
+    defaultDakshinaContent
   )
 }
 

@@ -1,34 +1,22 @@
 'use client'
 
-import Header from '../../components/Header'
-import Footer from '../../components/Footer'
-import WhatsAppButton from '../../components/WhatsAppButton'
+import { Suspense } from 'react'
 import GalleryPage from '../../components/pages/GalleryPage'
-import { AppPage, AppNavigationData } from '../../lib/types'
+
+// Loading component for Suspense fallback
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+)
 
 export default function Gallery() {
-  const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
-    if (typeof pageOrData === 'string') {
-      window.location.href = pageOrData === 'home' ? '/' : `/${pageOrData}`
-    } else {
-      // Handle AppNavigationData object
-      const { page, blogSlug } = pageOrData
-      if (page === 'blog-detail' && blogSlug) {
-        window.location.href = `/blog/${blogSlug}`
-      } else {
-        window.location.href = page === 'home' ? '/' : `/${page}`
-      }
-    }
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header currentPage="gallery" onNavigate={handleNavigate} />
-      <main className="flex-1">
-        <GalleryPage />
-      </main>
-      <Footer onNavigate={handleNavigate} />
-      <WhatsAppButton />
-    </div>
+    <Suspense fallback={<PageLoader />}>
+      <GalleryPage />
+    </Suspense>
   )
 }

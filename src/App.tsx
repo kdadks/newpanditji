@@ -32,7 +32,7 @@ const PageLoader = () => (
   </div>
 )
 
-export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'blog-detail' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy'
+export type Page = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'blog-detail' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy' | 'dakshina'
 
 export type NavigationData = {
   page: Page
@@ -114,17 +114,17 @@ function App() {
     const page = currentPage || 'home'
     switch (page) {
       case 'home':
-        return <HomePage onNavigate={handleNavigate} />
+        return <HomePage />
       case 'services':
         return <ServicesPage initialCategory={currentCategory} onNavigate={handleNavigate} />
       case 'about':
-        return <AboutPage onNavigate={handleNavigate} />
+        return <AboutPage />
       case 'why-choose-us':
         return <WhyChooseUsPage />
       case 'gallery':
         return <GalleryPage />
       case 'blog':
-        return <BlogPage onNavigate={handleNavigate} />
+        return <BlogPage />
       case 'blog-detail':
         return <BlogDetailPage blogId={currentBlogId} onNavigate={handleNavigate} />
       case 'books':
@@ -142,7 +142,7 @@ function App() {
       case 'privacy':
         return <PrivacyPage />
       default:
-        return <HomePage onNavigate={handleNavigate} />
+        return <HomePage />
     }
   }
 
@@ -150,13 +150,13 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {!isAdminPage && <Header currentPage={currentPage || 'home'} onNavigate={handleNavigate} />}
+      {!isAdminPage && <Header currentPage={currentPage || 'home'} />}
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           {renderPage()}
         </Suspense>
       </main>
-      {!isAdminPage && <Footer onNavigate={handleNavigate} />}
+      {!isAdminPage && <Footer />}
       {!isAdminPage && <WhatsAppButton />}
       <Toaster />
     </div>

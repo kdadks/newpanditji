@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Page, NavigationData } from '../../App'
+import { useRouter } from 'next/navigation'
+import { AppPage, AppNavigationData } from '../../lib/types'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/react'
@@ -9,10 +12,24 @@ import { useServices } from '../../hooks/useServices'
 import { useHomeContent } from '../../hooks/useCmsContent'
 
 interface HomePageProps {
-  onNavigate: (pageOrData: Page | NavigationData) => void
 }
 
-export default function HomePage({ onNavigate }: HomePageProps) {
+export default function HomePage({ }: HomePageProps) {
+  const router = useRouter()
+
+  const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
+    if (typeof pageOrData === 'string') {
+      router.push(pageOrData === 'home' ? '/' : `/${pageOrData}`)
+    } else {
+      // Handle AppNavigationData object
+      const { page, blogSlug } = pageOrData
+      if (page === 'blog-detail' && blogSlug) {
+        router.push(`/blog/${blogSlug}`)
+      } else {
+        router.push(page === 'home' ? '/' : `/${page}`)
+      }
+    }
+  }
   const { services: dbServices } = useServices()
   // Use database services if available, otherwise fall back to defaults
   const allServices = (dbServices && dbServices.length > 0) ? dbServices : services
@@ -34,50 +51,49 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
   return (
     <div className="w-full">
-      <section className="relative pt-8 md:pt-12 pb-6 md:pb-8 overflow-hidden">
+      <section className="relative pt-4 md:pt-6 pb-6 md:pb-10 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img 
+              <img
                 key={`bg-1-${index}`}
-                src={img} 
-                alt="" 
-                className="h-full w-auto object-cover opacity-40"
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
               />
             ))}
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img 
+              <img
                 key={`bg-2-${index}`}
-                src={img} 
-                alt="" 
-                className="h-full w-auto object-cover opacity-40"
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                aria-hidden="true"
               />
             ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left side - Image */}
             <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
                 <img
                   src={cmsContent.hero.profileImage}
                   alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
+                  className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
                   style={{
                     imageRendering: '-webkit-optimize-contrast',
                     backfaceVisibility: 'hidden',
@@ -91,45 +107,48 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-base md:text-lg font-medium mb-6 shadow-xl">
-                <FlowerLotus size={20} weight="fill" />
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+                <FlowerLotus size={18} weight="fill" className="animate-pulse" />
                 {cmsContent.hero.subtitle}
               </div>
 
-              <h1 className="font-aptos font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {cmsContent.hero.title.split(' ').map((word, i) => 
-                  word.toLowerCase() === 'authentic' ? (
-                    <span key={i} className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{word} </span>
-                  ) : (
-                    <span key={i}>{word} </span>
-                  )
+              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-[1.15] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe max-w-[700px] mx-auto lg:mx-0">
+                {cmsContent.hero.title.includes('Authentic') ? (
+                  <>
+                    {cmsContent.hero.title.split('Authentic')[0]}
+                    <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Authentic</span>
+                    {cmsContent.hero.title.split('Authentic')[1]}
+                  </>
+                ) : (
+                  cmsContent.hero.title
                 )}
               </h1>
 
-              <p className="text-xl md:text-2xl text-white/95 font-medium mb-4 leading-relaxed max-w-2xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <p className="text-lg md:text-xl lg:text-2xl text-white font-medium mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_3px_6px_rgba(0,0,0,0.95)] tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
                 {cmsContent.hero.description}
               </p>
 
               {/* Statistics - Compact inline version */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 mb-6">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-8 max-w-2xl mx-auto lg:mx-0">
                 {cmsContent.hero.statistics.map((stat, index) => (
-                  <span key={index}>
-                    {index > 0 && <span className="text-white/50 mr-6">•</span>}
-                    <span className="text-base md:text-lg text-white/95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                      <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
-                    </span>
+                  <span key={index} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center lg:text-left" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                    <span className="font-extrabold text-transparent bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                    <span className="font-semibold text-white/95">{stat.label}</span>
                   </span>
                 ))}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 {cmsContent.hero.ctaButtons.map((btn, index) => (
-                  <Button 
+                  <Button
                     key={index}
-                    size="lg" 
-                    variant={btn.variant === 'primary' ? 'default' : 'outline'}
-                    onClick={() => onNavigate(btn.link.replace('/', '') as Page || 'home')} 
-                    className={`text-base px-8 py-3 ${btn.variant === 'primary' ? 'shadow-lg hover:shadow-xl' : 'border-2 hover:bg-primary hover:text-primary-foreground'} transition-all duration-300`}
+                    size="lg"
+                    onClick={() => handleNavigate(btn.link.replace('/', '') as AppPage || 'home')}
+                    className={`text-base px-8 py-3 transition-all duration-300 hover:scale-105 font-semibold shadow-2xl ${
+                      btn.variant === 'primary'
+                        ? 'bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50 hover:shadow-3xl border-2 border-amber-700/30'
+                        : 'bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-stone-900/50 hover:shadow-3xl border-2 border-stone-600/30'
+                    }`}
                   >
                     {index === 0 && <Users className="mr-2" size={20} />}
                     {index === 1 && <Sparkle className="mr-2" size={20} weight="fill" />}
@@ -186,7 +205,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             {featuredServices.map((service, index) => (
               <Card 
                 key={`${service.id}-1`}
-                onClick={() => onNavigate({ page: 'services', category: service.category })}
+                onClick={() => handleNavigate({ page: 'services', category: service.category })}
                 className="group relative shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
               >
                 <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -224,7 +243,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             {featuredServices.map((service, index) => (
               <Card 
                 key={`${service.id}-2`}
-                onClick={() => onNavigate({ page: 'services', category: service.category })}
+                onClick={() => handleNavigate({ page: 'services', category: service.category })}
                 className="group relative shrink-0 w-80 overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
                 aria-hidden="true"
               >
@@ -265,7 +284,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mt-8">
             <Button
-              onClick={() => onNavigate('services')}
+              onClick={() => handleNavigate('services')}
               variant="outline"
               size="lg"
               className="px-8 py-3 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -344,7 +363,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <p className="text-muted-foreground text-base mb-6 max-w-2xl mx-auto">
             {cmsContent.ctaSection.description}
           </p>
-          <Button size="lg" onClick={() => onNavigate('contact')}>
+          <Button size="lg" onClick={() => handleNavigate('contact')} className="px-8 py-3 font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30">
             {cmsContent.ctaSection.ctaButtons[0]?.text || 'Get in Touch'}
           </Button>
         </div>

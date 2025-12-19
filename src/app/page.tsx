@@ -1,7 +1,5 @@
-'use client'
-
 import { Suspense } from 'react'
-import DakshinaPage from '../../components/pages/DakshinaPage'
+import HomePage from '../components/pages/HomePage'
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -13,10 +11,10 @@ const PageLoader = () => (
   </div>
 )
 
-export default function Dakshina() {
+export default function Home() {
   return (
     <Suspense fallback={<PageLoader />}>
-      <DakshinaPage />
+      <HomePage />
     </Suspense>
   )
 }

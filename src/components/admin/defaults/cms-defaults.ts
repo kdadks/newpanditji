@@ -5,6 +5,7 @@ import type {
   BooksPageContent,
   ContactPageContent,
   CharityPageContent,
+  DakshinaPageContent,
   HeaderContent,
   FooterContent,
   MenuItem
@@ -427,6 +428,87 @@ export const defaultFooterContent: FooterContent = {
   linkedinUrl: '',
   twitterUrl: '',
   pinterestUrl: ''
+}
+
+export const defaultDakshinaContent: DakshinaPageContent = {
+  pageMetadata: {
+    metaTitle: 'Dakshina | Understanding Sacred Offerings & Service Costs',
+    metaDescription: 'Learn about Dakshina in Hindu tradition - its meaning, significance, and transparent pricing for our spiritual services and ceremonies.',
+    metaKeywords: ['dakshina', 'Hindu offerings', 'pooja costs', 'ceremony pricing', 'spiritual services pricing', 'pandit fees'],
+    canonicalUrl: 'https://panditrajesh.com/dakshina'
+  },
+  hero: {
+    subtitle: 'Sacred Economics',
+    title: 'Understanding Dakshina',
+    description: 'In Hindu tradition, Dakshina represents the sacred exchange of energy between spiritual service and gratitude. It is not merely payment, but a blessing that sustains the continuity of spiritual knowledge and service.',
+    backgroundImages: [
+      '/images/South Asian Temple Complex.png',
+      '/images/Golden Temples of Devotion.png',
+      '/images/Traditional Altar with Marigold Flowers.png'
+    ]
+  },
+  whatIsDakshina: {
+    title: 'What is Dakshina?',
+    subtitle: 'The Sacred Exchange of Spiritual Service',
+    content: '<p>In Hindu tradition, Dakshina (दक्षिणा) is a fundamental concept that goes beyond monetary transaction. It represents the sacred exchange between spiritual knowledge and service, and the gratitude of those who receive it.</p><p>The word "Dakshina" comes from the Sanskrit "dakṣiṇā" meaning "gift" or "offering to the right." In ancient times, when knowledge was transmitted orally, students would offer their teacher a gift with their right hand as a token of respect and gratitude.</p><p>Today, Dakshina serves multiple purposes: it sustains the priest\'s livelihood, ensures the continuity of spiritual traditions, and creates positive karma for both the giver and receiver.</p>',
+    keyPoints: [
+      {
+        title: 'Sacred Exchange',
+        description: 'Dakshina is not payment for services, but a sacred exchange of spiritual energy and gratitude.'
+      },
+      {
+        title: 'Teacher\'s Sustenance',
+        description: 'It ensures that spiritual teachers and priests can dedicate their lives to service without material concerns.'
+      },
+      {
+        title: 'Karma Creation',
+        description: 'Giving Dakshina creates positive karma and strengthens the bond between teacher and student.'
+      }
+    ]
+  },
+  pricingSection: {
+    badge: 'Transparent Pricing',
+    title: 'Our Dakshina Guidelines',
+    description: 'We believe in transparent and fair pricing that reflects the time, preparation, and spiritual dedication required for each ceremony.',
+    services: [
+      {
+        name: 'Simple Pooja (1-2 hours)',
+        description: 'Basic ceremonies like daily worship, small blessings',
+        duration: '1-2 hours',
+        price: '50-100'
+      },
+      {
+        name: 'Special Ceremony (2-4 hours)',
+        description: 'Festive poojas, naming ceremonies, house warming',
+        duration: '2-4 hours',
+        price: '150-300'
+      },
+      {
+        name: 'Major Rituals (4-8 hours)',
+        description: 'Weddings, funerals, major life cycle events',
+        duration: '4-8 hours',
+        price: '400-800'
+      },
+      {
+        name: 'Extended Services (Multiple days)',
+        description: 'Multi-day ceremonies, special consultations',
+        duration: 'Varies',
+        price: '1000+'
+      }
+    ],
+    notes: [
+      'Prices are guidelines and may vary based on specific requirements and materials needed',
+      'Travel expenses may be additional for ceremonies outside Dublin area',
+      'All prices include preparation time, materials, and post-ceremony guidance',
+      'Payment can be made via bank transfer, cash, or traditional offerings'
+    ]
+  },
+  ctaSection: {
+    title: 'Ready to Begin Your Spiritual Journey?',
+    description: 'Contact us today to discuss your ceremony needs and receive personalized guidance for your spiritual practices.',
+    primaryButtonText: 'Contact Us',
+    secondaryButtonText: 'View Services'
+  }
 }
 
 export const defaultMenuItems: MenuItem[] = [

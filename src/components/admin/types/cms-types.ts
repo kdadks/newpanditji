@@ -210,6 +210,51 @@ export interface CharityPageContent {
   }
 }
 
+export interface DakshinaService {
+  name: string
+  description?: string
+  duration?: string
+  price: string
+  priceNote?: string
+}
+
+export interface DakshinaPageContent {
+  pageMetadata?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string[]
+    canonicalUrl?: string
+  }
+  hero: {
+    subtitle: string
+    title: string
+    description: string
+    backgroundImages: string[]
+  }
+  whatIsDakshina: {
+    title: string
+    subtitle: string
+    content: string
+    keyPoints: {
+      title: string
+      description: string
+    }[]
+  }
+  pricingSection: {
+    badge: string
+    title: string
+    description: string
+    services: DakshinaService[]
+    notes?: string[]
+  }
+  ctaSection: {
+    title: string
+    description: string
+    primaryButtonText: string
+    secondaryButtonText: string
+  }
+}
+
 // Section Content Interfaces
 export interface HeaderContent {
   logoUrl: string

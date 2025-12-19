@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug, type BlogPostRow, type BlogPostInsert, type BlogPostUpdate } from '../lib/supabase'
 import { toast } from 'sonner'

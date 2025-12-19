@@ -51,170 +51,215 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen">
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 flex">
-          <div className="flex animate-scroll-left">
-            {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
+            {['/images/Raj 1.jpg', '/images/Raj 3.jpg', '/images/Pooja 2.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
+              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
             ))}
-          </div>
-          <div className="flex animate-scroll-left" aria-hidden="true">
-            {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-cover opacity-40" />
+            {['/images/Raj 1.jpg', '/images/Raj 3.jpg', '/images/Pooja 2.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
+              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
             ))}
           </div>
         </div>
-        
+
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
-        
+
         {/* Sun glow effect */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
-        
+
         {/* Light rays */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-xl">
-              <Heart size={16} weight="fill" />
-              {cmsContent.hero.subtitle}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <Heart size={18} weight="fill" className="animate-pulse" />
+              Connect with Divine Guidance
             </div>
 
-            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              {cmsContent.hero.title.split(' ').map((word, i) => 
-                word.toLowerCase() === 'sacred' ? (
-                  <span key={i}><span className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{word}</span> </span>
-                ) : (
-                  <span key={i}>{word} </span>
-                )
-              )}
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              Get in <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Touch</span>
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl mx-auto leading-relaxed mb-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              {cmsContent.hero.description}
+            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
+              Ready to begin your spiritual journey? Let's connect and discuss how I can guide you through sacred Hindu traditions and ceremonies.
             </p>
 
-            {/* Stats - Compact inline version */}
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">15+</span> Years Experience
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">24hr</span> Response
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">500+</span> Families
-              </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">Global</span> Service
-              </span>
+            {/* Quick Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
+                onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <EnvelopeSimple size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                Send Message
+              </Button>
+              <Button
+                size="lg"
+                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-green-700 via-emerald-700 to-green-800 text-white hover:from-green-800 hover:via-emerald-800 hover:to-green-900 shadow-2xl hover:shadow-3xl shadow-green-800/50 transition-all duration-300 hover:scale-105 border-2 border-green-600/40"
+                onClick={() => window.open('https://wa.me/353876927927', '_blank')}
+              >
+                <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                WhatsApp Now
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <div className="py-8 md:py-12">
-
-        {/* Contact Form & Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto mb-16">
-          {/* Contact Form */}
-          <Card className="border-0 shadow-xl bg-linear-to-br from-card to-card/80">
-            <CardContent className="p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <EnvelopeSimple className="text-primary" size={24} />
-                </div>
-                <h2 className="font-heading font-semibold text-2xl">Send a Message</h2>
+      {/* Trust Indicators Section */}
+      <section className="py-8 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Clock size={28} className="text-primary shrink-0" weight="fill" />
+              <div className="text-left">
+                <div className="font-bold text-primary text-lg">24/7 Response</div>
+                <div className="text-sm text-muted-foreground">Quick replies</div>
               </div>
+            </div>
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Shield size={28} className="text-accent shrink-0" weight="fill" />
+              <div className="text-left">
+                <div className="font-bold text-primary text-lg">Confidential</div>
+                <div className="text-sm text-muted-foreground">Private & secure</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Sparkle size={28} className="text-primary shrink-0" weight="fill" />
+              <div className="text-left">
+                <div className="font-bold text-primary text-lg">Personalized</div>
+                <div className="text-sm text-muted-foreground">Tailored guidance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name" className="text-sm font-medium">Full Name *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Your name"
-                      className="mt-2"
-                      required
-                    />
+      {/* Main Contact Section */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Contact Form & Info Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            {/* Enhanced Contact Form */}
+            <div id="contact-form" className="order-2 lg:order-1">
+              <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm hover:shadow-3xl transition-all duration-500">
+                <CardContent className="p-8 md:p-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
+                      <EnvelopeSimple className="text-white" size={28} weight="fill" />
+                    </div>
+                    <div>
+                      <h2 className="font-heading font-bold text-3xl text-primary">Send a Message</h2>
+                      <p className="text-muted-foreground">Let's start your spiritual journey together</p>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="your.email@example.com"
-                      className="mt-2"
-                      required
-                    />
-                  </div>
-                </div>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-sm font-semibold text-primary flex items-center gap-2">
+                          <span>Full Name</span>
+                          <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="Enter your full name"
+                          className="h-12 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm"
+                          required
+                        />
+                      </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+353 123 456 789"
-                      className="mt-2"
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-sm font-semibold text-primary flex items-center gap-2">
+                          <span>Email Address</span>
+                          <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="your.email@example.com"
+                          className="h-12 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm"
+                          required
+                        />
+                      </div>
+                    </div>
 
-                  <div>
-                    <Label htmlFor="service" className="text-sm font-medium">Service of Interest</Label>
-                    <Select value={formData.service} onValueChange={(value) => setFormData({ ...formData, service: value })}>
-                      <SelectTrigger className="mt-2 h-10">
-                        <SelectValue placeholder="Select a service category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(categoryNames).map(([key, value]) => (
-                          <SelectItem key={key} value={value}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="general">General Inquiry</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-sm font-semibold text-primary">
+                        Phone Number <span className="text-muted-foreground font-normal">(optional)</span>
+                      </Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="+353 XX XXX XXXX"
+                        className="h-12 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm"
+                      />
+                    </div>
 
-                <div>
-                  <Label htmlFor="message" className="text-sm font-medium">Message *</Label>
-                  <Textarea
-                    id="message"
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Please describe your ceremony needs or inquiry..."
-                    rows={6}
-                    className="mt-2 resize-none"
-                    required
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="service" className="text-sm font-semibold text-primary">
+                        Service of Interest
+                      </Label>
+                      <Select value={formData.service} onValueChange={(value) => setFormData({ ...formData, service: value })}>
+                        <SelectTrigger className="h-12 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm">
+                          <SelectValue placeholder="Select a service (optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General Inquiry</SelectItem>
+                          <SelectItem value="pooja">Pooja Ceremony</SelectItem>
+                          <SelectItem value="wedding">Wedding Ceremony</SelectItem>
+                          <SelectItem value="funeral">Funeral Rites</SelectItem>
+                          <SelectItem value="consultation">Spiritual Consultation</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <Button type="submit" size="lg" className="w-full shadow-lg hover:shadow-xl transition-all duration-300">
-                  <EnvelopeSimple className="mr-2" size={20} />
-                  Send Message
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-sm font-semibold text-primary flex items-center gap-2">
+                        <span>Your Message</span>
+                        <span className="text-red-500">*</span>
+                      </Label>
+                      <Textarea
+                        id="message"
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        placeholder="Share your thoughts, questions, or how I can help you on your spiritual journey..."
+                        className="min-h-32 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm resize-none"
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                    >
+                      <EnvelopeSimple size={20} className="mr-3" />
+                      Send Sacred Message
+                    </Button>
+
+                    <p className="text-center text-sm text-muted-foreground">
+                      I typically respond within 24 hours. For urgent matters, please call directly.
+                    </p>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
 
           {/* Contact Information */}
           <div className="space-y-6">
@@ -395,6 +440,7 @@ export default function ContactPage() {
           </Card>
         </div>
       </div>
+      </section>
     </div>
   )
 }

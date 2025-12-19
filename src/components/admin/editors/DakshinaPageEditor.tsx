@@ -57,7 +57,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
       })
       lastNoteIndex.current = -1
     }
-  }, [content.pricingSection.notes.length])
+  }, [content.pricingSection.notes?.length])
 
   const addService = () => {
     const newService: DakshinaService = {
@@ -133,12 +133,12 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
   }
 
   const addNote = () => {
-    lastNoteIndex.current = content.pricingSection.notes.length
+    lastNoteIndex.current = content.pricingSection.notes?.length || 0
     setContent(prev => ({
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: [...prev.pricingSection.notes, '']
+        notes: [...(prev.pricingSection.notes || []), '']
       }
     }))
   }
@@ -148,7 +148,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: prev.pricingSection.notes.map((note, i) => i === index ? value : note)
+        notes: (prev.pricingSection.notes || []).map((note, i) => i === index ? value : note)
       }
     }))
   }
@@ -158,7 +158,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: prev.pricingSection.notes.filter((_, i) => i !== index)
+        notes: (prev.pricingSection.notes || []).filter((_, i) => i !== index)
       }
     }))
   }
@@ -466,7 +466,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
             </div>
 
             <div className="space-y-2">
-              {content.pricingSection.notes.map((note, index) => (
+              {content.pricingSection.notes?.map((note, index) => (
                 <div
                   key={index}
                   className="flex items-center gap-2"

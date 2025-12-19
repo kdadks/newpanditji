@@ -1,17 +1,24 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, Info, HandHeart, GraduationCap, ArrowRight } from '@phosphor-icons/react'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useDakshinaContent } from '../../hooks/useCmsContent'
-import { Page } from '../../App'
+import { AppPage } from '../../lib/types'
 import { renderHighlightedTitle, stripHighlightTags } from '../../utils/renderHighlight'
 
 interface DakshinaPageProps {
-  onNavigate?: (page: Page) => void
 }
 
-export default function DakshinaPage({ onNavigate }: DakshinaPageProps) {
+export default function DakshinaPage({ }: DakshinaPageProps) {
+  const router = useRouter()
+
+  const handleNavigate = (page: AppPage) => {
+    router.push(page === 'home' ? '/' : `/${page}`)
+  }
   // CMS Content
   const { content: cmsContent } = useDakshinaContent()
 
@@ -51,12 +58,12 @@ export default function DakshinaPage({ onNavigate }: DakshinaPageProps) {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary via-accent to-primary text-white px-6 py-3 rounded-full text-sm font-bold mb-6 shadow-2xl backdrop-blur-sm border border-white/20">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <CurrencyDollar size={18} weight="fill" className="animate-pulse" />
               {cmsContent.hero.subtitle}
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200">
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               Understanding <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Dakshina</span>
             </h1>
 
@@ -214,17 +221,16 @@ export default function DakshinaPage({ onNavigate }: DakshinaPageProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                onClick={() => onNavigate?.('contact')}
-                className="bg-white text-primary hover:bg-white/90 font-bold text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                onClick={() => handleNavigate('contact')}
+                className="font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30 text-lg px-8 py-6"
               >
                 <Heart className="mr-2" size={24} weight="fill" />
                 {cmsContent.ctaSection.primaryButtonText}
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                onClick={() => onNavigate?.('services')}
-                className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary font-bold text-lg px-8 py-6 shadow-xl transition-all duration-300 hover:-translate-y-1"
+                onClick={() => handleNavigate('services')}
+                className="font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 border-2 border-stone-600/30 text-lg px-8 py-6"
               >
                 <GraduationCap className="mr-2" size={24} weight="duotone" />
                 {cmsContent.ctaSection.secondaryButtonText}

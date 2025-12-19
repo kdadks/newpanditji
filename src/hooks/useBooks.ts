@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, BookRow, BookInsert, BookUpdate, generateSlug } from '../lib/supabase'
 
