@@ -12,6 +12,8 @@ dist
 dist-ssr
 *-dist
 *.local
+.next/
+.turbo/
 
 # Editor directories and files
 .vscode/*
