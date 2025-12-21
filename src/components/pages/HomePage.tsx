@@ -346,13 +346,13 @@ export default function HomePage({ }: HomePageProps) {
 
         {/* Premium 3D-style Carousel */}
         <div
-          className="relative w-full overflow-hidden"
+          className="relative w-full overflow-x-auto md:overflow-hidden scrollbar-hide"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
         >
-          <div className={`flex gap-6 py-8 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
+          <div className={`flex gap-6 py-8 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
             {/* First set of cards */}
             {featuredServices.map((service, index) => (
               <Card
@@ -370,12 +370,14 @@ export default function HomePage({ }: HomePageProps) {
 
                 <CardContent className="relative p-0 flex flex-col">
                   {/* Service Image */}
-                  <div className="relative h-40 overflow-hidden">
+                  <div className="relative h-40 overflow-hidden bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950">
                     <img
                       src={`/images/Pooja ${(index % 3) + 1}.jpg`}
                       alt={service.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading="lazy"
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      fetchPriority={index < 3 ? 'high' : 'auto'}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = '/images/Traditional Altar with Marigold Flowers.png';
@@ -464,12 +466,14 @@ export default function HomePage({ }: HomePageProps) {
 
                 <CardContent className="relative p-0 flex flex-col">
                   {/* Service Image */}
-                  <div className="relative h-40 overflow-hidden">
+                  <div className="relative h-40 overflow-hidden bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950">
                     <img
                       src={`/images/Pooja ${(index % 3) + 1}.jpg`}
                       alt={service.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading="lazy"
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      fetchPriority={index < 3 ? 'high' : 'auto'}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = '/images/Traditional Altar with Marigold Flowers.png';
