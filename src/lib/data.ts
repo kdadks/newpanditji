@@ -26,6 +26,7 @@ export interface Service {
   category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
   duration: string
   description: string
+  imageUrl?: string // Image URL for service card display
   // Detailed information (optional)
   detailedDescription?: string
   benefits?: string[]

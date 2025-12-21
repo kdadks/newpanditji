@@ -240,3 +240,30 @@ h1, h2, h3, h4, h5, h6 {
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
+
+/* 3D Carousel Animation */
+@keyframes scroll-3d-left {
+  0% {
+    transform: translateX(0) rotateY(-8deg) rotateX(2deg);
+  }
+  100% {
+    transform: translateX(-50%) rotateY(-8deg) rotateX(2deg);
+  }
+}
+
+.animate-scroll-3d-left {
+  animation: scroll-3d-left 50s linear infinite;
+}
+
+.animate-scroll-3d-left:hover {
+  animation-play-state: paused;
+}
+
+/* Animation delay utilities */
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
