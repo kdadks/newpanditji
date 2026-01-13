@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { usePhotos } from '../../hooks/usePhotos'
 import { useBooks, useCreateBook, useUpdateBook, useDeleteBook } from '../../hooks/useBooks'
 import { BookRow } from '../../lib/supabase'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, BookOpen, Image as ImageIcon, Tag, Users, FileText, ListBullets } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, BookOpen, Image as ImageIcon, Tag, Users, FileText, ListBullets, AmazonLogo } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -25,6 +25,9 @@ interface BookFormData {
   keyTopics: string[]
   targetAudience: string
   fullDescription: string
+  amazonIndia: string
+  amazonEU: string
+  amazonUK: string
 }
 
 export default function AdminBooks() {
@@ -54,7 +57,10 @@ export default function AdminBooks() {
     chapters: [],
     keyTopics: [],
     targetAudience: '',
-    fullDescription: ''
+    fullDescription: '',
+    amazonIndia: '',
+    amazonEU: '',
+    amazonUK: ''
   })
 
   // Helper states for array inputs
@@ -72,7 +78,10 @@ export default function AdminBooks() {
       chapters: [],
       keyTopics: [],
       targetAudience: '',
-      fullDescription: ''
+      fullDescription: '',
+      amazonIndia: '',
+      amazonEU: '',
+      amazonUK: ''
     })
     setChapterInput('')
     setKeyTopicInput('')
@@ -83,6 +92,7 @@ export default function AdminBooks() {
   }
 
   const handleEdit = (book: BookRow) => {
+    const otherUrls = book.other_purchase_urls as Record<string, string> || {}
     setFormData({
       id: book.id,
       title: book.title,
@@ -93,7 +103,10 @@ export default function AdminBooks() {
       chapters: book.chapter_list || [],
       keyTopics: book.key_topics || [],
       targetAudience: book.target_audience || '',
-      fullDescription: book.full_description || ''
+      fullDescription: book.full_description || '',
+      amazonIndia: otherUrls.amazonIndia || '',
+      amazonEU: otherUrls.amazonEU || '',
+      amazonUK: otherUrls.amazonUK || ''
     })
     setChapterInput('')
     setKeyTopicInput('')
@@ -111,6 +124,11 @@ export default function AdminBooks() {
 
     setIsSaving(true)
     try {
+      const purchaseUrls: Record<string, string> = {}
+      if (formData.amazonIndia) purchaseUrls.amazonIndia = formData.amazonIndia
+      if (formData.amazonEU) purchaseUrls.amazonEU = formData.amazonEU
+      if (formData.amazonUK) purchaseUrls.amazonUK = formData.amazonUK
+
       if (editingBook) {
         await updateBookMutation.mutateAsync({
           id: editingBook.id,
@@ -123,6 +141,7 @@ export default function AdminBooks() {
           chapter_list: formData.chapters.length > 0 ? formData.chapters : null,
           key_topics: formData.keyTopics.length > 0 ? formData.keyTopics : null,
           target_audience: formData.targetAudience || null,
+          other_purchase_urls: Object.keys(purchaseUrls).length > 0 ? purchaseUrls : null,
         })
         toast.success('Book updated successfully')
       } else {
@@ -141,7 +160,7 @@ export default function AdminBooks() {
           target_audience: formData.targetAudience || null,
           amazon_url: null,
           flipkart_url: null,
-          other_purchase_urls: null,
+          other_purchase_urls: Object.keys(purchaseUrls).length > 0 ? purchaseUrls : null,
           publication_date: null,
           page_count: null,
           language: 'English',
@@ -240,6 +259,33 @@ export default function AdminBooks() {
                 </div>
               </div>
               <CardContent className="p-6">
+                {/* Amazon Purchase Icons */}
+                {(() => {
+                  const purchaseUrls = (book.other_purchase_urls as Record<string, string>) || {}
+                  return (purchaseUrls.amazonIndia || purchaseUrls.amazonEU || purchaseUrls.amazonUK) && (
+                    <div className="flex gap-3 mb-3 pb-3 border-b border-border/50">
+                      {purchaseUrls.amazonIndia && (
+                        <div className="flex items-center gap-2 p-2 rounded transition-all border-2 border-transparent hover:border-amber-400">
+                          <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-6 h-6 object-contain" />
+                          <span className="text-sm font-medium">Amazon India</span>
+                        </div>
+                      )}
+                      {purchaseUrls.amazonEU && (
+                        <div className="flex items-center gap-2 p-2 rounded transition-all border-2 border-transparent hover:border-blue-400">
+                          <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-6 h-6 object-contain" />
+                          <span className="text-sm font-medium">Amazon EU</span>
+                        </div>
+                      )}
+                      {purchaseUrls.amazonUK && (
+                        <div className="flex items-center gap-2 p-2 rounded transition-all border-2 border-transparent hover:border-red-400">
+                          <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-6 h-6 object-contain" />
+                          <span className="text-sm font-medium">Amazon UK</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+
                 <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-2">
                   {book.title}
                 </h3>
@@ -702,6 +748,70 @@ export default function AdminBooks() {
                     )}
                   </div>
                 </div>
+
+                {/* Amazon Purchase Links */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-linear-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-amber-500/10 rounded-lg">
+                        <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-5 h-5 object-contain" />
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Amazon Purchase Links</h3>
+                        <p className="text-xs text-muted-foreground">Add Amazon links - icons will appear on book cards</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="amazonIndia" className="text-sm font-medium flex items-center gap-2">
+                          🇮🇳 Amazon India
+                        </Label>
+                        <Input
+                          id="amazonIndia"
+                          value={formData.amazonIndia}
+                          onChange={(e) => setFormData({ ...formData, amazonIndia: e.target.value })}
+                          placeholder="https://www.amazon.in/..."
+                          className="h-12 bg-background border-border/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="amazonEU" className="text-sm font-medium flex items-center gap-2">
+                          🇪🇺 Amazon EU
+                        </Label>
+                        <Input
+                          id="amazonEU"
+                          value={formData.amazonEU}
+                          onChange={(e) => setFormData({ ...formData, amazonEU: e.target.value })}
+                          placeholder="https://www.amazon.de/..."
+                          className="h-12 bg-background border-border/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="amazonUK" className="text-sm font-medium flex items-center gap-2">
+                          🇬🇧 Amazon UK
+                        </Label>
+                        <Input
+                          id="amazonUK"
+                          value={formData.amazonUK}
+                          onChange={(e) => setFormData({ ...formData, amazonUK: e.target.value })}
+                          placeholder="https://www.amazon.co.uk/..."
+                          className="h-12 bg-background border-border/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                        />
+                      </div>
+
+                      <div className="p-4 bg-amber-500/5 rounded-xl border border-amber-500/20 mt-4">
+                        <h4 className="font-medium text-sm mb-2">🔗 Link Display</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Amazon icons will appear above the book title on cards. Clicking them opens the purchase link in a new tab.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -712,7 +822,7 @@ export default function AdminBooks() {
               <div className="text-sm text-muted-foreground hidden sm:block">
                 {currentTab === 'basic' && '📚 Add the essential book information'}
                 {currentTab === 'content' && '📖 List chapters and key topics'}
-                {currentTab === 'media' && '🖼️ Select a beautiful cover image'}
+                {currentTab === 'media' && '🖼️ Add cover image & purchase links'}
               </div>
               <div className="flex gap-3 ml-auto">
                 <Button 

@@ -92,24 +92,24 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-xl shadow-2xl shadow-orange-900/30 bg-gradient-to-r from-slate-100 via-amber-100 to-slate-100">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-xl shadow-2xl shadow-orange-900/30 bg-linear-to-r from-slate-100 via-amber-100 to-slate-100">
       {/* Unified gradient overlay for entire header */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-50/80 via-orange-50/70 to-slate-50/80"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/40 via-transparent to-orange-50/20"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-slate-50/80 via-orange-50/70 to-slate-50/80"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-amber-50/40 via-transparent to-orange-50/20"></div>
         {/* Subtle center glow */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[800px] h-full bg-gradient-to-r from-transparent via-amber-100/30 to-transparent"></div>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[800px] h-full bg-linear-to-r from-transparent via-amber-100/30 to-transparent"></div>
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative">
         <div className="flex items-center justify-between gap-4 py-0.5">
           {/* Left: Logo and Title */}
-          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <button
               onClick={() => handleNavClick('home')}
               className="group relative flex items-center gap-3 hover:opacity-90 transition-opacity duration-300"
             >
               {/* Logo Container with enhanced gradient */}
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-primary/30 via-accent/20 to-primary/30 border-2 border-primary/40 group-hover:border-primary/60 transition-all duration-500 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/30 overflow-hidden flex-shrink-0">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-primary/30 border-2 border-primary/40 group-hover:border-primary/60 transition-all duration-500 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/30 overflow-hidden shrink-0">
                 <img
                   src="/images/Logo/Raj ji.png"
                   alt="Pandit Rajesh Joshi"
@@ -117,9 +117,9 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                   loading="eager"
                 />
                 {/* Enhanced overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-primary/20 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 {/* Sacred symbol with enhanced styling */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background group-hover:scale-110 transition-transform duration-300">
+                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-linear-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background group-hover:scale-110 transition-transform duration-300">
                   <FlowerLotus size={10} weight="fill" className="text-primary-foreground drop-shadow-sm" />
                 </div>
                 {/* Floating particles effect */}
@@ -143,7 +143,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
           <div className="hidden lg:flex flex-1 justify-center max-w-3xl">
             <nav className="bg-white/40 backdrop-blur-md rounded-full border-2 border-orange-800/50 shadow-xl shadow-orange-900/25 px-3 py-3 flex items-center gap-1.5 relative">
               {/* Navigation background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-50/30 via-amber-50/20 to-orange-50/30 rounded-full"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-orange-50/30 via-amber-50/20 to-orange-50/30 rounded-full"></div>
               {navItems.map(item => {
                 if (item.submenu) {
                   const isActive = item.submenu.some(sub => sub.page === currentPage) || currentPage === item.page
@@ -155,8 +155,8 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                           size="sm"
                           className={`gap-1 px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 text-sm font-medium relative z-10 ${
                             isActive
-                              ? 'bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
-                              : 'hover:bg-gradient-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
+                              ? 'bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
+                              : 'hover:bg-linear-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
                           }`}
                           suppressHydrationWarning
                         >
@@ -171,8 +171,8 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                             onClick={() => handleNavClick(subItem.page)}
                             className={`cursor-pointer rounded-lg transition-all duration-200 hover:scale-[1.02] ${
                               currentPage === subItem.page
-                                ? 'bg-gradient-to-r from-orange-200 via-amber-100 to-orange-200 text-orange-900 font-semibold shadow-sm'
-                                : 'hover:bg-gradient-to-r hover:from-orange-100/60 hover:via-amber-50/60 hover:to-orange-100/60 hover:text-orange-800'
+                                ? 'bg-linear-to-r from-orange-200 via-amber-100 to-orange-200 text-orange-900 font-semibold shadow-sm'
+                                : 'hover:bg-linear-to-r hover:from-orange-100/60 hover:via-amber-50/60 hover:to-orange-100/60 hover:text-orange-800'
                             }`}
                           >
                             {subItem.label}
@@ -190,8 +190,8 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                     onClick={() => handleNavClick(item.page)}
                     className={`px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 text-sm font-medium relative z-10 ${
                       currentPage === item.page
-                        ? 'bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
-                        : 'hover:bg-gradient-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
+                        ? 'bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
+                        : 'hover:bg-linear-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
                     }`}
                   >
                     {item.label}
@@ -205,8 +205,8 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                   onClick={() => handleNavClick('admin')}
                   className={`gap-1.5 px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 text-sm font-medium relative z-10 ${
                     currentPage === 'admin'
-                      ? 'bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
-                      : 'hover:bg-gradient-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
+                      ? 'bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
+                      : 'hover:bg-linear-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
                   }`}
                 >
                   <Shield size={14} weight="fill" />
@@ -231,13 +231,13 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-[320px] sm:w-[400px] bg-gradient-to-br from-card via-card/98 to-card border-l border-primary/30 shadow-2xl"
+                className="w-xs sm:w-[400px] bg-linear-to-br from-card via-card/98 to-card border-l border-primary/30 shadow-2xl"
               >
                 {/* Mobile Header with enhanced gradient */}
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/20">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/25 to-accent/20 border-2 border-primary/40 overflow-hidden">
+                      <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/25 to-accent/20 border-2 border-primary/40 overflow-hidden">
                         <img 
                           src="/images/Logo/Raj ji.png" 
                           alt="Pandit Rajesh Joshi" 
@@ -245,12 +245,12 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                           loading="eager"
                         />
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-card">
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-linear-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-card">
                         <FlowerLotus size={8} weight="fill" className="text-primary-foreground" />
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-heading font-bold text-base bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <span className="font-heading font-bold text-base bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                         Pandit Rajesh Joshi
                       </span>
                       <span className="text-xs text-muted-foreground font-medium">
@@ -274,7 +274,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                     if (item.submenu) {
                       return (
                         <div key={item.page} className="space-y-2">
-                          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/8 border border-primary/20 shadow-sm">
+                          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-linear-to-r from-primary/10 to-accent/8 border border-primary/20 shadow-sm">
                             <span className="text-sm font-semibold text-primary">{item.label}</span>
                             <CaretDown size={14} className="text-primary/70" />
                           </div>
@@ -286,7 +286,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                                 onClick={() => handleNavClick(subItem.page)}
                                 className={`justify-start text-left w-full rounded-lg transition-all duration-300 hover:scale-[1.02] ${
                                   currentPage === subItem.page
-                                    ? 'bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
+                                    ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
                                     : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
                                 }`}
                               >
@@ -304,7 +304,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                         onClick={() => handleNavClick(item.page)}
                         className={`justify-start text-left rounded-xl transition-all duration-300 hover:scale-[1.02] ${
                           currentPage === item.page
-                            ? 'bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
+                            ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
                             : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
                         }`}
                       >
@@ -318,7 +318,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                       onClick={() => handleNavClick('admin')}
                       className={`justify-start text-left gap-2 rounded-xl transition-all duration-300 hover:scale-[1.02] ${
                         currentPage === 'admin'
-                          ? 'bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
+                          ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
                           : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
                         }`}
                     >
@@ -343,3 +343,4 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
     </header>
   )
 }
+

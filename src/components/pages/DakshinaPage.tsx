@@ -58,13 +58,13 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <CurrencyDollar size={18} weight="fill" className="animate-pulse" />
               {cmsContent.hero.subtitle}
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Understanding <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Dakshina</span>
+              Understanding <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Dakshina</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
@@ -75,14 +75,14 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
       </section>
 
       {/* Content Section */}
-      <div className="py-12 md:py-16 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/20">
+      <div className="py-12 md:py-16 px-4 md:px-6 lg:px-8 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto max-w-7xl">
 
         {/* What is Dakshina Section */}
-        <Card className="mb-16 border-0 shadow-2xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 overflow-hidden">
+        <Card className="mb-16 border-0 shadow-2xl bg-linear-to-br from-primary/5 via-accent/5 to-secondary/5 overflow-hidden">
           <CardContent className="p-8 md:p-12">
             <div className="flex items-center gap-4 mb-8">
-              <div className="p-4 bg-gradient-to-br from-primary to-accent rounded-2xl shadow-xl">
+              <div className="p-4 bg-linear-to-br from-primary to-accent rounded-2xl shadow-xl">
                 <FlowerLotus className="text-white" size={32} weight="fill" />
               </div>
               <div>
@@ -99,7 +99,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               {cmsContent.whatIsDakshina.keyPoints.map((point, index) => (
-                <div key={index} className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-6 rounded-xl border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div key={index} className="bg-linear-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-6 rounded-xl border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <div className="flex items-start gap-3">
                     <CheckCircle size={24} className="text-primary shrink-0 mt-1" weight="fill" />
                     <div>
@@ -131,7 +131,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gradient-to-r from-primary via-accent to-primary text-white">
+                  <tr className="bg-linear-to-r from-primary via-accent to-primary text-white">
                     <th className="px-6 py-5 text-left font-bold text-lg">Service/Package Name</th>
                     <th className="px-6 py-5 text-left font-bold text-lg hidden md:table-cell">Duration</th>
                     <th className="px-6 py-5 text-right font-bold text-lg">Dakshina</th>
@@ -141,7 +141,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                   {cmsContent.pricingSection.services.map((service, index) => (
                     <tr
                       key={index}
-                      className="hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5 transition-colors duration-200 group"
+                      className="hover:bg-linear-to-r hover:from-primary/5 hover:to-accent/5 transition-colors duration-200 group"
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-start gap-3">
@@ -206,7 +206,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
         </div>
 
         {/* CTA Section */}
-        <Card className="border-0 shadow-2xl bg-gradient-to-br from-primary via-accent to-secondary text-white overflow-hidden relative">
+        <Card className="border-0 shadow-2xl bg-linear-to-br from-primary via-accent to-secondary text-white overflow-hidden relative">
           <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10"></div>
           <CardContent className="p-12 md:p-16 text-center relative z-10">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6">
@@ -222,7 +222,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               <Button
                 size="lg"
                 onClick={() => handleNavigate('contact')}
-                className="font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30 text-lg px-8 py-6"
+                className="font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30 text-lg px-8 py-6"
               >
                 <Heart className="mr-2" size={24} weight="fill" />
                 {cmsContent.ctaSection.primaryButtonText}
@@ -230,7 +230,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               <Button
                 size="lg"
                 onClick={() => handleNavigate('services')}
-                className="font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 border-2 border-stone-600/30 text-lg px-8 py-6"
+                className="font-semibold bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 border-2 border-stone-600/30 text-lg px-8 py-6"
               >
                 <GraduationCap className="mr-2" size={24} weight="duotone" />
                 {cmsContent.ctaSection.secondaryButtonText}

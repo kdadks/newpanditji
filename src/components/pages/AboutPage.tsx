@@ -59,7 +59,7 @@ export default function AboutPage({ }: AboutPageProps) {
             {/* Left side - Image */}
             <div className="order-1 lg:order-1 flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
                 <img
                   src={cmsContent.profileImage}
                   alt="Pandit Rajesh Joshi"
@@ -77,13 +77,13 @@ export default function AboutPage({ }: AboutPageProps) {
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <div className="flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
                 <FlowerLotus size={18} weight="fill" className="animate-pulse" />
                 {cmsContent.badge}
               </div>
 
               <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-                {cmsContent.hero.title} <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
+                {cmsContent.hero.title} <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
               </h1>
 
               <p className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
@@ -103,15 +103,15 @@ export default function AboutPage({ }: AboutPageProps) {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
-                <Button size="lg" onClick={() => handleNavigate('books')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-amber-700/30">
+                <Button size="lg" onClick={() => handleNavigate('books')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-amber-700/30">
                   <BookOpen className="mr-2" size={18} weight="fill" />
                   Published Books
                 </Button>
-                <Button size="lg" onClick={() => handleNavigate('charity')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
+                <Button size="lg" onClick={() => handleNavigate('charity')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
                   <HandHeart className="mr-2" size={18} weight="fill" />
                   Charity Work
                 </Button>
-                <Button size="lg" onClick={() => handleNavigate('testimonials')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
+                <Button size="lg" onClick={() => handleNavigate('testimonials')} className="text-sm md:text-base px-6 md:px-8 py-3 font-semibold bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto border-2 border-stone-600/30">
                   <ChatCircleDots className="mr-2" size={18} weight="fill" />
                   Testimonials
                 </Button>
@@ -135,77 +135,22 @@ export default function AboutPage({ }: AboutPageProps) {
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <FlowerLotus className="text-primary" size={24} weight="fill" />
                   </div>
-                  <h2 className="font-heading font-semibold text-2xl">The Spiritual Journey</h2>
+                  <h2 className="font-heading font-semibold text-2xl">{cmsContent.spiritualJourney.title}</h2>
                 </div>
 
                 <div className="space-y-5 text-muted-foreground">
-                  <p className="text-base leading-relaxed">
-                    Over a decade ago, Rajesh Ji's life took a transformative turn when he experienced stress-induced
-                    high blood pressure. Understanding that the root cause was stress and anxiety, he embraced the path
-                    of spirituality and Sanatana Dharma. Beginning with meditation, he experienced immediate benefits
-                    that revealed the profound science behind the Indian Knowledge System.
-                  </p>
+                  <div 
+                    className="prose prose-base max-w-none text-muted-foreground [&_p]:leading-relaxed [&_strong]:text-foreground [&_strong]:font-semibold"
+                    dangerouslySetInnerHTML={{ __html: cmsContent.spiritualJourney.content }}
+                  />
 
-                  <p className="text-base leading-relaxed">
-                    This awakening led him to explore the vast ocean of 10 million scriptures within the Indian Knowledge
-                    System. He participated in numerous meditation programs including:
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-4">
-                    <Badge variant="outline" className="justify-start py-2">Art of Living Sudarshan Kriya</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Isha Kriya</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Dalai Lama Meditation Programs</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Dzogchen Longchen Nyingtik</Badge>
-                    <Badge variant="outline" className="justify-start py-2">S.N. Goenka Dhamma Deepa (10 Days)</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Ramakrishna Mission Retreats</Badge>
-                  </div>
-
-                  <p className="text-base leading-relaxed">
-                    Realizing that ancient wisdom of the Indian subcontinent holds solutions for two-thirds of human
-                    mind's problems, he immersed himself in Hindu scriptures: Vedas, Upanishads, Ramayana, Mahabharata,
-                    Puranas, Yogic literature, Agama Tantras, and modern interpretations of ancient knowledge. This deep
-                    study led him to create his own meditation methodology, the <span className="font-semibold text-foreground">"eYogi Yoga
-                    and Meditation Guide"</span> for beginners.
-                  </p>
-
-                  <p className="text-base leading-relaxed">
-                    Rajesh Ji has conducted <span className="font-semibold text-foreground">200+ poojas since 2001</span> alongside his industrial
-                    career, performing all ceremonies without any monetary gain. His commitment to Karma Kanda (Daily
-                    Rituals) and the power of Bhakti has made him a beacon of authentic Vedic traditions.
-                  </p>
-
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-6">
-                    <div className="flex items-start gap-4">
-                      <Book className="text-primary shrink-0 mt-1" size={24} />
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-2">Literary Contributions</h4>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          Rajesh Ji has written multiple books on Indian culture and Sanatana Dharma, connecting ancient
-                          wisdom to modern science. His books are published with hundreds of physical copies in circulation
-                          across Ireland and India, including <span className="font-semibold text-foreground">Hinduism Basics for All</span>,
-                          <span className="font-semibold text-foreground"> Hinduism and Science</span>,
-                          <span className="font-semibold text-foreground"> eYogi Yoga & Meditation Guide</span>,
-                          <span className="font-semibold text-foreground"> Navaratri: The Bhakti of Shakti</span>,
-                          <span className="font-semibold text-foreground"> Diwali: The Oldest Festival</span>, and
-                          <span className="font-semibold text-foreground"> Leaving Cert Guide</span> (co-authored).
-                        </p>
-                      </div>
+                  {cmsContent.spiritualJourney.meditationPrograms.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-4">
+                      {cmsContent.spiritualJourney.meditationPrograms.map((program, index) => (
+                        <Badge key={index} variant="outline" className="justify-start py-2">{program}</Badge>
+                      ))}
                     </div>
-                  </div>
-
-                  <div className="bg-accent/5 border border-accent/20 rounded-lg p-5 mt-4">
-                    <div className="flex items-start gap-4">
-                      <Pencil className="text-primary shrink-0 mt-1" size={24} />
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-2">Poetry & Public Speaking</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Composed <span className="font-semibold text-foreground">100+ Hindi poems</span>, regularly recited at various prestigious stages in Ireland and USA.
-                          As a motivational speaker, Rajesh Ji weaves ancient wisdom into inspiring talks that resonate
-                          with modern audiences.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -214,61 +159,50 @@ export default function AboutPage({ }: AboutPageProps) {
           {/* Right Column - Combined Cards (Takes 1 column) */}
           <div className="lg:col-span-1 space-y-6">
             {/* Areas of Interest & Expertise Card */}
-            <Card className="border-0 shadow-lg bg-linear-to-br from-accent/5 to-secondary/5">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Lightbulb className="text-primary" size={24} weight="fill" />
+            {cmsContent.expertiseAreas.length > 0 && (
+              <Card className="border-0 shadow-lg bg-linear-to-br from-accent/5 to-secondary/5">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Lightbulb className="text-primary" size={24} weight="fill" />
+                    </div>
+                    <h3 className="font-heading font-semibold text-xl">Areas of Interest & Expertise</h3>
                   </div>
-                  <h3 className="font-heading font-semibold text-xl">Areas of Interest & Expertise</h3>
-                </div>
 
-                <div className="flex flex-col gap-2">
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <Atom className="mr-2" size={14} />
-                    Quantum Mechanics
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <Book className="mr-2" size={14} />
-                    Ancient Scriptures
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <BookOpen className="mr-2" size={14} />
-                    Indian History
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <Heart className="mr-2" size={14} weight="fill" />
-                    Positive Psychology
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <Pencil className="mr-2" size={14} />
-                    Poetry
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <FlowerLotus className="mr-2" size={14} weight="fill" />
-                    Yoga & Meditation
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <MedalMilitary className="mr-2" size={14} />
-                    Astronomy
-                  </Badge>
-                  <Badge variant="outline" className="justify-start py-2 text-xs">
-                    <Sparkle className="mr-2" size={14} weight="fill" />
-                    Sanatana Dharma
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="flex flex-col gap-2">
+                    {cmsContent.expertiseAreas.map((area, index) => {
+                      const getIcon = () => {
+                        if (area.toLowerCase().includes('quantum')) return <Atom className="mr-2" size={14} />
+                        if (area.toLowerCase().includes('scripture')) return <Book className="mr-2" size={14} />
+                        if (area.toLowerCase().includes('history')) return <BookOpen className="mr-2" size={14} />
+                        if (area.toLowerCase().includes('psychology')) return <Heart className="mr-2" size={14} weight="fill" />
+                        if (area.toLowerCase().includes('poetry')) return <Pencil className="mr-2" size={14} />
+                        if (area.toLowerCase().includes('yoga') || area.toLowerCase().includes('meditation')) return <FlowerLotus className="mr-2" size={14} weight="fill" />
+                        if (area.toLowerCase().includes('astronomy')) return <MedalMilitary className="mr-2" size={14} />
+                        if (area.toLowerCase().includes('dharma')) return <Sparkle className="mr-2" size={14} weight="fill" />
+                        return <Book className="mr-2" size={14} />
+                      }
+                      return (
+                        <Badge key={index} variant="outline" className="justify-start py-2 text-xs">
+                          {getIcon()}
+                          {area}
+                        </Badge>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Academic Excellence Card */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10">
               <CardContent className="p-6 text-center">
                 <GraduationCap className="mx-auto mb-4 text-primary" size={48} />
-                <h3 className="font-heading font-semibold text-xl mb-3">Academic Excellence</h3>
+                <h3 className="font-heading font-semibold text-xl mb-3">{cmsContent.academicCard.title}</h3>
                 <p className="text-muted-foreground text-sm">
-                  ME in Electronics Engineering from Dublin City University, Ireland
+                  {cmsContent.academicCard.description}
                 </p>
-                <Badge variant="secondary" className="mt-3">DCU Graduate</Badge>
+                <Badge variant="secondary" className="mt-3">{cmsContent.academicCard.badge}</Badge>
               </CardContent>
             </Card>
 
@@ -276,11 +210,11 @@ export default function AboutPage({ }: AboutPageProps) {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10">
               <CardContent className="p-6 text-center">
                 <Briefcase className="mx-auto mb-4 text-primary" size={48} />
-                <h3 className="font-heading font-semibold text-xl mb-3">Irish Industrialist</h3>
+                <h3 className="font-heading font-semibold text-xl mb-3">{cmsContent.industrialistCard.title}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Successful industrial career alongside spiritual pursuits and community service
+                  {cmsContent.industrialistCard.description}
                 </p>
-                <Badge variant="secondary" className="mt-3">Business Leader</Badge>
+                <Badge variant="secondary" className="mt-3">{cmsContent.industrialistCard.badge}</Badge>
               </CardContent>
             </Card>
 
@@ -288,11 +222,11 @@ export default function AboutPage({ }: AboutPageProps) {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10">
               <CardContent className="p-6 text-center">
                 <HandHeart className="mx-auto mb-4 text-primary" size={48} weight="fill" />
-                <h3 className="font-heading font-semibold text-xl mb-3">eYogi Gurukul</h3>
+                <h3 className="font-heading font-semibold text-xl mb-3">{cmsContent.gurukulCard.title}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Founded volunteer-based non-profit charity for Indic studies in Ireland (2017)
+                  {cmsContent.gurukulCard.description}
                 </p>
-                <Badge variant="secondary" className="mt-3">Founder</Badge>
+                <Badge variant="secondary" className="mt-3">{cmsContent.gurukulCard.badge}</Badge>
               </CardContent>
             </Card>
           </div>
@@ -303,11 +237,11 @@ export default function AboutPage({ }: AboutPageProps) {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Heart className="text-primary" size={16} weight="fill" />
-              Our Journey
+              {cmsContent.photoGallery.badge}
             </div>
-            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">Moments of Devotion & Service</h2>
+            <h2 className="font-heading font-semibold text-3xl md:text-4xl mb-4">{cmsContent.photoGallery.title}</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Glimpses of sacred ceremonies, spiritual gatherings, and community service performed with devotion and authenticity
+              {cmsContent.photoGallery.description}
             </p>
           </div>
 
@@ -315,20 +249,24 @@ export default function AboutPage({ }: AboutPageProps) {
           <div className="relative w-full h-64 md:h-80">
             <div className="absolute inset-0 flex gap-4">
               <div className="flex gap-4 animate-scroll-left">
-                <img src="/images/Raj 1.jpg" alt="Rajesh Joshi Ji" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 1.jpg" alt="Traditional Pooja Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Raj 2.jpg" alt="Spiritual Guidance" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 2.jpg" alt="Hindu Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Raj 3.jpg" alt="Religious Ceremony" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 3.jpg" alt="Sacred Ritual" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                {cmsContent.photoGallery.images.map((image, index) => (
+                  <img 
+                    key={index}
+                    src={image.src} 
+                    alt={image.alt} 
+                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" 
+                  />
+                ))}
               </div>
               <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
-                <img src="/images/Raj 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 1.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Raj 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 2.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Raj 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
-                <img src="/images/Pooja 3.jpg" alt="" className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" />
+                {cmsContent.photoGallery.images.map((image, index) => (
+                  <img 
+                    key={`dup-${index}`}
+                    src={image.src} 
+                    alt="" 
+                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" 
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -340,166 +278,99 @@ export default function AboutPage({ }: AboutPageProps) {
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
                 <Sparkle size={16} weight="fill" />
-                What Makes Rajesh Ji Unique
+                {cmsContent.whatToExpect.badge}
               </div>
-              <h2 className="font-heading font-semibold text-3xl mb-4">What to Expect When You Invite Rajesh Ji</h2>
+              <h2 className="font-heading font-semibold text-3xl mb-4">{cmsContent.whatToExpect.title}</h2>
               <p className="text-muted-foreground max-w-3xl mx-auto">
-                When you invite Rajesh Ji to perform a pooja, he comes as a complete package - blending deep
-                scholarship, authentic rituals, and modern relevance in a way that touches hearts and minds.
+                {cmsContent.whatToExpect.description}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-linear-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <BookOpen className="text-primary" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Deep Knowledge of Sanatana Dharma</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Scholar of Indian Knowledge System with extensive study of Vedas, Upanishads, Puranas,
-                      and Itihasas. He quotes exact references and explains the meaning and context.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {cmsContent.whatToExpect.features.map((feature, index) => {
+                const getIcon = () => {
+                  if (feature.title.toLowerCase().includes('knowledge')) return <BookOpen className="text-primary" size={24} />
+                  if (feature.title.toLowerCase().includes('science')) return <Atom className="text-primary" size={24} />
+                  if (feature.title.toLowerCase().includes('pooja')) return <FlowerLotus className="text-primary" size={24} weight="fill" />
+                  if (feature.title.toLowerCase().includes('children')) return <Users className="text-primary" size={24} weight="fill" />
+                  if (feature.title.toLowerCase().includes('vedic') || feature.title.toLowerCase().includes('authentic')) return <Book className="text-primary" size={24} />
+                  if (feature.title.toLowerCase().includes('motivational')) return <Lightbulb className="text-primary" size={24} weight="fill" />
+                  if (feature.title.toLowerCase().includes('sacred') || feature.title.toLowerCase().includes('environment')) return <Heart className="text-primary" size={24} weight="fill" />
+                  return <Sparkle className="text-primary" size={24} weight="fill" />
+                }
 
-              <div className="bg-linear-to-br from-accent/5 to-accent/10 p-6 rounded-lg border border-accent/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                    <Atom className="text-primary" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Ancient Wisdom Meets Modern Science</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Bridges ancient spiritual practices with quantum mechanics, astronomy, and positive
-                      psychology, making traditions relevant for contemporary understanding.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                const getColorScheme = () => {
+                  const schemes = [
+                    'bg-linear-to-br from-primary/5 to-primary/10 border-primary/20',
+                    'bg-linear-to-br from-accent/5 to-accent/10 border-accent/20',
+                    'bg-linear-to-br from-secondary/5 to-secondary/10 border-secondary/20',
+                    'bg-linear-to-br from-primary/5 to-accent/5 border-primary/20',
+                    'bg-linear-to-br from-accent/5 to-secondary/5 border-accent/20',
+                    'bg-linear-to-br from-secondary/5 to-primary/5 border-secondary/20',
+                  ]
+                  return schemes[index % schemes.length]
+                }
 
-              <div className="bg-linear-to-br from-secondary/5 to-secondary/10 p-6 rounded-lg border border-secondary/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                    <FlowerLotus className="text-primary" size={24} weight="fill" />
+                return (
+                  <div 
+                    key={index}
+                    className={`${getColorScheme()} p-6 rounded-lg border ${index === cmsContent.whatToExpect.features.length - 1 && cmsContent.whatToExpect.features.length % 2 !== 0 ? 'md:col-span-2' : ''}`}
+                  >
+                    <div className="flex gap-4">
+                      <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                        {getIcon()}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2 text-foreground">{feature.title}</h3>
+                        <p className="text-muted-foreground text-sm">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Complete Pooja Explanation</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Every step of the pooja is explained - why we do it, what it means, and how it
-                      relates to modern life. No ritual is performed without understanding.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Users className="text-primary" size={24} weight="fill" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Special Connection with Children</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Having taught hundreds of children (ages 4-18) through eYogi Gurukul, he knows how to
-                      engage young minds. Kids are typically glued to the pooja in his presence.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                    <Book className="text-primary" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Authentic Vedic Rituals</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Performs poojas as per Shastras with exact scriptural references. You'll know which
-                      verse comes from which scripture and its precise meaning.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-secondary/5 to-primary/5 p-6 rounded-lg border border-secondary/20">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                    <Lightbulb className="text-primary" size={24} weight="fill" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Motivational & Inspiring</h3>
-                    <p className="text-muted-foreground text-sm">
-                      As a motivational speaker, his subtle messages bind families together. He weaves
-                      words with examples that rejuvenate relationships and inspire spiritual growth.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-primary/5 to-secondary/5 p-6 rounded-lg border border-primary/20 md:col-span-2">
-                <div className="flex gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Heart className="text-primary" size={24} weight="fill" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Creating Sacred Environments</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Rajesh Ji creates an atmosphere of purity, bhakti, and devotion that leaves forever imprints
-                      in the minds of the Yajamana (host). His presence brings families and friends together,
-                      encouraging spiritual growth while fostering harmony and understanding.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                )
+              })}
             </div>
           </CardContent>
         </Card>
 
         {/* Community Service */}
-        <Card className="border-0 shadow-xl bg-linear-to-br from-accent/5 to-primary/5">
-          <CardContent className="p-8">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-                <HandHeart size={16} weight="fill" />
-                Community Service
-              </div>
-              <h2 className="font-heading font-semibold text-2xl mb-4">Seva and Social Impact</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="bg-linear-to-r from-primary/5 to-accent/5 p-6 rounded-lg border border-primary/20">
-                <div className="flex items-start gap-4">
-                  <BookOpen className="text-primary shrink-0 mt-1" size={32} />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">One Notary One Gita Project</h3>
-                    <p className="text-muted-foreground">
-                      A unique community service initiative aimed at spreading the wisdom of the Bhagavad Gita
-                      to communities across Ireland, making ancient wisdom accessible to all.
-                    </p>
-                  </div>
+        {cmsContent.communityService.services.length > 0 && (
+          <Card className="border-0 shadow-xl bg-linear-to-br from-accent/5 to-primary/5">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+                  <HandHeart size={16} weight="fill" />
+                  {cmsContent.communityService.badge}
                 </div>
+                <h2 className="font-heading font-semibold text-2xl mb-4">{cmsContent.communityService.title}</h2>
               </div>
 
-              <div className="bg-linear-to-r from-accent/5 to-secondary/5 p-6 rounded-lg border border-accent/20">
-                <div className="flex items-start gap-4">
-                  <Heart className="text-primary shrink-0 mt-1" size={32} weight="fill" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-foreground">Seva Without Monetary Gain</h3>
-                    <p className="text-muted-foreground">
-                      Rajesh Ji strongly believes in the power of Bhakti and selfless service. All 200+ poojas
-                      performed since 2001 have been conducted alongside his industrial career without taking
-                      any monetary gains for himself - a true testament to his dedication to spiritual service.
-                    </p>
+              <div className="space-y-6">
+                {cmsContent.communityService.services.map((service, index) => (
+                  <div 
+                    key={index}
+                    className={`${index % 2 === 0 ? 'bg-linear-to-r from-primary/5 to-accent/5 border-primary/20' : 'bg-linear-to-r from-accent/5 to-secondary/5 border-accent/20'} p-6 rounded-lg border`}
+                  >
+                    <div className="flex items-start gap-4">
+                      {index === 0 ? (
+                        <BookOpen className="text-primary shrink-0 mt-1" size={32} />
+                      ) : (
+                        <Heart className="text-primary shrink-0 mt-1" size={32} weight="fill" />
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2 text-foreground">{service.title}</h3>
+                        <p className="text-muted-foreground">
+                          {service.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
         </div>
       </section>
     </div>

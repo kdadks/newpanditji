@@ -17,6 +17,7 @@ interface CharityFormData {
   title: string
   description: string
   videoUrl: string
+  video2Url: string
   category: string
 }
 
@@ -32,6 +33,7 @@ export default function AdminCharity() {
     title: '',
     description: '',
     videoUrl: '',
+    video2Url: '',
     category: 'Community Service'
   })
 
@@ -41,6 +43,7 @@ export default function AdminCharity() {
       title: '',
       description: '',
       videoUrl: '',
+      video2Url: '',
       category: 'Community Service'
     })
     setEditingProject(null)
@@ -49,11 +52,14 @@ export default function AdminCharity() {
   }
 
   const handleEdit = (project: CharityProjectRow) => {
+    const videoUrls = (project.gallery_images as any)?.[0] ? (typeof project.gallery_images?.[0] === 'object' ? project.gallery_images[0] : { video1: project.video_url || '', video2: '' }) : { video1: project.video_url || '', video2: '' }
+    
     setFormData({
       id: project.id,
       title: project.title,
       description: project.full_description || '',
       videoUrl: project.video_url || '',
+      video2Url: (videoUrls as any).video2 || '',
       category: project.category || 'Community Service'
     })
     setEditingProject(project)
@@ -75,6 +81,7 @@ export default function AdminCharity() {
           short_description: formData.description.substring(0, 200),
           full_description: formData.description,
           video_url: formData.videoUrl || null,
+          gallery_images: (formData.video2Url ? [JSON.stringify({ video1: formData.videoUrl, video2: formData.video2Url })] : null) as any,
           category: formData.category
         })
       } else {
@@ -84,6 +91,7 @@ export default function AdminCharity() {
           videoUrl: formData.videoUrl,
           category: formData.category
         })
+        newProject.gallery_images = (formData.video2Url ? [JSON.stringify({ video1: formData.videoUrl, video2: formData.video2Url })] : null) as any
         await createProject(newProject)
       }
       setIsDialogOpen(false)
@@ -301,7 +309,7 @@ export default function AdminCharity() {
                       
                       <div className="space-y-2">
                         <Label htmlFor="videoUrl" className="text-sm font-medium">
-                          Video URL
+                          Video URL 1
                         </Label>
                         <Input
                           id="videoUrl"
@@ -313,6 +321,23 @@ export default function AdminCharity() {
                         />
                         <p className="text-xs text-muted-foreground">
                           Add a YouTube video link to showcase the project
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="video2Url" className="text-sm font-medium">
+                          Video URL 2 (Optional)
+                        </Label>
+                        <Input
+                          id="video2Url"
+                          value={formData.video2Url}
+                          onChange={(e) => setFormData({ ...formData, video2Url: e.target.value })}
+                          placeholder="https://youtu.be/... or https://youtube.com/watch?v=..."
+                          className="h-11 bg-background"
+                          disabled={isSaving}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Add a second YouTube video link (optional)
                         </p>
                       </div>
                     </CardContent>

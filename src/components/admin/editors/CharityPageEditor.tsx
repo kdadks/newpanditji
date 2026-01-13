@@ -19,7 +19,7 @@ export default function CharityPageEditor({ content, setContent, onSave, isSavin
   return (
     <div className="space-y-6">
       {/* Save Button */}
-      <div className="flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50 pb-4 pt-2 border-b mb-4">
+      <div className="flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur z-50 pb-4 pt-2 border-b mb-4">
         <div>
           <h2 className="text-2xl font-heading font-bold">Charity Page Content</h2>
           <p className="text-muted-foreground">Manage charity page content and sections</p>

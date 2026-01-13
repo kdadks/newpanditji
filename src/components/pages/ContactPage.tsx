@@ -78,13 +78,13 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <Heart size={18} weight="fill" className="animate-pulse" />
               Connect with Divine Guidance
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Get in <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Touch</span>
+              Get in <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Touch</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
@@ -95,7 +95,7 @@ export default function ContactPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
                 size="lg"
-                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
                 onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 <EnvelopeSimple size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
@@ -103,7 +103,7 @@ export default function ContactPage() {
               </Button>
               <Button
                 size="lg"
-                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-green-700 via-emerald-700 to-green-800 text-white hover:from-green-800 hover:via-emerald-800 hover:to-green-900 shadow-2xl hover:shadow-3xl shadow-green-800/50 transition-all duration-300 hover:scale-105 border-2 border-green-600/40"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-green-700 via-emerald-700 to-green-800 text-white hover:from-green-800 hover:via-emerald-800 hover:to-green-900 shadow-2xl hover:shadow-3xl shadow-green-800/50 transition-all duration-300 hover:scale-105 border-2 border-green-600/40"
                 onClick={() => window.open('https://wa.me/353876927927', '_blank')}
               >
                 <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
@@ -115,24 +115,24 @@ export default function ContactPage() {
       </section>
 
       {/* Trust Indicators Section */}
-      <section className="py-8 bg-gradient-to-b from-background to-muted/20">
+      <section className="py-8 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Clock size={28} className="text-primary shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-primary text-lg">24/7 Response</div>
                 <div className="text-sm text-muted-foreground">Quick replies</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Shield size={28} className="text-accent shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-primary text-lg">Confidential</div>
                 <div className="text-sm text-muted-foreground">Private & secure</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Sparkle size={28} className="text-primary shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-primary text-lg">Personalized</div>
@@ -153,7 +153,7 @@ export default function ContactPage() {
               <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm hover:shadow-3xl transition-all duration-500">
                 <CardContent className="p-8 md:p-10">
                   <div className="flex items-center gap-4 mb-8">
-                    <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
+                  <div className="p-3 bg-linear-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
                       <EnvelopeSimple className="text-white" size={28} weight="fill" />
                     </div>
                     <div>
@@ -247,7 +247,7 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                      className="w-full h-14 text-lg font-semibold bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                     >
                       <EnvelopeSimple size={20} className="mr-3" />
                       Send Sacred Message
@@ -444,3 +444,4 @@ export default function ContactPage() {
     </div>
   )
 }
+
