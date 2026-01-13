@@ -13,6 +13,7 @@ import {
   useBooksPageContent,
   useContactContent,
   useCharityContent,
+  useDakshinaContent,
   useHeaderContent,
   useFooterContent
 } from '../../hooks/useCmsContent'
@@ -32,6 +33,7 @@ import {
   BooksPageEditor,
   ContactPageEditor,
   CharityPageEditor,
+  DakshinaPageEditor,
   HeaderEditor,
   FooterEditor,
   MenuEditor
@@ -52,6 +54,7 @@ export default function AdminContent() {
   const booksContent = useBooksPageContent()
   const contactContent = useContactContent()
   const charityContent = useCharityContent()
+  const dakshinaContent = useDakshinaContent()
   const headerContentHook = useHeaderContent()
   const footerContentHook = useFooterContent()
 
@@ -65,6 +68,7 @@ export default function AdminContent() {
   const [booksState, setBooksState] = useState(booksContent.content)
   const [contactState, setContactState] = useState(contactContent.content)
   const [charityState, setCharityState] = useState(charityContent.content)
+  const [dakshinaState, setDakshinaState] = useState(dakshinaContent.content)
   const [headerState, setHeaderState] = useState(headerContentHook.content)
   const [footerState, setFooterState] = useState(footerContentHook.content)
   const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems)
@@ -93,6 +97,10 @@ export default function AdminContent() {
   useEffect(() => {
     if (!charityContent.isLoading) setCharityState(charityContent.content)
   }, [charityContent.content, charityContent.isLoading])
+
+  useEffect(() => {
+    if (!dakshinaContent.isLoading) setDakshinaState(dakshinaContent.content)
+  }, [dakshinaContent.content, dakshinaContent.isLoading])
 
   useEffect(() => {
     if (!headerContentHook.isLoading) setHeaderState(headerContentHook.content)
@@ -136,6 +144,9 @@ export default function AdminContent() {
         case 'charity':
           await charityContent.save(charityState)
           break
+        case 'dakshina':
+          await dakshinaContent.save(dakshinaState)
+          break
       }
     } catch (error) {
       // Error already handled by hook
@@ -176,6 +187,7 @@ export default function AdminContent() {
     booksContent.isLoading ||
     contactContent.isLoading ||
     charityContent.isLoading ||
+    dakshinaContent.isLoading ||
     headerContentHook.isLoading ||
     footerContentHook.isLoading
 
@@ -188,6 +200,7 @@ export default function AdminContent() {
       case 'books': return booksContent.isSaving
       case 'contact': return contactContent.isSaving
       case 'charity': return charityContent.isSaving
+      case 'dakshina': return dakshinaContent.isSaving
       default: return false
     }
   }
@@ -218,13 +231,14 @@ export default function AdminContent() {
 
         <TabsContent value="pages" className="mt-6">
           <Tabs value={activePageTab} onValueChange={(value) => setActivePageTab(value as PageKey)}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-muted/50 p-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-7 h-auto gap-2 bg-muted/50 p-2">
               <TabsTrigger value="home" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Home</TabsTrigger>
               <TabsTrigger value="about" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">About Us</TabsTrigger>
               <TabsTrigger value="whyChoose" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Why Choose Us</TabsTrigger>
               <TabsTrigger value="books" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Books</TabsTrigger>
               <TabsTrigger value="contact" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Contact</TabsTrigger>
               <TabsTrigger value="charity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Charity</TabsTrigger>
+              <TabsTrigger value="dakshina" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Dakshina</TabsTrigger>
             </TabsList>
 
             <TabsContent value="home" className="mt-6">
@@ -273,6 +287,14 @@ export default function AdminContent() {
                 setContent={setCharityState}
                 onSave={() => handleSavePageContent('charity')}
                 isSaving={getSavingState('charity')}
+              />
+            </TabsContent>
+            <TabsContent value="dakshina" className="mt-6">
+              <DakshinaPageEditor
+                content={dakshinaState}
+                setContent={setDakshinaState}
+                onSave={() => handleSavePageContent('dakshina')}
+                isSaving={getSavingState('dakshina')}
               />
             </TabsContent>
           </Tabs>

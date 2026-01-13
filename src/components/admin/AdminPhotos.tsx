@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { usePhotos, convertLegacyPhoto, type Photo } from '../../hooks/usePhotos'
 import { uploadImage, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl, fileToBase64 } from '../../lib/storage'
-import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images, Eye } from '@phosphor-icons/react'
+import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images, Eye, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -29,11 +29,21 @@ interface FileUploadItem {
 }
 
 export default function AdminPhotos() {
-  const { photos, isLoading, createPhoto, updatePhoto, deletePhoto, isCreating, isUpdating, isDeleting } = usePhotos()
-  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const itemsPerPage = 25
+  
+  // Fetch photos with pagination from server
+  const { photos, total, totalPages, isLoading, createPhoto, updatePhoto, deletePhoto, isCreating, isUpdating, isDeleting } = usePhotos({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery || undefined,
+    category: filterCategory !== 'all' ? filterCategory : undefined
+  })
+  
+  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState<PhotoFormData>({
     id: '',
     url: '',
@@ -55,15 +65,19 @@ export default function AdminPhotos() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
-  // Get unique categories from photos
+  // Get unique categories - need to fetch separately or use a cached list
   const categories = Array.from(new Set(photos.map(p => p.category).filter(Boolean)))
 
-  // Filter photos
-  const filteredPhotos = photos.filter(photo => {
-    const matchesSearch = photo.title?.toLowerCase().includes(searchQuery.toLowerCase()) || false
-    const matchesCategory = filterCategory === 'all' || photo.category === filterCategory
-    return matchesSearch && matchesCategory
-  })
+  // Reset to page 1 when filters change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setFilterCategory(value)
+    setCurrentPage(1)
+  }
 
   const handleAdd = () => {
     setFormData({
@@ -392,7 +406,7 @@ export default function AdminPhotos() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-heading font-semibold">Photo Gallery</h2>
-          <p className="text-sm text-muted-foreground">{photos.length} photos</p>
+          <p className="text-sm text-muted-foreground">{total} photos</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleBulkAdd} variant="outline" size="sm" className="gap-1.5">
@@ -413,11 +427,11 @@ export default function AdminPhotos() {
           <Input
             placeholder="Search photos..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-8 h-9"
           />
         </div>
-        <Select value={filterCategory} onValueChange={setFilterCategory}>
+        <Select value={filterCategory} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full sm:w-40 h-9">
             <SelectValue placeholder="All" />
           </SelectTrigger>
@@ -433,9 +447,9 @@ export default function AdminPhotos() {
       </div>
 
       {/* Photos Grid */}
-      {filteredPhotos.length === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          {photos.length === 0 ? (
+          {!searchQuery && filterCategory === 'all' ? (
             <>
               <Upload size={32} className="mx-auto mb-2" />
               <p className="text-sm">No photos yet. Click "Add" to get started.</p>
@@ -451,8 +465,9 @@ export default function AdminPhotos() {
           )}
         </div>
       ) : (
+        <>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filteredPhotos.map((photo) => (
+          {photos.map((photo) => (
             <div 
               key={photo.id} 
               className="group relative rounded-lg overflow-hidden border bg-card cursor-pointer"
@@ -511,6 +526,62 @@ export default function AdminPhotos() {
             </div>
           ))}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, total)} of {total} photos
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="gap-1"
+              >
+                <CaretLeft size={14} />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show first page, last page, current page, and pages around current
+                    if (page === 1 || page === totalPages) return true
+                    if (Math.abs(page - currentPage) <= 1) return true
+                    return false
+                  })
+                  .map((page, idx, arr) => (
+                    <div key={page}>
+                      {idx > 0 && arr[idx - 1] !== page - 1 && (
+                        <span className="px-2 text-muted-foreground">...</span>
+                      )}
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="h-8 w-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="gap-1"
+              >
+                Next
+                <CaretRight size={14} />
+              </Button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       {/* Modern Redesigned Photo Modal */}

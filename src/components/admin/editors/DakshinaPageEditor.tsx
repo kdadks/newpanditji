@@ -166,7 +166,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
   return (
     <div className="space-y-6">
       {/* Save Button */}
-      <div className="flex justify-between items-center sticky top-0 bg-background z-10 pb-4">
+      <div className="flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50 pb-4 pt-2 border-b mb-4">
         <div>
           <h2 className="text-2xl font-heading font-bold">Dakshina Page Content</h2>
           <p className="text-muted-foreground">Manage Dakshina page content and pricing</p>
@@ -196,7 +196,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Hero Title</Label>
             <Input
-              value={content.hero.title}
+              value={content.hero.title || ''}
               onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, title: e.target.value } }))}
               placeholder="Understanding <highlight>Dakshina</highlight>"
             />
@@ -206,7 +206,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Subtitle</Label>
             <Input
-              value={content.hero.subtitle}
+              value={content.hero.subtitle || ''}
               onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, subtitle: e.target.value } }))}
               placeholder="Sacred Offerings & Service Costs"
             />
@@ -215,7 +215,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Description</Label>
             <Textarea
-              value={content.hero.description}
+              value={content.hero.description || ''}
               onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, description: e.target.value } }))}
               placeholder="Brief description of the page"
               rows={3}
@@ -260,7 +260,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Section Title</Label>
             <Input
-              value={content.whatIsDakshina.title}
+              value={content.whatIsDakshina.title || ''}
               onChange={(e) => setContent(prev => ({ ...prev, whatIsDakshina: { ...prev.whatIsDakshina, title: e.target.value } }))}
               placeholder="What is Dakshina?"
             />
@@ -269,7 +269,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Subtitle</Label>
             <Input
-              value={content.whatIsDakshina.subtitle}
+              value={content.whatIsDakshina.subtitle || ''}
               onChange={(e) => setContent(prev => ({ ...prev, whatIsDakshina: { ...prev.whatIsDakshina, subtitle: e.target.value } }))}
               placeholder="Understanding the Sacred Tradition"
             />
@@ -278,7 +278,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Content (Rich Text)</Label>
             <QuillEditor
-              value={content.whatIsDakshina.content}
+              value={content.whatIsDakshina.content || ''}
               onChange={(value) => setContent(prev => ({ ...prev, whatIsDakshina: { ...prev.whatIsDakshina, content: value } }))}
               placeholder="Write detailed explanation about Dakshina..."
               minHeight="200px"
@@ -317,12 +317,12 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                       </Button>
                     </div>
                     <Input
-                      value={point.title}
+                      value={point.title || ''}
                       onChange={(e) => updateKeyPoint(index, 'title', e.target.value)}
                       placeholder="Point title"
                     />
                     <Textarea
-                      value={point.description}
+                      value={point.description || ''}
                       onChange={(e) => updateKeyPoint(index, 'description', e.target.value)}
                       placeholder="Point description"
                       rows={2}
@@ -345,7 +345,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Badge Text</Label>
             <Input
-              value={content.pricingSection.badge}
+              value={content.pricingSection.badge || ''}
               onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, badge: e.target.value } }))}
               placeholder="Transparent Pricing"
             />
@@ -354,7 +354,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Section Title</Label>
             <Input
-              value={content.pricingSection.title}
+              value={content.pricingSection.title || ''}
               onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, title: e.target.value } }))}
               placeholder="Service & Package Pricing"
             />
@@ -363,7 +363,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>Description</Label>
             <Textarea
-              value={content.pricingSection.description}
+              value={content.pricingSection.description || ''}
               onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, description: e.target.value } }))}
               placeholder="Brief description of pricing"
               rows={3}
@@ -406,7 +406,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                       <div>
                         <Label className="text-xs">Service Name *</Label>
                         <Input
-                          value={service.name}
+                          value={service.name || ''}
                           onChange={(e) => updateService(index, 'name', e.target.value)}
                           placeholder="e.g., Lakshmi Pooja"
                         />
@@ -414,7 +414,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                       <div>
                         <Label className="text-xs">Price (€) *</Label>
                         <Input
-                          value={service.price}
+                          value={service.price || ''}
                           onChange={(e) => updateService(index, 'price', e.target.value)}
                           placeholder="e.g., 100"
                           type="number"
@@ -504,7 +504,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>CTA Title</Label>
             <Input
-              value={content.ctaSection.title}
+              value={content.ctaSection.title || ''}
               onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection, title: e.target.value } }))}
               placeholder="Ready to Book a Ceremony?"
             />
@@ -513,7 +513,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           <div className="space-y-2">
             <Label>CTA Description</Label>
             <Textarea
-              value={content.ctaSection.description}
+              value={content.ctaSection.description || ''}
               onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection, description: e.target.value } }))}
               placeholder="Compelling description to encourage action"
               rows={3}
@@ -524,7 +524,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
             <div className="space-y-2">
               <Label>Primary Button Text</Label>
               <Input
-                value={content.ctaSection.primaryButtonText}
+                value={content.ctaSection.primaryButtonText || ''}
                 onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection, primaryButtonText: e.target.value } }))}
                 placeholder="Contact Us"
               />
@@ -533,7 +533,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
             <div className="space-y-2">
               <Label>Secondary Button Text</Label>
               <Input
-                value={content.ctaSection.secondaryButtonText}
+                value={content.ctaSection.secondaryButtonText || ''}
                 onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection, secondaryButtonText: e.target.value } }))}
                 placeholder="View All Services"
               />

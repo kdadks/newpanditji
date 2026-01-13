@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useAdminServices, convertLegacyService } from '../../hooks/useServices'
 import { usePhotos } from '../../hooks/usePhotos'
 import { uploadDocument, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl } from '../../lib/storage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp, Image as ImageIcon, Clock } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp, Image as ImageIcon, Clock, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -50,6 +50,8 @@ export default function AdminServicesNew() {
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [serviceToDelete, setServiceToDelete] = useState<AdminServiceRow | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 25
   const samagriFileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<ServiceFormData>({
@@ -78,6 +80,23 @@ export default function AdminServicesNew() {
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory
     return matchesSearch && matchesCategory
   })
+
+  // Pagination
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedServices = filteredServices.slice(startIndex, endIndex)
+
+  // Reset to page 1 when filters change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (value: 'all' | ServiceCategory) => {
+    setFilterCategory(value)
+    setCurrentPage(1)
+  }
 
   const handleAdd = () => {
     setFormData({
@@ -259,12 +278,12 @@ export default function AdminServicesNew() {
               <Input
                 placeholder="Search services by name or description..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="w-full md:w-48">
-              <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as 'all' | ServiceCategory)}>
+              <Select value={filterCategory} onValueChange={(v) => handleCategoryChange(v as 'all' | ServiceCategory)}>
                 <SelectTrigger>
                   <div className="flex items-center gap-2">
                     <FunnelSimple size={16} />
@@ -283,8 +302,11 @@ export default function AdminServicesNew() {
             </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredServices.length}</span> of{' '}
-            <span className="font-semibold text-foreground">{services.length}</span> services
+            Showing <span className="font-semibold text-foreground">{paginatedServices.length}</span> of{' '}
+            <span className="font-semibold text-foreground">{filteredServices.length}</span> services
+            {filteredServices.length !== services.length && (
+              <span> (filtered from {services.length} total)</span>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -301,14 +323,14 @@ export default function AdminServicesNew() {
                   : 'No services found matching your criteria'}
               </p>
               {services.length > 0 && (
-                <Button onClick={() => { setSearchQuery(''); setFilterCategory('all') }} variant="outline">
+                <Button onClick={() => { handleSearchChange(''); handleCategoryChange('all') }} variant="outline">
                   Clear Filters
                 </Button>
               )}
             </CardContent>
           </Card>
         ) : (
-          filteredServices.map((service) => (
+          paginatedServices.map((service) => (
             <Card key={service.id} className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
@@ -378,6 +400,60 @@ export default function AdminServicesNew() {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {filteredServices.length > 0 && totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t">
+          <div className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="gap-1"
+            >
+              <CaretLeft size={14} />
+              Previous
+            </Button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((page) => {
+                  if (page === 1 || page === totalPages) return true
+                  if (Math.abs(page - currentPage) <= 1) return true
+                  return false
+                })
+                .map((page, idx, arr) => (
+                  <div key={page}>
+                    {idx > 0 && arr[idx - 1] !== page - 1 && (
+                      <span className="px-2 text-muted-foreground">...</span>
+                    )}
+                    <Button
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="h-8 w-8 p-0"
+                    >
+                      {page}
+                    </Button>
+                  </div>
+                ))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="gap-1"
+            >
+              Next
+              <CaretRight size={14} />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Edit/Add Dialog - Modern Stunning UX */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

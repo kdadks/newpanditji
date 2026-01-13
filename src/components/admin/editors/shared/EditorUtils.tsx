@@ -46,7 +46,8 @@ export const getPageTitle = (key: PageKey): string => {
     whyChoose: 'Why Choose Us',
     books: 'Books',
     contact: 'Contact',
-    charity: 'Charity'
+    charity: 'Charity',
+    dakshina: 'Dakshina'
   }
   return titles[key]
 }

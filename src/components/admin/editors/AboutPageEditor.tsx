@@ -20,6 +20,27 @@ interface AboutPageEditorProps {
 export default function AboutPageEditor({ content, setContent, onSave, isSaving }: AboutPageEditorProps) {
   return (
     <div className="space-y-6">
+      {/* Save Button */}
+      <div className="flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50 pb-4 pt-2 border-b mb-4">
+        <div>
+          <h2 className="text-2xl font-heading font-bold">About Page Content</h2>
+          <p className="text-muted-foreground">Manage about page content and sections</p>
+        </div>
+        <Button onClick={onSave} disabled={isSaving} size="lg" className="gap-2">
+          {isSaving ? (
+            <>
+              <Spinner className="animate-spin" size={20} />
+              Saving...
+            </>
+          ) : (
+            <>
+              <FloppyDisk size={20} />
+              Save Changes
+            </>
+          )}
+        </Button>
+      </div>
+
       {/* Section 1: Hero */}
       <Card>
         <CardHeader>
@@ -31,7 +52,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
             <div className="space-y-2">
               <Label>Name</Label>
               <Input
-                value={content.name}
+                value={content.name || ''}
                 onChange={(e) => setContent(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Rajesh Joshi"
               />
@@ -39,7 +60,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
             <div className="space-y-2">
               <Label>Title / Alias</Label>
               <Input
-                value={content.title}
+                value={content.title || ''}
                 onChange={(e) => setContent(prev => ({ ...prev, title: e.target.value }))}
                 placeholder='"eYogi Raj"'
               />
@@ -48,7 +69,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
           <div className="space-y-2">
             <Label>Badge Text</Label>
             <Input
-              value={content.badge}
+              value={content.badge || ''}
               onChange={(e) => setContent(prev => ({ ...prev, badge: e.target.value }))}
               placeholder="Hindu Scholar & Spiritual Guide"
             />
@@ -56,7 +77,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
           <div className="space-y-2">
             <Label>Short Bio (Hero Description)</Label>
             <Textarea
-              value={content.shortBio}
+              value={content.shortBio || ''}
               onChange={(e) => setContent(prev => ({ ...prev, shortBio: e.target.value }))}
               rows={3}
               placeholder="Brief introduction shown in the hero section..."
@@ -64,7 +85,7 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
           </div>
           <MediaPickerInput
             label="Profile Image"
-            value={content.profileImage}
+            value={content.profileImage || ''}
             onChange={(url) => setContent(prev => ({ ...prev, profileImage: url }))}
           />
           <ImageGrid
@@ -309,13 +330,6 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
           </div>
         </CardContent>
       </Card>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={onSave} disabled={isSaving} size="lg" className="min-w-[200px]">
-          {isSaving ? <><Spinner className="mr-2 animate-spin" size={18} />Saving...</> : <><FloppyDisk size={18} className="mr-2" />Save About Page</>}
-        </Button>
-      </div>
     </div>
   )
 }

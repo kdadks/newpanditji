@@ -83,9 +83,6 @@ export default function AdminLayout({
           {/* Logo/Header */}
           <div className="p-6 border-b">
             <h1 className="font-heading font-bold text-2xl text-primary">Admin Panel</h1>
-            {userEmail && (
-              <p className="text-xs text-muted-foreground mt-2 truncate">{userEmail}</p>
-            )}
           </div>
 
           {/* Navigation Menu */}
@@ -123,8 +120,15 @@ export default function AdminLayout({
             </div>
           </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t">
+          {/* User Info & Logout */}
+          <div className="p-4 border-t space-y-3">
+            {userEmail && (
+              <div className="text-center pb-2">
+                <p className="text-base font-medium text-foreground truncate">
+                  {userEmail}
+                </p>
+              </div>
+            )}
             <Button
               variant="outline"
               className="w-full gap-2"

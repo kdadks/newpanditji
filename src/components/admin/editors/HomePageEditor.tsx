@@ -19,6 +19,27 @@ interface HomePageEditorProps {
 export default function HomePageEditor({ content, setContent, onSave, isSaving }: HomePageEditorProps) {
   return (
     <div className="space-y-6">
+      {/* Save Button */}
+      <div className="flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50 pb-4 pt-2 border-b mb-4">
+        <div>
+          <h2 className="text-2xl font-heading font-bold">Home Page Content</h2>
+          <p className="text-muted-foreground">Manage home page content and sections</p>
+        </div>
+        <Button onClick={onSave} disabled={isSaving} size="lg" className="gap-2">
+          {isSaving ? (
+            <>
+              <Spinner className="animate-spin" size={20} />
+              Saving...
+            </>
+          ) : (
+            <>
+              <FloppyDisk size={20} />
+              Save Changes
+            </>
+          )}
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <Card>
         <CardHeader>
@@ -488,13 +509,6 @@ export default function HomePageEditor({ content, setContent, onSave, isSaving }
           </div>
         </CardContent>
       </Card>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={onSave} disabled={isSaving} size="lg" className="min-w-[200px]">
-          {isSaving ? <><Spinner className="mr-2 animate-spin" size={18} />Saving...</> : <><FloppyDisk size={18} className="mr-2" />Save Home Page</>}
-        </Button>
-      </div>
     </div>
   )
 }

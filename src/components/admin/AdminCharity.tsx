@@ -158,7 +158,10 @@ export default function AdminCharity() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{project.short_description}</p>
+                        <div 
+                          className="text-sm text-muted-foreground mb-2 line-clamp-3 prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: project.short_description || '' }}
+                        />
                         {project.video_url && (
                           <p className="text-xs text-muted-foreground">Video: {project.video_url}</p>
                         )}

@@ -1,6 +1,6 @@
 // CMS Content Type Definitions
 
-export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity'
+export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina'
 export type SectionKey = 'header' | 'footer' | 'menu'
 
 // Base Interfaces

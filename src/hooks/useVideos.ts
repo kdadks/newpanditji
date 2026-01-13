@@ -29,22 +29,68 @@ function mapVideoRowToVideo(row: VideoRow): Video {
   }
 }
 
+export interface VideosQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+  category?: string
+}
+
+export interface VideosResponse {
+  videos: Video[]
+  total: number
+  page: number
+  totalPages: number
+}
+
 /**
- * Fetch all videos from Supabase
+ * Fetch videos from Supabase with pagination
  */
-async function fetchVideos(): Promise<Video[]> {
-  const { data, error } = await supabase
+async function fetchVideos(params?: VideosQueryParams): Promise<VideosResponse> {
+  const page = params?.page || 1
+  const limit = params?.limit || 25
+  const search = params?.search?.toLowerCase()
+  const category = params?.category
+
+  let query = supabase
     .from('videos')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('is_published', true)
+
+  // Apply search filter
+  if (search) {
+    query = query.ilike('title', `%${search}%`)
+  }
+
+  // Apply category filter
+  if (category && category !== 'all') {
+    query = query.eq('category', category)
+  }
+
+  // Apply pagination
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  query = query
     .order('sort_order', { ascending: true })
+    .range(from, to)
+
+  const { data, error, count } = await query
 
   if (error) {
     console.error('Error fetching videos:', error)
     throw error
   }
 
-  return (data || []).map(mapVideoRowToVideo)
+  const total = count || 0
+  const totalPages = Math.ceil(total / limit)
+
+  return {
+    videos: (data || []).map(mapVideoRowToVideo),
+    total,
+    page,
+    totalPages
+  }
 }
 
 /**
@@ -102,13 +148,13 @@ async function deleteVideo(id: string): Promise<void> {
 /**
  * React hook for videos CRUD operations
  */
-export function useVideos() {
+export function useVideos(params?: VideosQueryParams) {
   const queryClient = useQueryClient()
 
   // Query for fetching videos
-  const query = useQuery({
-    queryKey: VIDEOS_KEY,
-    queryFn: fetchVideos,
+  const query = useQuery<VideosResponse>({
+    queryKey: [...VIDEOS_KEY, params],
+    queryFn: () => fetchVideos(params),
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   })
 
@@ -150,7 +196,10 @@ export function useVideos() {
 
   return {
     // Data
-    videos: query.data || [],
+    videos: query.data?.videos || [],
+    total: query.data?.total || 0,
+    page: query.data?.page || 1,
+    totalPages: query.data?.totalPages || 0,
     isLoading: query.isLoading,
     error: query.error,
 

@@ -5,6 +5,7 @@ export { default as WhyChoosePageEditor } from './WhyChoosePageEditor'
 export { default as BooksPageEditor } from './BooksPageEditor'
 export { default as ContactPageEditor } from './ContactPageEditor'
 export { default as CharityPageEditor } from './CharityPageEditor'
+export { default as DakshinaPageEditor } from './DakshinaPageEditor'
 
 // Section Editors
 export { default as HeaderEditor } from './HeaderEditor'

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useVideos, convertLegacyVideo, type Video } from '../../hooks/useVideos'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Video as VideoIcon, MagnifyingGlass, Eye, Play } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Video as VideoIcon, MagnifyingGlass, Eye, Play, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -26,14 +26,24 @@ interface VideoFormData {
 }
 
 export default function AdminVideos() {
-  const { videos, isLoading, createVideo, updateVideo, deleteVideo, isCreating, isUpdating, isDeleting } = useVideos()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCategory, setFilterCategory] = useState<string>('all')
+  const itemsPerPage = 25
+  
+  // Fetch videos with pagination from server
+  const { videos, total, totalPages, isLoading, createVideo, updateVideo, deleteVideo, isCreating, isUpdating, isDeleting } = useVideos({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery || undefined,
+    category: filterCategory !== 'all' ? filterCategory : undefined
+  })
+  
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [videoToDelete, setVideoToDelete] = useState<Video | null>(null)
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterCategory, setFilterCategory] = useState<string>('all')
   const [formData, setFormData] = useState<VideoFormData>({
     id: '',
     title: '',
@@ -44,12 +54,16 @@ export default function AdminVideos() {
   // Get unique categories from videos
   const categories = Array.from(new Set(videos.map(v => v.category).filter(Boolean)))
 
-  // Filter videos
-  const filteredVideos = videos.filter(video => {
-    const matchesSearch = video.title?.toLowerCase().includes(searchQuery.toLowerCase()) || false
-    const matchesCategory = filterCategory === 'all' || video.category === filterCategory
-    return matchesSearch && matchesCategory
-  })
+  // Reset to page 1 when filters change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setFilterCategory(value)
+    setCurrentPage(1)
+  }
 
   const handleAdd = () => {
     setFormData({
@@ -141,7 +155,7 @@ export default function AdminVideos() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-heading font-semibold">Videos</h2>
-          <p className="text-sm text-muted-foreground">{videos.length} videos</p>
+          <p className="text-sm text-muted-foreground">{total} videos</p>
         </div>
         <Button onClick={handleAdd} size="sm" className="gap-1.5">
           <Plus size={16} />
@@ -156,11 +170,11 @@ export default function AdminVideos() {
           <Input
             placeholder="Search videos..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-8 h-9"
           />
         </div>
-        <Select value={filterCategory} onValueChange={setFilterCategory}>
+        <Select value={filterCategory} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full sm:w-40 h-9">
             <SelectValue placeholder="All" />
           </SelectTrigger>
@@ -176,9 +190,9 @@ export default function AdminVideos() {
       </div>
 
       {/* Videos Grid */}
-      {filteredVideos.length === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          {videos.length === 0 ? (
+          {!searchQuery && filterCategory === 'all' ? (
             <>
               <VideoIcon size={32} className="mx-auto mb-2" />
               <p className="text-sm">No videos yet. Click "Add" to get started.</p>
@@ -194,8 +208,9 @@ export default function AdminVideos() {
           )}
         </div>
       ) : (
+        <>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filteredVideos.map((video) => (
+          {videos.map((video) => (
             <div 
               key={video.id} 
               className="group relative rounded-lg overflow-hidden border bg-card cursor-pointer"
@@ -266,6 +281,63 @@ export default function AdminVideos() {
             </div>
           ))}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, total)} of {total} videos
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="gap-1"
+              >
+                <CaretLeft size={14} />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show first page, last page, current page, and pages around current
+                    if (page === 1 || page === totalPages) return true
+                    if (Math.abs(page - currentPage) <= 1) return true
+                    return false
+                  })
+                  .map((page, idx, arr) => (
+                    <>
+                      {idx > 0 && arr[idx - 1] !== page - 1 && (
+                        <span key={`ellipsis-${page}`} className="px-2 text-muted-foreground">...</span>
+                      )}
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="h-8 w-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    </>
+                  ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="gap-1"
+              >
+                Next
+                <CaretRight size={14} />
+              </Button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

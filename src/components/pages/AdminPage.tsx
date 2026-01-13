@@ -82,8 +82,8 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-background" suppressHydrationWarning>
+        <div className="text-center" suppressHydrationWarning>
           <Shield className="mx-auto mb-4 text-muted-foreground animate-pulse" size={64} />
           <p className="text-muted-foreground">Verifying access...</p>
         </div>
@@ -155,7 +155,7 @@ export default function AdminPage() {
       currentSection={currentSection}
       onSectionChange={setCurrentSection}
       onLogout={handleLogout}
-      userEmail={user?.email}
+      userEmail={user?.email || 'admin@panditji.com'}
     >
       {renderContent()}
     </AdminLayout>

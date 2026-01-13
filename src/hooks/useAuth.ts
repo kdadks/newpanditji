@@ -18,10 +18,16 @@ interface UseAuthReturn {
  * Provides reactive auth state and auth methods
  */
 export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<AuthUser | null>(authService.user())
-  const [loading, setLoading] = useState(authService.isLoading())
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    // Initialize auth state
+    setUser(authService.user())
+    setLoading(authService.isLoading())
+
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((state) => {
       setUser(state.user)

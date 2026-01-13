@@ -32,22 +32,68 @@ function mapPhotoRowToPhoto(row: MediaFileRow): Photo {
   }
 }
 
+export interface PhotosQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+  category?: string
+}
+
+export interface PhotosResponse {
+  photos: Photo[]
+  total: number
+  page: number
+  totalPages: number
+}
+
 /**
- * Fetch all gallery photos from Supabase (from media_files table)
+ * Fetch gallery photos from Supabase with pagination (from media_files table)
  */
-async function fetchPhotos(): Promise<Photo[]> {
-  const { data, error } = await supabase
+async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> {
+  const page = params?.page || 1
+  const limit = params?.limit || 25
+  const search = params?.search?.toLowerCase()
+  const category = params?.category
+
+  let query = supabase
     .from('media_files')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('file_type', 'image')
+
+  // Apply search filter
+  if (search) {
+    query = query.or(`alt_text.ilike.%${search}%,original_name.ilike.%${search}%,file_name.ilike.%${search}%`)
+  }
+
+  // Apply category filter
+  if (category && category !== 'all') {
+    query = query.eq('folder', category)
+  }
+
+  // Apply pagination
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  query = query
     .order('created_at', { ascending: false })
+    .range(from, to)
+
+  const { data, error, count } = await query
 
   if (error) {
     console.error('Error fetching photos:', error)
     throw error
   }
 
-  return (data || []).map(mapPhotoRowToPhoto)
+  const total = count || 0
+  const totalPages = Math.ceil(total / limit)
+
+  return {
+    photos: (data || []).map(mapPhotoRowToPhoto),
+    total,
+    page,
+    totalPages
+  }
 }
 
 /**
@@ -105,13 +151,13 @@ async function deletePhoto(id: string): Promise<void> {
 /**
  * React hook for gallery photos CRUD operations
  */
-export function usePhotos() {
+export function usePhotos(params?: PhotosQueryParams) {
   const queryClient = useQueryClient()
 
   // Query for fetching photos
-  const query = useQuery<Photo[]>({
-    queryKey: PHOTOS_KEY,
-    queryFn: fetchPhotos,
+  const query = useQuery<PhotosResponse>({
+    queryKey: [...PHOTOS_KEY, params],
+    queryFn: () => fetchPhotos(params),
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   })
 
@@ -153,7 +199,10 @@ export function usePhotos() {
 
   return {
     // Data
-    photos: query.data || [],
+    photos: query.data?.photos || [],
+    total: query.data?.total || 0,
+    page: query.data?.page || 1,
+    totalPages: query.data?.totalPages || 0,
     isLoading: query.isLoading,
     error: query.error,
 
