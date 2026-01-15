@@ -20,14 +20,29 @@ export default function WhyChooseUsPage() {
     <div className="w-full">
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
-        {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Background decoration with animated rolling images - Hidden on mobile for performance */}
+        <div className="absolute inset-0 overflow-hidden hidden md:block">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+              <img
+                key={`bg-1-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+              <img
+                key={`bg-2-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
           </div>
         </div>
@@ -84,7 +99,7 @@ export default function WhyChooseUsPage() {
       </section>
 
       {/* Content Section */}
-      <div className="py-8 md:py-12">
+      <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Main Reasons */}
         <div className="space-y-8">
@@ -117,7 +132,7 @@ export default function WhyChooseUsPage() {
             const Icon = getIcon()
 
             return (
-              <Card key={index} className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br ${getGradient()}`}>
+              <Card key={index} className={`border-0 shadow-lg hover:shadow-lg transition-all duration-300 bg-linear-to-br ${getGradient()}`}>
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Icon Section */}
@@ -185,7 +200,7 @@ export default function WhyChooseUsPage() {
         </div>
 
         {/* Call to Action */}
-        <Card className="mt-12 border-0 shadow-xl bg-linear-to-r from-primary/10 via-accent/10 to-secondary/10">
+        <Card className="mt-12 border-0 shadow-lg bg-linear-to-r from-primary/10 via-accent/10 to-secondary/10">
           <CardContent className="p-8 text-center">
             <Sparkle className="mx-auto mb-4 text-primary" size={48} weight="fill" />
             <h2 className="font-heading font-bold text-2xl md:text-3xl mb-4 text-foreground">

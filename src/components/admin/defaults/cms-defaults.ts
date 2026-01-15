@@ -337,17 +337,35 @@ export const defaultCharityContent: CharityPageContent = {
     title: 'eYogi Gurukul',
     subtitle: 'Spreading Sanatan Dharma, One Heart at a Time',
     description: 'Founded by Rajesh Joshi ji, eYogi Gurukul is dedicated to preserving and propagating the timeless wisdom of Sanatan Dharma through education, service, and community development.',
+    logoImage: '/images/Logo/Raj ji.jpg',
     backgroundImages: [
       '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png'
+      '/images/Golden Temples of Devotion.png',
+      '/images/Traditional Altar with Marigold Flowers.png',
+      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
+    ],
+    statistics: [
+      { value: '500+', label: 'Students Taught' },
+      { value: '10+', label: 'Countries Reached' },
+      { value: '5+', label: 'Published Books' },
+      { value: '1000+', label: 'Lives Impacted' }
+    ],
+    ctaButtons: [
+      { text: 'Join Our Mission', link: '/contact', variant: 'primary' },
+      { text: 'Learn More', link: '#mission', variant: 'outline' }
     ]
   },
-  statistics: [
-    { value: '500+', label: 'Students Taught' },
-    { value: '10+', label: 'Countries Reached' },
-    { value: '5+', label: 'Published Books' },
-    { value: '1000+', label: 'Lives Impacted' }
-  ],
+  impactSection: {
+    badge: 'Our Impact',
+    title: 'Transforming Lives Through Dharma',
+    description: 'Through dedicated service and authentic spiritual education, eYogi Gurukul has touched thousands of lives across the globe, creating a ripple effect of positive change.',
+    statistics: [
+      { value: '500+', label: 'Students Taught', subtext: 'Ages 4-18' },
+      { value: '10+', label: 'Countries Reached', subtext: 'Worldwide presence' },
+      { value: '5,000+', label: 'Sacred Texts Distributed', subtext: 'Bhagavad Gita, Ramayana & more' },
+      { value: '1,000+', label: 'Lives Transformed', subtext: 'Through spiritual guidance' }
+    ]
+  },
   featuredProjects: {
     badge: 'Our Mission',
     title: 'Spreading the Light of Dharma',
@@ -359,55 +377,155 @@ export const defaultCharityContent: CharityPageContent = {
       { value: '100%', label: 'Free Education' }
     ]
   },
-  serviceAreas: [
-    {
-      icon: 'BookOpenText',
-      title: 'Scripture Distribution',
-      description: 'Distributing sacred Hindu texts including Bhagavad Gita, Ramayana, and Upanishads to temples, institutions, and individuals worldwide.',
-      stats: '5,000+ Texts'
-    },
-    {
-      icon: 'GraduationCap',
-      title: 'Community Education',
-      description: 'Online and offline classes on Vedic scriptures, Sanskrit mantras, meditation techniques, and Hindu philosophy for all ages.',
-      stats: '500+ Students'
-    },
-    {
-      icon: 'Heart',
-      title: 'Spiritual Support',
-      description: 'Providing free spiritual counselling, guidance for religious ceremonies, and support during life transitions and challenging times.',
-      stats: 'Always Available'
-    }
-  ],
-  missionStatement: {
-    title: 'Why We Serve',
-    description: 'At the heart of eYogi Gurukul lies a simple yet profound mission: to make the transformative knowledge of Sanatan Dharma accessible to everyone, regardless of background or means.',
-    features: [
+  serviceAreas: {
+    badge: 'What We Do',
+    title: 'Our Service Areas',
+    description: 'Dedicated to serving the community through comprehensive spiritual education, sacred text distribution, and heartfelt support.',
+    areas: [
       {
-        icon: 'Sparkle',
-        title: 'Preserving Ancient Wisdom',
-        description: 'Safeguarding traditional Vedic knowledge for future generations'
+        icon: 'BookOpenText',
+        title: 'Scripture Distribution',
+        description: 'Distributing sacred Hindu texts including Bhagavad Gita, Ramayana, and Upanishads to temples, institutions, and individuals worldwide.',
+        stats: '5,000+ Texts'
       },
       {
-        icon: 'Globe',
-        title: 'Global Outreach',
-        description: 'Connecting seekers worldwide through online platforms and resources'
+        icon: 'GraduationCap',
+        title: 'Community Education',
+        description: 'Online and offline classes on Vedic scriptures, Sanskrit mantras, meditation techniques, and Hindu philosophy for all ages.',
+        stats: '500+ Students'
       },
       {
         icon: 'Heart',
-        title: 'Selfless Service (Seva)',
-        description: 'All our educational services are offered freely as an act of devotion'
+        title: 'Spiritual Support',
+        description: 'Providing free spiritual counselling, guidance for religious ceremonies, and support during life transitions and challenging times.',
+        stats: 'Always Available'
+      }
+    ]
+  },
+  impactStories: {
+    badge: 'Real Stories',
+    title: 'Lives We\'ve Touched',
+    description: 'Hear from the hearts of those whose lives have been transformed through our spiritual education and community service.',
+    stories: [
+      {
+        name: 'Priya Sharma',
+        role: 'Student',
+        story: 'eYogi Gurukul introduced me to the profound wisdom of the Bhagavad Gita. The classes helped me find peace and direction during a challenging phase in my life. The teachings are practical, relatable, and life-changing.',
+        image: '/images/Raj 1.jpg',
+        location: 'Dublin, Ireland'
+      },
+      {
+        name: 'Anil Kapoor',
+        role: 'Parent',
+        story: 'My children have been attending eYogi Gurukul classes for two years. They have developed a deep respect for our culture and traditions. Rajesh Ji\'s ability to engage children is remarkable.',
+        image: '/images/Raj 2.jpg',
+        location: 'Cork, Ireland'
+      },
+      {
+        name: 'Lakshmi Patel',
+        role: 'Devotee',
+        story: 'The free spiritual counseling I received during a difficult time was invaluable. The guidance was rooted in scriptures yet completely relevant to modern life challenges. I am forever grateful.',
+        image: '/images/Raj 3.jpg',
+        location: 'Galway, Ireland'
+      }
+    ]
+  },
+  missionVision: {
+    badge: 'Our Purpose',
+    missionTitle: 'Our Mission',
+    missionDescription: 'To preserve, propagate, and make the transformative knowledge of Sanatan Dharma accessible to everyone, regardless of background or means, through authentic education and selfless service.',
+    visionTitle: 'Our Vision',
+    visionDescription: 'A world where the timeless wisdom of Vedic knowledge enlightens hearts and minds, creating a global community rooted in dharma, compassion, and spiritual growth.',
+    coreValues: [
+      {
+        icon: 'Sparkle',
+        title: 'Authenticity',
+        description: 'We stay true to the authentic Vedic teachings and scriptural knowledge passed down through generations.'
+      },
+      {
+        icon: 'Heart',
+        title: 'Seva (Selfless Service)',
+        description: 'All our educational services are offered freely as an act of devotion and commitment to the community.'
+      },
+      {
+        icon: 'Globe',
+        title: 'Inclusivity',
+        description: 'We welcome seekers from all backgrounds and make spiritual knowledge accessible to everyone.'
+      },
+      {
+        icon: 'BookOpenText',
+        title: 'Education',
+        description: 'We believe in empowering individuals through knowledge, understanding, and practical application of dharma.'
+      }
+    ]
+  },
+  waysToContribute: {
+    badge: 'Get Involved',
+    title: 'Ways to Support Our Mission',
+    description: 'Your contribution, whether through donations, volunteering, or partnership, helps us continue spreading the light of dharma and supporting spiritual seekers worldwide.',
+    options: [
+      {
+        icon: 'HandHeart',
+        title: 'Make a Donation',
+        description: 'Support our free educational programs, sacred text distribution, and community service initiatives.',
+        buttonText: 'Donate Now',
+        buttonLink: '/contact',
+        features: [
+          'Fund free spiritual education',
+          'Support sacred text distribution',
+          'Sponsor community events',
+          'Help maintain resources'
+        ]
+      },
+      {
+        icon: 'Users',
+        title: 'Volunteer With Us',
+        description: 'Share your time and skills to help organize classes, events, and outreach programs.',
+        buttonText: 'Join as Volunteer',
+        buttonLink: '/contact',
+        features: [
+          'Teach or assist in classes',
+          'Help with event organization',
+          'Support online initiatives',
+          'Contribute your expertise'
+        ]
+      },
+      {
+        icon: 'Handshake',
+        title: 'Partner With Us',
+        description: 'Collaborate with eYogi Gurukul to spread dharma through joint initiatives and programs.',
+        buttonText: 'Become a Partner',
+        buttonLink: '/contact',
+        features: [
+          'Institutional collaborations',
+          'Temple partnerships',
+          'Educational programs',
+          'Community outreach'
+        ]
+      },
+      {
+        icon: 'Gift',
+        title: 'Sponsor a Program',
+        description: 'Sponsor specific programs like book distribution, student scholarships, or festival celebrations.',
+        buttonText: 'Sponsor Now',
+        buttonLink: '/contact',
+        features: [
+          'Book distribution campaigns',
+          'Student sponsorships',
+          'Festival celebrations',
+          'Special workshops'
+        ]
       }
     ]
   },
   ctaSection: {
-    title: 'Support Our Mission',
-    description: 'Your contribution helps us continue spreading the light of Sanatan Dharma and supporting seekers on their spiritual journey.',
+    title: 'Join Us in Spreading the Light of Dharma',
+    description: 'Together, we can preserve the sacred wisdom of Sanatan Dharma and empower future generations with spiritual knowledge that transforms lives.',
     buttons: [
-      { text: 'Make a Donation', link: '/contact', variant: 'primary' },
-      { text: 'Volunteer With Us', link: '/contact', variant: 'outline' },
-      { text: 'Learn More', link: '/about', variant: 'outline' }
-    ]
+      { text: 'Get Involved Today', link: '/contact', variant: 'primary' },
+      { text: 'Explore Our Work', link: '#mission', variant: 'outline' }
+    ],
+    backgroundImage: '/images/Golden Temples of Devotion.png'
   }
 }
 

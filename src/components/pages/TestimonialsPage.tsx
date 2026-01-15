@@ -3,9 +3,10 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { Star, Quotes, Sparkle, Heart, Trophy, Users } from '@phosphor-icons/react'
-import { testimonials } from '../../lib/data'
+import { usePublishedTestimonials } from '../../hooks/useTestimonials'
 
 export default function TestimonialsPage() {
+  const { data: testimonials = [], isLoading } = usePublishedTestimonials()
   usePageSEO({
     title: 'Client Reviews & Testimonials | Pandit Rajesh Joshi Hindu Services',
     description: 'Read testimonials from satisfied clients about their pooja ceremonies and spiritual services. Genuine reviews of Hindu rituals performed in Ireland and UK.',
@@ -81,56 +82,88 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Content Section */}
-      <div className="py-8 md:py-12">
+      <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {testimonials.map((testimonial, index) => (
-            <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-              <CardContent className="relative p-6">
-                {/* Quote Icon */}
-                <div className="absolute top-4 right-4 text-primary/20">
-                  <Quotes size={24} weight="fill" />
-                </div>
-
-                {/* Rating Stars */}
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} weight="fill" className="text-accent" />
-                  ))}
-                </div>
-
-                {/* Testimonial Text */}
-                <p className="text-foreground mb-6 leading-relaxed italic text-lg">
-                  "{testimonial.text}"
-                </p>
-
-                {/* Author Info */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground text-sm">{testimonial.name}</p>
-                    <Badge variant="secondary" className="text-xs mt-1">
-                      {testimonial.service}
-                    </Badge>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 overflow-hidden">
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={index} className="group relative overflow-hidden border-0 shadow-lg bg-linear-to-br from-card to-card/80">
+                <CardContent className="relative p-6">
+                  <div className="animate-pulse">
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="w-4 h-4 bg-muted rounded"></div>
+                      ))}
+                    </div>
+                    <div className="h-20 bg-muted rounded mb-6"></div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="h-4 bg-muted rounded w-24 mb-1"></div>
+                        <div className="h-3 bg-muted rounded w-16"></div>
+                      </div>
+                      <div className="h-6 bg-muted rounded w-8"></div>
+                    </div>
                   </div>
-                  <div className="text-primary/60 text-lg font-bold">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : testimonials.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Heart className="mx-auto mb-4 text-muted-foreground" size={48} />
+              <p className="text-muted-foreground text-lg">No testimonials available yet.</p>
+            </div>
+          ) : (
+            testimonials.map((testimonial, index) => (
+              <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-102 cursor-pointer">
+                <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                {/* Decorative Element */}
-                <div className="absolute bottom-4 left-4 text-primary/10">
-                  <Sparkle size={20} weight="fill" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                <CardContent className="relative p-6">
+                  {/* Quote Icon */}
+                  <div className="absolute top-4 right-4 text-primary/20">
+                    <Quotes size={24} weight="fill" />
+                  </div>
+
+                  {/* Rating Stars */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={16} weight="fill" className={i < (testimonial.rating || 5) ? "text-accent" : "text-muted"} />
+                    ))}
+                  </div>
+
+                  {/* Testimonial Text */}
+                  <p className="text-foreground mb-6 leading-relaxed italic text-lg">
+                    "{testimonial.testimonial_text}"
+                  </p>
+
+                  {/* Author Info */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-foreground text-sm">{testimonial.client_name}</p>
+                      {testimonial.service_name && (
+                        <Badge variant="secondary" className="text-xs mt-1">
+                          {testimonial.service_name}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-primary/60 text-lg font-bold">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+
+                  {/* Decorative Element */}
+                  <div className="absolute bottom-4 left-4 text-primary/10">
+                    <Sparkle size={20} weight="fill" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Share Your Experience */}
-        <Card className="border-0 shadow-xl bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
+        <Card className="border-0 shadow-lg bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
           <CardContent className="p-8 md:p-12 text-center">
             <Heart className="mx-auto mb-6 text-primary" size={48} weight="fill" />
 
@@ -190,7 +223,7 @@ export default function TestimonialsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10">
+            <Card className="border-0 shadow-lg hover:shadow-lg transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded-lg">
@@ -205,7 +238,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10">
+            <Card className="border-0 shadow-lg hover:shadow-lg transition-all duration-300 bg-linear-to-br from-accent/5 to-accent/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-accent/10 rounded-lg">
@@ -220,7 +253,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10">
+            <Card className="border-0 shadow-lg hover:shadow-lg transition-all duration-300 bg-linear-to-br from-secondary/5 to-secondary/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-secondary/10 rounded-lg">
@@ -235,7 +268,7 @@ export default function TestimonialsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-accent/5">
+            <Card className="border-0 shadow-lg hover:shadow-lg transition-all duration-300 bg-linear-to-br from-primary/5 to-accent/5">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded-lg">

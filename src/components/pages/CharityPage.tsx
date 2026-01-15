@@ -1,10 +1,29 @@
+'use client'
+
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useCharity } from '../../hooks/useCharity'
 import { useCharityContent } from '../../hooks/useCmsContent'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { Heart, Book, Users, HandHeart, Sparkle, Target, Globe, Trophy, CircleNotch, BookOpenText, GraduationCap } from '@phosphor-icons/react'
+import {
+  Heart,
+  Book,
+  Users,
+  HandHeart,
+  Sparkle,
+  Target,
+  Globe,
+  CircleNotch,
+  BookOpenText,
+  GraduationCap,
+  Handshake,
+  Gift
+} from '@phosphor-icons/react'
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
+import { getOptimizedImageProps } from '../../utils/imageOptimization'
+import { useDisableAnimations } from '../../hooks/useMediaQuery'
 
 interface CharityProject {
   id: string
@@ -20,9 +39,9 @@ const getYouTubeEmbedUrl = (url: string) => {
   return `https://www.youtube.com/embed/${videoId}`
 }
 
-const getIconComponent = (iconName?: string, size: number = 48) => {
+const getIconComponent = (iconName?: string, size: number = 48, className?: string) => {
   if (!iconName) return null
-  
+
   const iconMap: Record<string, any> = {
     'BookOpenText': BookOpenText,
     'GraduationCap': GraduationCap,
@@ -33,16 +52,92 @@ const getIconComponent = (iconName?: string, size: number = 48) => {
     'Sparkle': Sparkle,
     'Target': Target,
     'Globe': Globe,
-    'Trophy': Trophy
+    'Handshake': Handshake,
+    'Gift': Gift
   }
-  
+
   const IconComponent = iconMap[iconName]
-  return IconComponent ? <IconComponent className="mx-auto text-primary" size={size} weight="fill" /> : null
+  return IconComponent ? <IconComponent className={className || 'text-primary'} size={size} weight="fill" /> : null
+}
+
+// Animation variants for reusable animations
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0
+  }
+}
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1
+  }
+}
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const scaleIn = {
+  hidden: { scale: 0.8, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1
+  }
+}
+
+// Animated Counter Component
+function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { value: string; label: string; subtext?: string; disableAnimation?: boolean }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-100px' })
+
+  if (disableAnimation) {
+    return (
+      <div className="text-center">
+        <div className="text-5xl md:text-6xl font-black bg-gradient-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
+          {value}
+        </div>
+        <div className="text-lg md:text-xl font-semibold text-foreground mb-1">{label}</div>
+        {subtext && <div className="text-sm text-muted-foreground">{subtext}</div>}
+      </div>
+    )
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="text-center"
+    >
+      <motion.div
+        className="text-5xl md:text-6xl font-black bg-gradient-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2"
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : {}}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        {value}
+      </motion.div>
+      <div className="text-lg md:text-xl font-semibold text-foreground mb-1">{label}</div>
+      {subtext && <div className="text-sm text-muted-foreground">{subtext}</div>}
+    </motion.div>
+  )
 }
 
 export default function CharityPage() {
-  // CMS Content
   const { content: cmsContent } = useCharityContent()
+  const { projects, isLoading } = useCharity()
+  const disableAnimations = useDisableAnimations()
 
   usePageSEO({
     title: 'Hindu Community Charity Work & Social Service | Pandit Rajesh Joshi',
@@ -51,20 +146,33 @@ export default function CharityPage() {
     canonicalUrl: 'https://panditrajesh.ie/charity'
   })
 
-  const { projects, isLoading } = useCharity()
-
   return (
-    <div className="w-full">
-      {/* Hero Section with Sunrise Effect */}
+    <div className="w-full overflow-hidden">
+      {/* Hero Section with Sunrise Theme */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
-        {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Background decoration with animated rolling images - Hidden on mobile for performance */}
+        <div className="absolute inset-0 overflow-hidden hidden md:block">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+              <img
+                key={`bg-1-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+              <img
+                key={`bg-2-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
           </div>
         </div>
@@ -79,286 +187,462 @@ export default function CharityPage() {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
-          {/* Hero Content */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
-              <HandHeart size={18} weight="fill" className="animate-pulse" />
-              {cmsContent.hero.badge}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Left side - Featured Image */}
+            <div className="order-1 lg:order-1 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-3xl blur-2xl scale-110"></div>
+                <img
+                  {...getOptimizedImageProps({
+                    src: cmsContent.hero.logoImage || cmsContent.hero.backgroundImages[0] || '/images/charity-hero.jpg',
+                    alt: 'Charity Project Logo',
+                    priority: true,
+                    className: 'relative w-full max-w-[320px] md:max-w-md h-64 md:h-80 lg:h-96 rounded-3xl object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300'
+                  })}
+                />
+              </div>
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              {cmsContent.hero.title} <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.hero.subtitle}</span>
-            </h1>
+            {/* Right side - Content */}
+            <div className="order-2 lg:order-2 text-center lg:text-left">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide">
+                <HandHeart size={18} weight="fill" className="animate-pulse" />
+                {cmsContent.hero.badge}
+              </div>
 
-            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
-              {cmsContent.hero.description}
-            </p>
+              {/* Title */}
+              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+                {cmsContent.hero.title}
+              </h1>
 
-            {/* Stats - Compact inline version */}
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              {cmsContent.statistics.map((stat, index) => (
-                <span key={index}>
-                  {index > 0 && <span className="text-white/50 mr-6">•</span>}
-                  <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                    <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
+              {/* Subtitle */}
+              <p className="text-lg md:text-xl lg:text-2xl font-semibold bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent mb-6 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                {cmsContent.hero.subtitle}
+              </p>
+
+              {/* Description */}
+              <p className="text-lg md:text-xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                {cmsContent.hero.description}
+              </p>
+
+              {/* Statistics - Compact inline */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-8 max-w-2xl mx-auto lg:mx-0">
+                {cmsContent.hero.statistics.map((stat, index) => (
+                  <span key={index} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap text-center lg:text-left">
+                    <span className="font-extrabold text-transparent bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                    <span className="font-semibold text-white/95">{stat.label}</span>
                   </span>
-                </span>
-              ))}
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                {cmsContent.hero.ctaButtons.map((button, index) => (
+                  <Button
+                    key={index}
+                    size="lg"
+                    onClick={() => window.location.href = button.link}
+                    className={`text-base px-8 py-3 transition-all duration-300 hover:scale-105 font-semibold shadow-2xl ${
+                      button.variant === 'primary'
+                        ? 'bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50 hover:shadow-3xl border-2 border-amber-700/30'
+                        : 'bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-stone-900/50 hover:shadow-3xl border-2 border-stone-600/30'
+                    }`}
+                  >
+                    {button.text}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <div className="py-8 md:py-12">
-        {/* Featured Projects Section Header (from CMS) */}
-        <div className="mb-16">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <Sparkle size={16} />
-              {cmsContent.featuredProjects.badge}
-            </div>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">
-              {cmsContent.featuredProjects.title}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-              {cmsContent.featuredProjects.description}
-            </p>
-          </div>
+      {/* Main Content */}
+      <div className="pt-0 pb-0 bg-background">
 
-          {/* Featured Projects Video and Stats */}
-          <Card className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden mb-8">
-            <CardContent className="p-0">
-              <div className="flex flex-col">
-                {/* Video - Centered */}
-                <div className="w-full max-w-4xl mx-auto">
-                  {cmsContent.featuredProjects.videoUrl ? (
-                    <div className="aspect-video">
-                      <iframe
-                        src={getYouTubeEmbedUrl(cmsContent.featuredProjects.videoUrl)}
-                        title={cmsContent.featuredProjects.title}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                      <div className="text-center">
-                        <Book className="text-primary/60 mx-auto mb-4" size={64} />
-                        <p className="text-primary/60 font-medium">Featured Content</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Stats - Below Video */}
-                {cmsContent.featuredProjects.stats && cmsContent.featuredProjects.stats.length > 0 && (
-                  <div className="p-8 lg:p-12">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {cmsContent.featuredProjects.stats.map((stat, index) => (
-                        <div key={index} className="text-center">
-                          <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10 mx-auto mb-3">
-                            <Trophy className="text-primary" size={24} />
-                          </div>
-                          <div className="text-2xl font-bold text-primary mb-1">{stat.value}</div>
-                          <div className="text-muted-foreground">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Featured Projects */}
-        <div className="space-y-12 mb-16">
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <CircleNotch className="animate-spin text-primary" size={48} />
-            </div>
-          ) : !projects || projects.length === 0 ? (
-            <Card className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden">
-              <CardContent className="p-12 text-center">
-                <HandHeart className="mx-auto mb-4 text-muted-foreground" size={64} />
-                <h3 className="font-heading font-semibold text-2xl mb-2">No Projects Yet</h3>
-                <p className="text-muted-foreground">Check back soon for updates on our charity initiatives.</p>
-              </CardContent>
-            </Card>
-          ) : projects.map((project, index) => (
-            <Card key={project.id} className="border-0 shadow-2xl bg-linear-to-br from-card via-card to-primary/5 overflow-hidden">
-              <CardContent className="p-0">
-                <div className={`grid grid-cols-1 lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''}`}>
-                  <div className="p-8 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Book className="text-primary" size={20} />
-                      </div>
-                      <Badge className="bg-primary/20 text-primary border-primary/30">
-                        {project.category}
-                      </Badge>
-                    </div>
-
-                    <h2 className="font-heading font-bold text-3xl lg:text-4xl mb-6 leading-tight">
-                      {project.title}
-                    </h2>
-
-                    {project.full_description ? (
-                      <div 
-                        className="text-lg text-muted-foreground mb-6 leading-relaxed prose prose-lg max-w-none"
-                        dangerouslySetInnerHTML={{ __html: project.full_description }}
-                      />
-                    ) : (
-                      <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                        {project.short_description}
-                      </p>
-                    )}
-
-                    <div className="flex flex-wrap gap-3">
-                      <Badge variant="secondary" className="px-3 py-1">
-                        <Globe size={14} className="mr-1" />
-                        Global Impact
-                      </Badge>
-                      <Badge variant="secondary" className="px-3 py-1">
-                        <Users size={14} className="mr-1" />
-                        Community Focused
-                      </Badge>
-                      <Badge variant="secondary" className="px-3 py-1">
-                        <Trophy size={14} className="mr-1" />
-                        Spiritual Growth
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className={`order-1 lg:order-2 ${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
-                    {project.video_url ? (
-                      <div className="aspect-video">
-                        <iframe
-                          src={getYouTubeEmbedUrl(project.video_url)}
-                          title={project.title}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                        <div className="text-center">
-                          <Book className="text-primary/60 mx-auto mb-4" size={64} />
-                          <p className="text-primary/60 font-medium">Sacred Wisdom</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Service Areas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {cmsContent.serviceAreas.map((area, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-primary/5 to-primary/10 text-center">
-              <CardContent className="p-8">
-                <div className="mb-6">{getIconComponent(area.icon)}</div>
-                <h3 className="font-heading font-semibold text-xl mb-4">{area.title}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {area.description}
-                </p>
-                {area.stats && (
-                  <Badge variant="secondary">
-                    {area.stats}
+        <section className="mb-10 md:mb-16 bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-12">
+          <div className="container mx-auto px-4 max-w-7xl">
+            {disableAnimations ? (
+              <div className="text-center mb-12">
+                <div className="mb-4">
+                  <Badge className="bg-primary/10 text-primary px-4 py-2 text-sm font-medium border-primary/20">
+                    <Target size={16} className="mr-2" />
+                    {cmsContent.featuredProjects.badge}
                   </Badge>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Mission Statement */}
-        <Card className="border-0 shadow-xl bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 mb-16">
-          <CardContent className="p-8 md:p-12">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-                <Target size={16} />
-                {cmsContent.missionStatement.title}
+                </div>
+                <h2 className="font-heading font-black text-4xl md:text-6xl mb-6">
+                  {cmsContent.featuredProjects.title}
+                </h2>
+                <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                  {cmsContent.featuredProjects.description}
+                </p>
               </div>
-              <h2 className="font-heading font-semibold text-3xl mb-4">{cmsContent.missionStatement.title}</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">{cmsContent.missionStatement.description}</p>
-            </div>
+            ) : (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+                variants={staggerContainer}
+                className="text-center mb-12"
+              >
+                <motion.div variants={fadeInUp} className="mb-4">
+                  <Badge className="bg-primary/10 text-primary px-4 py-2 text-sm font-medium border-primary/20">
+                    <Target size={16} className="mr-2" />
+                    {cmsContent.featuredProjects.badge}
+                  </Badge>
+                </motion.div>
+                <motion.h2
+                  variants={fadeInUp}
+                  className="font-heading font-black text-4xl md:text-6xl mb-6"
+                >
+                  {cmsContent.featuredProjects.title}
+                </motion.h2>
+                <motion.p
+                  variants={fadeInUp}
+                  className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
+                >
+                  {cmsContent.featuredProjects.description}
+                </motion.p>
+              </motion.div>
+            )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-8">
-              <div className="space-y-6">
-                {cmsContent.missionStatement.features.map((feature, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                      {feature.icon === 'Globe' && <Globe className="text-primary" size={20} />}
-                      {feature.icon === 'Heart' && <Heart className="text-primary" size={20} weight="fill" />}
-                      {feature.icon === 'Sparkle' && <Sparkle className="text-primary" size={20} />}
-                      {feature.icon === 'Trophy' && <Trophy className="text-primary" size={20} />}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                      <p className="text-muted-foreground">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
+            {/* Featured Video Card - Compact Design */}
+            {disableAnimations ? (
+              <div className="max-w-5xl mx-auto mb-16">
+                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden group">
+                  <CardContent className="p-6 md:p-8">
+                    {/* Video Container - Reduced Size */}
+                    {cmsContent.featuredProjects.videoUrl ? (
+                      <div className="relative rounded-xl overflow-hidden shadow-lg mb-6">
+                        <div className="aspect-video bg-black">
+                          <iframe
+                            src={getYouTubeEmbedUrl(cmsContent.featuredProjects.videoUrl)}
+                            title={cmsContent.featuredProjects.title}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            loading="lazy"
+                          />
+                        </div>
+                        {/* Decorative Border Accent */}
+                        <div className="absolute inset-0 border-4 border-primary/20 rounded-xl pointer-events-none group-hover:border-primary/40 transition-colors duration-300"></div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
+                        <Book className="text-primary/60" size={80} />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+                variants={scaleIn}
+                className="max-w-5xl mx-auto mb-16"
+              >
+                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden group">
+                  <CardContent className="p-6 md:p-8">
+                    {/* Video Container - Reduced Size */}
+                    {cmsContent.featuredProjects.videoUrl ? (
+                      <div className="relative rounded-xl overflow-hidden shadow-lg mb-6">
+                        <div className="aspect-video bg-black">
+                          <iframe
+                            src={getYouTubeEmbedUrl(cmsContent.featuredProjects.videoUrl)}
+                            title={cmsContent.featuredProjects.title}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                        {/* Decorative Border Accent */}
+                        <div className="absolute inset-0 border-4 border-primary/20 rounded-xl pointer-events-none group-hover:border-primary/40 transition-colors duration-300"></div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
+                        <Book className="text-primary/60" size={80} />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Database Projects - Compact Grid Layout */}
+            {isLoading ? (
+              <div className="flex justify-center items-center py-20">
+                <CircleNotch className="animate-spin text-primary" size={64} />
+              </div>
+            ) : projects && projects.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                {projects.map((project) => (
+                  <motion.div
+                    key={project.id}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-100px' }}
+                    variants={fadeInUp}
+                  >
+                    <Card className="border-2 border-primary/10 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-primary/5 overflow-hidden group h-full flex flex-col">
+                      <CardContent className="p-0 flex flex-col h-full">
+                        {/* Video Section - Top */}
+                        {project.video_url ? (
+                          <div className="relative">
+                            <div className="aspect-video bg-black">
+                              <iframe
+                                src={getYouTubeEmbedUrl(project.video_url)}
+                                title={project.title}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            </div>
+                            {/* Category Badge Overlay */}
+                            {project.category && (
+                              <div className="absolute top-4 left-4">
+                                <Badge className="bg-gradient-to-r from-primary/95 to-accent/95 text-white border-0 shadow-lg px-3 py-1.5 backdrop-blur-sm">
+                                  {project.category}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative">
+                            <Book className="text-primary/40" size={80} />
+                            {project.category && (
+                              <div className="absolute top-4 left-4">
+                                <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1.5">
+                                  {project.category}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Content Section - Bottom */}
+                        <div className="p-6 flex flex-col flex-1">
+                          {/* Icon & Title */}
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="mt-1 p-2.5 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
+                              <Book className="text-primary" size={20} weight="fill" />
+                            </div>
+                            <h3 className="font-heading font-bold text-xl lg:text-2xl leading-tight group-hover:text-primary transition-colors duration-300">
+                              {project.title}
+                            </h3>
+                          </div>
+
+                          {/* Description */}
+                          <div className="flex-1 mb-4">
+                            {project.full_description ? (
+                              <div
+                                className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none line-clamp-4"
+                                dangerouslySetInnerHTML={{ __html: project.full_description }}
+                              />
+                            ) : (
+                              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
+                                {project.short_description}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-2 pt-4 border-t border-primary/10">
+                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
+                              <Globe size={12} className="mr-1" />
+                              Global Impact
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
+                              <Users size={12} className="mr-1" />
+                              Community
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
+                              <Heart size={12} className="mr-1" weight="fill" />
+                              Spiritual
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
+            ) : null}
+          </div>
+        </section>
 
-              <div className="text-center">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
-                  <div className="relative bg-linear-to-br from-primary/10 to-accent/10 rounded-full p-8">
-                    <Heart className="text-primary mx-auto" size={64} weight="fill" />
-                  </div>
-                </div>
-              </div>
+
+
+
+
+        {/* Mission & Vision */}
+        <section className="-mt-3 md:-mt-4 mb-5 md:mb-8">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+              variants={staggerContainer}
+              className="text-center mb-4"
+            >
+              <motion.div variants={fadeInUp} className="mb-4">
+                <Badge className="bg-primary/10 text-primary px-4 py-2 text-sm font-medium border-primary/20">
+                  <Target size={16} className="mr-2" />
+                  {cmsContent.missionVision.badge}
+                </Badge>
+              </motion.div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2">
+              {/* Mission */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+                variants={fadeInUp}
+              >
+                <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/5 to-accent/5 h-full">
+                  <CardContent className="p-2 md:p-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl mb-4">
+                      <Target className="text-primary" size={24} weight="fill" />
+                    </div>
+                    <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
+                      {cmsContent.missionVision.missionTitle}
+                    </h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      {cmsContent.missionVision.missionDescription}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Vision */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+                variants={fadeInUp}
+              >
+                <Card className="border-0 shadow-xl bg-gradient-to-br from-accent/5 to-primary/5 h-full">
+                  <CardContent className="p-2 md:p-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-accent/20 to-primary/20 rounded-2xl mb-4">
+                      <Sparkle className="text-primary" size={24} weight="fill" />
+                    </div>
+                    <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
+                      {cmsContent.missionVision.visionTitle}
+                    </h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      {cmsContent.missionVision.visionDescription}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Call to Action */}
-        <Card className="border-0 shadow-xl bg-linear-to-br from-primary/10 to-accent/10">
-          <CardContent className="p-8 md:p-12 text-center">
-            <HandHeart className="mx-auto mb-6 text-primary" size={48} weight="fill" />
-
-            <h2 className="font-heading font-semibold text-3xl mb-4">{cmsContent.ctaSection.title}</h2>
-
-            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-              {cmsContent.ctaSection.description}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {cmsContent.ctaSection.buttons.map((button, index) => (
-                <Button
-                  key={index}
-                  size="lg"
-                  className={`px-8 py-3 font-semibold ${
-                    button.variant === 'primary'
-                      ? 'bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 border-2 border-amber-700/30'
-                      : 'bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 border-2 border-stone-600/30'
-                  } transition-all duration-300 hover:scale-105`}
-                  onClick={() => window.location.href = button.link}
-                >
-                  {button.text === 'Make a Donation' && <Heart className="mr-2" size={20} weight="fill" />}
-                  {button.text === 'Volunteer With Us' && <Users className="mr-2" size={20} />}
-                  {button.text === 'Learn More' && <Book className="mr-2" size={20} />}
-                  {button.text}
-                </Button>
+            {/* Core Values */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+              variants={staggerContainer}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
+            >
+              {cmsContent.missionVision.coreValues.map((value, index) => (
+                <motion.div key={index} variants={fadeInUp}>
+                  <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-primary/5 h-full text-center group hover:-translate-y-1">
+                    <CardContent className="p-2">
+                      <div className="mb-3 inline-block p-2 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                        {getIconComponent(value.icon, 24, 'text-primary')}
+                      </div>
+                      <h4 className="font-heading font-bold text-lg mb-2">{value.title}</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {value.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
+          </div>
+        </section>
 
-            <p className="text-sm text-muted-foreground mt-6">
-              All charitable contributions are used directly for educational materials, community programs,
-              and spiritual support services. Your generosity makes a real difference.
-            </p>
-          </CardContent>
-        </Card>
+
+
+        {/* Final CTA Section */}
+        <section className="relative overflow-hidden py-12 md:py-16">
+          {/* Background Image */}
+          {cmsContent.ctaSection.backgroundImage && (
+            <div className="absolute inset-0">
+              <img
+                src={cmsContent.ctaSection.backgroundImage}
+                alt=""
+                className="w-full h-full object-cover opacity-20"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-accent/80 to-primary/90"></div>
+            </div>
+          )}
+
+          <div className="container mx-auto px-4 max-w-4xl relative z-10">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="text-center text-white"
+            >
+              <motion.div variants={scaleIn} className="mb-6">
+                <HandHeart className="mx-auto text-white/90" size={48} weight="fill" />
+              </motion.div>
+
+              <motion.h2
+                variants={fadeInUp}
+                className="font-heading font-black text-3xl md:text-4xl lg:text-5xl mb-4 drop-shadow-lg"
+              >
+                {cmsContent.ctaSection.title}
+              </motion.h2>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow-md max-w-2xl mx-auto"
+              >
+                {cmsContent.ctaSection.description}
+              </motion.p>
+
+              <motion.div
+                variants={fadeInUp}
+                className="flex flex-col sm:flex-row gap-3 justify-center items-center"
+              >
+                {cmsContent.ctaSection.buttons.map((button, index) => (
+                  <Button
+                    key={index}
+                    size="lg"
+                    className={`px-8 py-3 text-base font-semibold ${
+                      button.variant === 'primary'
+                        ? 'bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl'
+                        : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border-2 border-white/30 shadow-lg'
+                    } transition-all duration-300 hover:scale-105`}
+                    onClick={() => window.location.href = button.link}
+                  >
+                    {button.text}
+                  </Button>
+                ))}
+              </motion.div>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-xs md:text-sm text-white/70 mt-6 drop-shadow-sm"
+              >
+                All contributions directly support our educational programs and community service initiatives
+              </motion.p>
+            </motion.div>
+          </div>
+        </section>
       </div>
     </div>
   )

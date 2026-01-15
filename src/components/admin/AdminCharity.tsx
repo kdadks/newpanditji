@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { QuillEditor } from '../ui/quill-editor'
 import { toast } from 'sonner'
@@ -209,9 +209,9 @@ export default function AdminCharity() {
                 <DialogTitle className="text-xl font-bold text-white">
                   {editingProject ? 'Edit Charity Project' : 'Create New Project'}
                 </DialogTitle>
-                <p className="text-pink-100 text-sm mt-0.5">
+                <DialogDescription className="text-pink-100 text-sm mt-0.5">
                   {editingProject ? 'Update project details and information' : 'Add a new charitable initiative'}
-                </p>
+                </DialogDescription>
               </div>
             </div>
             

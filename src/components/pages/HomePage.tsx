@@ -10,6 +10,7 @@ import { services, categoryNames, Service } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useServices } from '../../hooks/useServices'
 import { useHomeContent } from '../../hooks/useCmsContent'
+import { getOptimizedImageProps } from '../../utils/imageOptimization'
 
 interface HomePageProps {
 }
@@ -52,8 +53,8 @@ export default function HomePage({ }: HomePageProps) {
   return (
     <div className="w-full">
       <section className="relative pt-4 md:pt-6 pb-2 md:pb-4 overflow-hidden">
-        {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Background decoration with animated rolling images - Hidden on mobile for performance */}
+        <div className="absolute inset-0 overflow-hidden hidden md:block">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
               <img
@@ -61,6 +62,8 @@ export default function HomePage({ }: HomePageProps) {
                 src={img}
                 alt=""
                 className="h-full w-auto object-contain opacity-40 shrink-0"
+                loading="lazy"
+                decoding="async"
               />
             ))}
             {cmsContent.hero.backgroundImages.map((img, index) => (
@@ -70,6 +73,8 @@ export default function HomePage({ }: HomePageProps) {
                 alt=""
                 className="h-full w-auto object-contain opacity-40 shrink-0"
                 aria-hidden="true"
+                loading="lazy"
+                decoding="async"
               />
             ))}
           </div>
@@ -91,16 +96,12 @@ export default function HomePage({ }: HomePageProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
                 <img
-                  src={cmsContent.hero.profileImage}
-                  alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
-                  style={{
-                    imageRendering: '-webkit-optimize-contrast',
-                    backfaceVisibility: 'hidden',
-                    transform: 'translateZ(0)',
-                    willChange: 'transform'
-                  }}
-                  loading="eager"
+                  {...getOptimizedImageProps({
+                    src: cmsContent.hero.profileImage || '/images/Logo/Raj ji.png',
+                    alt: 'Pandit Rajesh Joshi',
+                    priority: true,
+                    className: 'relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer'
+                  })}
                 />
               </div>
             </div>
@@ -215,6 +216,7 @@ export default function HomePage({ }: HomePageProps) {
                       alt="Sacred Ceremony"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       loading="lazy"
+                      decoding="async"
                     />
 
                     {/* Gradient overlay */}
@@ -264,6 +266,7 @@ export default function HomePage({ }: HomePageProps) {
                       alt=""
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       loading="lazy"
+                      decoding="async"
                     />
 
                     {/* Gradient overlay */}

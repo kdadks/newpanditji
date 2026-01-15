@@ -79,15 +79,15 @@ export default function BlogPage({ }: BlogPageProps) {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
             {/* Duplicate for seamless animation */}
-            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
-            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
-            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
-            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+            <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+            <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+            <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+            <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
           </div>
         </div>
 
@@ -189,6 +189,8 @@ export default function BlogPage({ }: BlogPageProps) {
                         src={blogArticles[0].featured_image_url} 
                         alt={blogArticles[0].title}
                         className="w-full h-full object-cover rounded-lg"
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="text-center">
@@ -220,6 +222,8 @@ export default function BlogPage({ }: BlogPageProps) {
                     src={article.featured_image_url} 
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
                 </div>

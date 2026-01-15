@@ -23,7 +23,7 @@ export interface ServiceDetail {
 export interface Service {
   id: string
   name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
+  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'package'
   duration: string
   description: string
   imageUrl?: string // Image URL for service card display
@@ -368,6 +368,34 @@ export const services: Service[] = [
     category: 'wellness',
     duration: '1 hour plus',
     description: 'Traditional yoga practice including physical postures and breath control for holistic well-being.'
+  },
+  {
+    id: 'family-blessing-package',
+    name: 'Family Blessing Package',
+    category: 'package',
+    duration: '3-4 hours',
+    description: 'Complete family blessing ceremony including Satyanarayana Pooja, family prayers, and personalized blessings for all family members.'
+  },
+  {
+    id: 'wedding-package-complete',
+    name: 'Complete Wedding Package',
+    category: 'package',
+    duration: 'Full day',
+    description: 'Comprehensive wedding package including all traditional ceremonies, decorations, music, and priest services for your special day.'
+  },
+  {
+    id: 'housewarming-package',
+    name: 'Housewarming Ceremony Package',
+    category: 'package',
+    duration: '2-3 hours',
+    description: 'Complete housewarming package with Griha Pravesh ceremony, Vastu consultation, and traditional rituals for new home blessings.'
+  },
+  {
+    id: 'spiritual-retreat-package',
+    name: 'Spiritual Retreat Package',
+    category: 'package',
+    duration: 'Full weekend',
+    description: 'Weekend spiritual retreat with meditation, yoga sessions, spiritual discourses, and personalized guidance for inner transformation.'
   }
 ]
 
@@ -463,7 +491,8 @@ export const categoryNames = {
   sanskar: 'Sanskars',
   paath: 'Paath/Recitations',
   consultation: 'Consultations',
-  wellness: 'Meditation & Yoga'
+  wellness: 'Meditation & Yoga',
+  package: 'Package Options'
 }
 
 export const testimonials = [

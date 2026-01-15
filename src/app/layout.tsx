@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ErrorBoundary } from "react-error-boundary"
 import { ThemeProvider } from 'next-themes'
 import { useRouter, usePathname } from 'next/navigation'
+import { useState } from 'react'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -25,15 +26,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Create a client for React Query
-  const queryClient = new QueryClient({
+  // Create QueryClient once and memoize it - CRITICAL for performance!
+  // Recreating on every render causes massive slowdowns
+  const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 5 * 60 * 1000, // 5 minutes
         retry: 1,
+        refetchOnWindowFocus: false, // Disable refetch on focus for mobile performance
       },
     },
-  })
+  }))
 
   const router = useRouter()
   const pathname = usePathname()
@@ -55,6 +58,14 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* DNS prefetch and preconnect for faster image loading */}
+        <link rel="dns-prefetch" href="https://supabase.co" />
+        <link rel="preconnect" href="https://supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://storage.googleapis.com" />
+        <link rel="preconnect" href="https://storage.googleapis.com" crossOrigin="anonymous" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <QueryClientProvider client={queryClient}>

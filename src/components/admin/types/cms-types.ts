@@ -9,6 +9,7 @@ export interface HeroContent {
   subtitle: string
   description: string
   backgroundImages: string[]
+  logoImage?: string
   profileImage?: string
   ctaText?: string
   ctaLink?: string
@@ -187,9 +188,35 @@ export interface CharityMissionFeature {
   icon?: string
 }
 
+export interface CharityImpactStory {
+  name: string
+  role: string
+  story: string
+  image?: string
+  location?: string
+}
+
+export interface CharityContributionOption {
+  title: string
+  description: string
+  icon: string
+  buttonText: string
+  buttonLink: string
+  features?: string[]
+}
+
 export interface CharityPageContent {
-  hero: HeroContent & { badge?: string }
-  statistics: StatisticItem[]
+  hero: HeroContent & {
+    badge?: string
+    statistics: StatisticItem[]
+    ctaButtons: CTAButton[]
+  }
+  impactSection: {
+    badge: string
+    title: string
+    description: string
+    statistics: StatisticItem[]
+  }
   featuredProjects: {
     badge: string
     title: string
@@ -197,16 +224,37 @@ export interface CharityPageContent {
     videoUrl?: string
     stats: StatisticItem[]
   }
-  serviceAreas: CharityServiceArea[]
-  missionStatement: {
+  serviceAreas: {
+    badge: string
     title: string
     description: string
-    features: CharityMissionFeature[]
+    areas: CharityServiceArea[]
+  }
+  impactStories: {
+    badge: string
+    title: string
+    description: string
+    stories: CharityImpactStory[]
+  }
+  missionVision: {
+    badge: string
+    missionTitle: string
+    missionDescription: string
+    visionTitle: string
+    visionDescription: string
+    coreValues: CharityMissionFeature[]
+  }
+  waysToContribute: {
+    badge: string
+    title: string
+    description: string
+    options: CharityContributionOption[]
   }
   ctaSection: {
     title: string
     description: string
     buttons: CTAButton[]
+    backgroundImage?: string
   }
 }
 

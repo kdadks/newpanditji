@@ -140,7 +140,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
         </div>
 
         <Tabs value={selectedCategory} className="mb-8" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')}>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto gap-2 bg-muted/50 p-2">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2">
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               All Services ({services.length})
             </TabsTrigger>
@@ -158,6 +158,9 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
             </TabsTrigger>
             <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Wellness ({services.filter(s => s.category === 'wellness').length})
+            </TabsTrigger>
+            <TabsTrigger value="package" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Packages ({services.filter(s => s.category === 'package').length})
             </TabsTrigger>
           </TabsList>
         </Tabs>

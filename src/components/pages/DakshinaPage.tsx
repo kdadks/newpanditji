@@ -34,14 +34,29 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
     <div className="w-full">
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
-        {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Background decoration with animated rolling images - Hidden on mobile for performance */}
+        <div className="absolute inset-0 overflow-hidden hidden md:block">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+              <img
+                key={`bg-1-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
             {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+              <img
+                key={`bg-2-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
           </div>
         </div>

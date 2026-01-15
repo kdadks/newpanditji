@@ -5,13 +5,113 @@ import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
 import { Badge } from '../ui/badge'
 import { EnvelopeSimple, Phone, WhatsappLogo, MapPin, Clock, Shield, Heart, Sparkle, CheckCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { categoryNames } from '../../lib/data'
 import { usePageSEO } from '../../hooks/usePageSEO'
 import { useContactContent } from '../../hooks/useCmsContent'
+
+const faqData = [
+  {
+    id: 'item-1',
+    question: 'How do I book a ceremony?',
+    answer: 'Simply contact us through the form above, WhatsApp, or email with your ceremony requirements. We\'ll discuss the details, date, and arrangements to ensure everything is perfect for your sacred occasion.'
+  },
+  {
+    id: 'item-2',
+    question: 'Do you provide the pooja materials (samagri)?',
+    answer: 'Yes, we can provide all necessary pooja materials and samagri for ceremonies. We can also guide you on what to arrange if you prefer to gather items yourself. This will be discussed during booking.'
+  },
+  {
+    id: 'item-3',
+    question: 'What is the dakshina/fee structure?',
+    answer: 'Dakshina varies based on the type and duration of ceremony. We believe in transparent and fair pricing. Please contact us to discuss specific ceremony costs. We work with families to ensure sacred services are accessible.'
+  },
+  {
+    id: 'item-4',
+    question: 'Can ceremonies be performed virtually?',
+    answer: 'Yes, we offer virtual ceremony options for families who cannot attend in person. While in-person is preferred for traditional rituals, we\'ve adapted to serve devotees worldwide through video consultations and guided virtual ceremonies.'
+  },
+  {
+    id: 'item-5',
+    question: 'How far in advance should I book?',
+    answer: 'For major ceremonies like weddings and large poojas, we recommend booking 2-4 weeks in advance. For smaller ceremonies and consultations, we can often accommodate requests within a few days. Contact us as early as possible for your preferred date.'
+  },
+  {
+    id: 'item-6',
+    question: 'Do you explain the rituals during ceremonies?',
+    answer: 'Absolutely! We believe understanding enhances the spiritual experience. Each step and mantra is explained in a way that helps participants connect with the deeper meaning of the ceremony.'
+  }
+]
+
+function FAQAccordion() {
+  const [expandedItem, setExpandedItem] = useState<string | null>(null)
+
+  const toggleItem = (itemId: string) => {
+    setExpandedItem(expandedItem === itemId ? null : itemId)
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Questions Column */}
+      <div className="space-y-4">
+        {faqData.map((faq, index) => (
+          <div
+            key={faq.id}
+            className={`p-6 rounded-lg cursor-pointer transition-all duration-300 ${
+              expandedItem === faq.id
+                ? 'bg-primary/10 border-2 border-primary shadow-lg'
+                : 'bg-white/50 border-2 border-transparent hover:bg-white/70 hover:border-primary/30'
+            }`}
+            onClick={() => toggleItem(faq.id)}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                expandedItem === faq.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
+              }`}>
+                <span className="font-semibold text-sm">{index + 1}</span>
+              </div>
+              <h3 className={`font-semibold text-lg transition-colors ${
+                expandedItem === faq.id ? 'text-primary' : 'text-foreground hover:text-primary'
+              }`}>
+                {faq.question}
+              </h3>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Answer Column */}
+      <div className="lg:sticky lg:top-8">
+        {expandedItem ? (
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 border-2 border-primary/20 shadow-lg min-h-[300px]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="text-primary" size={24} weight="fill" />
+              </div>
+              <h3 className="font-heading font-semibold text-xl text-primary">
+                Answer
+              </h3>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-lg">
+              {faqData.find(faq => faq.id === expandedItem)?.answer}
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-8 border-2 border-dashed border-primary/30 min-h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <Sparkle className="mx-auto mb-4 text-primary/50" size={48} weight="fill" />
+              <p className="text-muted-foreground text-lg">
+                Click on a question to see the answer here
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function ContactPage() {
   // CMS Content
@@ -109,34 +209,38 @@ export default function ContactPage() {
                 <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
                 WhatsApp Now
               </Button>
+              <Button
+                size="lg"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white hover:from-blue-800 hover:via-indigo-800 hover:to-blue-900 shadow-2xl hover:shadow-3xl shadow-blue-800/50 transition-all duration-300 hover:scale-105 border-2 border-blue-600/40"
+                onClick={() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <Sparkle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                FAQ
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Trust Indicators Section */}
-      <section className="py-8 bg-linear-to-b from-background to-muted/20">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <Clock size={28} className="text-primary shrink-0" weight="fill" />
+          {/* Trust Indicators */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Clock size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
-                <div className="font-bold text-primary text-lg">24/7 Response</div>
-                <div className="text-sm text-muted-foreground">Quick replies</div>
+                <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">24/7 Response</div>
+                <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Quick replies</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <Shield size={28} className="text-accent shrink-0" weight="fill" />
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Shield size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
-                <div className="font-bold text-primary text-lg">Confidential</div>
-                <div className="text-sm text-muted-foreground">Private & secure</div>
+                <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Confidential</div>
+                <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Private & secure</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <Sparkle size={28} className="text-primary shrink-0" weight="fill" />
+            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Sparkle size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
-                <div className="font-bold text-primary text-lg">Personalized</div>
-                <div className="text-sm text-muted-foreground">Tailored guidance</div>
+                <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Personalized</div>
+                <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Tailored guidance</div>
               </div>
             </div>
           </div>
@@ -332,7 +436,7 @@ export default function ContactPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="max-w-4xl mx-auto">
+        <div id="faq-section" className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Sparkle size={16} weight="fill" />
@@ -344,98 +448,7 @@ export default function ContactPage() {
 
           <Card className="border-0 shadow-xl bg-linear-to-br from-card to-card/80">
             <CardContent className="p-8">
-              <Accordion type="single" collapsible className="w-full space-y-4">
-                <AccordionItem value="item-1" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">1</span>
-                      </div>
-                      How do I book a ceremony?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    Simply contact us through the form above, WhatsApp, or email with your ceremony requirements.
-                    We'll discuss the details, date, and arrangements to ensure everything is perfect for your sacred occasion.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">2</span>
-                      </div>
-                      Do you provide the pooja materials (samagri)?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    Yes, we can provide all necessary pooja materials and samagri for ceremonies. We can also guide you
-                    on what to arrange if you prefer to gather items yourself. This will be discussed during booking.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">3</span>
-                      </div>
-                      What is the dakshina/fee structure?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    Dakshina varies based on the type and duration of ceremony. We believe in transparent and fair pricing.
-                    Please contact us to discuss specific ceremony costs. We work with families to ensure sacred services are accessible.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">4</span>
-                      </div>
-                      Can ceremonies be performed virtually?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    Yes, we offer virtual ceremony options for families who cannot attend in person. While in-person is preferred
-                    for traditional rituals, we've adapted to serve devotees worldwide through video consultations and guided virtual ceremonies.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-5" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">5</span>
-                      </div>
-                      How far in advance should I book?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    For major ceremonies like weddings and large poojas, we recommend booking 2-4 weeks in advance.
-                    For smaller ceremonies and consultations, we can often accommodate requests within a few days.
-                    Contact us as early as possible for your preferred date.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-6" className="border-0 bg-white/50 rounded-lg px-6">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary font-semibold text-sm">6</span>
-                      </div>
-                      Do you explain the rituals during ceremonies?
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pl-11 leading-relaxed">
-                    Absolutely! We believe understanding enhances the spiritual experience. Each step and mantra is explained
-                    in a way that helps participants connect with the deeper meaning of the ceremony.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              <FAQAccordion />
             </CardContent>
           </Card>
         </div>

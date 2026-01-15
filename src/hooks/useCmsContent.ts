@@ -559,14 +559,16 @@ function contactContentToSections(content: ContactPageContent): { sectionKey: st
  */
 function sectionsToCharityContent(sections: PageSectionRow[]): CharityPageContent {
   const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
-  
+
   const heroSection = getSection('hero') as Record<string, unknown>
-  const statsSection = getSection('statistics') as Record<string, unknown>
+  const impactSection = getSection('impact_section') as Record<string, unknown>
   const projectsSection = getSection('featured_projects') as Record<string, unknown>
   const areasSection = getSection('service_areas') as Record<string, unknown>
-  const missionSection = getSection('mission_statement') as Record<string, unknown>
+  const storiesSection = getSection('impact_stories') as Record<string, unknown>
+  const missionVisionSection = getSection('mission_vision') as Record<string, unknown>
+  const contributeSection = getSection('ways_to_contribute') as Record<string, unknown>
   const ctaSection = getSection('cta_section') as Record<string, unknown>
-  
+
   return {
     hero: {
       badge: (heroSection.badge as string) || defaultCharityContent.hero.badge,
@@ -574,8 +576,16 @@ function sectionsToCharityContent(sections: PageSectionRow[]): CharityPageConten
       subtitle: (heroSection.subtitle as string) || defaultCharityContent.hero.subtitle,
       description: (heroSection.description as string) || defaultCharityContent.hero.description,
       backgroundImages: (heroSection.backgroundImages as string[]) || defaultCharityContent.hero.backgroundImages,
+      logoImage: (heroSection.logoImage as string) || defaultCharityContent.hero.logoImage,
+      statistics: (heroSection.statistics as typeof defaultCharityContent.hero.statistics) || defaultCharityContent.hero.statistics,
+      ctaButtons: (heroSection.ctaButtons as typeof defaultCharityContent.hero.ctaButtons) || defaultCharityContent.hero.ctaButtons,
     },
-    statistics: (statsSection.statistics as typeof defaultCharityContent.statistics) || defaultCharityContent.statistics,
+    impactSection: {
+      badge: (impactSection.badge as string) || defaultCharityContent.impactSection.badge,
+      title: (impactSection.title as string) || defaultCharityContent.impactSection.title,
+      description: (impactSection.description as string) || defaultCharityContent.impactSection.description,
+      statistics: (impactSection.statistics as typeof defaultCharityContent.impactSection.statistics) || defaultCharityContent.impactSection.statistics,
+    },
     featuredProjects: {
       badge: (projectsSection.badge as string) || defaultCharityContent.featuredProjects.badge,
       title: (projectsSection.title as string) || defaultCharityContent.featuredProjects.title,
@@ -583,16 +593,37 @@ function sectionsToCharityContent(sections: PageSectionRow[]): CharityPageConten
       videoUrl: (projectsSection.videoUrl as string) || defaultCharityContent.featuredProjects.videoUrl,
       stats: (projectsSection.stats as typeof defaultCharityContent.featuredProjects.stats) || defaultCharityContent.featuredProjects.stats,
     },
-    serviceAreas: (areasSection.areas as typeof defaultCharityContent.serviceAreas) || defaultCharityContent.serviceAreas,
-    missionStatement: {
-      title: (missionSection.title as string) || defaultCharityContent.missionStatement.title,
-      description: (missionSection.description as string) || defaultCharityContent.missionStatement.description,
-      features: (missionSection.features as typeof defaultCharityContent.missionStatement.features) || defaultCharityContent.missionStatement.features,
+    serviceAreas: {
+      badge: (areasSection.badge as string) || defaultCharityContent.serviceAreas.badge,
+      title: (areasSection.title as string) || defaultCharityContent.serviceAreas.title,
+      description: (areasSection.description as string) || defaultCharityContent.serviceAreas.description,
+      areas: (areasSection.areas as typeof defaultCharityContent.serviceAreas.areas) || defaultCharityContent.serviceAreas.areas,
+    },
+    impactStories: {
+      badge: (storiesSection.badge as string) || defaultCharityContent.impactStories.badge,
+      title: (storiesSection.title as string) || defaultCharityContent.impactStories.title,
+      description: (storiesSection.description as string) || defaultCharityContent.impactStories.description,
+      stories: (storiesSection.stories as typeof defaultCharityContent.impactStories.stories) || defaultCharityContent.impactStories.stories,
+    },
+    missionVision: {
+      badge: (missionVisionSection.badge as string) || defaultCharityContent.missionVision.badge,
+      missionTitle: (missionVisionSection.missionTitle as string) || defaultCharityContent.missionVision.missionTitle,
+      missionDescription: (missionVisionSection.missionDescription as string) || defaultCharityContent.missionVision.missionDescription,
+      visionTitle: (missionVisionSection.visionTitle as string) || defaultCharityContent.missionVision.visionTitle,
+      visionDescription: (missionVisionSection.visionDescription as string) || defaultCharityContent.missionVision.visionDescription,
+      coreValues: (missionVisionSection.coreValues as typeof defaultCharityContent.missionVision.coreValues) || defaultCharityContent.missionVision.coreValues,
+    },
+    waysToContribute: {
+      badge: (contributeSection.badge as string) || defaultCharityContent.waysToContribute.badge,
+      title: (contributeSection.title as string) || defaultCharityContent.waysToContribute.title,
+      description: (contributeSection.description as string) || defaultCharityContent.waysToContribute.description,
+      options: (contributeSection.options as typeof defaultCharityContent.waysToContribute.options) || defaultCharityContent.waysToContribute.options,
     },
     ctaSection: {
       title: (ctaSection.title as string) || defaultCharityContent.ctaSection.title,
       description: (ctaSection.description as string) || defaultCharityContent.ctaSection.description,
       buttons: (ctaSection.buttons as typeof defaultCharityContent.ctaSection.buttons) || defaultCharityContent.ctaSection.buttons,
+      backgroundImage: (ctaSection.backgroundImage as string) || defaultCharityContent.ctaSection.backgroundImage,
     },
   }
 }
@@ -610,11 +641,19 @@ function charityContentToSections(content: CharityPageContent): { sectionKey: st
         subtitle: content.hero.subtitle,
         description: content.hero.description,
         backgroundImages: content.hero.backgroundImages,
+        logoImage: content.hero.logoImage,
+        statistics: content.hero.statistics,
+        ctaButtons: content.hero.ctaButtons,
       }
     },
     {
-      sectionKey: 'statistics',
-      content: { statistics: content.statistics }
+      sectionKey: 'impact_section',
+      content: {
+        badge: content.impactSection.badge,
+        title: content.impactSection.title,
+        description: content.impactSection.description,
+        statistics: content.impactSection.statistics,
+      }
     },
     {
       sectionKey: 'featured_projects',
@@ -628,14 +667,40 @@ function charityContentToSections(content: CharityPageContent): { sectionKey: st
     },
     {
       sectionKey: 'service_areas',
-      content: { areas: content.serviceAreas }
+      content: {
+        badge: content.serviceAreas.badge,
+        title: content.serviceAreas.title,
+        description: content.serviceAreas.description,
+        areas: content.serviceAreas.areas,
+      }
     },
     {
-      sectionKey: 'mission_statement',
+      sectionKey: 'impact_stories',
       content: {
-        title: content.missionStatement.title,
-        description: content.missionStatement.description,
-        features: content.missionStatement.features,
+        badge: content.impactStories.badge,
+        title: content.impactStories.title,
+        description: content.impactStories.description,
+        stories: content.impactStories.stories,
+      }
+    },
+    {
+      sectionKey: 'mission_vision',
+      content: {
+        badge: content.missionVision.badge,
+        missionTitle: content.missionVision.missionTitle,
+        missionDescription: content.missionVision.missionDescription,
+        visionTitle: content.missionVision.visionTitle,
+        visionDescription: content.missionVision.visionDescription,
+        coreValues: content.missionVision.coreValues,
+      }
+    },
+    {
+      sectionKey: 'ways_to_contribute',
+      content: {
+        badge: content.waysToContribute.badge,
+        title: content.waysToContribute.title,
+        description: content.waysToContribute.description,
+        options: content.waysToContribute.options,
       }
     },
     {
@@ -644,6 +709,7 @@ function charityContentToSections(content: CharityPageContent): { sectionKey: st
         title: content.ctaSection.title,
         description: content.ctaSection.description,
         buttons: content.ctaSection.buttons,
+        backgroundImage: content.ctaSection.backgroundImage,
       }
     }
   ]

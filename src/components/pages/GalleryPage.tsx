@@ -124,10 +124,25 @@ export default function GalleryPage() {
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
             {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+              <img
+                key={`bg-1-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
             {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+              <img
+                key={`bg-2-${index}`}
+                src={img}
+                alt=""
+                className="h-full w-auto object-contain opacity-40 shrink-0"
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
             ))}
           </div>
         </div>
@@ -351,6 +366,8 @@ export default function GalleryPage() {
                             src={thumbnailUrl} 
                             alt={video.title}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            loading="lazy"
+                            decoding="async"
                           />
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors duration-300">
                             <div className="bg-red-600 rounded-full p-4 shadow-xl transform group-hover:scale-110 transition-transform duration-300">
@@ -448,6 +465,7 @@ export default function GalleryPage() {
                             alt={photo.title}
                             className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
                             loading="lazy"
+                            decoding="async"
                           />
                         ))}
                         {/* Duplicate for seamless loop */}
@@ -458,6 +476,7 @@ export default function GalleryPage() {
                             alt={photo.title}
                             className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
                             loading="lazy"
+                            decoding="async"
                           />
                         ))}
                       </div>

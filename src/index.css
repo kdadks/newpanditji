@@ -267,3 +267,25 @@ h1, h2, h3, h4, h5, h6 {
 .animation-delay-2000 {
   animation-delay: 2s;
 }
+
+/* Disable heavy animations on mobile for performance */
+@media (max-width: 767px) {
+  .animate-scroll-left,
+  .animate-sunrise-glow,
+  .animate-sunrise-rays,
+  .animate-breathe,
+  .animate-pulse,
+  .animate-fade-in-up,
+  .animate-scroll-3d-left {
+    animation: none !important;
+  }
+  
+  /* Reduce motion for better mobile performance */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
