@@ -271,7 +271,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                 </div>
 
                 {/* Mobile Navigation */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 overflow-y-auto">
                   {navItems.map(item => {
                     if (item.submenu) {
                       return (

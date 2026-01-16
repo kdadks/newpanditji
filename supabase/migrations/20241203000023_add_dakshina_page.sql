@@ -82,22 +82,22 @@ BEGIN
           {
             "name": "Simple Pooja",
             "description": "Daily worship, Satyanarayan Katha, small ceremonies",
-            "suggested": "€50 - €100"
+            "price": "50-100"
           },
           {
             "name": "Standard Ceremonies",
             "description": "Housewarming, naming ceremony, thread ceremony",
-            "suggested": "€150 - €250"
+            "price": "150-250"
           },
           {
             "name": "Major Ceremonies",
             "description": "Wedding, engagement, anniversary celebrations",
-            "suggested": "€300 - €500+"
+            "price": "300-500"
           },
           {
             "name": "Special Rituals",
             "description": "Vastu Shanti, Griha Pravesh, extended ceremonies",
-            "suggested": "€200 - €400"
+            "price": "200-400"
           }
         ],
         "notes": [

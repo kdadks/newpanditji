@@ -29,6 +29,7 @@ interface BlogPageProps {
 export default function BlogPage({ }: BlogPageProps) {
   const router = useRouter()
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('All Articles')
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
@@ -74,6 +75,18 @@ export default function BlogPage({ }: BlogPageProps) {
 
   // Get unique categories (filter out undefined/null values)
   const categories = [...new Set(blogArticles.map(article => article.category).filter((c): c is string => Boolean(c)))]
+
+  // Create category counts
+  const categoryCounts = blogArticles.reduce((acc, article) => {
+    const category = article.category || 'Article'
+    acc[category] = (acc[category] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  // Filter articles based on selected category
+  const filteredArticles = selectedCategory === 'All Articles' 
+    ? blogArticles 
+    : blogArticles.filter(article => article.category === selectedCategory)
 
   return (
     <div className="w-full">
@@ -129,12 +142,29 @@ export default function BlogPage({ }: BlogPageProps) {
 
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
-          <Badge variant="secondary" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
-            All Articles
+          <Badge 
+            variant={selectedCategory === 'All Articles' ? 'default' : 'secondary'} 
+            className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
+              selectedCategory === 'All Articles' 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                : 'hover:bg-primary hover:text-primary-foreground'
+            }`}
+            onClick={() => setSelectedCategory('All Articles')}
+          >
+            All Articles ({blogArticles.length})
           </Badge>
           {categories.map((category, index) => (
-            <Badge key={category || `category-${index}`} variant="outline" className="px-4 py-2 text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
-              {category}
+            <Badge 
+              key={category || `category-${index}`} 
+              variant={selectedCategory === category ? 'default' : 'outline'} 
+              className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
+                selectedCategory === category 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'hover:bg-primary hover:text-primary-foreground'
+              }`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category} ({categoryCounts[category] || 0})
             </Badge>
           ))}
         </div>
@@ -147,7 +177,7 @@ export default function BlogPage({ }: BlogPageProps) {
         ) : (
         <>
         {/* Featured Article */}
-        {blogArticles.length > 0 && (
+        {filteredArticles.length > 0 && (
           <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="font-heading font-semibold text-2xl mb-2">Featured Article</h2>
@@ -160,7 +190,7 @@ export default function BlogPage({ }: BlogPageProps) {
                   <div className="p-8 lg:p-12 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-4">
                       <Badge className="bg-primary/20 text-primary border-primary/30">
-                        {'category' in blogArticles[0] ? blogArticles[0].category : 'Article'}
+                        {'category' in filteredArticles[0] ? filteredArticles[0].category : 'Article'}
                       </Badge>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar size={14} />
@@ -169,23 +199,23 @@ export default function BlogPage({ }: BlogPageProps) {
                     </div>
 
                     <h2 className="font-heading font-bold text-3xl lg:text-4xl mb-4 leading-tight">
-                      {blogArticles[0].title}
+                      {filteredArticles[0].title}
                     </h2>
 
                     <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                      {blogArticles[0].excerpt}
+                      {filteredArticles[0].excerpt}
                     </p>
 
                     <Button 
                       className="w-fit shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={() => {
-                        if (blogArticles[0].slug) {
-                          handleNavigate({ page: 'blog-detail', blogSlug: blogArticles[0].slug })
+                        if (filteredArticles[0].slug) {
+                          handleNavigate({ page: 'blog-detail', blogSlug: filteredArticles[0].slug })
                         }
                       }}
-                      disabled={!blogArticles[0].slug || navigatingTo === blogArticles[0].slug}
+                      disabled={!filteredArticles[0].slug || navigatingTo === filteredArticles[0].slug}
                     >
-                      {navigatingTo === blogArticles[0].slug ? (
+                      {navigatingTo === filteredArticles[0].slug ? (
                         <>
                           <CircleNotch className="mr-2 animate-spin" size={18} />
                           Loading...
@@ -201,10 +231,10 @@ export default function BlogPage({ }: BlogPageProps) {
                   </div>
 
                   <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12 min-h-[300px]">
-                    {blogArticles[0].featured_image_url ? (
+                    {filteredArticles[0].featured_image_url ? (
                       <img 
-                        src={blogArticles[0].featured_image_url} 
-                        alt={blogArticles[0].title}
+                        src={filteredArticles[0].featured_image_url} 
+                        alt={filteredArticles[0].title}
                         className="w-full h-full object-cover rounded-lg"
                         loading="lazy"
                         decoding="async"
@@ -224,7 +254,7 @@ export default function BlogPage({ }: BlogPageProps) {
 
         {/* Article Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {blogArticles.slice(1).map((article, index) => (
+          {filteredArticles.slice(1).map((article, index) => (
             <Card 
               key={article.id} 
               className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
@@ -304,30 +334,23 @@ export default function BlogPage({ }: BlogPageProps) {
           ))}
         </div>
 
-        {/* Newsletter/Coming Soon */}
-        <Card className="bg-linear-to-r from-primary/5 via-accent/5 to-secondary/5 border-0 shadow-xl">
-          <CardContent className="p-8 md:p-12 text-center">
-            <BookOpen className="mx-auto mb-6 text-primary" size={48} />
-
-            <h3 className="font-heading font-semibold text-2xl mb-4">More Wisdom Coming Soon</h3>
-
-            <p className="text-muted-foreground text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
-              We regularly publish new articles on Hindu spirituality, philosophy, and practical guidance
-              for modern living. Subscribe to stay updated with fresh insights and timeless wisdom.
+        {/* No articles found message */}
+        {filteredArticles.length === 0 && !isLoading && (
+          <div className="text-center py-12">
+            <BookOpen className="mx-auto mb-4 text-muted-foreground" size={48} />
+            <h3 className="font-heading font-semibold text-xl mb-2">No articles found</h3>
+            <p className="text-muted-foreground mb-4">
+              No articles found in the "{selectedCategory}" category.
             </p>
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedCategory('All Articles')}
+            >
+              View All Articles
+            </Button>
+          </div>
+        )}
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button variant="outline" className="px-6 py-2">
-                <Calendar className="mr-2" size={18} />
-                Notify Me of New Articles
-              </Button>
-              <span className="text-muted-foreground text-sm">or</span>
-              <Button variant="ghost" className="px-6 py-2 text-primary hover:text-primary/80">
-                Browse All Categories
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
         </>
         )}
         </div>

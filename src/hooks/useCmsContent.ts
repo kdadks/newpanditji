@@ -873,7 +873,13 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
       badge: (pricingSection.badge as string) || defaultDakshinaContent.pricingSection.badge,
       title: (pricingSection.title as string) || defaultDakshinaContent.pricingSection.title,
       description: (pricingSection.description as string) || defaultDakshinaContent.pricingSection.description,
-      services: (pricingSection.services as typeof defaultDakshinaContent.pricingSection.services) || defaultDakshinaContent.pricingSection.services,
+      services: ((pricingSection.services as any[]) || defaultDakshinaContent.pricingSection.services).map(service => ({
+        name: service.name || '',
+        description: service.description || '',
+        duration: service.duration || '',
+        price: service.price || service.suggested || '',
+        priceNote: service.priceNote || ''
+      })),
       notes: (pricingSection.notes as string[]) || defaultDakshinaContent.pricingSection.notes,
     },
     ctaSection: {

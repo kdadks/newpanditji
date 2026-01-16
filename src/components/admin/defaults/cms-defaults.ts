@@ -337,7 +337,7 @@ export const defaultCharityContent: CharityPageContent = {
     title: 'eYogi Gurukul',
     subtitle: 'Spreading Sanatan Dharma, One Heart at a Time',
     description: 'Founded by Rajesh Joshi ji, eYogi Gurukul is dedicated to preserving and propagating the timeless wisdom of Sanatan Dharma through education, service, and community development.',
-    logoImage: '/images/Logo/Raj ji.jpg',
+    logoImage: '/images/Logo/Raj ji.png',
     backgroundImages: [
       '/images/South Asian Temple Complex.png',
       '/images/Golden Temples of Devotion.png',
@@ -530,7 +530,7 @@ export const defaultCharityContent: CharityPageContent = {
 }
 
 export const defaultHeaderContent: HeaderContent = {
-  logoUrl: '/Raj ji.jpg',
+  logoUrl: '/images/Logo/Raj ji.png',
   siteName: 'Pandit Rajesh Joshi',
   tagline: 'Hindu Priest & Spiritual Guide',
   ctaText: 'Book Consultation',

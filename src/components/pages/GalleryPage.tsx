@@ -167,6 +167,26 @@ export default function GalleryPage() {
               Immerse yourself in the divine beauty of Hindu ceremonies, pooja rituals, and spiritual moments captured in sacred time
             </p>
 
+            {/* Stats - Compact inline version */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8">
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">200+</span>{' '}
+                <span className="font-semibold text-white/95">Ceremonies</span>
+              </span>
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">50+</span>{' '}
+                <span className="font-semibold text-white/95">Videos</span>
+              </span>
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">1000+</span>{' '}
+                <span className="font-semibold text-white/95">Photos</span>
+              </span>
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">15+</span>{' '}
+                <span className="font-semibold text-white/95">Years</span>
+              </span>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
                 size="lg"
@@ -189,37 +209,13 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-8 md:py-12 px-4 md:px-6 lg:px-8 bg-linear-to-b from-background to-muted/20">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-2">200+</div>
-              <div className="text-sm text-muted-foreground font-medium">Ceremonies</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-linear-to-r from-accent to-primary bg-clip-text text-transparent mb-2">50+</div>
-              <div className="text-sm text-muted-foreground font-medium">Videos</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-2">1000+</div>
-              <div className="text-sm text-muted-foreground font-medium">Photos</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-linear-to-r from-accent to-primary bg-clip-text text-transparent mb-2">15+</div>
-              <div className="text-sm text-muted-foreground font-medium">Years</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Main Gallery Content */}
-      <section className="py-16 md:py-20">
+      <section className="py-10 md:py-12">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Enhanced Tabs Section */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation with Enhanced Design */}
-            <div className="flex flex-col items-center mb-12">
+            <div className="flex flex-col items-center mb-7">
               <TabsList className="grid w-full max-w-lg grid-cols-2 h-14 p-1 bg-linear-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
                 <TabsTrigger
                   value="videos"
@@ -244,7 +240,7 @@ export default function GalleryPage() {
               </TabsList>
 
               {/* View Mode Toggle */}
-              <div className="flex items-center gap-2 mt-6 p-1 bg-white/60 backdrop-blur-sm border border-white/20 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2 mt-4 p-1 bg-white/60 backdrop-blur-sm border border-white/20 rounded-lg shadow-sm">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
@@ -266,28 +262,9 @@ export default function GalleryPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="p-2"
-              >
-                <SquaresFour size={16} />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="p-2"
-              >
-                <List size={16} />
-              </Button>
-            </div>
-
-          <TabsContent value="videos" className="space-y-8">
+          <TabsContent value="videos" className="space-y-5">
             {/* Video Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <div className="flex flex-wrap justify-center gap-3 mb-5">
               <Button
                 variant={selectedVideoCategory === 'all' ? 'default' : 'outline'}
                 size="sm"
@@ -341,11 +318,11 @@ export default function GalleryPage() {
 
             {/* Videos Grid */}
             {loadingVideos ? (
-              <div className="flex justify-center items-center py-12">
+              <div className="flex justify-center items-center py-7">
                 <CircleNotch className="animate-spin text-primary" size={48} />
               </div>
             ) : (
-            <div className={`grid gap-6 overflow-hidden ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            <div className={`grid gap-4 overflow-hidden ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredVideos.map((video, index) => {
                 const embedUrl = getYouTubeEmbedUrl(video.url)
                 const videoId = embedUrl ? embedUrl.split('/embed/')[1] : ''
@@ -385,7 +362,7 @@ export default function GalleryPage() {
                       </div>
                     </div>
 
-                    <div className="p-6">
+                    <div className="p-4">
                       <h3 className="font-heading font-semibold text-lg mb-2 group-hover:text-primary transition-colors duration-300">
                         {video.title}
                       </h3>
@@ -411,12 +388,12 @@ export default function GalleryPage() {
 
           <TabsContent value="photos">
             {loadingPhotos ? (
-              <div className="flex justify-center items-center py-12">
+              <div className="flex justify-center items-center py-7">
                 <CircleNotch className="animate-spin text-primary" size={48} />
               </div>
             ) : !photos || photos.length === 0 ? (
               <Card className="border-0 shadow-xl bg-linear-to-br from-muted/50 to-muted/20">
-                <CardContent className="p-12 md:p-16 text-center">
+                <CardContent className="p-7 md:p-10 text-center">
                   <div className="relative mb-8">
                     <Images className="mx-auto text-muted-foreground" size={80} />
                     <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full">
@@ -444,10 +421,10 @@ export default function GalleryPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-5">
                 {/* Rolling Photo Gallery */}
-                <div className="mb-8 overflow-hidden">
-                  <h2 className="font-heading font-bold text-2xl md:text-3xl mb-6 text-center">
+                <div className="mb-5 overflow-hidden">
+                  <h2 className="font-heading font-bold text-2xl md:text-3xl mb-4 text-center">
                     Moments of <span className="text-primary">Devotion & Service</span>
                   </h2>
                   <div className="relative w-full h-64 md:h-80 lg:h-96">

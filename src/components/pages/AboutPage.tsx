@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
@@ -18,6 +19,10 @@ export default function AboutPage({ }: AboutPageProps) {
   const handleNavigate = (page: AppPage) => {
     router.push(page === 'home' ? '/' : `/${page}`)
   }
+  
+  // Service carousel pause state on hover
+  const [isPaused, setIsPaused] = useState(false)
+  
   // CMS Content
   const { content: cmsContent } = useAboutContent()
 
@@ -88,11 +93,9 @@ export default function AboutPage({ }: AboutPageProps) {
               {/* Statistics - Compact inline version */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mb-6">
                 {cmsContent.statistics.map((stat, index) => (
-                  <span key={index}>
-                    {index > 0 && <span className="text-white/50 mr-6">•</span>}
-                    <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                      <span className="font-bold text-amber-400">{stat.value}</span> {stat.label}
-                    </span>
+                  <span key={index} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center lg:text-left" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                    <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                    <span className="font-semibold text-white/95">{stat.label}</span>
                   </span>
                 ))}
               </div>
@@ -241,25 +244,31 @@ export default function AboutPage({ }: AboutPageProps) {
           </div>
 
           {/* Rolling Gallery */}
-          <div className="relative w-full h-64 md:h-80">
-            <div className="absolute inset-0 flex gap-4">
-              <div className="flex gap-4 animate-scroll-left">
+          <div
+            className="relative w-full h-64 md:h-80 overflow-x-auto md:overflow-hidden scrollbar-hide"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setIsPaused(false)}
+          >
+            <div className={`absolute inset-0 flex gap-4 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
+              <div className="flex gap-4">
                 {cmsContent.photoGallery.images.map((image, index) => (
                   <img 
                     key={index}
                     src={image.src} 
                     alt={image.alt} 
-                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" 
+                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg shrink-0" 
                   />
                 ))}
               </div>
-              <div className="flex gap-4 animate-scroll-left" aria-hidden="true">
+              <div className="flex gap-4" aria-hidden="true">
                 {cmsContent.photoGallery.images.map((image, index) => (
                   <img 
                     key={`dup-${index}`}
                     src={image.src} 
                     alt="" 
-                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg" 
+                    className="h-64 md:h-80 w-auto object-cover rounded-lg shadow-lg shrink-0" 
                   />
                 ))}
               </div>
@@ -309,7 +318,7 @@ export default function AboutPage({ }: AboutPageProps) {
                 return (
                   <div 
                     key={index}
-                    className={`${getColorScheme()} p-6 rounded-lg border ${index === cmsContent.whatToExpect.features.length - 1 && cmsContent.whatToExpect.features.length % 2 !== 0 ? 'md:col-span-2' : ''}`}
+                    className={`${getColorScheme()} p-6 rounded-lg border text-left ${index === cmsContent.whatToExpect.features.length - 1 && cmsContent.whatToExpect.features.length % 2 !== 0 ? 'md:col-span-2' : ''}`}
                   >
                     <div className="flex gap-4">
                       <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">

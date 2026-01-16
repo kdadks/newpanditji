@@ -183,10 +183,16 @@ export default function HomePage({ }: HomePageProps) {
         </div>
 
         {/* Straight Line Carousel - No 3D transforms on container */}
-        <div className="relative z-20 overflow-hidden">
+        <div
+          className="relative z-20 overflow-x-auto md:overflow-hidden scrollbar-hide"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
           {/* Main carousel track */}
           <div
-            className="flex gap-6 md:gap-8 py-8 animate-scroll-left"
+            className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}
             style={{
               willChange: 'transform'
             }}

@@ -71,24 +71,29 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
           <img
             src={blog.featured_image_url}
             alt={blog.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
           
-          {/* Title overlay on image */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 lg:p-16">
+          {/* Navigation at top */}
+          <div className="absolute top-0 left-0 right-0 p-6 md:p-8">
             <div className="container mx-auto max-w-7xl">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onNavigate('blog')}
-                className="text-white/80 hover:text-white hover:bg-white/10 mb-6"
+                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 border border-orange-600/30 backdrop-blur-sm"
               >
                 <ArrowLeft size={18} className="mr-2" />
                 Back to Blog
               </Button>
-              
-              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur mb-4">
+            </div>
+          </div>
+          
+          {/* Title overlay on image */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 lg:p-16">
+            <div className="container mx-auto max-w-7xl">
+              <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm mb-4">
                 {categoryName}
               </Badge>
               
@@ -126,17 +131,19 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
         /* Header without image */
         <section className="bg-linear-to-br from-primary/5 via-background to-accent/5 py-12 md:py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate('blog')}
-              className="mb-6"
-            >
-              <ArrowLeft size={18} className="mr-2" />
-              Back to Blog
-            </Button>
+            <div className="flex justify-start mb-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onNavigate('blog')}
+                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 border border-orange-600/30 backdrop-blur-sm"
+              >
+                <ArrowLeft size={18} className="mr-2" />
+                Back to Blog
+              </Button>
+            </div>
             
-            <Badge className="bg-primary/20 text-primary border-primary/30 mb-4">
+            <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm mb-4">
               {categoryName}
             </Badge>
             
@@ -238,7 +245,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
                   <h3 className="font-heading font-semibold text-lg mb-4">About the Author</h3>
                   <div className="flex items-start gap-4">
                     <img 
-                      src="/Raj ji.jpg" 
+                      src="/images/Logo/Raj ji.png" 
                       alt="Pandit Rajesh Joshi"
                       className="w-16 h-16 rounded-full object-cover border-2 border-primary"
                     />

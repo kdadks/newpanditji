@@ -95,16 +95,17 @@ export default function BooksPage() {
 
             {/* Stats - Compact inline version */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">{books?.length || 0}</span> Books Published
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{books?.length || 0}</span>{' '}
+                <span className="font-semibold text-white/95">Books Published</span>
               </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">15K+</span> Years of Wisdom
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">15K+</span>{' '}
+                <span className="font-semibold text-white/95">Years of Wisdom</span>
               </span>
-              <span className="text-white/50">•</span>
-              <span className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                <span className="font-bold text-amber-400">Multiple</span> Topics Covered
+              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">Multiple</span>{' '}
+                <span className="font-semibold text-white/95">Topics Covered</span>
               </span>
             </div>
           </div>

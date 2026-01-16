@@ -83,7 +83,7 @@ export default function WhyChooseUsPage() {
                 'Globe': <Globe className="mx-auto mb-2 text-amber-400" size={32} />
               }
               return (
-                <div key={index} className="text-center p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+                <div key={index} className="text-center p-4 rounded-lg">
                   {iconMap[benefit.icon] || <Sparkle className="mx-auto mb-2 text-amber-400" size={32} weight="fill" />}
                   <p className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{benefit.label}</p>
                 </div>

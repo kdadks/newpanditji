@@ -172,7 +172,7 @@ export function generateOrganizationSchema() {
     '@type': 'Organization',
     name: 'Pandit Rajesh Joshi - Hindu Religious Services',
     url: 'https://panditrajesh.com',
-    logo: 'https://panditrajesh.com/Raj ji.jpg',
+    logo: 'https://panditrajesh.com/images/Logo/Raj ji.png',
     description: 'Professional Hindu pooja services, rituals, and spiritual guidance. 15+ years experience serving communities worldwide.',
     foundingDate: '2009',
     contactPoint: {
@@ -232,7 +232,7 @@ export function generateLocalBusinessSchema() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'Pandit Rajesh Joshi',
-    image: 'https://panditrajesh.com/Raj ji.jpg',
+    image: 'https://panditrajesh.com/images/Logo/Raj ji.png',
     description: 'Hindu priest providing authentic poojas, ceremonies, and spiritual guidance',
     url: 'https://panditrajesh.com',
     telephone: '+353-XXXX-XXXX',

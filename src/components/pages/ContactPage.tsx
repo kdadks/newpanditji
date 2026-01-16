@@ -217,21 +217,21 @@ export default function ContactPage() {
 
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6">
               <Clock size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">24/7 Response</div>
                 <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Quick replies</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6">
               <Shield size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Confidential</div>
                 <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Private & secure</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-center gap-3 p-6">
               <Sparkle size={28} className="text-amber-400 shrink-0" weight="fill" />
               <div className="text-left">
                 <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Personalized</div>
@@ -250,7 +250,7 @@ export default function ContactPage() {
             {/* Enhanced Contact Form */}
             <div id="contact-form" className="order-2 lg:order-1">
               <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm hover:shadow-3xl transition-all duration-500">
-                <CardContent className="p-8 md:p-10">
+                <CardContent className="p-4 md:p-5">
                   <div className="flex items-center gap-4 mb-8">
                   <div className="p-3 bg-linear-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
                       <EnvelopeSimple className="text-white" size={28} weight="fill" />
