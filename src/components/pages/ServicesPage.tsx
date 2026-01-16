@@ -86,13 +86,13 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <FlowerLotus size={18} weight="fill" className="animate-pulse" />
               Sacred Services & Ceremonies
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Our <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Services</span>
+              Our <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Services</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
@@ -103,7 +103,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
               <Button
                 size="lg"
                 onClick={() => onNavigate?.('why-choose-us')}
-                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
               >
                 <Sparkle className="mr-3 group-hover:scale-110 transition-transform" size={20} weight="fill" />
                 Why Choose Us
@@ -183,12 +183,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           {!isLoading && filteredServices.map((service, index) => (
             <Card
               key={service.id}
-              className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 bg-gradient-to-br from-white via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-amber-950/30 flex flex-col"
+              className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 bg-linear-to-br from-white via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-amber-950/30 flex flex-col"
               onClick={() => handleServiceClick(service)}
             >
               {/* Image Section */}
-              <div className="relative h-64 overflow-hidden bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 flex-shrink-0">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+              <div className="relative h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 flex-shrink-0">
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent z-10"></div>
                 <img 
                   src={`/images/Pooja ${(index % 3) + 1}.jpg`}
                   alt={service.name}
@@ -200,7 +200,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 />
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4 z-20">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
                     <FlowerLotus size={14} weight="fill" />
                     {categoryNames[service.category]}
                   </span>
@@ -221,7 +221,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
               {/* Content Section */}
               <CardContent className="p-6 relative flex flex-col flex-grow">
                 {/* Decorative corner */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-amber-100/50 to-transparent dark:from-amber-900/20 rounded-bl-full"></div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-br from-amber-100/50 to-transparent dark:from-amber-900/20 rounded-bl-full"></div>
                 
                 <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors duration-300 leading-tight">
                   {service.name}
@@ -235,7 +235,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 {/* Action Button */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-2 bg-linear-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
                       <FlowerLotus className="text-amber-700 dark:text-amber-400" size={18} weight="fill" />
                     </div>
                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Sacred Ritual</span>
@@ -249,7 +249,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
               {/* Hover Glow Effect */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-t from-amber-500/10 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-amber-500/10 via-transparent to-transparent"></div>
               </div>
             </Card>
           ))}

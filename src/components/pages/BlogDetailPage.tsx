@@ -57,7 +57,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
             alt={blog.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
           
           {/* Title overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 lg:p-16">
@@ -108,7 +108,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
         </section>
       ) : (
         /* Header without image */
-        <section className="bg-gradient-to-br from-primary/5 via-background to-accent/5 py-12 md:py-16">
+        <section className="bg-linear-to-br from-primary/5 via-background to-accent/5 py-12 md:py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
             <Button
               variant="ghost"

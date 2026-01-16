@@ -14,9 +14,10 @@ export interface BlogPostWithCategory extends BlogPostRow {
 
 /**
  * Fetch all blog posts from Supabase with category names
+ * @param includeAll - If true, fetch all blogs regardless of status (for admin). If false, only published blogs.
  */
-async function fetchBlogs(): Promise<BlogPostWithCategory[]> {
-  const { data, error } = await supabase
+async function fetchBlogs(includeAll: boolean = false): Promise<BlogPostWithCategory[]> {
+  let query = supabase
     .from('blog_posts')
     .select(`
       *,
@@ -24,8 +25,13 @@ async function fetchBlogs(): Promise<BlogPostWithCategory[]> {
         name
       )
     `)
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
+
+  // Only filter by published status if not fetching all
+  if (!includeAll) {
+    query = query.eq('status', 'published')
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) {
     console.error('Error fetching blogs:', error)
@@ -94,14 +100,15 @@ async function deleteBlog(id: string): Promise<void> {
 
 /**
  * React hook for blog posts CRUD operations
+ * @param includeAll - If true, fetch all blogs (including drafts) - for admin use
  */
-export function useBlogs() {
+export function useBlogs(includeAll: boolean = false) {
   const queryClient = useQueryClient()
 
   // Query for fetching blogs
   const query = useQuery({
-    queryKey: BLOGS_KEY,
-    queryFn: fetchBlogs,
+    queryKey: [...BLOGS_KEY, includeAll ? 'all' : 'published'],
+    queryFn: () => fetchBlogs(includeAll),
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   })
 

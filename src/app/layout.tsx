@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ErrorBoundary } from "react-error-boundary"
 import { ThemeProvider } from 'next-themes'
 import { useRouter, usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -26,6 +26,30 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Handle auth errors globally
+  useEffect(() => {
+    // Listen for unhandled promise rejections (like auth errors)
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      const error = event.reason
+      // Check if it's a Supabase auth error
+      if (error?.message?.includes('Refresh Token') || error?.name === 'AuthApiError') {
+        console.warn('Clearing invalid auth session')
+        // Clear the invalid session data
+        if (typeof window !== 'undefined') {
+          const keysToRemove = Object.keys(localStorage).filter(key => 
+            key.startsWith('sb-') || key.includes('supabase')
+          )
+          keysToRemove.forEach(key => localStorage.removeItem(key))
+        }
+        // Prevent the error from showing in console
+        event.preventDefault()
+      }
+    }
+
+    window.addEventListener('unhandledrejection', handleRejection)
+    return () => window.removeEventListener('unhandledrejection', handleRejection)
+  }, [])
+
   // Create QueryClient once and memoize it - CRITICAL for performance!
   // Recreating on every render causes massive slowdowns
   const [queryClient] = useState(() => new QueryClient({
@@ -59,12 +83,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>Pandit Shivkumar Sharma - Vedic Astrologer & Spiritual Guide</title>
+        <meta name="description" content="Experience authentic Vedic rituals, astrology consultations, and spiritual guidance with Pandit Shivkumar Sharma. Book pujas, havans, and personalized horoscope readings." />
+        <meta name="keywords" content="vedic astrology, pandit, puja services, horoscope, spiritual guidance, hindu rituals" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.svg" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
         {/* DNS prefetch and preconnect for faster image loading */}
         <link rel="dns-prefetch" href="https://supabase.co" />
         <link rel="preconnect" href="https://supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://storage.googleapis.com" />
         <link rel="preconnect" href="https://storage.googleapis.com" crossOrigin="anonymous" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <ErrorBoundary FallbackComponent={ErrorFallback}>

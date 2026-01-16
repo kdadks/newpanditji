@@ -30,7 +30,7 @@ export function renderHighlightedTitle(text: string): React.ReactElement {
           return (
             <span
               key={index}
-              className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent"
+              className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent"
             >
               {highlightMatch[1]}
             </span>

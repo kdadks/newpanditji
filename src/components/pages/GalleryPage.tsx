@@ -159,13 +159,13 @@ export default function GalleryPage() {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           {/* Hero Content */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <Images size={18} weight="fill" className="animate-pulse" />
               Divine Moments
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Sacred <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Gallery</span>
+              Sacred <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Gallery</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
@@ -176,7 +176,7 @@ export default function GalleryPage() {
               <Button
                 size="lg"
                 onClick={() => setActiveTab('videos')}
-                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 text-white hover:from-slate-800 hover:via-slate-900 hover:to-black shadow-2xl hover:shadow-3xl shadow-slate-900/50 transition-all duration-300 hover:scale-105 border-2 border-slate-600/40"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 text-white hover:from-slate-800 hover:via-slate-900 hover:to-black shadow-2xl hover:shadow-3xl shadow-slate-900/50 transition-all duration-300 hover:scale-105 border-2 border-slate-600/40"
               >
                 <PlayCircle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
                 Watch Sacred Videos
@@ -184,7 +184,7 @@ export default function GalleryPage() {
               <Button
                 size="lg"
                 onClick={() => setActiveTab('photos')}
-                className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 shadow-2xl hover:shadow-3xl shadow-orange-800/50 transition-all duration-300 hover:scale-105 border-2 border-orange-600/40"
+                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 shadow-2xl hover:shadow-3xl shadow-orange-800/50 transition-all duration-300 hover:scale-105 border-2 border-orange-600/40"
               >
                 <Images size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
                 View Divine Photos
@@ -195,23 +195,23 @@ export default function GalleryPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-8 md:py-12 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/20">
+      <section className="py-8 md:py-12 px-4 md:px-6 lg:px-8 bg-linear-to-b from-background to-muted/20">
         <div className="container mx-auto max-w-7xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">200+</div>
+            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-2">200+</div>
               <div className="text-sm text-muted-foreground font-medium">Ceremonies</div>
             </div>
-            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">50+</div>
+            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-linear-to-r from-accent to-primary bg-clip-text text-transparent mb-2">50+</div>
               <div className="text-sm text-muted-foreground font-medium">Videos</div>
             </div>
-            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">1000+</div>
+            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/5 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-2">1000+</div>
               <div className="text-sm text-muted-foreground font-medium">Photos</div>
             </div>
-            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">15+</div>
+            <div className="text-center p-6 rounded-2xl bg-linear-to-br from-accent/10 to-primary/5 backdrop-blur-sm border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold bg-linear-to-r from-accent to-primary bg-clip-text text-transparent mb-2">15+</div>
               <div className="text-sm text-muted-foreground font-medium">Years</div>
             </div>
           </div>
@@ -225,10 +225,10 @@ export default function GalleryPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation with Enhanced Design */}
             <div className="flex flex-col items-center mb-12">
-              <TabsList className="grid w-full max-w-lg grid-cols-2 h-14 p-1 bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
+              <TabsList className="grid w-full max-w-lg grid-cols-2 h-14 p-1 bg-linear-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
                 <TabsTrigger
                   value="videos"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
                 >
                   <PlayCircle size={20} weight="fill" />
                   Sacred Videos
@@ -238,7 +238,7 @@ export default function GalleryPage() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="photos"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent data-[state=active]:to-accent/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-accent data-[state=active]:to-accent/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
                 >
                   <Images size={20} weight="fill" />
                   Divine Photos

@@ -34,7 +34,7 @@ interface BlogFormData {
 }
 
 export default function AdminBlogs() {
-  const { blogs, isLoading, createBlog, updateBlog, deleteBlog, isCreating, isUpdating, isDeleting } = useBlogs()
+  const { blogs, isLoading, createBlog, updateBlog, deleteBlog, isCreating, isUpdating, isDeleting } = useBlogs(true) // Pass true to fetch all blogs including drafts
   const { photos } = usePhotos()
   const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)

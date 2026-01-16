@@ -103,7 +103,7 @@ function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { 
   if (disableAnimation) {
     return (
       <div className="text-center">
-        <div className="text-5xl md:text-6xl font-black bg-gradient-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
+        <div className="text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
           {value}
         </div>
         <div className="text-lg md:text-xl font-semibold text-foreground mb-1">{label}</div>
@@ -121,7 +121,7 @@ function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { 
       className="text-center"
     >
       <motion.div
-        className="text-5xl md:text-6xl font-black bg-gradient-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2"
+        className="text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -230,7 +230,7 @@ export default function CharityPage() {
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-8 max-w-2xl mx-auto lg:mx-0">
                 {cmsContent.hero.statistics.map((stat, index) => (
                   <span key={index} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap text-center lg:text-left">
-                    <span className="font-extrabold text-transparent bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                    <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
                     <span className="font-semibold text-white/95">{stat.label}</span>
                   </span>
                 ))}
@@ -245,8 +245,8 @@ export default function CharityPage() {
                     onClick={() => window.location.href = button.link}
                     className={`text-base px-8 py-3 transition-all duration-300 hover:scale-105 font-semibold shadow-2xl ${
                       button.variant === 'primary'
-                        ? 'bg-gradient-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50 hover:shadow-3xl border-2 border-amber-700/30'
-                        : 'bg-gradient-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-stone-900/50 hover:shadow-3xl border-2 border-stone-600/30'
+                        ? 'bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50 hover:shadow-3xl border-2 border-amber-700/30'
+                        : 'bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-stone-900/50 hover:shadow-3xl border-2 border-stone-600/30'
                     }`}
                   >
                     {button.text}
@@ -263,7 +263,7 @@ export default function CharityPage() {
 
 
         {/* Featured Projects */}
-        <section className="mb-10 md:mb-16 bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-12">
+        <section className="mb-10 md:mb-16 bg-linear-to-b from-primary/5 to-transparent py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-7xl">
             {disableAnimations ? (
               <div className="text-center mb-12">
@@ -312,7 +312,7 @@ export default function CharityPage() {
             {/* Featured Video Card - Compact Design */}
             {disableAnimations ? (
               <div className="max-w-5xl mx-auto mb-16">
-                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden group">
+                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card via-card to-primary/5 overflow-hidden group">
                   <CardContent className="p-6 md:p-8">
                     {/* Video Container - Reduced Size */}
                     {cmsContent.featuredProjects.videoUrl ? (
@@ -331,7 +331,7 @@ export default function CharityPage() {
                         <div className="absolute inset-0 border-4 border-primary/20 rounded-xl pointer-events-none group-hover:border-primary/40 transition-colors duration-300"></div>
                       </div>
                     ) : (
-                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
+                      <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
                         <Book className="text-primary/60" size={80} />
                       </div>
                     )}
@@ -346,7 +346,7 @@ export default function CharityPage() {
                 variants={scaleIn}
                 className="max-w-5xl mx-auto mb-16"
               >
-                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card via-card to-primary/5 overflow-hidden group">
+                <Card className="border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card via-card to-primary/5 overflow-hidden group">
                   <CardContent className="p-6 md:p-8">
                     {/* Video Container - Reduced Size */}
                     {cmsContent.featuredProjects.videoUrl ? (
@@ -364,7 +364,7 @@ export default function CharityPage() {
                         <div className="absolute inset-0 border-4 border-primary/20 rounded-xl pointer-events-none group-hover:border-primary/40 transition-colors duration-300"></div>
                       </div>
                     ) : (
-                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
+                      <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-xl">
                         <Book className="text-primary/60" size={80} />
                       </div>
                     )}
@@ -388,7 +388,7 @@ export default function CharityPage() {
                     viewport={{ once: true, margin: '-100px' }}
                     variants={fadeInUp}
                   >
-                    <Card className="border-2 border-primary/10 shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-primary/5 overflow-hidden group h-full flex flex-col">
+                    <Card className="border-2 border-primary/10 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-primary/5 overflow-hidden group h-full flex flex-col">
                       <CardContent className="p-0 flex flex-col h-full">
                         {/* Video Section - Top */}
                         {project.video_url ? (
@@ -405,14 +405,14 @@ export default function CharityPage() {
                             {/* Category Badge Overlay */}
                             {project.category && (
                               <div className="absolute top-4 left-4">
-                                <Badge className="bg-gradient-to-r from-primary/95 to-accent/95 text-white border-0 shadow-lg px-3 py-1.5 backdrop-blur-sm">
+                                <Badge className="bg-linear-to-r from-primary/95 to-accent/95 text-white border-0 shadow-lg px-3 py-1.5 backdrop-blur-sm">
                                   {project.category}
                                 </Badge>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative">
+                          <div className="aspect-video bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center relative">
                             <Book className="text-primary/40" size={80} />
                             {project.category && (
                               <div className="absolute top-4 left-4">
@@ -428,7 +428,7 @@ export default function CharityPage() {
                         <div className="p-6 flex flex-col flex-1">
                           {/* Icon & Title */}
                           <div className="flex items-start gap-3 mb-4">
-                            <div className="mt-1 p-2.5 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
+                            <div className="mt-1 p-2.5 bg-linear-to-br from-primary/20 to-accent/20 rounded-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
                               <Book className="text-primary" size={20} weight="fill" />
                             </div>
                             <h3 className="font-heading font-bold text-xl lg:text-2xl leading-tight group-hover:text-primary transition-colors duration-300">
@@ -505,9 +505,9 @@ export default function CharityPage() {
                 viewport={{ once: true, margin: '-100px' }}
                 variants={fadeInUp}
               >
-                <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/5 to-accent/5 h-full">
+                <Card className="border-0 shadow-xl bg-linear-to-br from-primary/5 to-accent/5 h-full">
                   <CardContent className="p-2 md:p-3">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl mb-4">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4">
                       <Target className="text-primary" size={24} weight="fill" />
                     </div>
                     <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
@@ -527,9 +527,9 @@ export default function CharityPage() {
                 viewport={{ once: true, margin: '-100px' }}
                 variants={fadeInUp}
               >
-                <Card className="border-0 shadow-xl bg-gradient-to-br from-accent/5 to-primary/5 h-full">
+                <Card className="border-0 shadow-xl bg-linear-to-br from-accent/5 to-primary/5 h-full">
                   <CardContent className="p-2 md:p-3">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-accent/20 to-primary/20 rounded-2xl mb-4">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-linear-to-br from-accent/20 to-primary/20 rounded-2xl mb-4">
                       <Sparkle className="text-primary" size={24} weight="fill" />
                     </div>
                     <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
@@ -553,9 +553,9 @@ export default function CharityPage() {
             >
               {cmsContent.missionVision.coreValues.map((value, index) => (
                 <motion.div key={index} variants={fadeInUp}>
-                  <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-primary/5 h-full text-center group hover:-translate-y-1">
+                  <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-card to-primary/5 h-full text-center group hover:-translate-y-1">
                     <CardContent className="p-2">
-                      <div className="mb-3 inline-block p-2 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <div className="mb-3 inline-block p-2 bg-linear-to-br from-primary/10 to-accent/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
                         {getIconComponent(value.icon, 24, 'text-primary')}
                       </div>
                       <h4 className="font-heading font-bold text-lg mb-2">{value.title}</h4>
@@ -584,7 +584,7 @@ export default function CharityPage() {
                 loading="lazy"
                 decoding="async"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-accent/80 to-primary/90"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-primary/90 via-accent/80 to-primary/90"></div>
             </div>
           )}
 
