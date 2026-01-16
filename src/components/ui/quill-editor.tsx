@@ -72,9 +72,9 @@ export function QuillEditor({
   )
 
   return (
-    <div className={cn('border rounded-lg overflow-hidden bg-background', className)}>
-      {/* Toolbar */}
-      <div className="flex flex-wrap gap-1 p-2 bg-muted/30 border-b">
+    <div className={cn('border rounded-lg bg-background', className)}>
+      {/* Toolbar - Sticky to parent scrolling container */}
+      <div className="sticky top-0 z-10 flex flex-wrap gap-1 p-2 bg-background border-b shadow-md">
         <MenuButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           isActive={editor.isActive('heading', { level: 2 })}
@@ -146,7 +146,7 @@ export function QuillEditor({
         </MenuButton>
       </div>
 
-      {/* Editor */}
+      {/* Editor - Content area (parent handles scrolling) */}
       <div
         className="p-4"
         style={{ minHeight }}
