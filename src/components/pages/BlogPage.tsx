@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBlogs } from '../../hooks/useBlogs'
@@ -27,16 +28,20 @@ interface BlogPageProps {
 
 export default function BlogPage({ }: BlogPageProps) {
   const router = useRouter()
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null)
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
+      setNavigatingTo(pageOrData)
       router.push(pageOrData === 'home' ? '/' : `/${pageOrData}`)
     } else {
       // Handle AppNavigationData object
       const { page, blogSlug } = pageOrData
       if (page === 'blog-detail' && blogSlug) {
+        setNavigatingTo(blogSlug)
         router.push(`/blog/${blogSlug}`)
       } else {
+        setNavigatingTo(page)
         router.push(page === 'home' ? '/' : `/${page}`)
       }
     }
@@ -178,11 +183,20 @@ export default function BlogPage({ }: BlogPageProps) {
                           handleNavigate({ page: 'blog-detail', blogSlug: blogArticles[0].slug })
                         }
                       }}
-                      disabled={!blogArticles[0].slug}
+                      disabled={!blogArticles[0].slug || navigatingTo === blogArticles[0].slug}
                     >
-                      <BookOpen className="mr-2" size={18} />
-                      Read Full Article
-                      <CaretRight className="ml-2" size={16} />
+                      {navigatingTo === blogArticles[0].slug ? (
+                        <>
+                          <CircleNotch className="mr-2 animate-spin" size={18} />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="mr-2" size={18} />
+                          Read Full Article
+                          <CaretRight className="ml-2" size={16} />
+                        </>
+                      )}
                     </Button>
                   </div>
 
@@ -273,8 +287,16 @@ export default function BlogPage({ }: BlogPageProps) {
                         handleNavigate({ page: 'blog-detail', blogSlug: article.slug })
                       }
                     }}
+                    disabled={navigatingTo === article.slug}
                   >
-                    Read More →
+                    {navigatingTo === article.slug ? (
+                      <>
+                        <CircleNotch className="mr-1 animate-spin" size={14} />
+                        Loading...
+                      </>
+                    ) : (
+                      'Read More →'
+                    )}
                   </Button>
                 </div>
               </CardContent>
