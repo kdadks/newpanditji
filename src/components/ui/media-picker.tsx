@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './dialog'
 import { Button } from './button'
 import { Input } from './input'
 import { Label } from './label'
@@ -132,6 +132,9 @@ export function MediaPicker({
             <ImageIcon size={24} className="text-primary" />
             {title}
           </DialogTitle>
+          <DialogDescription>
+            Choose an image from your media library or upload a new one
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'library' | 'upload')} className="flex-1 flex flex-col min-h-0">

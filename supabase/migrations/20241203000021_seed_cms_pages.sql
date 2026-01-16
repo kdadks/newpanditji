@@ -578,7 +578,8 @@ BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = '';
 
 DROP TRIGGER IF EXISTS update_page_sections_timestamp ON page_sections;
 CREATE TRIGGER update_page_sections_timestamp

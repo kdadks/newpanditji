@@ -541,60 +541,6 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           </div>
         </CardContent>
       </Card>
-
-      {/* Section 5: SEO Metadata */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">5. SEO Metadata</CardTitle>
-          <CardDescription>Search engine optimization settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Meta Title</Label>
-            <Input
-              value={content.pageMetadata?.metaTitle || ''}
-              onChange={(e) => setContent(prev => ({ ...prev, pageMetadata: { ...prev.pageMetadata, metaTitle: e.target.value } }))}
-              placeholder="Dakshina | Service Pricing & Sacred Offerings"
-            />
-            <p className="text-xs text-muted-foreground">Recommended: 50-60 characters</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Meta Description</Label>
-            <Textarea
-              value={content.pageMetadata?.metaDescription || ''}
-              onChange={(e) => setContent(prev => ({ ...prev, pageMetadata: { ...prev.pageMetadata, metaDescription: e.target.value } }))}
-              placeholder="Brief description for search engines"
-              rows={3}
-            />
-            <p className="text-xs text-muted-foreground">Recommended: 150-160 characters</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Meta Keywords (comma-separated)</Label>
-            <Input
-              value={content.pageMetadata?.metaKeywords?.join(', ') || ''}
-              onChange={(e) => setContent(prev => ({
-                ...prev,
-                pageMetadata: {
-                  ...prev.pageMetadata,
-                  metaKeywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean)
-                }
-              }))}
-              placeholder="dakshina, pricing, services"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Canonical URL</Label>
-            <Input
-              value={content.pageMetadata?.canonicalUrl || ''}
-              onChange={(e) => setContent(prev => ({ ...prev, pageMetadata: { ...prev.pageMetadata, canonicalUrl: e.target.value } }))}
-              placeholder="https://panditrajesh.com/dakshina"
-            />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

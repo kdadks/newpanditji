@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useVideos, type Video } from '../../hooks/useVideos'
 import { usePhotos } from '../../hooks/usePhotos'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
@@ -56,12 +56,7 @@ const defaultPhotos: Photo[] = [
 ]
 
 export default function GalleryPage() {
-  usePageSEO({
-    title: 'Hindu Ceremony Photos & Pooja Videos | Religious Rituals Gallery Ireland',
-    description: 'View gallery of Hindu ceremonies, pooja rituals, and spiritual services. Photos and videos of authentic Hindu traditions performed in Ireland and UK.',
-    keywords: 'Hindu ceremonies photos, pooja videos, ritual gallery, Hindu services, spiritual events, religious ceremonies Ireland',
-    canonicalUrl: 'https://panditrajesh.ie/gallery'
-  })
+  usePageMetadata('gallery')
 
   const { videos: dbVideos, isLoading: loadingVideos } = useVideos()
   const { photos: dbPhotos, isLoading: loadingPhotos } = usePhotos()

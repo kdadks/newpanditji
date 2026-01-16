@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { BookOpen, BookBookmark, FlowerLotus, Atom, GraduationCap, Lightbulb, Sparkle, Heart, Calendar, Users, CircleNotch, AmazonLogo } from '@phosphor-icons/react'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBooksPageContent } from '../../hooks/useCmsContent'
 import { usePublishedBooks } from '../../hooks/useBooks'
 import type { BookRow } from '../../lib/supabase'
@@ -20,12 +20,7 @@ export default function BooksPage() {
   const { data: books, isLoading } = usePublishedBooks()
 
   // SEO Configuration
-  usePageSEO({
-    title: 'Books by Rajesh Joshi Ji | Hindu Philosophy, Yoga, Meditation & Spirituality',
-    description: 'Explore enlightening books by Rajesh Joshi Ji on Hinduism, Yoga, Meditation, Diwali, Navaratri, and spiritual practices. Learn about ancient wisdom, science-based spirituality, and practical guides for modern life.',
-    keywords: 'Hindu books, Yoga guide, Meditation books, Hinduism and Science, Diwali book, Navaratri guide, Bhagavad Gita, Vedanta, spiritual books, Rajesh Joshi books',
-    canonicalUrl: 'https://panditrajesh.com/books'
-  })
+  usePageMetadata('books')
 
   // Icon mapping - matches database category to icon
   const getCategoryIcon = (category: string) => {
@@ -291,11 +286,9 @@ export default function BooksPage() {
                     <DialogTitle className="font-heading text-2xl md:text-3xl mb-2">
                       {selectedBook.title}
                     </DialogTitle>
-                    {selectedBook.subtitle && (
-                      <p className="text-muted-foreground text-sm">
-                        {selectedBook.subtitle}
-                      </p>
-                    )}
+                    <DialogDescription className="text-muted-foreground text-sm">
+                      {selectedBook.subtitle || 'Detailed information about this book'}
+                    </DialogDescription>
                   </div>
                 </div>
               </DialogHeader>

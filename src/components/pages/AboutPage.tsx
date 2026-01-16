@@ -5,7 +5,7 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil, Briefcase, HandHeart, Lightbulb, MedalMilitary, BookOpen, Atom, ArrowRight, ChatCircleDots } from '@phosphor-icons/react'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useAboutContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
 
@@ -22,12 +22,7 @@ export default function AboutPage({ }: AboutPageProps) {
   const { content: cmsContent } = useAboutContent()
 
   // SEO Configuration
-  usePageSEO({
-    title: 'About Rajesh Joshi "eYogi Raj" | Industrialist, Scholar, Pandit & Author',
-    description: 'Rajesh Joshi "eYogi Raj" - Indian-Irish Industrialist, Hindu scholar, author of multiple books, founder of eYogi Gurukul, and spiritual guide. ME in Electronics Engineering from DCU. 200+ poojas performed, 100+ poems composed.',
-    keywords: 'Rajesh Joshi, eYogi Raj, Hindu priest Ireland, eYogi Gurukul, Hindu scholar, Sanatana Dharma, meditation teacher, Irish industrialist, Vedic poojas, motivational speaker',
-    canonicalUrl: 'https://panditrajesh.com/about'
-  })
+  usePageMetadata('about')
 
   return (
     <div className="w-full">

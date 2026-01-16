@@ -1,5 +1,6 @@
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { useEffect, useLayoutEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
+import { updateMetaTags, generateOrganizationSchema } from '../../utils/seo'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { BookOpen, Calendar, User, Sparkle, CircleNotch, ArrowLeft } from '@phosphor-icons/react'
@@ -16,12 +17,27 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
   // Find the blog by slug (not ID)
   const blog = blogs?.find(b => b.slug === blogId)
   
-  usePageSEO({
-    title: blog ? `${blog.title} | Spiritual Wisdom Blog` : 'Blog Article | Pandit Rajesh Joshi',
-    description: blog?.excerpt || 'Read spiritual wisdom and insights from Pandit Rajesh Joshi.',
-    keywords: 'Hindu spirituality, pooja blog, spiritual practices, Vedic wisdom',
-    canonicalUrl: `https://panditrajesh.ie/blog/${blogId}`
-  })
+  // Apply blog-specific SEO metadata from database
+  useLayoutEffect(() => {
+    if (blog) {
+      updateMetaTags({
+        title: blog.meta_title || `${blog.title} | Spiritual Wisdom Blog`,
+        description: blog.meta_description || blog.excerpt || 'Read spiritual wisdom and insights from Pandit Rajesh Joshi.',
+        keywords: blog.meta_keywords ? (Array.isArray(blog.meta_keywords) ? blog.meta_keywords.join(', ') : blog.meta_keywords) : 'Hindu spirituality, pooja blog, spiritual practices, Vedic wisdom',
+        ogTitle: blog.meta_title || blog.title,
+        ogDescription: blog.meta_description || blog.excerpt || undefined,
+        ogImage: blog.featured_image_url || undefined,
+        canonicalUrl: blog.canonical_url || `https://panditrajesh.ie/blog/${blogId}`,
+        schema: generateOrganizationSchema(),
+        robots: 'index, follow'
+      })
+    }
+  }, [blog, blogId])
+
+  // Scroll to top
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [blogId])
 
   if (isLoading) {
     return (

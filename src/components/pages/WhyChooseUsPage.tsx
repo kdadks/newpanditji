@@ -1,7 +1,7 @@
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Heart, GraduationCap, FlowerLotus, ListChecks, UsersFour, Globe, Sparkle, BookOpen, CheckCircle } from '@phosphor-icons/react'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useWhyChooseContent } from '../../hooks/useCmsContent'
 
 export default function WhyChooseUsPage() {
@@ -9,12 +9,7 @@ export default function WhyChooseUsPage() {
   const { content: cmsContent } = useWhyChooseContent()
 
   // SEO Configuration
-  usePageSEO({
-    title: 'Why Choose Rajesh Joshi | Authentic Vedic Poojas with Heart & Knowledge',
-    description: '6 compelling reasons to choose Rajesh Ji for your spiritual ceremonies: 20+ years experience, authentic Vedic rituals, scholarly expertise, personalized service, 30+ pooja offerings, and online E-Pooja options available worldwide.',
-    keywords: 'why choose Hindu priest, authentic Vedic poojas, experienced pandit, personalized rituals, online pooja, E-pooja Ireland, traditional Hindu ceremonies, Vedic priest Ireland',
-    canonicalUrl: 'https://panditrajesh.com/why-choose-us'
-  })
+  usePageMetadata('why-choose-us')
 
   return (
     <div className="w-full">

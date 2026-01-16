@@ -857,7 +857,6 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
   const ctaSection = getSection('cta_section') as Record<string, unknown>
   
   return {
-    pageMetadata: getSection('page_metadata') as DakshinaPageContent['pageMetadata'] || defaultDakshinaContent.pageMetadata,
     hero: {
       subtitle: (heroSection.subtitle as string) || defaultDakshinaContent.hero.subtitle,
       title: (heroSection.title as string) || defaultDakshinaContent.hero.title,
@@ -891,10 +890,6 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
  */
 function dakshinaContentToSections(content: DakshinaPageContent): { sectionKey: string; content: Record<string, unknown> }[] {
   return [
-    {
-      sectionKey: 'page_metadata',
-      content: content.pageMetadata || {}
-    },
     {
       sectionKey: 'hero',
       content: {
@@ -974,12 +969,12 @@ async function fetchSiteSettingsForCms(): Promise<ExtendedSiteSettings | null> {
   const { data, error } = await supabase
     .from('site_settings')
     .select('site_logo_url, site_name, site_tagline, header_cta_text, header_cta_link, footer_text, copyright_text, facebook_page_url, instagram_url, youtube_channel_url, linkedin_url, twitter_url, pinterest_url')
-    .single()
+    .eq('singleton_guard', true)
+    .maybeSingle()
 
   if (error) {
-    if (error.code === 'PGRST116') return null
-    console.error('Error fetching site settings:', error)
-    throw error
+    // Silently return null if settings not found - will use default values
+    return null
   }
 
   return data

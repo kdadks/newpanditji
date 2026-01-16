@@ -7,7 +7,7 @@ import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/react'
 import { services, categoryNames, Service } from '../../lib/data'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useServices } from '../../hooks/useServices'
 import { useHomeContent } from '../../hooks/useCmsContent'
 import { getOptimizedImageProps } from '../../utils/imageOptimization'
@@ -42,13 +42,8 @@ export default function HomePage({ }: HomePageProps) {
   // Service carousel pause state on hover
   const [isPaused, setIsPaused] = useState(false)
 
-  // SEO Configuration
-  usePageSEO({
-    title: 'Hindu Pooja & Rituals in Ireland | Expert Ceremonies & Spiritual Guidance',
-    description: 'Professional Hindu pooja services, rituals, and spiritual guidance in Ireland, UK, and Northern Ireland. Authentic ceremonies by Pandit Rajesh Joshi. 15+ years experience.',
-    keywords: 'Hindu pooja, Hindu ritual, Indian pooja, pooja in Ireland, Hindu priest Ireland, Hindu ceremonies, Lakshmi puja, Durga puja, Hindu priest UK, Northern Ireland pooja',
-    canonicalUrl: 'https://panditrajesh.com/'
-  })
+  // SEO Configuration - Fetched from database
+  usePageMetadata('home')
 
   return (
     <div className="w-full">

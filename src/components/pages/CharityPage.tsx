@@ -1,6 +1,6 @@
 'use client'
 
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useCharity } from '../../hooks/useCharity'
 import { useCharityContent } from '../../hooks/useCmsContent'
 import { Card, CardContent } from '../ui/card'
@@ -139,12 +139,7 @@ export default function CharityPage() {
   const { projects, isLoading } = useCharity()
   const disableAnimations = useDisableAnimations()
 
-  usePageSEO({
-    title: 'Hindu Community Charity Work & Social Service | Pandit Rajesh Joshi',
-    description: 'Explore our Hindu community charity initiatives, spiritual education programs, and social service projects. Supporting communities in Ireland, UK, and Northern Ireland.',
-    keywords: 'Hindu charity, community service, spiritual education, charity work, social service, Hindu community Ireland, Bhagavad Gita distribution',
-    canonicalUrl: 'https://panditrajesh.ie/charity'
-  })
+  usePageMetadata('charity')
 
   return (
     <div className="w-full overflow-hidden">

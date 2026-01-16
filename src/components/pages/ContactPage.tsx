@@ -9,7 +9,7 @@ import { Badge } from '../ui/badge'
 import { EnvelopeSimple, Phone, WhatsappLogo, MapPin, Clock, Shield, Heart, Sparkle, CheckCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { categoryNames } from '../../lib/data'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useContactContent } from '../../hooks/useCmsContent'
 
 const faqData = [
@@ -118,12 +118,7 @@ export default function ContactPage() {
   const { content: cmsContent } = useContactContent()
 
   // SEO Configuration
-  usePageSEO({
-    title: 'Contact Pandit Rajesh Joshi | Book Hindu Pooja Services in Ireland, UK, Northern Ireland',
-    description: 'Contact Pandit Rajesh Joshi to book authentic Hindu poojas, ceremonies, and spiritual consultations in Ireland, UK, and Northern Ireland. Quick response within 24 hours.',
-    keywords: 'contact pandit, book pooja, Hindu priest contact, book Hindu ceremony, pooja booking, spiritual consultation booking, contact Hindu priest Ireland',
-    canonicalUrl: 'https://panditrajesh.com/contact'
-  })
+  usePageMetadata('contact')
 
   const [formData, setFormData] = useState({
     name: '',

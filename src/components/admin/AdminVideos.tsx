@@ -5,7 +5,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { toast } from 'sonner'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 
@@ -344,6 +344,9 @@ export default function AdminVideos() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingVideo ? 'Edit Video' : 'Add New Video'}</DialogTitle>
+            <DialogDescription>
+              {editingVideo ? 'Update video details and settings' : 'Add a new YouTube video to your collection'}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -411,6 +414,9 @@ export default function AdminVideos() {
       {/* Preview Modal */}
       <Dialog open={!!previewVideo} onOpenChange={(open) => !open && setPreviewVideo(null)}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black">
+          <DialogDescription className="sr-only">
+            Video preview player for {previewVideo?.title || 'selected video'}
+          </DialogDescription>
           <div className="relative">
             <Button
               variant="ghost"

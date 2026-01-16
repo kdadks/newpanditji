@@ -5,7 +5,7 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, Info, HandHeart, GraduationCap, ArrowRight } from '@phosphor-icons/react'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useDakshinaContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
 import { renderHighlightedTitle, stripHighlightTags } from '../../utils/renderHighlight'
@@ -23,12 +23,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
   const { content: cmsContent } = useDakshinaContent()
 
   // SEO Configuration
-  usePageSEO({
-    title: stripHighlightTags(cmsContent.pageMetadata?.metaTitle || cmsContent.hero.title) || 'Dakshina | Understanding Sacred Offerings & Service Costs',
-    description: cmsContent.pageMetadata?.metaDescription || 'Learn about Dakshina in Hindu tradition - its meaning, significance, and transparent pricing for our spiritual services and ceremonies.',
-    keywords: cmsContent.pageMetadata?.metaKeywords?.join(', ') || 'dakshina, Hindu offerings, pooja costs, ceremony pricing, spiritual services pricing, pandit fees',
-    canonicalUrl: cmsContent.pageMetadata?.canonicalUrl || 'https://panditrajesh.com/dakshina'
-  })
+  usePageMetadata('dakshina')
 
   return (
     <div className="w-full">
@@ -79,7 +74,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Understanding <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Dakshina</span>
+              {renderHighlightedTitle(cmsContent.hero.title)}
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">

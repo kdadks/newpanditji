@@ -1,6 +1,9 @@
 import { supabase } from '../../../lib/supabase'
 import BlogDetailClient from './BlogDetailClient'
 
+// Allow dynamic params for blogs created after build
+export const dynamicParams = true
+
 // Generate static params for all blog slugs
 export async function generateStaticParams() {
   try {

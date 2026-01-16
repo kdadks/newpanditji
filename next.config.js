@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Removed output: 'export' to enable dynamic rendering for new blog posts
   images: {
     unoptimized: true,
     remotePatterns: [

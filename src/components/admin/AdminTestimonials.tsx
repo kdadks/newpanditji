@@ -5,7 +5,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import { useTestimonials, useCreateTestimonial, useUpdateTestimonial, useDeleteTestimonial } from '../../hooks/useTestimonials'
@@ -266,9 +266,9 @@ export default function AdminTestimonials() {
                 <DialogTitle className="text-xl font-bold text-white">
                   {editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
                 </DialogTitle>
-                <p className="text-amber-100 text-sm mt-0.5">
+                <DialogDescription className="text-amber-100 text-sm mt-0.5">
                   {editingTestimonial ? 'Update customer review details' : 'Add a new customer testimonial'}
-                </p>
+                </DialogDescription>
               </div>
             </div>
             

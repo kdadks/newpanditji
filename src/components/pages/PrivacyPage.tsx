@@ -1,14 +1,9 @@
 import { Card, CardContent } from '../ui/card'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { ShieldCheck } from '@phosphor-icons/react'
 
 export default function PrivacyPage() {
-  usePageSEO({
-    title: 'Privacy Policy | Pandit Rajesh Joshi',
-    description: 'Read our privacy policy to understand how we protect your personal information and data privacy.',
-    keywords: 'privacy policy, data protection, personal information',
-    canonicalUrl: 'https://panditrajesh.ie/privacy'
-  })
+  usePageMetadata('privacy')
 
   return (
     <div className="w-full py-16 md:py-24">

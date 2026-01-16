@@ -47,6 +47,9 @@ CREATE TABLE IF NOT EXISTS site_settings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Enable Row Level Security on site_settings
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
 -- Menus Table
 CREATE TABLE IF NOT EXISTS menus (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

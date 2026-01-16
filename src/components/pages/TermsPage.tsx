@@ -1,14 +1,9 @@
 import { Card, CardContent } from '../ui/card'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { FileText } from '@phosphor-icons/react'
 
 export default function TermsPage() {
-  usePageSEO({
-    title: 'Terms & Conditions | Pandit Rajesh Joshi',
-    description: 'Read our terms and conditions for using Pandit Rajesh Joshi\'s website and services.',
-    keywords: 'terms and conditions, terms of service, legal terms',
-    canonicalUrl: 'https://panditrajesh.ie/terms'
-  })
+  usePageMetadata('terms')
 
   return (
     <div className="w-full py-16 md:py-24">

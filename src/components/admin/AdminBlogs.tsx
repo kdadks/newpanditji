@@ -7,7 +7,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { QuillEditor } from '../ui/quill-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -270,12 +270,6 @@ export default function AdminBlogs() {
       return
     }
 
-    const contentLength = formData.content.replace(/<[^>]*>/g, '').trim().length
-    if (contentLength > 15000) {
-      toast.error(`Article content exceeds maximum limit. Current: ${contentLength.toLocaleString()} / 15,000 characters`)
-      return
-    }
-
     // If in "add category" mode, create the category first
     let categoryId = formData.category_id
     if (showAddCategory && newCategoryName.trim()) {
@@ -521,9 +515,9 @@ export default function AdminBlogs() {
                 <DialogTitle className="text-xl font-bold text-white">
                   {editingBlog ? 'Edit Blog Article' : 'Create New Article'}
                 </DialogTitle>
-                <p className="text-white/90 text-sm mt-0.5">
+                <DialogDescription className="text-white/90 text-sm mt-0.5">
                   {editingBlog ? 'Update your article content and details' : 'Share spiritual wisdom with your readers'}
-                </p>
+                </DialogDescription>
               </div>
             </div>
             
@@ -763,14 +757,9 @@ export default function AdminBlogs() {
                             Article Content <span className="text-red-500">*</span>
                           </Label>
                           <div className="text-xs">
-                            <span className={`font-medium ${
-                              formData.content.replace(/<[^>]*>/g, '').trim().length > 15000
-                                ? 'text-red-500'
-                                : 'text-green-600'
-                            }`}>
-                              {formData.content.replace(/<[^>]*>/g, '').trim().length.toLocaleString()}
+                            <span className="font-medium text-muted-foreground">
+                              {formData.content.replace(/<[^>]*>/g, '').trim().length.toLocaleString()} characters
                             </span>
-                            <span className="text-muted-foreground"> / 15,000 characters max</span>
                           </div>
                         </div>
                         <QuillEditor
@@ -848,7 +837,7 @@ export default function AdminBlogs() {
             </div>
             
             {/* Footer */}
-            <div className="border-t bg-muted/30 px-6 py-4">
+            <div className="sticky bottom-0 z-10 border-t bg-background/95 backdrop-blur-sm shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {currentTab !== 'basic' && (
@@ -885,8 +874,7 @@ export default function AdminBlogs() {
                         !formData.content || 
                         !formData.excerpt || 
                         (!formData.category_id && !showAddCategory) || 
-                        (showAddCategory && !newCategoryName.trim()) ||
-                        formData.content.replace(/<[^>]*>/g, '').trim().length > 15000
+                        (showAddCategory && !newCategoryName.trim())
                       }
                       className="gap-2"
                     >
@@ -1003,6 +991,7 @@ export default function AdminBlogs() {
         <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden p-0">
           <DialogHeader className="sr-only">
             <DialogTitle>Blog Preview</DialogTitle>
+            <DialogDescription>Preview of blog post before publishing</DialogDescription>
           </DialogHeader>
           {previewBlog && (
             <div className="overflow-y-auto max-h-[90vh]">
@@ -1124,6 +1113,7 @@ export default function AdminBlogs() {
               <Tag size={20} />
               Manage Blog Categories
             </DialogTitle>
+            <DialogDescription>Create, edit, and delete blog categories</DialogDescription>
           </DialogHeader>
           <div className="overflow-y-auto max-h-[60vh] space-y-2">
             {categories.length === 0 ? (

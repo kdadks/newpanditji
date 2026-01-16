@@ -9,7 +9,7 @@ import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
@@ -337,12 +337,12 @@ export default function AdminBooks() {
                 <DialogTitle className="text-2xl font-heading font-bold">
                   {editingBook ? 'Edit Book' : 'Add New Book'}
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <DialogDescription className="text-sm text-muted-foreground mt-1">
                   {editingBook 
                     ? `Updating "${editingBook.title}"` 
                     : 'Share your spiritual wisdom with readers'
                   }
-                </p>
+                </DialogDescription>
               </div>
             </div>
 

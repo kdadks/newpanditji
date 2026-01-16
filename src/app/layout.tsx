@@ -14,6 +14,7 @@ import WhatsAppButton from '../components/WhatsAppButton'
 import { Toaster } from '../components/ui/sonner'
 import { ErrorFallback } from '../ErrorFallback'
 import { AppPage, AppNavigationData } from '../lib/types'
+import { supabase } from '../lib/supabase'
 
 import "../main.css"
 import "../styles/theme.css"
@@ -26,6 +27,53 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const [siteMetadata, setSiteMetadata] = useState({
+    title: 'Pandit Rajesh Joshi - Hindu Priest & Spiritual Guide',
+    description: 'Experience authentic Hindu rituals, puja ceremonies, and spiritual guidance with Pandit Rajesh Joshi in Ireland.',
+    keywords: 'hindu priest ireland, pandit ireland, puja services ireland'
+  })
+
+  // Fetch site metadata from database
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_metadata')
+          .select('setting_key, setting_value')
+          .eq('category', 'metadata')
+          .in('setting_key', ['site_title', 'site_description', 'site_keywords'])
+
+        if (error) throw error
+
+        const settings: Record<string, string> = {}
+        data?.forEach((item) => {
+          settings[item.setting_key] = item.setting_value
+        })
+
+        if (settings.site_title || settings.site_description || settings.site_keywords) {
+          setSiteMetadata({
+            title: settings.site_title || siteMetadata.title,
+            description: settings.site_description || siteMetadata.description,
+            keywords: settings.site_keywords || siteMetadata.keywords
+          })
+
+          // Update document metadata
+          if (typeof document !== 'undefined') {
+            document.title = settings.site_title || siteMetadata.title
+            const metaDesc = document.querySelector('meta[name="description"]')
+            if (metaDesc) metaDesc.setAttribute('content', settings.site_description || siteMetadata.description)
+            const metaKeywords = document.querySelector('meta[name="keywords"]')
+            if (metaKeywords) metaKeywords.setAttribute('content', settings.site_keywords || siteMetadata.keywords)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching site metadata:', error)
+      }
+    }
+
+    fetchMetadata()
+  }, [])
+
   // Handle auth errors globally
   useEffect(() => {
     // Listen for unhandled promise rejections (like auth errors)
@@ -83,9 +131,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Pandit Shivkumar Sharma - Vedic Astrologer & Spiritual Guide</title>
-        <meta name="description" content="Experience authentic Vedic rituals, astrology consultations, and spiritual guidance with Pandit Shivkumar Sharma. Book pujas, havans, and personalized horoscope readings." />
-        <meta name="keywords" content="vedic astrology, pandit, puja services, horoscope, spiritual guidance, hindu rituals" />
+        <title>{siteMetadata.title}</title>
+        <meta name="description" content={siteMetadata.description} />
+        <meta name="keywords" content={siteMetadata.keywords} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* Favicon */}
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

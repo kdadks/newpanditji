@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBlogs } from '../../hooks/useBlogs'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
@@ -41,12 +41,7 @@ export default function BlogPage({ }: BlogPageProps) {
       }
     }
   }
-  usePageSEO({
-    title: 'Hindu Spirituality & Philosophy | Blog on Rituals, Traditions & Vedic Wisdom',
-    description: 'Discover insights on Hindu spirituality, pooja significance, and Vedic traditions. Learn about spiritual practices and sacred rituals in modern life.',
-    keywords: 'Hindu spirituality, pooja blog, spiritual practices, Vedic wisdom, Hindu traditions, spiritual guidance, ritual significance',
-    canonicalUrl: 'https://panditrajesh.ie/blog'
-  })
+  usePageMetadata('blog')
 
   const { blogs: dbBlogs, isLoading } = useBlogs()
   

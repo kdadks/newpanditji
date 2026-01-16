@@ -14,7 +14,8 @@ import {
   DotsThreeOutline,
   X,
   ChartLine,
-  Books
+  Books,
+  MagnifyingGlass
 } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { cn } from '../../lib/utils'
@@ -44,6 +45,7 @@ const menuItems: MenuItem[] = [
   { id: 'charity', label: 'Charity', icon: <Heart size={20} /> },
   { id: 'profile', label: 'Profile', icon: <User size={20} /> },
   { id: 'content', label: 'CMS', icon: <FileText size={20} /> },
+  { id: 'seo', label: 'SEO & Metadata', icon: <MagnifyingGlass size={20} /> },
 ]
 
 export default function AdminLayout({

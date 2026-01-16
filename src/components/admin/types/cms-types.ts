@@ -267,12 +267,6 @@ export interface DakshinaService {
 }
 
 export interface DakshinaPageContent {
-  pageMetadata?: {
-    metaTitle?: string
-    metaDescription?: string
-    metaKeywords?: string[]
-    canonicalUrl?: string
-  }
   hero: {
     subtitle: string
     title: string

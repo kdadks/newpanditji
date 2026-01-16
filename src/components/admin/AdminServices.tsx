@@ -10,7 +10,7 @@ import { Textarea } from '../ui/textarea'
 import { QuillEditor } from '../ui/quill-editor'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
@@ -475,12 +475,12 @@ export default function AdminServicesNew() {
                 <DialogTitle className="text-2xl font-heading font-bold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
                   {editingService ? 'Edit Service' : 'Create New Service'}
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <DialogDescription className="text-sm text-muted-foreground mt-1">
                   {editingService 
                     ? `Updating "${editingService.name}"` 
                     : 'Add a new pooja, sanskar, or spiritual service'
                   }
-                </p>
+                </DialogDescription>
               </div>
             </div>
 

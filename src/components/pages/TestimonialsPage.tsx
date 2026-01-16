@@ -1,18 +1,13 @@
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { Star, Quotes, Sparkle, Heart, Trophy, Users } from '@phosphor-icons/react'
 import { usePublishedTestimonials } from '../../hooks/useTestimonials'
 
 export default function TestimonialsPage() {
   const { data: testimonials = [], isLoading } = usePublishedTestimonials()
-  usePageSEO({
-    title: 'Client Reviews & Testimonials | Pandit Rajesh Joshi Hindu Services',
-    description: 'Read testimonials from satisfied clients about their pooja ceremonies and spiritual services. Genuine reviews of Hindu rituals performed in Ireland and UK.',
-    keywords: 'client testimonials, pooja reviews, service reviews, customer feedback, spiritual services reviews, Hindu ceremony feedback',
-    canonicalUrl: 'https://panditrajesh.ie/testimonials'
-  })
+  usePageMetadata('testimonials')
 
   return (
     <div className="w-full">

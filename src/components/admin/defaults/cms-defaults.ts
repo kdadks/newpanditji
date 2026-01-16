@@ -549,12 +549,6 @@ export const defaultFooterContent: FooterContent = {
 }
 
 export const defaultDakshinaContent: DakshinaPageContent = {
-  pageMetadata: {
-    metaTitle: 'Dakshina | Understanding Sacred Offerings & Service Costs',
-    metaDescription: 'Learn about Dakshina in Hindu tradition - its meaning, significance, and transparent pricing for our spiritual services and ceremonies.',
-    metaKeywords: ['dakshina', 'Hindu offerings', 'pooja costs', 'ceremony pricing', 'spiritual services pricing', 'pandit fees'],
-    canonicalUrl: 'https://panditrajesh.com/dakshina'
-  },
   hero: {
     subtitle: 'Sacred Economics',
     title: 'Understanding Dakshina',

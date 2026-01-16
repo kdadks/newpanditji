@@ -8,7 +8,7 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Badge } from '../ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Progress } from '../ui/progress'
 import { toast } from 'sonner'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
@@ -609,13 +609,13 @@ export default function AdminPhotos() {
                 <DialogTitle className="text-xl font-bold text-white">
                   {isBulkMode ? 'Bulk Upload Photos' : editingPhoto ? 'Edit Photo' : 'Add New Photo'}
                 </DialogTitle>
-                <p className="text-cyan-100 text-sm mt-0.5">
+                <DialogDescription className="text-cyan-100 text-sm mt-0.5">
                   {isBulkMode 
                     ? 'Upload multiple photos at once' 
                     : editingPhoto 
                       ? 'Update photo details and image' 
                       : 'Upload a new photo to your gallery'}
-                </p>
+                </DialogDescription>
               </div>
             </div>
             
@@ -1137,6 +1137,9 @@ export default function AdminPhotos() {
       {/* Image Preview Modal */}
       <Dialog open={!!previewPhoto} onOpenChange={(open) => !open && setPreviewPhoto(null)}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black">
+          <DialogDescription className="sr-only">
+            Full size image preview for {previewPhoto?.title || 'selected photo'}
+          </DialogDescription>
           <div className="relative">
             <Button
               variant="ghost"

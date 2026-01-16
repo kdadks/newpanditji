@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react'
 import { useServices } from '../../hooks/useServices'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
 import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch } from '@phosphor-icons/react'
 import { services as defaultServices, categoryNames, Service } from '../../lib/data'
-import { usePageSEO } from '../../hooks/usePageSEO'
+import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { AppPage, AppNavigationData } from '../../lib/types'
 
 interface ServicesPageProps {
@@ -28,12 +28,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const [searchQuery, setSearchQuery] = useState('')
 
   // SEO Configuration
-  usePageSEO({
-    title: 'Hindu Poojas, Sanskars & Rituals | Professional Services in Ireland, UK, Northern Ireland',
-    description: 'Complete Hindu pooja services including Lakshmi Puja, Durga Puja, Hanuman Puja, wedding ceremonies, housewarming rituals, and spiritual consultations. Serving Ireland, UK, and Northern Ireland.',
-    keywords: 'Hindu pooja services, Lakshmi puja, Durga puja, Hanuman puja, Hindu rituals, Indian pooja, pooja in Ireland, UK pooja services, Northern Ireland ceremonies, Hindu priest',
-    canonicalUrl: 'https://panditrajesh.com/services'
-  })
+  usePageMetadata('services')
 
   useEffect(() => {
     if (initialCategory && initialCategory !== selectedCategory) {
@@ -273,10 +268,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                     </Badge>
                   </div>
                   <DialogTitle className="font-heading text-3xl mb-2">{selectedService.name}</DialogTitle>
-                  <div
-                    className="text-muted-foreground text-base prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: selectedService.description }}
-                  />
+                  <DialogDescription asChild>
+                    <div
+                      className="text-muted-foreground text-base prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: selectedService.description }}
+                    />
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6 mt-6">
