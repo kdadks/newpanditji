@@ -175,7 +175,7 @@ export default function BlogPage({ }: BlogPageProps) {
 
                     <Button 
                       className="w-fit shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => handleNavigate({ page: 'blog-detail', blogId: blogArticles[0].id })}
+                      onClick={() => handleNavigate({ page: 'blog-detail', blogId: blogArticles[0].slug })}
                     >
                       <BookOpen className="mr-2" size={18} />
                       Read Full Article
@@ -211,7 +211,7 @@ export default function BlogPage({ }: BlogPageProps) {
             <Card 
               key={article.id} 
               className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
-              onClick={() => handleNavigate({ page: 'blog-detail', blogId: article.id })}
+              onClick={() => handleNavigate({ page: 'blog-detail', blogId: article.slug })}
             >
               <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 

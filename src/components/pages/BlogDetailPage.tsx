@@ -13,8 +13,8 @@ interface BlogDetailPageProps {
 export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPageProps) {
   const { blogs, isLoading } = useBlogs()
   
-  // Find the blog by ID
-  const blog = blogs?.find(b => b.id === blogId)
+  // Find the blog by slug (not ID)
+  const blog = blogs?.find(b => b.slug === blogId)
   
   usePageSEO({
     title: blog ? `${blog.title} | Spiritual Wisdom Blog` : 'Blog Article | Pandit Rajesh Joshi',
