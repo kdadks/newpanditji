@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
 import { usePhotos } from '../../hooks/usePhotos'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Article, Tag, FileText, Notebook, Image as ImageIcon, Upload, Eye, Clock, CheckCircle, WarningCircle, ArrowLeft, ArrowRight } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Article, Tag, FileText, Notebook, Image as ImageIcon, Upload, Eye, Clock, Calendar, CheckCircle, WarningCircle, ArrowLeft, ArrowRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -44,6 +44,14 @@ export default function AdminBlogs() {
   const [blogToDelete, setBlogToDelete] = useState<BlogPostRow | null>(null)
   const [categories, setCategories] = useState<BlogCategory[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(false)
+  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
+  const [previewBlog, setPreviewBlog] = useState<BlogPostRow | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [showCategoryManager, setShowCategoryManager] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<BlogCategory | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<BlogCategory | null>(null)
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     excerpt: '',
@@ -77,6 +85,141 @@ export default function AdminBlogs() {
       toast.error('Failed to load categories')
     } finally {
       setIsLoadingCategories(false)
+    }
+  }
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error('Please enter a category name')
+      return
+    }
+
+    setIsCreatingCategory(true)
+    try {
+      const slug = generateSlug(newCategoryName)
+      
+      // Get the highest sort_order and increment by 1
+      const { data: maxSortOrder } = await supabase
+        .from('blog_categories')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .single()
+      
+      const nextSortOrder = (maxSortOrder?.sort_order ?? -1) + 1
+      
+      const { data, error } = await supabase
+        .from('blog_categories')
+        .insert({
+          name: newCategoryName.trim(),
+          slug: slug,
+          is_active: true,
+          sort_order: nextSortOrder
+        })
+        .select()
+        .single()
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast.error('A category with this name already exists')
+        } else {
+          throw error
+        }
+        return
+      }
+
+      toast.success('Category created successfully')
+      setCategories([...categories, data])
+      setFormData({ ...formData, category_id: data.id })
+      setNewCategoryName('')
+      setShowAddCategory(false)
+    } catch (error) {
+      console.error('Error creating category:', error)
+      toast.error('Failed to create category')
+    } finally {
+      setIsCreatingCategory(false)
+    }
+  }
+
+  const handleUpdateCategory = async (category: BlogCategory, newName: string) => {
+    if (!newName.trim()) {
+      toast.error('Category name cannot be empty')
+      return
+    }
+
+    try {
+      const slug = generateSlug(newName)
+      const { error } = await supabase
+        .from('blog_categories')
+        .update({ name: newName.trim(), slug, updated_at: new Date().toISOString() })
+        .eq('id', category.id)
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('A category with this name already exists')
+        } else {
+          throw error
+        }
+        return
+      }
+
+      toast.success('Category updated successfully')
+      fetchCategories()
+      setEditingCategory(null)
+    } catch (error) {
+      console.error('Error updating category:', error)
+      toast.error('Failed to update category')
+    }
+  }
+
+  const handleDeleteCategory = async (category: BlogCategory) => {
+    try {
+      // First, ensure "Uncategorized" category exists
+      let uncategorizedCat: BlogCategory | undefined = categories.find(c => c.slug === 'uncategorized')
+      
+      if (!uncategorizedCat) {
+        const { data, error: createError } = await supabase
+          .from('blog_categories')
+          .insert({
+            name: 'Uncategorized',
+            slug: 'uncategorized',
+            is_active: true,
+            sort_order: -1
+          })
+          .select()
+          .single()
+
+        if (createError) throw createError
+        if (!data) throw new Error('Failed to create Uncategorized category')
+        uncategorizedCat = data as BlogCategory
+      }
+
+      if (!uncategorizedCat) {
+        throw new Error('Unable to get or create Uncategorized category')
+      }
+
+      // Move all blog posts from this category to Uncategorized
+      const { error: updateError } = await supabase
+        .from('blog_posts')
+        .update({ category_id: uncategorizedCat.id })
+        .eq('category_id', category.id)
+
+      if (updateError) throw updateError
+
+      // Delete the category
+      const { error: deleteError } = await supabase
+        .from('blog_categories')
+        .delete()
+        .eq('id', category.id)
+
+      if (deleteError) throw deleteError
+
+      toast.success('Category deleted and posts moved to Uncategorized')
+      fetchCategories()
+      setCategoryToDelete(null)
+    } catch (error) {
+      console.error('Error deleting category:', error)
+      toast.error('Failed to delete category')
     }
   }
 
@@ -133,6 +276,47 @@ export default function AdminBlogs() {
       return
     }
 
+    // If in "add category" mode, create the category first
+    let categoryId = formData.category_id
+    if (showAddCategory && newCategoryName.trim()) {
+      try {
+        const slug = generateSlug(newCategoryName)
+        const { data, error } = await supabase
+          .from('blog_categories')
+          .insert({
+            name: newCategoryName.trim(),
+            slug: slug,
+            is_active: true
+          })
+          .select()
+          .single()
+
+        if (error) {
+          if (error.code === '23505') {
+            toast.error('A category with this name already exists')
+          } else {
+            throw error
+          }
+          return
+        }
+
+        categoryId = data.id
+        setCategories([...categories, data])
+        setShowAddCategory(false)
+        setNewCategoryName('')
+      } catch (error) {
+        console.error('Error creating category:', error)
+        toast.error('Failed to create category')
+        return
+      }
+    }
+
+    // Validate category is selected
+    if (!categoryId) {
+      toast.error('Please select or create a category')
+      return
+    }
+
     try {
       // Calculate reading time
       const readingTime = calculateReadingTime(formData.content)
@@ -142,7 +326,7 @@ export default function AdminBlogs() {
         slug: generateSlug(formData.title),
         excerpt: formData.excerpt,
         content: formData.content,
-        category_id: formData.category_id,
+        category_id: categoryId,
         featured_image_url: formData.featured_image_url,
         status: formData.status,
         reading_time_minutes: readingTime,
@@ -209,10 +393,16 @@ export default function AdminBlogs() {
               Create and manage spiritual wisdom articles
             </p>
           </div>
-          <Button onClick={handleAdd} className="gap-2">
-            <Plus size={18} />
-            Add Article
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setShowCategoryManager(true)} variant="outline" className="gap-2">
+              <Tag size={18} />
+              Manage Categories
+            </Button>
+            <Button onClick={handleAdd} className="gap-2">
+              <Plus size={18} />
+              Add Article
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {blogs.length === 0 ? (
@@ -221,9 +411,9 @@ export default function AdminBlogs() {
               <p>No blog articles yet. Click "Add Article" to get started.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {blogs.map((blog) => (
-                <Card key={blog.id} className="border-l-4 border-l-primary/30 hover:shadow-lg transition-shadow">
+                <Card key={blog.id} className="border-l-4 border-l-primary/30 hover:shadow-lg transition-shadow group">
                   <CardContent className="p-4">
                     {/* Featured Image */}
                     {blog.featured_image_url && (
@@ -275,15 +465,35 @@ export default function AdminBlogs() {
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
+                      <div className="flex flex-row gap-1.5 lg:flex-col">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setPreviewBlog(blog)
+                            setIsPreviewOpen(true)
+                          }} 
+                          title="Preview"
+                          className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEdit(blog)}
+                          title="Edit"
+                          className="hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200"
+                        >
                           <PencilSimple size={16} />
                         </Button>
                         <Button 
-                          variant="destructive" 
+                          variant="outline" 
                           size="sm" 
                           onClick={() => openDeleteDialog(blog)}
                           disabled={isDeleting}
+                          title="Delete"
+                          className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
                         >
                           <Trash size={16} />
                         </Button>
@@ -368,22 +578,80 @@ export default function AdminBlogs() {
                           <Label htmlFor="category" className="text-sm font-medium">
                             Category <span className="text-red-500">*</span>
                           </Label>
-                          <Select
-                            value={formData.category_id || undefined}
-                            onValueChange={(value) => setFormData({ ...formData, category_id: value })}
-                            disabled={isSaving || isLoadingCategories}
-                          >
-                            <SelectTrigger className="h-11">
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.map((cat) => (
-                                <SelectItem key={cat.id} value={cat.id}>
-                                  {cat.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          
+                          {showAddCategory ? (
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="New category name"
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    handleCreateCategory()
+                                  } else if (e.key === 'Escape') {
+                                    setShowAddCategory(false)
+                                    setNewCategoryName('')
+                                  }
+                                }}
+                                disabled={isCreatingCategory}
+                                className="h-11"
+                                autoFocus
+                              />
+                              <Button
+                                type="button"
+                                onClick={handleCreateCategory}
+                                disabled={isCreatingCategory || !newCategoryName.trim()}
+                                size="sm"
+                                className="h-11 px-3"
+                              >
+                                {isCreatingCategory ? <Spinner className="animate-spin" size={16} /> : <CheckCircle size={16} />}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowAddCategory(false)
+                                  setNewCategoryName('')
+                                }}
+                                disabled={isCreatingCategory}
+                                size="sm"
+                                className="h-11 px-3"
+                              >
+                                <X size={16} />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Select
+                                value={formData.category_id || undefined}
+                                onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+                                disabled={isSaving || isLoadingCategories}
+                              >
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {categories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.id}>
+                                      {cat.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowAddCategory(true)}
+                                disabled={isSaving}
+                                size="sm"
+                                className="h-11 px-3 shrink-0"
+                                title="Add new category"
+                              >
+                                <Plus size={16} />
+                              </Button>
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-2">
@@ -611,7 +879,15 @@ export default function AdminBlogs() {
                   {currentTab === 'seo' ? (
                     <Button 
                       onClick={handleSave} 
-                      disabled={isSaving || !formData.title || !formData.content || !formData.excerpt || !formData.category_id || formData.content.replace(/<[^>]*>/g, '').trim().length > 15000}
+                      disabled={
+                        isSaving || 
+                        !formData.title || 
+                        !formData.content || 
+                        !formData.excerpt || 
+                        (!formData.category_id && !showAddCategory) || 
+                        (showAddCategory && !newCategoryName.trim()) ||
+                        formData.content.replace(/<[^>]*>/g, '').trim().length > 15000
+                      }
                       className="gap-2"
                     >
                       {isSaving ? (
@@ -721,6 +997,219 @@ export default function AdminBlogs() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Blog Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Blog Preview</DialogTitle>
+          </DialogHeader>
+          {previewBlog && (
+            <div className="overflow-y-auto max-h-[90vh]">
+              {/* Hero Section with Featured Image */}
+              {previewBlog.featured_image_url ? (
+                <div className="relative w-full h-[40vh] overflow-hidden">
+                  <img
+                    src={previewBlog.featured_image_url}
+                    alt={previewBlog.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+                  
+                  {/* Title overlay on image */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                    <div className="container mx-auto max-w-4xl">
+                      <Badge className="bg-white/20 text-white border-white/30 backdrop-blur mb-3">
+                        Preview Mode
+                      </Badge>
+                      
+                      <h1 className="font-heading font-bold text-3xl md:text-4xl text-white leading-tight drop-shadow-lg">
+                        {previewBlog.title}
+                      </h1>
+                      
+                      <div className="flex items-center gap-4 mt-4 text-white/90 text-sm">
+                        {previewBlog.reading_time_minutes && (
+                          <div className="flex items-center gap-1">
+                            <Clock size={16} />
+                            {previewBlog.reading_time_minutes} min read
+                          </div>
+                        )}
+                        {previewBlog.published_at && (
+                          <div className="flex items-center gap-1">
+                            <Calendar size={16} />
+                            {new Date(previewBlog.published_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-linear-to-br from-primary/5 to-accent/5 p-8">
+                  <div className="container mx-auto max-w-4xl">
+                    <Badge className="mb-3">Preview Mode</Badge>
+                    <h1 className="font-heading font-bold text-3xl md:text-4xl leading-tight">
+                      {previewBlog.title}
+                    </h1>
+                    <div className="flex items-center gap-4 mt-4 text-muted-foreground text-sm">
+                      {previewBlog.reading_time_minutes && (
+                        <div className="flex items-center gap-1">
+                          <Clock size={16} />
+                          {previewBlog.reading_time_minutes} min read
+                        </div>
+                      )}
+                      {previewBlog.published_at && (
+                        <div className="flex items-center gap-1">
+                          <Calendar size={16} />
+                          {new Date(previewBlog.published_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Content Section */}
+              <div className="container mx-auto max-w-4xl px-6 md:px-8 py-8">
+                {/* Excerpt */}
+                <div className="mb-8">
+                  <p className="text-lg text-muted-foreground leading-relaxed italic border-l-4 border-primary pl-4">
+                    {previewBlog.excerpt}
+                  </p>
+                </div>
+
+                {/* Main Content */}
+                <div 
+                  className="prose prose-lg max-w-none
+                    prose-headings:font-heading prose-headings:font-bold
+                    prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
+                    prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                    prose-p:leading-relaxed prose-p:mb-4
+                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                    prose-strong:text-foreground prose-strong:font-semibold
+                    prose-ul:my-4 prose-ol:my-4
+                    prose-li:my-2
+                    prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2
+                    dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: previewBlog.content }}
+                />
+              </div>
+
+              {/* Close Button */}
+              <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t p-4">
+                <div className="container mx-auto max-w-4xl flex justify-end">
+                  <Button onClick={() => setIsPreviewOpen(false)}>
+                    Close Preview
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Manager Dialog */}
+      <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag size={20} />
+              Manage Blog Categories
+            </DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[60vh] space-y-2">
+            {categories.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No categories yet</p>
+            ) : (
+              categories.map((category) => (
+                <Card key={category.id} className="p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    {editingCategory?.id === category.id ? (
+                      <div className="flex-1 flex items-center gap-2">
+                        <Input
+                          value={editingCategory.name}
+                          onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleUpdateCategory(category, editingCategory.name)
+                            } else if (e.key === 'Escape') {
+                              setEditingCategory(null)
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <Button size="sm" onClick={() => handleUpdateCategory(category, editingCategory.name)}>
+                          <FloppyDisk size={16} />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditingCategory(null)}>
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1">
+                          <p className="font-medium">{category.name}</p>
+                          <p className="text-xs text-muted-foreground">{category.slug}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => setEditingCategory(category)}
+                            title="Edit"
+                          >
+                            <PencilSimple size={16} />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => setCategoryToDelete(category)}
+                            disabled={category.slug === 'uncategorized'}
+                            title={category.slug === 'uncategorized' ? 'Cannot delete Uncategorized' : 'Delete'}
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input
+              placeholder="New category name..."
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreateCategory()}
+            />
+            <Button onClick={handleCreateCategory} disabled={isCreatingCategory || !newCategoryName.trim()}>
+              {isCreatingCategory ? <Spinner className="animate-spin" size={16} /> : <Plus size={16} />}
+              Add
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Category Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!categoryToDelete}
+        onOpenChange={(open) => !open && setCategoryToDelete(null)}
+        onConfirm={() => categoryToDelete && handleDeleteCategory(categoryToDelete)}
+        title="Delete Category"
+        itemName={categoryToDelete?.name}
+        isDeleting={false}
+        description="All blog posts in this category will be moved to 'Uncategorized'"
+      />
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}

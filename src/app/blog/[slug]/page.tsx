@@ -1,46 +1,39 @@
-'use client'
+import { supabase } from '../../../lib/supabase'
+import BlogDetailClient from './BlogDetailClient'
 
-import { useRouter } from 'next/navigation'
-import { Suspense } from 'react'
-import BlogDetailPage from '../../../components/pages/BlogDetailPage'
-import { AppPage, AppNavigationData } from '../../../lib/types'
+// Generate static params for all blog slugs
+export async function generateStaticParams() {
+  try {
+    const { data: blogs, error } = await supabase
+      .from('blog_posts')
+      .select('slug')
+      .eq('status', 'published')
+    
+    if (error) {
+      console.error('Error fetching blog slugs:', error)
+      return [{ slug: 'placeholder' }]
+    }
 
-// Loading component for Suspense fallback
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-      <p className="text-muted-foreground">Loading...</p>
-    </div>
-  </div>
-)
+    if (!blogs || blogs.length === 0) {
+      return [{ slug: 'placeholder' }]
+    }
 
-interface BlogDetailProps {
-  params: {
-    slug: string
+    return blogs.map((blog) => ({
+      slug: blog.slug,
+    }))
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error)
+    return [{ slug: 'placeholder' }]
   }
 }
 
-export default function BlogDetail({ params }: BlogDetailProps) {
-  const router = useRouter()
+interface BlogDetailProps {
+  params: Promise<{
+    slug: string
+  }>
+}
 
-  const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
-    if (typeof pageOrData === 'string') {
-      router.push(pageOrData === 'home' ? '/' : `/${pageOrData}`)
-    } else {
-      // Handle AppNavigationData object
-      const { page, blogSlug } = pageOrData
-      if (page === 'blog-detail' && blogSlug) {
-        router.push(`/blog/${blogSlug}`)
-      } else {
-        router.push(page === 'home' ? '/' : `/${page}`)
-      }
-    }
-  }
-
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <BlogDetailPage blogId={params.slug} onNavigate={handleNavigate} />
-    </Suspense>
-  )
+export default async function BlogDetail({ params }: BlogDetailProps) {
+  const { slug } = await params
+  return <BlogDetailClient slug={slug} />
 }

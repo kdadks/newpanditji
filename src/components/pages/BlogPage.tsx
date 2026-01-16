@@ -12,6 +12,7 @@ import { AppPage, AppNavigationData } from '../../lib/types'
 
 interface BlogArticle {
   id: string
+  slug?: string
   title: string
   excerpt: string
   category: string
@@ -53,6 +54,7 @@ export default function BlogPage({ }: BlogPageProps) {
   const blogArticles: BlogArticle[] = (dbBlogs && dbBlogs.length > 0) 
     ? dbBlogs.map(blog => ({
         id: blog.id,
+        slug: blog.slug,
         title: blog.title,
         excerpt: blog.excerpt,
         category: blog.category_name || 'Article',
@@ -63,6 +65,7 @@ export default function BlogPage({ }: BlogPageProps) {
       }))
     : defaultBlogs.map(blog => ({
         ...blog,
+        slug: undefined,
         content: undefined,
         featured_image_url: null,
         reading_time_minutes: null,
@@ -175,7 +178,12 @@ export default function BlogPage({ }: BlogPageProps) {
 
                     <Button 
                       className="w-fit shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => handleNavigate({ page: 'blog-detail', blogId: blogArticles[0].slug })}
+                      onClick={() => {
+                        if (blogArticles[0].slug) {
+                          handleNavigate({ page: 'blog-detail', blogSlug: blogArticles[0].slug })
+                        }
+                      }}
+                      disabled={!blogArticles[0].slug}
                     >
                       <BookOpen className="mr-2" size={18} />
                       Read Full Article
@@ -211,7 +219,11 @@ export default function BlogPage({ }: BlogPageProps) {
             <Card 
               key={article.id} 
               className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
-              onClick={() => handleNavigate({ page: 'blog-detail', blogId: article.slug })}
+              onClick={() => {
+                if (article.slug) {
+                  handleNavigate({ page: 'blog-detail', blogSlug: article.slug })
+                }
+              }}
             >
               <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -262,7 +274,9 @@ export default function BlogPage({ }: BlogPageProps) {
                     className="text-primary hover:text-primary/80 p-0 h-auto font-medium group-hover:translate-x-1 transition-transform duration-300"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleNavigate({ page: 'blog-detail', blogId: article.id })
+                      if (article.slug) {
+                        handleNavigate({ page: 'blog-detail', blogSlug: article.slug })
+                      }
                     }}
                   >
                     Read More →

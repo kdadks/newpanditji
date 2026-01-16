@@ -182,14 +182,16 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                     </DropdownMenu>
                   )
                 }
+                // Check if this nav item should be active (including blog-detail for blog)
+                const isItemActive = currentPage === item.page || (item.page === 'blog' && currentPage === 'blog-detail')
                 return (
                   <Button
                     key={item.page}
-                    variant={currentPage === item.page ? 'default' : 'ghost'}
+                    variant={isItemActive ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => handleNavClick(item.page)}
                     className={`px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 text-sm font-medium relative z-10 ${
-                      currentPage === item.page
+                      isItemActive
                         ? 'bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white shadow-lg shadow-orange-800/30 border border-orange-600/40 hover:from-orange-800 hover:via-amber-800 hover:to-orange-900'
                         : 'hover:bg-linear-to-r hover:from-orange-200/60 hover:via-amber-100/50 hover:to-orange-200/60 hover:text-orange-900 hover:shadow-md hover:shadow-orange-300/20'
                     }`}
@@ -297,13 +299,15 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                         </div>
                       )
                     }
+                    // Check if this nav item should be active (including blog-detail for blog)
+                    const isItemActive = currentPage === item.page || (item.page === 'blog' && currentPage === 'blog-detail')
                     return (
                       <Button
                         key={item.page}
-                        variant={currentPage === item.page ? 'default' : 'ghost'}
+                        variant={isItemActive ? 'default' : 'ghost'}
                         onClick={() => handleNavClick(item.page)}
                         className={`justify-start text-left rounded-xl transition-all duration-300 hover:scale-[1.02] ${
-                          currentPage === item.page
+                          isItemActive
                             ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
                             : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
                         }`}
