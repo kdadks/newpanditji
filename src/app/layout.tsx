@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import WhatsAppButton from '../components/WhatsAppButton'
+import { AuthErrorHandler } from '../components/AuthErrorHandler'
 import { Toaster } from '../components/ui/sonner'
 import { ErrorFallback } from '../ErrorFallback'
 import { AppPage, AppNavigationData } from '../lib/types'
@@ -74,30 +75,6 @@ export default function RootLayout({
     fetchMetadata()
   }, [])
 
-  // Handle auth errors globally
-  useEffect(() => {
-    // Listen for unhandled promise rejections (like auth errors)
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      const error = event.reason
-      // Check if it's a Supabase auth error
-      if (error?.message?.includes('Refresh Token') || error?.name === 'AuthApiError') {
-        console.warn('Clearing invalid auth session')
-        // Clear the invalid session data
-        if (typeof window !== 'undefined') {
-          const keysToRemove = Object.keys(localStorage).filter(key => 
-            key.startsWith('sb-') || key.includes('supabase')
-          )
-          keysToRemove.forEach(key => localStorage.removeItem(key))
-        }
-        // Prevent the error from showing in console
-        event.preventDefault()
-      }
-    }
-
-    window.addEventListener('unhandledrejection', handleRejection)
-    return () => window.removeEventListener('unhandledrejection', handleRejection)
-  }, [])
-
   // Create QueryClient once and memoize it - CRITICAL for performance!
   // Recreating on every render causes massive slowdowns
   const [queryClient] = useState(() => new QueryClient({
@@ -154,6 +131,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <AuthErrorHandler />
               <div className="min-h-screen flex flex-col bg-background">
                 <Header />
                 <main className="flex-1">

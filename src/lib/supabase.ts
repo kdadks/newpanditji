@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// Create Supabase client
+// Create Supabase client with enhanced error handling
 export const supabase = createClient(
   supabaseUrl || '',
   supabaseAnonKey || '',
@@ -19,9 +19,40 @@ export const supabase = createClient(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      storageKey: 'sb-auth-token',
+      flowType: 'pkce'
     },
   }
 )
+
+// Handle invalid refresh tokens by clearing storage
+if (typeof window !== 'undefined') {
+  // Listen for storage events to detect token changes
+  window.addEventListener('storage', (e) => {
+    if (e.key?.startsWith('sb-') && e.newValue === null) {
+      // Token was removed, trigger session cleanup
+      supabase.auth.getSession().catch(() => {
+        // Clear any remaining invalid tokens
+        const keysToRemove = Object.keys(localStorage).filter(key => 
+          key.startsWith('sb-') || key === 'sb-auth-token'
+        )
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+      })
+    }
+  })
+
+  // Clear invalid tokens on initialization
+  supabase.auth.getSession().catch((error) => {
+    if (error?.message?.includes('refresh') || error?.message?.includes('token')) {
+      console.warn('Clearing invalid session tokens:', error.message)
+      const keysToRemove = Object.keys(localStorage).filter(key => 
+        key.startsWith('sb-') || key === 'sb-auth-token'
+      )
+      keysToRemove.forEach(key => localStorage.removeItem(key))
+    }
+  })
+}
 
 // Database types based on schema
 export interface Database {

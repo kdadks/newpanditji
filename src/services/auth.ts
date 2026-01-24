@@ -54,7 +54,7 @@ const initializeAuth = async () => {
     // If there's an error (like invalid refresh token), clear the session
     if (error) {
       console.warn('Session error, clearing auth state:', error.message)
-      await supabase.auth.signOut()
+      await clearAllAuthData()
       authState = { user: null, session: null, loading: false }
       notifyListeners()
       return
@@ -66,17 +66,51 @@ const initializeAuth = async () => {
       loading: false
     }
     notifyListeners()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error initializing auth:', error)
-    // Clear any invalid session data
-    await supabase.auth.signOut().catch(() => {})
+    // Handle specific refresh token errors
+    if (error?.message?.includes('refresh') || error?.message?.includes('Invalid Refresh Token')) {
+      console.warn('Invalid refresh token detected, clearing all auth data')
+      await clearAllAuthData()
+    } else {
+      // Clear any invalid session data
+      await supabase.auth.signOut().catch(() => {})
+    }
     authState = { user: null, session: null, loading: false }
     notifyListeners()
   }
 }
 
+// Helper function to clear all auth-related data
+const clearAllAuthData = async () => {
+  try {
+    // Sign out from Supabase
+    await supabase.auth.signOut({ scope: 'local' })
+  } catch (e) {
+    console.warn('Error during signOut:', e)
+  }
+  
+  // Clear all Supabase-related items from localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const keysToRemove = Object.keys(localStorage).filter(key => 
+        key.startsWith('sb-') || key.includes('supabase') || key === 'sb-auth-token'
+      )
+      keysToRemove.forEach(key => {
+        try {
+          localStorage.removeItem(key)
+        } catch (e) {
+          console.warn('Could not remove key:', key)
+        }
+      })
+    } catch (e) {
+      console.warn('Error clearing localStorage:', e)
+    }
+  }
+}
+
 // Set up auth state change listener
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
   // Handle sign out event
   if (event === 'SIGNED_OUT') {
     authState = {
@@ -91,6 +125,20 @@ supabase.auth.onAuthStateChange((event, session) => {
   // Handle token refresh error - clear session
   if (event === 'TOKEN_REFRESHED' && !session) {
     console.warn('Token refresh failed, clearing session')
+    await clearAllAuthData()
+    authState = {
+      user: null,
+      session: null,
+      loading: false
+    }
+    notifyListeners()
+    return
+  }
+  
+  // Handle USER_UPDATED event with no session (indicates token issue)
+  if (event === 'USER_UPDATED' && !session) {
+    console.warn('User updated with no session, clearing auth data')
+    await clearAllAuthData()
     authState = {
       user: null,
       session: null,
@@ -186,14 +234,9 @@ class AuthService {
    */
   async clearSession(): Promise<void> {
     try {
-      await supabase.auth.signOut()
-      // Also clear local storage manually as backup
-      if (typeof window !== 'undefined') {
-        const keysToRemove = Object.keys(localStorage).filter(key => 
-          key.startsWith('sb-') || key.includes('supabase')
-        )
-        keysToRemove.forEach(key => localStorage.removeItem(key))
-      }
+      await clearAllAuthData()
+      authState = { user: null, session: null, loading: false }
+      notifyListeners()
     } catch (error) {
       console.error('Error clearing session:', error)
     }
