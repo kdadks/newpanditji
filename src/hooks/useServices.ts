@@ -27,6 +27,7 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     category: category as Service['category'],
     duration: row.duration || '',
     description: row.short_description,
+    imageUrl: row.featured_image_url || undefined,
     detailedDescription: row.full_description || undefined,
     benefits: row.benefits || undefined,
     includes: row.includes || undefined,

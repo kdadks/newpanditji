@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
-import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch } from '@phosphor-icons/react'
+import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch, CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { AppPage, AppNavigationData } from '../../lib/types'
@@ -26,6 +26,10 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
   // SEO Configuration
   usePageMetadata('services')
@@ -35,6 +39,11 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
       setSelectedCategory(initialCategory as Service['category'] | 'all')
     }
   }, [initialCategory])
+
+  // Reset to page 1 when category or search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, searchQuery])
 
   const filteredServices = services.filter(service => {
     // Filter by category
@@ -49,27 +58,27 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
     return matchesCategory && matchesSearch
   })
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedServices = filteredServices.slice(startIndex, endIndex)
+
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
     setIsDetailsOpen(true)
+  }
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top of services section
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
     <div className="w-full">
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
-        {/* Background decoration with animated rolling images - Service Related */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="flex gap-0 animate-scroll-left w-max h-full">
-            {['/images/Pooja 1.jpg', '/images/Pooja 2.jpg', '/images/Pooja 3.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
-            ))}
-            {['/images/Pooja 1.jpg', '/images/Pooja 2.jpg', '/images/Pooja 3.jpg', '/images/Traditional Altar with Marigold Flowers.png'].map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
-            ))}
-          </div>
-        </div>
-
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
 
@@ -168,6 +177,14 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
+        {!searchQuery && filteredServices.length > 0 && (
+          <div className="mb-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">{startIndex + 1}-{Math.min(endIndex, filteredServices.length)}</span> of <span className="font-semibold text-foreground">{filteredServices.length}</span> services
+            </p>
+          </div>
+        )}
+
         {isLoading && (
           <div className="flex justify-center items-center py-12">
             <CircleNotch className="animate-spin text-primary" size={48} />
@@ -175,24 +192,25 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {!isLoading && filteredServices.map((service, index) => (
+          {!isLoading && paginatedServices.map((service, index) => {
+            // Calculate the actual index for display
+            const displayIndex = startIndex + index
+            return (
             <Card
               key={service.id}
               className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 bg-linear-to-br from-white via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-amber-950/30 flex flex-col"
               onClick={() => handleServiceClick(service)}
             >
               {/* Image Section */}
-              <div className="relative h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 flex-shrink-0">
+              <div className="relative h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 shrink-0">
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent z-10"></div>
-                <img 
-                  src={`/images/Pooja ${(index % 3) + 1}.jpg`}
-                  alt={service.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/images/Traditional Altar with Marigold Flowers.png';
-                  }}
-                />
+                {service.imageUrl && (
+                  <img 
+                    src={service.imageUrl}
+                    alt={service.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                )}
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4 z-20">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
@@ -203,7 +221,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 {/* Number Badge */}
                 <div className="absolute top-4 right-4 z-20">
                   <div className="w-10 h-10 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center font-black text-amber-700 dark:text-amber-400 shadow-lg border border-amber-200 dark:border-amber-800">
-                    {String(index + 1).padStart(2, '0')}
+                    {String(displayIndex + 1).padStart(2, '0')}
                   </div>
                 </div>
                 {/* Duration Badge */}
@@ -214,7 +232,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
               </div>
 
               {/* Content Section */}
-              <CardContent className="p-6 relative flex flex-col flex-grow">
+              <CardContent className="p-6 relative flex flex-col grow">
                 {/* Decorative corner */}
                 <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-br from-amber-100/50 to-transparent dark:from-amber-900/20 rounded-bl-full"></div>
                 
@@ -223,7 +241,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 </h3>
                 
                 <div
-                  className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3 prose prose-sm max-w-none flex-grow"
+                  className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3 prose prose-sm max-w-none grow"
                   dangerouslySetInnerHTML={{ __html: service.description }}
                 />
                 
@@ -247,7 +265,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 <div className="absolute inset-0 bg-linear-to-t from-amber-500/10 via-transparent to-transparent"></div>
               </div>
             </Card>
-          ))}
+          )})}
         </div>
 
         {filteredServices.length === 0 && (
@@ -256,27 +274,149 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2">
+              {/* First Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => goToPage(1)}
+                disabled={currentPage === 1}
+                className="h-10 w-10"
+              >
+                <CaretDoubleLeft size={16} weight="bold" />
+              </Button>
+
+              {/* Previous Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-10 w-10"
+              >
+                <CaretLeft size={16} weight="bold" />
+              </Button>
+
+              {/* Page Numbers */}
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  // Show first page, last page, current page, and adjacent pages
+                  const showPage = 
+                    page === 1 || 
+                    page === totalPages || 
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+
+                  // Show ellipsis
+                  if (!showPage) {
+                    // Show ellipsis before current page range
+                    if (page === currentPage - 2 && currentPage > 3) {
+                      return (
+                        <span key={page} className="px-2 text-muted-foreground">
+                          ...
+                        </span>
+                      )
+                    }
+                    // Show ellipsis after current page range
+                    if (page === currentPage + 2 && currentPage < totalPages - 2) {
+                      return (
+                        <span key={page} className="px-2 text-muted-foreground">
+                          ...
+                        </span>
+                      )
+                    }
+                    return null
+                  }
+
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => goToPage(page)}
+                      className={`h-10 w-10 ${
+                        currentPage === page 
+                          ? "bg-primary text-primary-foreground" 
+                          : ""
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  )
+                })}
+              </div>
+
+              {/* Next Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="h-10 w-10"
+              >
+                <CaretRight size={16} weight="bold" />
+              </Button>
+
+              {/* Last Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => goToPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="h-10 w-10"
+              >
+                <CaretDoubleRight size={16} weight="bold" />
+              </Button>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </p>
+          </div>
+        )}
+
         {/* Service Details Modal */}
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
           <DialogContent className="max-w-[95vw] lg:max-w-[1200px] max-h-[90vh] overflow-y-auto">
             {selectedService && (
               <>
-                <DialogHeader>
-                  <div className="mb-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {categoryNames[selectedService.category]}
-                    </Badge>
-                  </div>
-                  <DialogTitle className="font-heading text-3xl mb-2">{selectedService.name}</DialogTitle>
-                  <DialogDescription asChild>
-                    <div
-                      className="text-muted-foreground text-base prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: selectedService.description }}
-                    />
-                  </DialogDescription>
-                </DialogHeader>
+                {/* Header with Image and Title */}
+                <div className="flex flex-col md:flex-row gap-6 mb-6">
+                  {/* Image Section */}
+                  {selectedService.imageUrl && (
+                    <div className="w-full md:w-auto shrink-0">
+                      <div className="relative overflow-hidden rounded-lg bg-linear-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
+                        <img 
+                          src={selectedService.imageUrl}
+                          alt={selectedService.name}
+                          style={{ width: '400px', height: 'auto' }}
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
 
-                <div className="space-y-6 mt-6">
+                  {/* Title and Info Section */}
+                  <div className="flex-1">
+                    <div className="mb-3">
+                      <Badge className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white border-white/30">
+                        <FlowerLotus size={14} weight="fill" className="mr-1.5" />
+                        {categoryNames[selectedService.category]}
+                      </Badge>
+                    </div>
+                    <DialogTitle className="font-heading text-3xl mb-3">{selectedService.name}</DialogTitle>
+                    <DialogDescription asChild>
+                      <div
+                        className="text-muted-foreground text-base prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ __html: selectedService.description }}
+                      />
+                    </DialogDescription>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
                   {/* Quick Info Bar */}
                   <div className="flex flex-wrap gap-4 p-4 bg-linear-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20">
                     <div className="flex items-center gap-2 text-sm">
