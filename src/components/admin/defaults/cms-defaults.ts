@@ -308,8 +308,24 @@ export const defaultBooksContent: BooksPageContent = {
   hero: {
     title: 'Books by Rajesh Joshi Ji',
     subtitle: 'Wisdom & Knowledge',
-    description: 'Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality.',
-    backgroundImages: []
+    description: 'Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality. Ancient wisdom presented with modern scientific understanding.',
+    backgroundImages: [
+      '/images/books/hinduism-basics-for-all.jpeg',
+      '/images/books/hinduism-and-science.jpeg',
+      '/images/books/diwali.jpeg',
+      '/images/books/navaratri.jpeg'
+    ]
+  },
+  stats: [
+    { label: 'Books Published', value: '8+', subtext: '' },
+    { label: 'Years of Wisdom', value: '15K+', subtext: '' },
+    { label: 'Topics Covered', value: 'Multiple', subtext: '' }
+  ],
+  cta: {
+    title: 'Interested in These Books?',
+    description: 'To learn more about these books or to inquire about availability, please feel free to contact us.',
+    buttonText: 'Contact Us for More Information',
+    buttonLink: '/contact'
   }
 }
 

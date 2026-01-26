@@ -7,6 +7,7 @@ import { BookOpen, BookBookmark, FlowerLotus, Atom, GraduationCap, Lightbulb, Sp
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBooksPageContent } from '../../hooks/useCmsContent'
 import { usePublishedBooks } from '../../hooks/useBooks'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 import type { BookRow } from '../../lib/supabase'
 
 export default function BooksPage() {
@@ -60,10 +61,10 @@ export default function BooksPage() {
         {/* Background decoration with animated rolling book cover images */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
-            {['/images/books/hinduism-basics-for-all.jpeg', '/images/books/hinduism-and-science.jpeg', '/images/books/diwali.jpeg', '/images/books/navaratri.jpeg'].map((img, index) => (
+            {cmsContent?.hero?.backgroundImages?.map((img, index) => (
               <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
             ))}
-            {['/images/books/hinduism-basics-for-all.jpeg', '/images/books/hinduism-and-science.jpeg', '/images/books/diwali.jpeg', '/images/books/navaratri.jpeg'].map((img, index) => (
+            {cmsContent?.hero?.backgroundImages?.map((img, index) => (
               <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
             ))}
           </div>
@@ -82,31 +83,25 @@ export default function BooksPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <BookOpen size={18} weight="fill" className="animate-pulse" />
-              Wisdom & Knowledge
+              {cmsContent?.hero?.subtitle}
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Books by <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Rajesh Joshi Ji</span>
+              {renderHighlightedTitle(cmsContent?.hero?.title)}
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
-              Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality. Ancient wisdom presented with modern scientific understanding.
+              {cmsContent?.hero?.description}
             </p>
 
             {/* Stats - Compact inline version */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{books?.length || 0}</span>{' '}
-                <span className="font-semibold text-white/95">Books Published</span>
-              </span>
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">15K+</span>{' '}
-                <span className="font-semibold text-white/95">Years of Wisdom</span>
-              </span>
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">Multiple</span>{' '}
-                <span className="font-semibold text-white/95">Topics Covered</span>
-              </span>
+              {cmsContent?.stats?.map((stat, idx) => (
+                <span key={idx} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                  <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                  <span className="font-semibold text-white/95">{stat.label}</span>
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -246,13 +241,17 @@ export default function BooksPage() {
           <div className="mt-16 text-center p-8 rounded-lg bg-linear-to-br from-primary/5 to-accent/5 border border-primary/10">
             <BookOpen className="mx-auto mb-4 text-primary" size={48} weight="fill" />
             <h2 className="font-heading font-bold text-2xl md:text-3xl mb-3">
-              Interested in These Books?
+              {cmsContent?.cta?.title}
             </h2>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              To learn more about these books or to inquire about availability, please feel free to contact us.
+              {cmsContent?.cta?.description}
             </p>
-            <Button size="lg" onClick={() => window.location.href = '/contact'} className="px-8 py-3 font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30">
-              Contact Us for More Information
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = cmsContent?.cta?.buttonLink} 
+              className="px-8 py-3 font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30"
+            >
+              {cmsContent?.cta?.buttonText}
             </Button>
           </div>
         </div>

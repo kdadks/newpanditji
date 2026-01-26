@@ -477,6 +477,8 @@ function whyChooseContentToSections(content: WhyChooseContent): { sectionKey: st
 function sectionsToBooksContent(sections: PageSectionRow[]): BooksPageContent {
   const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
   const heroSection = getSection('hero') as Record<string, unknown>
+  const statsSection = getSection('stats') as Record<string, unknown>
+  const ctaSection = getSection('cta') as Record<string, unknown>
   
   return {
     hero: {
@@ -485,6 +487,13 @@ function sectionsToBooksContent(sections: PageSectionRow[]): BooksPageContent {
       description: (heroSection.description as string) || defaultBooksContent.hero.description,
       backgroundImages: (heroSection.backgroundImages as string[]) || defaultBooksContent.hero.backgroundImages,
     },
+    stats: (statsSection.items as any[]) || defaultBooksContent.stats,
+    cta: {
+      title: (ctaSection.title as string) || defaultBooksContent.cta.title,
+      description: (ctaSection.description as string) || defaultBooksContent.cta.description,
+      buttonText: (ctaSection.buttonText as string) || defaultBooksContent.cta.buttonText,
+      buttonLink: (ctaSection.buttonLink as string) || defaultBooksContent.cta.buttonLink,
+    }
   }
 }
 
@@ -500,6 +509,21 @@ function booksContentToSections(content: BooksPageContent): { sectionKey: string
         subtitle: content.hero.subtitle,
         description: content.hero.description,
         backgroundImages: content.hero.backgroundImages,
+      }
+    },
+    {
+      sectionKey: 'stats',
+      content: {
+        items: content.stats
+      }
+    },
+    {
+      sectionKey: 'cta',
+      content: {
+        title: content.cta.title,
+        description: content.cta.description,
+        buttonText: content.cta.buttonText,
+        buttonLink: content.cta.buttonLink
       }
     }
   ]

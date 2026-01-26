@@ -37,6 +37,7 @@ export interface PhotosQueryParams {
   limit?: number
   search?: string
   category?: string
+  enabled?: boolean
 }
 
 export interface PhotosResponse {
@@ -159,6 +160,7 @@ export function usePhotos(params?: PhotosQueryParams) {
     queryKey: [...PHOTOS_KEY, params],
     queryFn: () => fetchPhotos(params),
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    enabled: params?.enabled !== false, // Default to true, can be disabled
   })
 
   // Mutation for creating a photo

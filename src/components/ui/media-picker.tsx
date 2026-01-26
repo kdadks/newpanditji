@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './dialog'
 import { Button } from './button'
 import { Input } from './input'
@@ -34,28 +34,67 @@ export function MediaPicker({
   const [tempSelectedUrl, setTempSelectedUrl] = useState<string | null>(selectedUrl || null)
   const [isUploading, setIsUploading] = useState(false)
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [categories, setCategories] = useState<string[]>(['all'])
+  const pageSize = 25
 
-  const { photos, isLoading, refetch } = usePhotos()
+  // Only fetch photos when modal is open
+  const { photos, isLoading, refetch, total, totalPages } = usePhotos({
+    page: currentPage,
+    limit: pageSize,
+    search: searchQuery,
+    category: selectedCategory !== 'all' ? selectedCategory : undefined,
+    enabled: open // Only fetch when modal is open
+  })
 
-  // Get unique categories from photos
-  const categories = useMemo(() => {
-    const cats = new Set<string>()
-    photos.forEach(photo => {
-      if (photo.category) cats.add(photo.category)
-    })
-    return ['all', ...Array.from(cats).sort()]
-  }, [photos])
+  // Reset state when modal opens
+  useEffect(() => {
+    if (open) {
+      setCurrentPage(1)
+      setSearchQuery('')
+      setSelectedCategory('all')
+      setTempSelectedUrl(selectedUrl || null) // Reset to current selectedUrl when opening
+    }
+  }, [open, selectedUrl])
 
-  // Filter photos based on search and category
-  const filteredPhotos = useMemo(() => {
-    return photos.filter(photo => {
-      const matchesSearch = !searchQuery || 
-        photo.title.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesCategory = selectedCategory === 'all' || 
-        photo.category === selectedCategory
-      return matchesSearch && matchesCategory
-    })
-  }, [photos, searchQuery, selectedCategory])
+  // Fetch categories only once when modal opens
+  useEffect(() => {
+    if (open) {
+      const fetchCategories = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('media_files')
+            .select('folder')
+            .eq('file_type', 'image')
+            .not('folder', 'is', null)
+
+          if (error) throw error
+
+          const uniqueFolders = new Set<string>()
+          data?.forEach((item) => {
+            if (item.folder) uniqueFolders.add(item.folder)
+          })
+
+          setCategories(['all', ...Array.from(uniqueFolders).sort()])
+        } catch (error) {
+          console.error('Error fetching categories:', error)
+        }
+      }
+
+      fetchCategories()
+    }
+  }, [open])
+
+  // Reset to page 1 when search or category changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+    setCurrentPage(1)
+  }
 
   const handleSelect = () => {
     if (tempSelectedUrl) {
@@ -116,6 +155,7 @@ export function MediaPicker({
       // Select the newly uploaded image
       setTempSelectedUrl(result.url)
       setActiveTab('library')
+      setCurrentPage(1) // Go to first page to see the newly uploaded image
     } catch (error) {
       console.error('Upload error:', error)
       toast.error(`Failed to upload: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -126,8 +166,8 @@ export function MediaPicker({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col gap-4">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={24} className="text-primary" />
             {title}
@@ -137,7 +177,7 @@ export function MediaPicker({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'library' | 'upload')} className="flex-1 flex flex-col min-h-0">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'library' | 'upload')} className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <TabsList className="grid w-full grid-cols-2 shrink-0">
             <TabsTrigger value="library">
               <FolderOpen size={16} className="mr-2" />
@@ -151,7 +191,7 @@ export function MediaPicker({
             )}
           </TabsList>
 
-          <TabsContent value="library" className="flex-1 flex flex-col min-h-0 mt-4">
+          <TabsContent value="library" className="flex-1 flex flex-col min-h-0 mt-0 overflow-hidden">
             {/* Search and Filter */}
             <div className="flex flex-wrap gap-4 mb-4 shrink-0">
               <div className="relative flex-1 min-w-[200px]">
@@ -159,7 +199,7 @@ export function MediaPicker({
                 <Input
                   placeholder="Search images..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -169,7 +209,7 @@ export function MediaPicker({
                     key={cat}
                     variant={selectedCategory === cat ? 'default' : 'outline'}
                     className="cursor-pointer capitalize"
-                    onClick={() => setSelectedCategory(cat)}
+                    onClick={() => handleCategoryChange(cat)}
                   >
                     {cat}
                   </Badge>
@@ -178,71 +218,106 @@ export function MediaPicker({
             </div>
 
             {/* Image Grid */}
-            <ScrollArea className="flex-1 min-h-0">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Spinner className="animate-spin text-primary" size={32} />
-                </div>
-              ) : filteredPhotos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                  <ImageIcon size={48} className="mb-2 opacity-50" />
-                  <p>No images found</p>
-                  {searchQuery && <p className="text-sm">Try adjusting your search</p>}
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 p-1">
-                  {filteredPhotos.map(photo => (
-                    <div
-                      key={photo.id}
-                      className={`relative group aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                        tempSelectedUrl === photo.url 
-                          ? 'border-primary ring-2 ring-primary/30' 
-                          : 'border-transparent hover:border-primary/50'
-                      }`}
-                      onClick={() => setTempSelectedUrl(photo.url)}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={photo.title}
-                        className="w-full h-full object-cover"
-                      />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                        <span className="text-white text-xs truncate w-full">{photo.title}</span>
-                      </div>
-                      {/* Selection indicator */}
-                      {tempSelectedUrl === photo.url && (
-                        <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
-                          <Check size={14} weight="bold" />
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+              <ScrollArea className="flex-1 min-h-0">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Spinner className="animate-spin text-primary" size={32} />
+                  </div>
+                ) : photos.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <ImageIcon size={48} className="mb-2 opacity-50" />
+                    <p>No images found</p>
+                    {searchQuery && <p className="text-sm">Try adjusting your search</p>}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 p-1 pb-4">
+                    {photos.map(photo => (
+                      <div
+                        key={photo.id}
+                        className={`relative group aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                          tempSelectedUrl === photo.url 
+                            ? 'border-primary ring-2 ring-primary/30' 
+                            : 'border-transparent hover:border-primary/50'
+                        }`}
+                        onClick={() => setTempSelectedUrl(photo.url)}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                          <span className="text-white text-xs truncate w-full">{photo.title}</span>
                         </div>
-                      )}
+                        {/* Selection indicator */}
+                        {tempSelectedUrl === photo.url && (
+                          <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
+                            <Check size={14} weight="bold" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+
+              {/* Pagination Controls - Outside ScrollArea */}
+              {!isLoading && photos.length > 0 && totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-2 pt-2 border-t shrink-0">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, total)} of {total} images
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        // Show first, last, and pages around current
+                        let pageNum: number
+                        if (totalPages <= 5) {
+                          pageNum = i + 1
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i
+                        } else {
+                          pageNum = currentPage - 2 + i
+                        }
+
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={currentPage === pageNum ? 'default' : 'outline'}
+                            size="sm"
+                            className="w-9 h-9 p-0"
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </Button>
+                        )
+                      })}
                     </div>
-                  ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
               )}
-            </ScrollArea>
-
-            {/* Selected Preview */}
-            {tempSelectedUrl && (
-              <div className="mt-4 p-3 bg-muted/50 rounded-lg flex items-center gap-3 shrink-0">
-                <img
-                  src={tempSelectedUrl}
-                  alt="Selected"
-                  className="w-16 h-16 object-cover rounded"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">Selected Image</p>
-                  <p className="text-xs text-muted-foreground truncate">{tempSelectedUrl}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTempSelectedUrl(null)}
-                >
-                  <X size={16} />
-                </Button>
-              </div>
-            )}
+            </div>
           </TabsContent>
 
           {allowUpload && (
@@ -279,7 +354,29 @@ export function MediaPicker({
           )}
         </Tabs>
 
-        <DialogFooter className="shrink-0 mt-4">
+        {/* Selected Preview - Outside Tabs */}
+        {tempSelectedUrl && (
+          <div className="p-3 bg-muted/50 rounded-lg flex items-center gap-3 shrink-0">
+            <img
+              src={tempSelectedUrl}
+              alt="Selected"
+              className="w-12 h-12 object-cover rounded"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">Selected Image</p>
+              <p className="text-xs text-muted-foreground truncate">{tempSelectedUrl}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTempSelectedUrl(null)}
+            >
+              <X size={16} />
+            </Button>
+          </div>
+        )}
+
+        <DialogFooter className="shrink-0">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

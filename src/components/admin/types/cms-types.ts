@@ -165,6 +165,13 @@ export interface WhyChooseContent {
 
 export interface BooksPageContent {
   hero: HeroContent
+  stats: StatisticItem[]
+  cta: {
+    title: string
+    description: string
+    buttonText: string
+    buttonLink: string
+  }
 }
 
 export interface ContactPageContent {
