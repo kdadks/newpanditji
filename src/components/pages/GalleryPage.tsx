@@ -214,26 +214,30 @@ export default function GalleryPage() {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Enhanced Tabs Section */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Tab Navigation with Enhanced Design */}
+            {/* Tab Navigation with Enhanced Design - Mobile Optimized */}
             <div className="flex flex-col items-center mb-7">
-              <TabsList className="grid w-full max-w-lg grid-cols-2 h-14 p-1 bg-linear-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
+              <TabsList className="grid w-full max-w-lg grid-cols-2 h-auto sm:h-14 p-1 bg-linear-to-r from-primary/5 to-accent/5 border border-primary/10 shadow-lg backdrop-blur-sm">
                 <TabsTrigger
                   value="videos"
-                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-2 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
                 >
-                  <PlayCircle size={20} weight="fill" />
-                  Sacred Videos
-                  <Badge variant="secondary" className="ml-2 bg-white/20 text-white border-0">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <PlayCircle size={18} className="sm:size-5" weight="fill" />
+                    <span className="text-xs sm:text-base">Sacred Videos</span>
+                  </div>
+                  <Badge variant="secondary" className="sm:ml-2 bg-orange-800 data-[state=active]:bg-orange-900 text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 font-bold shadow-sm">
                     {videos.length}
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger
                   value="photos"
-                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-accent data-[state=active]:to-accent/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-3 px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
+                  className="data-[state=active]:bg-linear-to-r data-[state=active]:from-accent data-[state=active]:to-accent/80 data-[state=active]:text-white data-[state=active]:shadow-lg flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-2 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-all duration-300 hover:scale-105 rounded-lg"
                 >
-                  <Images size={20} weight="fill" />
-                  Divine Photos
-                  <Badge variant="secondary" className="ml-2 bg-white/20 text-white border-0">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Images size={18} className="sm:size-5" weight="fill" />
+                    <span className="text-xs sm:text-base">Divine Photos</span>
+                  </div>
+                  <Badge variant="secondary" className="sm:ml-2 bg-amber-800 data-[state=active]:bg-amber-900 text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 font-bold shadow-sm">
                     {photos.length}
                   </Badge>
                 </TabsTrigger>
@@ -357,7 +361,7 @@ export default function GalleryPage() {
                           {video.category}
                         </Badge>
                       </div>
-                      <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      <div className="absolute top-3 right-3 bg-linear-to-r from-orange-600 to-amber-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg border border-orange-400/30">
                         {String(index + 1).padStart(2, '0')}
                       </div>
                     </div>

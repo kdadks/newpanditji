@@ -233,110 +233,175 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-xs sm:w-[400px] bg-linear-to-br from-card via-card/98 to-card border-l border-primary/30 shadow-2xl"
+                className="w-[85vw] sm:w-[400px] bg-linear-to-br from-slate-50/98 via-amber-50/95 to-orange-50/98 border-l-2 border-primary/40 shadow-2xl p-0 flex flex-col [&>button]:hidden"
               >
-                {/* Mobile Header with enhanced gradient */}
-                <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/20">
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/25 to-accent/20 border-2 border-primary/40 overflow-hidden">
-                        <img 
-                          src="/images/Logo/Raj ji.png" 
-                          alt="Pandit Rajesh Joshi" 
-                          className="w-full h-full object-cover object-center"
-                          loading="eager"
-                        />
+                {/* Mobile Header - Fixed at top with enhanced gradient and glow */}
+                <div className="flex-shrink-0 relative">
+                  {/* Background glow effect */}
+                  <div className="absolute inset-0 bg-linear-to-br from-orange-100/40 via-amber-100/30 to-orange-50/40"></div>
+                  <div className="relative flex items-center justify-between p-5 pb-4 border-b-2 border-primary/30 backdrop-blur-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="relative group">
+                        <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 to-accent/25 border-2 border-primary/50 overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-primary/70 transition-all duration-300">
+                          <img
+                            src="/images/Logo/Raj ji.png"
+                            alt="Pandit Rajesh Joshi"
+                            className="w-full h-full object-cover object-center"
+                            loading="eager"
+                          />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-linear-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-card">
+                          <FlowerLotus size={9} weight="fill" className="text-primary-foreground" />
+                        </div>
+                        {/* Subtle glow effect */}
+                        <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-linear-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-lg border-2 border-card">
-                        <FlowerLotus size={8} weight="fill" className="text-primary-foreground" />
+                      <div className="flex flex-col">
+                        <span className="font-heading font-bold text-base bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 bg-clip-text text-transparent">
+                          Pandit Rajesh Joshi
+                        </span>
+                        <span className="text-[11px] text-muted-foreground font-medium">
+                          Hindu Priest & Spiritual Guide
+                        </span>
                       </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-heading font-bold text-base bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-                        Pandit Rajesh Joshi
-                      </span>
-                      <span className="text-xs text-muted-foreground font-medium">
-                        Hindu Priest & Spiritual Guide
-                      </span>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="rounded-full hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:rotate-90 shadow-md hover:shadow-lg"
+                    >
+                      <X size={22} weight="bold" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-full hover:bg-primary/10 hover:text-primary transition-all duration-300"
-                  >
-                    <X size={20} />
-                  </Button>
                 </div>
 
-                {/* Mobile Navigation */}
-                <div className="flex flex-col gap-3 overflow-y-auto">
-                  {navItems.map(item => {
-                    if (item.submenu) {
+                {/* Scrollable Navigation Area - This is the key improvement */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 scroll-smooth">
+                  <style jsx>{`
+                    /* Custom scrollbar styling */
+                    div::-webkit-scrollbar {
+                      width: 6px;
+                    }
+                    div::-webkit-scrollbar-track {
+                      background: rgba(251, 191, 36, 0.1);
+                      border-radius: 10px;
+                    }
+                    div::-webkit-scrollbar-thumb {
+                      background: linear-gradient(to bottom, rgb(234, 88, 12), rgb(251, 146, 60));
+                      border-radius: 10px;
+                    }
+                    div::-webkit-scrollbar-thumb:hover {
+                      background: linear-gradient(to bottom, rgb(194, 65, 12), rgb(234, 88, 12));
+                    }
+                  `}</style>
+
+                  {/* Main Navigation Section */}
+                  <div className="space-y-1.5">
+                    {navItems.map((item) => {
+                      if (item.submenu) {
+                        return (
+                          <div key={item.page} className="space-y-1.5 mb-3">
+                            {/* Parent menu item with submenu */}
+                            <div className="relative group">
+                              <div className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-linear-to-r from-orange-100/70 via-amber-100/60 to-orange-100/70 border border-primary/30 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01]">
+                                <span className="text-sm font-bold text-orange-900 tracking-wide">{item.label}</span>
+                                <CaretDown size={16} weight="bold" className="text-primary/80" />
+                              </div>
+                              {/* Subtle glow on hover */}
+                              <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                            </div>
+
+                            {/* Submenu items with indent */}
+                            <div className="ml-3 pl-3 border-l-2 border-primary/20 space-y-1">
+                              {item.submenu.map(subItem => (
+                                <Button
+                                  key={subItem.page}
+                                  variant={currentPage === subItem.page ? 'default' : 'ghost'}
+                                  onClick={() => handleNavClick(subItem.page)}
+                                  className={`justify-start text-left w-full rounded-xl py-3 px-4 transition-all duration-300 text-[13px] font-medium ${
+                                    currentPage === subItem.page
+                                      ? 'bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-lg shadow-orange-600/40 border border-orange-500/30 hover:from-orange-700 hover:via-amber-700 hover:to-orange-800 scale-[1.02]'
+                                      : 'hover:bg-linear-to-r hover:from-orange-100/80 hover:via-amber-100/70 hover:to-orange-100/80 hover:text-orange-900 hover:shadow-md hover:scale-[1.01] hover:translate-x-1'
+                                  }`}
+                                >
+                                  <span className={currentPage === subItem.page ? 'font-semibold' : ''}>{subItem.label}</span>
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      }
+
+                      // Regular menu items
+                      const isItemActive = currentPage === item.page || (item.page === 'blog' && currentPage === 'blog-detail')
                       return (
-                        <div key={item.page} className="space-y-2">
-                          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-linear-to-r from-primary/10 to-accent/8 border border-primary/20 shadow-sm">
-                            <span className="text-sm font-semibold text-primary">{item.label}</span>
-                            <CaretDown size={14} className="text-primary/70" />
-                          </div>
-                          <div className="ml-4 space-y-1">
-                            {item.submenu.map(subItem => (
-                              <Button
-                                key={subItem.page}
-                                variant={currentPage === subItem.page ? 'default' : 'ghost'}
-                                onClick={() => handleNavClick(subItem.page)}
-                                className={`justify-start text-left w-full rounded-lg transition-all duration-300 hover:scale-[1.02] ${
-                                  currentPage === subItem.page
-                                    ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
-                                    : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
-                                }`}
-                              >
-                                {subItem.label}
-                              </Button>
-                            ))}
-                          </div>
+                        <div key={item.page} className="relative group">
+                          <Button
+                            variant={isItemActive ? 'default' : 'ghost'}
+                            onClick={() => handleNavClick(item.page)}
+                            className={`justify-start text-left w-full rounded-2xl py-4 px-5 transition-all duration-300 text-sm font-semibold ${
+                              isItemActive
+                                ? 'bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-xl shadow-orange-600/40 border-2 border-orange-500/30 hover:from-orange-700 hover:via-amber-700 hover:to-orange-800 scale-[1.02]'
+                                : 'hover:bg-linear-to-r hover:from-orange-100/80 hover:via-amber-100/70 hover:to-orange-100/80 hover:text-orange-900 hover:shadow-lg hover:scale-[1.02] hover:border hover:border-primary/20'
+                            }`}
+                          >
+                            {item.label}
+                          </Button>
+                          {/* Glow effect on hover */}
+                          {!isItemActive && (
+                            <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                          )}
                         </div>
                       )
-                    }
-                    // Check if this nav item should be active (including blog-detail for blog)
-                    const isItemActive = currentPage === item.page || (item.page === 'blog' && currentPage === 'blog-detail')
-                    return (
-                      <Button
-                        key={item.page}
-                        variant={isItemActive ? 'default' : 'ghost'}
-                        onClick={() => handleNavClick(item.page)}
-                        className={`justify-start text-left rounded-xl transition-all duration-300 hover:scale-[1.02] ${
-                          isItemActive
-                            ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
-                            : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
-                        }`}
-                      >
-                        {item.label}
-                      </Button>
-                    )
-                  })}
-                  {isOwner && (
-                    <Button
-                      variant={currentPage === 'admin' ? 'default' : 'ghost'}
-                      onClick={() => handleNavClick('admin')}
-                      className={`justify-start text-left gap-2 rounded-xl transition-all duration-300 hover:scale-[1.02] ${
-                        currentPage === 'admin'
-                          ? 'bg-linear-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg shadow-primary/30 border border-primary/20'
-                          : 'hover:bg-primary/15 hover:text-primary hover:shadow-md'
-                        }`}
-                    >
-                      <Shield size={16} weight="fill" />
-                      Admin
-                    </Button>
-                  )}
+                    })}
+
+                    {/* Admin button with special styling */}
+                    {isOwner && (
+                      <>
+                        {/* Separator before admin */}
+                        <div className="relative py-3">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-primary/30"></div>
+                          </div>
+                          <div className="relative flex justify-center">
+                            <span className="bg-linear-to-r from-orange-100 via-amber-100 to-orange-100 px-3 text-[10px] font-semibold text-primary/70 tracking-wider uppercase">
+                              Management
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="relative group">
+                          <Button
+                            variant={currentPage === 'admin' ? 'default' : 'ghost'}
+                            onClick={() => handleNavClick('admin')}
+                            className={`justify-start text-left w-full gap-2.5 rounded-2xl py-4 px-5 transition-all duration-300 text-sm font-semibold ${
+                              currentPage === 'admin'
+                                ? 'bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-xl shadow-orange-600/40 border-2 border-orange-500/30 hover:from-orange-700 hover:via-amber-700 hover:to-orange-800 scale-[1.02]'
+                                : 'hover:bg-linear-to-r hover:from-orange-100/80 hover:via-amber-100/70 hover:to-orange-100/80 hover:text-orange-900 hover:shadow-lg hover:scale-[1.02] hover:border hover:border-primary/20'
+                            }`}
+                          >
+                            <Shield size={18} weight="fill" />
+                            Admin Panel
+                          </Button>
+                          {currentPage !== 'admin' && (
+                            <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                {/* Mobile Footer */}
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="text-center text-xs text-muted-foreground">
-                    <p>Experience divine guidance with</p>
-                    <p className="font-medium text-primary mt-1">traditional Hindu ceremonies</p>
+                {/* Mobile Footer - Fixed at bottom */}
+                <div className="flex-shrink-0 relative border-t-2 border-primary/30 bg-linear-to-br from-orange-50/80 via-amber-50/70 to-orange-50/80 backdrop-blur-sm">
+                  <div className="p-5 text-center">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Experience divine guidance with
+                    </p>
+                    <p className="text-xs font-bold bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 bg-clip-text text-transparent mt-0.5">
+                      Traditional Hindu Ceremonies
+                    </p>
                   </div>
                 </div>
               </SheetContent>

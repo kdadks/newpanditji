@@ -67,13 +67,30 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
     <div className="w-full">
       {/* Hero Section with Featured Image */}
       {blog.featured_image_url ? (
-        <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-          <img
-            src={blog.featured_image_url}
-            alt={blog.title}
-            className="w-full h-full object-contain"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+        <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden bg-linear-to-br from-amber-50 via-orange-100 to-amber-100">
+          {/* Beautiful warm gradient background pattern */}
+          <div className="absolute inset-0 bg-linear-to-br from-orange-100/80 via-amber-200/60 to-orange-200/70"></div>
+          <div className="absolute inset-0 opacity-30" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(217, 119, 6, 0.25) 0%, transparent 50%)'
+          }}></div>
+
+          {/* Decorative pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(251, 146, 60, 0.5) 35px, rgba(251, 146, 60, 0.5) 70px)'
+          }}></div>
+
+          {/* Centered image with proper sizing */}
+          <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
+            <img
+              src={blog.featured_image_url}
+              alt={blog.title}
+              className="max-w-full max-h-full object-contain shadow-2xl rounded-lg"
+            />
+          </div>
+
+          {/* Gradient overlays for text readability */}
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-r from-orange-900/20 via-transparent to-orange-900/20 pointer-events-none" />
           
           {/* Navigation at top */}
           <div className="absolute top-0 left-0 right-0 p-6 md:p-8">

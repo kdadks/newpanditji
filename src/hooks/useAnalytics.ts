@@ -132,10 +132,64 @@ async function fetchPopularPages(): Promise<PopularPage[]> {
   }
 }
 
-// Fetch popular services - placeholder since service_views may not exist
+// Fetch popular services from service_views table
 async function fetchPopularServices(): Promise<PopularService[]> {
-  // Return empty array - service tracking can be implemented later
-  return []
+  try {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+    const { data, error } = await supabase
+      .from('service_views')
+      .select('service_id, service_name, session_id, created_at')
+      .gte('created_at', thirtyDaysAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(500)
+
+    if (error) {
+      console.error('Error fetching service views:', error)
+      return []
+    }
+
+    // Aggregate by service_id
+    const serviceStats = new Map<string, {
+      service_name: string
+      view_count: number
+      sessions: Set<string>
+      last_viewed: string
+    }>()
+
+    for (const view of data || []) {
+      const existing = serviceStats.get(view.service_id)
+      if (existing) {
+        existing.view_count++
+        if (view.session_id) existing.sessions.add(view.session_id)
+        if (view.created_at > existing.last_viewed) {
+          existing.last_viewed = view.created_at
+        }
+      } else {
+        serviceStats.set(view.service_id, {
+          service_name: view.service_name,
+          view_count: 1,
+          sessions: view.session_id ? new Set([view.session_id]) : new Set(),
+          last_viewed: view.created_at
+        })
+      }
+    }
+
+    return Array.from(serviceStats.entries())
+      .map(([service_id, stats]) => ({
+        service_id,
+        service_name: stats.service_name,
+        view_count: stats.view_count,
+        unique_visitors: stats.sessions.size,
+        last_viewed: stats.last_viewed
+      }))
+      .sort((a, b) => b.view_count - a.view_count)
+      .slice(0, 10)
+  } catch (err) {
+    console.error('Error in fetchPopularServices:', err)
+    return []
+  }
 }
 
 // Fetch location statistics by aggregating page_views
@@ -259,7 +313,7 @@ async function fetchTotalStats() {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
   try {
-    const [pageViewsResult, uniqueVisitorsResult] = await Promise.all([
+    const [pageViewsResult, uniqueVisitorsResult, serviceViewsResult] = await Promise.all([
       supabase
         .from('page_views')
         .select('*', { count: 'exact', head: true })
@@ -268,7 +322,12 @@ async function fetchTotalStats() {
       supabase
         .from('page_views')
         .select('session_id')
-        .gte('viewed_at', thirtyDaysAgo.toISOString())
+        .gte('viewed_at', thirtyDaysAgo.toISOString()),
+
+      supabase
+        .from('service_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', thirtyDaysAgo.toISOString())
     ])
 
     const uniqueSessions = new Set(
@@ -277,7 +336,7 @@ async function fetchTotalStats() {
 
     return {
       totalPageViews: pageViewsResult.count || 0,
-      totalServiceViews: 0, // Service views tracking not implemented
+      totalServiceViews: serviceViewsResult.count || 0,
       uniqueVisitors: uniqueSessions,
     }
   } catch (err) {

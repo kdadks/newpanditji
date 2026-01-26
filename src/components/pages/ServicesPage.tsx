@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useServices } from '../../hooks/useServices'
+import { trackServiceView } from '../../lib/analytics-tracker'
+import { shouldTrackAnalytics } from '../../lib/analytics-utils'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
@@ -67,6 +69,13 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
     setIsDetailsOpen(true)
+
+    // Track service view (only in production, not localhost/development)
+    if (shouldTrackAnalytics() && service.id) {
+      trackServiceView(service.id, service.name).catch(err => {
+        console.error('Failed to track service view:', err)
+      })
+    }
   }
 
   const goToPage = (page: number) => {

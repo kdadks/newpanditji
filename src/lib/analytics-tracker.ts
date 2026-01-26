@@ -78,20 +78,30 @@ export async function trackPageView(pagePath: string, pageTitle?: string) {
   try {
     const locationData = await getLocationData()
 
+    // Extract domain from referrer if it exists
+    let referrerDomain = null
+    if (document.referrer) {
+      try {
+        const referrerUrl = new URL(document.referrer)
+        referrerDomain = referrerUrl.hostname
+      } catch (e) {
+        // Invalid referrer URL
+      }
+    }
+
     await supabase.from('page_views').insert({
-      page_path: pagePath,
+      page_slug: pagePath,
       page_title: pageTitle || document.title,
-      referrer: document.referrer || null,
+      referrer_url: document.referrer || null,
+      referrer_domain: referrerDomain,
       user_agent: navigator.userAgent,
       ip_address: locationData.ip_address,
       country: locationData.country,
       city: locationData.city,
       region: locationData.region,
-      latitude: locationData.latitude,
-      longitude: locationData.longitude,
       device_type: getDeviceType(),
       browser: getBrowser(),
-      os: getOS(),
+      operating_system: getOS(),
       session_id: getSessionId(),
     })
 
