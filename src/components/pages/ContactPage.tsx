@@ -11,7 +11,9 @@ import {
   Phone, 
   Clock,
   Sparkle,
-  CheckCircle
+  CheckCircle,
+  Heart,
+  Shield
 } from '@phosphor-icons/react'
 import { Badge } from '../ui/badge'
 import {
@@ -23,6 +25,8 @@ import {
 } from '../ui/select'
 import { useContactContent } from '@/hooks/useCmsContent'
 import { renderHighlightedTitle } from '@/utils/renderHighlight'
+import { toast } from 'sonner'
+import { usePageMetadata } from '@/hooks/usePageMetadata'
 
 interface ContactFormData {
   name: string
@@ -43,13 +47,28 @@ export default function ContactPage() {
   })
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
 
+  // SEO Configuration
+  usePageMetadata('contact')
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
+
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    const mailtoLink = `mailto:${cmsContent.email}?subject=Service Inquiry: ${formData.service || 'General'}&body=Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0APhone: ${formData.phone}%0D%0AService Interest: ${formData.service}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`
+    window.location.href = mailtoLink
+
+    toast.success('Opening your email client...')
+
+    setFormData({ name: '', email: '', phone: '', service: '', message: '' })
   }
 
   const toggleItem = (itemId: string) => {
-    setExpandedItem(expandedItem === itemId ? null : itemId)
+    console.log('Toggling FAQ item:', itemId, 'Current expanded:', expandedItem)
+    setExpandedItem(prev => prev === itemId ? null : itemId)
   }
 
   if (isLoading || !cmsContent) {
@@ -60,85 +79,176 @@ export default function ContactPage() {
     )
   }
 
+  const renderFAQAccordion = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Questions Column */}
+      <div className="space-y-4">
+        {cmsContent.faqSection.faqs.map((faq, index) => (
+          <div
+            key={faq.id || `faq-${index}`}
+            className={`p-6 rounded-lg cursor-pointer transition-all duration-300 ${
+              expandedItem === faq.id
+                ? 'bg-primary/10 border-2 border-primary shadow-lg'
+                : 'bg-white/50 border-2 border-transparent hover:bg-white/70 hover:border-primary/30'
+            }`}
+            onClick={() => toggleItem(faq.id)}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                expandedItem === faq.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
+              }`}>
+                <span className="font-semibold text-sm">{index + 1}</span>
+              </div>
+              <h3 className={`font-semibold text-lg transition-colors ${
+                expandedItem === faq.id ? 'text-primary' : 'text-foreground hover:text-primary'
+              }`}>
+                {faq.question}
+              </h3>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Answer Column */}
+      <div className="lg:sticky lg:top-8">
+        {expandedItem ? (
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 border-2 border-primary/20 shadow-lg min-h-[300px]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="text-primary" size={24} weight="fill" />
+              </div>
+              <h3 className="font-heading font-semibold text-xl text-primary">
+                Answer
+              </h3>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-lg">
+              {cmsContent.faqSection.faqs.find(faq => faq.id === expandedItem)?.answer}
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-8 border-2 border-dashed border-primary/30 min-h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <Sparkle className="mx-auto mb-4 text-primary/50" size={48} weight="fill" />
+              <p className="text-muted-foreground text-lg">
+                Click on a question to see the answer here
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="absolute inset-0 z-0">
-          {cmsContent.hero.backgroundImages.map((img, index) => (
-            <div
-              key={index}
-              className="absolute inset-0 opacity-5"
-              style={{
-                backgroundImage: `url(${img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundBlendMode: 'overlay',
-                transform: `scale(${1 + index * 0.05})`,
-                animation: `float ${20 + index * 5}s ease-in-out infinite`,
-              }}
-            />
-          ))}
+    <div className="w-full min-h-screen">
+      {/* Hero Section with Sunrise Effect */}
+      <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
+        {/* Background decoration with animated rolling images */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="flex gap-0 animate-scroll-left w-max h-full">
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-1-${index}-${img.substring(img.lastIndexOf('/') + 1)}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+            ))}
+            {cmsContent.hero.backgroundImages.map((img, index) => (
+              <img key={`bg-2-${index}-${img.substring(img.lastIndexOf('/') + 1)}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-24">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in">
-              <Sparkle size={16} weight="fill" />
+        {/* Sunrise gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+
+        {/* Sun glow effect */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+
+        {/* Light rays */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          {/* Hero Content */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
+              <Heart size={18} weight="fill" className="animate-pulse" />
               {cmsContent.hero.badge}
             </div>
 
-            <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-foreground">
+            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {renderHighlightedTitle(cmsContent.hero.title)}
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
               {cmsContent.hero.description}
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
+            {/* Quick Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {cmsContent.hero.quickActions.map((action, index) => (
                 <Button
-                  key={index}
-                  asChild
+                  key={`action-${index}-${action.text.replace(/\s+/g, '-')}`}
                   size="lg"
-                  className="shadow-lg hover:shadow-xl transition-all hover:scale-105"
-                  variant={index === 0 ? 'default' : 'outline'}
+                  className={`group px-8 py-4 text-lg font-semibold ${
+                    index === 0 
+                      ? 'bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50'
+                      : index === 1
+                      ? 'bg-linear-to-r from-green-700 via-emerald-700 to-green-800 text-white hover:from-green-800 hover:via-emerald-800 hover:to-green-900 shadow-green-800/50'
+                      : 'bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white hover:from-blue-800 hover:via-indigo-800 hover:to-blue-900 shadow-blue-800/50'
+                  } shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 border-2 ${
+                    index === 0 ? 'border-amber-700/30' : index === 1 ? 'border-green-600/40' : 'border-blue-600/40'
+                  }`}
+                  onClick={() => {
+                    if (action.link.startsWith('#')) {
+                      document.getElementById(action.link.substring(1))?.scrollIntoView({ behavior: 'smooth' })
+                    } else if (action.link.startsWith('http')) {
+                      window.open(action.link, '_blank', 'noopener,noreferrer')
+                    } else {
+                      window.location.href = action.link
+                    }
+                  }}
                 >
-                  <a href={action.link}>
-                    <EnvelopeSimple size={20} className="mr-2" />
-                    {action.text}
-                  </a>
+                  {index === 0 ? <EnvelopeSimple size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
+                   index === 1 ? <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
+                   <Sparkle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />}
+                  {action.text}
                 </Button>
               ))}
             </div>
+          </div>
 
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              {cmsContent.hero.trustIndicators.map((indicator, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <CheckCircle size={20} className="text-primary" weight="fill" />
-                  <span className="text-muted-foreground">
-                    <span className="font-semibold text-foreground">{indicator.title}:</span> {indicator.description}
-                  </span>
+          {/* Trust Indicators */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+            {cmsContent.hero.trustIndicators.map((indicator, index) => (
+              <div key={`trust-${index}-${indicator.title.replace(/\s+/g, '-')}`} className="flex items-center justify-center gap-3 p-6">
+                {index === 0 ? <Clock size={28} className="text-amber-400 shrink-0" weight="fill" /> :
+                 index === 1 ? <Shield size={28} className="text-amber-400 shrink-0" weight="fill" /> :
+                 <Sparkle size={28} className="text-amber-400 shrink-0" weight="fill" />}
+                <div className="text-left">
+                  <div className="font-bold text-white text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{indicator.title}</div>
+                  <div className="text-sm text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{indicator.description}</div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Form & Info Section */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <Card className="border-0 shadow-xl">
-                <CardContent className="p-8">
-                  <h2 className="font-heading font-semibold text-3xl mb-2">{cmsContent.hero.subtitle}</h2>
-                  <p className="text-muted-foreground mb-8">
-                    Fill out the form below and I'll get back to you within 24 hours
-                  </p>
+      {/* Main Contact Section */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Contact Form & Info Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            {/* Enhanced Contact Form */}
+            <div id="contact-form" className="order-2 lg:order-1">
+              <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm hover:shadow-3xl transition-all duration-500">
+                <CardContent className="p-4 md:p-5">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 bg-linear-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
+                      <EnvelopeSimple className="text-white" size={28} weight="fill" />
+                    </div>
+                    <div>
+                      <h2 className="font-heading font-bold text-3xl text-primary">{cmsContent.hero.subtitle}</h2>
+                      <p className="text-muted-foreground">Let's start your spiritual journey together</p>
+                    </div>
+                  </div>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,7 +261,7 @@ export default function ContactPage() {
                           id="name"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          placeholder="Your full name"
+                          placeholder="Enter your full name"
                           className="h-12 border-2 border-primary/20 focus:border-primary/50 transition-colors shadow-sm"
                           required
                         />
@@ -240,7 +350,7 @@ export default function ContactPage() {
             </div>
 
             {/* Contact Information */}
-            <div className="space-y-6">
+            <div className="order-1 lg:order-2 space-y-6">
               <Card className="border-0 shadow-xl bg-linear-to-br from-primary/5 to-primary/10">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-3 mb-6">
@@ -300,7 +410,7 @@ export default function ContactPage() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {cmsContent.responseGuarantee.badges.map((badge, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">{badge}</Badge>
+                      <Badge key={`badge-${index}-${badge.replace(/\s+/g, '-')}`} variant="secondary" className="text-xs">{badge}</Badge>
                     ))}
                   </div>
                 </CardContent>
@@ -309,7 +419,7 @@ export default function ContactPage() {
           </div>
 
           {/* FAQ Section */}
-          <div id="faq-section" className="max-w-6xl mx-auto mt-16">
+          <div id="faq-section" className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
                 <Sparkle size={16} weight="fill" />
@@ -321,61 +431,7 @@ export default function ContactPage() {
 
             <Card className="border-0 shadow-xl bg-linear-to-br from-card to-card/80">
               <CardContent className="p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Questions Column */}
-                  <div className="space-y-4">
-                    {cmsContent.faqSection.faqs.map((faq, index) => (
-                      <div
-                        key={faq.id}
-                        className={`p-6 rounded-lg cursor-pointer transition-all duration-300 ${
-                          expandedItem === faq.id
-                            ? 'bg-primary/10 border-2 border-primary shadow-lg'
-                            : 'bg-white/50 border-2 border-transparent hover:bg-white/70 hover:border-primary/30'
-                        }`}
-                        onClick={() => toggleItem(faq.id)}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                            expandedItem === faq.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
-                          }`}>
-                            <span className="font-semibold text-sm">{index + 1}</span>
-                          </div>
-                          <h3 className={`font-semibold text-lg transition-colors ${
-                            expandedItem === faq.id ? 'text-primary' : 'text-foreground hover:text-primary'
-                          }`}>
-                            {faq.question}
-                          </h3>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Answer Column */}
-                  <div className="lg:sticky lg:top-8">
-                    {expandedItem ? (
-                      <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 border-2 border-primary/20 shadow-lg min-h-[300px]">
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                            <CheckCircle className="text-primary" size={24} weight="fill" />
-                          </div>
-                          <h3 className="font-heading font-semibold text-xl text-primary">
-                            Answer
-                          </h3>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed text-lg">
-                          {cmsContent.faqSection.faqs.find(faq => faq.id === expandedItem)?.answer}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="bg-white/50 rounded-lg p-8 border-2 border-dashed border-primary/30 min-h-[300px] flex items-center justify-center">
-                        <p className="text-muted-foreground text-center">
-                          <Sparkle size={32} className="mx-auto mb-4 text-primary" weight="fill" />
-                          Click on a question to see the answer
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {renderFAQAccordion()}
               </CardContent>
             </Card>
           </div>

@@ -573,7 +573,11 @@ function sectionsToContactContent(sections: PageSectionRow[]): ContactPageConten
     faqSection: {
       badge: (faqSection.badge as string) || defaultContactContent.faqSection.badge,
       title: (faqSection.title as string) || defaultContactContent.faqSection.title,
-      faqs: (faqSection.faqs as Array<{ id: string; question: string; answer: string }>) || defaultContactContent.faqSection.faqs,
+      faqs: ((faqSection.faqs as Array<{ id?: string; question: string; answer: string }>) || defaultContactContent.faqSection.faqs).map((faq, index) => ({
+        id: faq.id || `faq-${index + 1}`,
+        question: faq.question,
+        answer: faq.answer
+      })),
     },
     form: {
       nameLabel: (formSection.nameLabel as string) || defaultContactContent.form.nameLabel,

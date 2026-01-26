@@ -232,48 +232,34 @@ export default function ContactPageEditor({ content, setContent, onSave, isSavin
           />
 
           {/* Quick Action Buttons */}
-          <div className="space-y-4 pt-4 border-t">
+          <div className="space-y-2 pt-4 border-t">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">Quick Action Buttons</Label>
               <Button onClick={addQuickAction} size="sm" variant="outline">
                 <Plus size={16} className="mr-1" />
-                Add Button
+                Add
               </Button>
             </div>
             {content.hero.quickActions.map((action, index) => (
-              <Card key={index} className="bg-muted/30">
-                <CardContent className="pt-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Button {index + 1}</span>
-                    <Button onClick={() => removeQuickAction(index)} size="sm" variant="ghost">
-                      <Trash size={16} />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Text</Label>
-                      <Input
-                        value={action.text}
-                        onChange={(e) => updateQuickAction(index, 'text', e.target.value)}
-                        placeholder="Button text"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Link</Label>
-                      <Input
-                        value={action.link}
-                        onChange={(e) => updateQuickAction(index, 'link', e.target.value)}
-                        placeholder="/contact or https://..."
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Icon (optional)</Label>
+              <Card key={`quick-action-${index}-${action.text}`} className="bg-muted/30">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium w-8">#{index + 1}</span>
                     <Input
-                      value={action.icon || ''}
-                      onChange={(e) => updateQuickAction(index, 'icon', e.target.value)}
-                      placeholder="Icon name"
+                      value={action.text}
+                      onChange={(e) => updateQuickAction(index, 'text', e.target.value)}
+                      placeholder="Text"
+                      className="h-8 text-sm"
                     />
+                    <Input
+                      value={action.link}
+                      onChange={(e) => updateQuickAction(index, 'link', e.target.value)}
+                      placeholder="Link"
+                      className="h-8 text-sm"
+                    />
+                    <Button onClick={() => removeQuickAction(index)} size="sm" variant="ghost" className="h-8 w-8 p-0">
+                      <Trash size={14} />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -290,7 +276,7 @@ export default function ContactPageEditor({ content, setContent, onSave, isSavin
               </Button>
             </div>
             {content.hero.trustIndicators.map((indicator, index) => (
-              <Card key={index} className="bg-muted/30">
+              <Card key={`trust-indicator-${index}-${indicator.title}`} className="bg-muted/30">
                 <CardContent className="pt-4 space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Indicator {index + 1}</span>
@@ -485,7 +471,7 @@ export default function ContactPageEditor({ content, setContent, onSave, isSavin
               </Button>
             </div>
             {content.responseGuarantee.badges.map((badge, index) => (
-              <div key={index} className="flex gap-2">
+              <div key={`badge-${index}-${badge}`} className="flex gap-2">
                 <Input
                   value={badge}
                   onChange={(e) => updateResponseBadge(index, e.target.value)}

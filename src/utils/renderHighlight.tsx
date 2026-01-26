@@ -29,14 +29,14 @@ export function renderHighlightedTitle(text: string): React.ReactElement {
         if (highlightMatch) {
           return (
             <span
-              key={index}
+              key={`highlight-${index}-${highlightMatch[1].substring(0, 20)}`}
               className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent"
             >
               {highlightMatch[1]}
             </span>
           )
         }
-        return <span key={index}>{part}</span>
+        return <span key={`text-${index}-${part.substring(0, 20)}`}>{part}</span>
       })}
     </>
   )
