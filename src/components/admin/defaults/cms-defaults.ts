@@ -331,20 +331,93 @@ export const defaultBooksContent: BooksPageContent = {
 
 export const defaultContactContent: ContactPageContent = {
   hero: {
-    title: "Let's Begin Your Sacred Journey",
+    title: "Get in <highlight>Touch</highlight>",
     subtitle: 'Connect With Us',
-    description: "Whether you're planning a traditional ceremony or seeking spiritual guidance, we're here to serve.",
+    description: "Ready to begin your spiritual journey? Whether you're planning a sacred ceremony or seeking spiritual guidance, I'm here to serve you with devotion and authenticity.",
     backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png',
-      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
+      '/images/Raj 1.jpg',
+      '/images/Raj 3.jpg',
+      '/images/Pooja 2.jpg',
+      '/images/Traditional Altar with Marigold Flowers.png'
+    ],
+    badge: 'Connect with Divine Guidance',
+    quickActions: [
+      { text: 'Send Message', link: '#contact-form', icon: 'envelope' },
+      { text: 'WhatsApp Now', link: 'https://wa.me/353123456789', icon: 'whatsapp' },
+      { text: 'FAQ', link: '#faq-section', icon: 'question' }
+    ],
+    trustIndicators: [
+      { title: '24/7 Response', description: 'Quick replies to all inquiries' },
+      { title: 'Confidential', description: 'Your privacy matters' },
+      { title: 'Personalized', description: 'Tailored to your needs' }
     ]
   },
   email: 'panditjoshirajesh@gmail.com',
   phone: '+353 123 456 789',
   whatsapp: '+353 123 456 789',
-  address: 'Serving communities worldwide'
+  address: 'Serving communities worldwide',
+  contactInfoCard: {
+    emailLabel: 'Email',
+    emailBadge: 'Primary Contact',
+    whatsappLabel: 'WhatsApp',
+    whatsappText: 'Click to chat directly • Instant response',
+    serviceAreaLabel: 'Service Area',
+    serviceAreaText: 'Serving communities worldwide with in-person and virtual ceremonies',
+    serviceAreaBadge: 'Global Reach'
+  },
+  responseGuarantee: {
+    title: 'Quick Response Guarantee',
+    description: 'We typically respond to inquiries within 24 hours. For urgent ceremony needs, please contact us directly via WhatsApp or phone for immediate assistance.',
+    badges: ['24hr Response', 'Weekend Available', 'Emergency Support']
+  },
+  faqSection: {
+    badge: 'Common Questions',
+    title: 'Frequently Asked Questions',
+    faqs: [
+      {
+        id: 'faq-1',
+        question: 'How do I book a ceremony?',
+        answer: 'Simply contact us through the form above, WhatsApp, or email with your ceremony requirements. We\'ll discuss the details, date, and arrangements to ensure everything is perfect for your sacred occasion.'
+      },
+      {
+        id: 'faq-2',
+        question: 'Do you provide the pooja materials (samagri)?',
+        answer: 'Yes, we can provide all necessary pooja materials and samagri for ceremonies. We can also guide you on what to arrange if you prefer to gather items yourself. This will be discussed during booking.'
+      },
+      {
+        id: 'faq-3',
+        question: 'What is the dakshina/fee structure?',
+        answer: 'Dakshina varies based on the type and duration of ceremony. We believe in transparent and fair pricing. Please contact us to discuss specific ceremony costs. We work with families to ensure sacred services are accessible.'
+      },
+      {
+        id: 'faq-4',
+        question: 'Can ceremonies be performed virtually?',
+        answer: 'Yes, we offer virtual ceremony options for families who cannot attend in person. While in-person is preferred for traditional rituals, we\'ve adapted to serve devotees worldwide through video consultations and guided virtual ceremonies.'
+      },
+      {
+        id: 'faq-5',
+        question: 'How far in advance should I book?',
+        answer: 'For major ceremonies like weddings and large poojas, we recommend booking 2-4 weeks in advance. For smaller ceremonies and consultations, we can often accommodate requests within a few days. Contact us as early as possible for your preferred date.'
+      },
+      {
+        id: 'faq-6',
+        question: 'Do you explain the rituals during ceremonies?',
+        answer: 'Absolutely! We believe understanding enhances the spiritual experience. Each step and mantra is explained in a way that helps participants connect with the deeper meaning of the ceremony.'
+      }
+    ]
+  },
+  form: {
+    nameLabel: 'Your Full Name',
+    emailLabel: 'Email Address',
+    phoneLabel: 'Phone Number',
+    phoneOptional: 'optional',
+    serviceLabel: 'Service of Interest',
+    servicePlaceholder: 'Select a service (optional)',
+    messageLabel: 'Your Message',
+    messagePlaceholder: 'Share your thoughts, questions, or how I can help you on your spiritual journey...',
+    submitButtonText: 'Send Sacred Message',
+    responseText: 'I typically respond within 24 hours. For urgent matters, please call directly.'
+  }
 }
 
 export const defaultCharityContent: CharityPageContent = {

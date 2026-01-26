@@ -174,12 +174,68 @@ export interface BooksPageContent {
   }
 }
 
+export interface FAQItem {
+  id: string
+  question: string
+  answer: string
+}
+
+export interface TrustIndicator {
+  title: string
+  description: string
+}
+
+export interface QuickActionButton {
+  text: string
+  link: string
+  icon?: string
+}
+
+export interface ContactInfoCard {
+  emailLabel: string
+  emailBadge: string
+  whatsappLabel: string
+  whatsappText: string
+  serviceAreaLabel: string
+  serviceAreaText: string
+  serviceAreaBadge: string
+}
+
+export interface ResponseGuarantee {
+  title: string
+  description: string
+  badges: string[]
+}
+
 export interface ContactPageContent {
-  hero: HeroContent
+  hero: HeroContent & {
+    badge: string
+    quickActions: QuickActionButton[]
+    trustIndicators: TrustIndicator[]
+  }
   email: string
   phone: string
   whatsapp: string
   address: string
+  contactInfoCard: ContactInfoCard
+  responseGuarantee: ResponseGuarantee
+  faqSection: {
+    badge: string
+    title: string
+    faqs: FAQItem[]
+  }
+  form: {
+    nameLabel: string
+    emailLabel: string
+    phoneLabel: string
+    phoneOptional: string
+    serviceLabel: string
+    servicePlaceholder: string
+    messageLabel: string
+    messagePlaceholder: string
+    submitButtonText: string
+    responseText: string
+  }
 }
 
 export interface CharityServiceArea {

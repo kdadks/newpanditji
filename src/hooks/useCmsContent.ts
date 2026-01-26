@@ -537,6 +537,10 @@ function sectionsToContactContent(sections: PageSectionRow[]): ContactPageConten
   
   const heroSection = getSection('hero') as Record<string, unknown>
   const contactSection = getSection('contact_info') as Record<string, unknown>
+  const contactCardSection = getSection('contact_info_card') as Record<string, unknown>
+  const responseSection = getSection('response_guarantee') as Record<string, unknown>
+  const faqSection = getSection('faq_section') as Record<string, unknown>
+  const formSection = getSection('form_labels') as Record<string, unknown>
   
   return {
     hero: {
@@ -544,11 +548,45 @@ function sectionsToContactContent(sections: PageSectionRow[]): ContactPageConten
       subtitle: (heroSection.subtitle as string) || defaultContactContent.hero.subtitle,
       description: (heroSection.description as string) || defaultContactContent.hero.description,
       backgroundImages: (heroSection.backgroundImages as string[]) || defaultContactContent.hero.backgroundImages,
+      badge: (heroSection.badge as string) || defaultContactContent.hero.badge,
+      quickActions: (heroSection.quickActions as Array<{ text: string; link: string; icon?: string }>) || defaultContactContent.hero.quickActions,
+      trustIndicators: (heroSection.trustIndicators as Array<{ title: string; description: string }>) || defaultContactContent.hero.trustIndicators,
     },
     email: (contactSection.email as string) || defaultContactContent.email,
     phone: (contactSection.phone as string) || defaultContactContent.phone,
     whatsapp: (contactSection.whatsapp as string) || defaultContactContent.whatsapp,
     address: (contactSection.address as string) || defaultContactContent.address,
+    contactInfoCard: {
+      emailLabel: (contactCardSection.emailLabel as string) || defaultContactContent.contactInfoCard.emailLabel,
+      emailBadge: (contactCardSection.emailBadge as string) || defaultContactContent.contactInfoCard.emailBadge,
+      whatsappLabel: (contactCardSection.whatsappLabel as string) || defaultContactContent.contactInfoCard.whatsappLabel,
+      whatsappText: (contactCardSection.whatsappText as string) || defaultContactContent.contactInfoCard.whatsappText,
+      serviceAreaLabel: (contactCardSection.serviceAreaLabel as string) || defaultContactContent.contactInfoCard.serviceAreaLabel,
+      serviceAreaText: (contactCardSection.serviceAreaText as string) || defaultContactContent.contactInfoCard.serviceAreaText,
+      serviceAreaBadge: (contactCardSection.serviceAreaBadge as string) || defaultContactContent.contactInfoCard.serviceAreaBadge,
+    },
+    responseGuarantee: {
+      title: (responseSection.title as string) || defaultContactContent.responseGuarantee.title,
+      description: (responseSection.description as string) || defaultContactContent.responseGuarantee.description,
+      badges: (responseSection.badges as string[]) || defaultContactContent.responseGuarantee.badges,
+    },
+    faqSection: {
+      badge: (faqSection.badge as string) || defaultContactContent.faqSection.badge,
+      title: (faqSection.title as string) || defaultContactContent.faqSection.title,
+      faqs: (faqSection.faqs as Array<{ id: string; question: string; answer: string }>) || defaultContactContent.faqSection.faqs,
+    },
+    form: {
+      nameLabel: (formSection.nameLabel as string) || defaultContactContent.form.nameLabel,
+      emailLabel: (formSection.emailLabel as string) || defaultContactContent.form.emailLabel,
+      phoneLabel: (formSection.phoneLabel as string) || defaultContactContent.form.phoneLabel,
+      phoneOptional: (formSection.phoneOptional as string) || defaultContactContent.form.phoneOptional,
+      serviceLabel: (formSection.serviceLabel as string) || defaultContactContent.form.serviceLabel,
+      servicePlaceholder: (formSection.servicePlaceholder as string) || defaultContactContent.form.servicePlaceholder,
+      messageLabel: (formSection.messageLabel as string) || defaultContactContent.form.messageLabel,
+      messagePlaceholder: (formSection.messagePlaceholder as string) || defaultContactContent.form.messagePlaceholder,
+      submitButtonText: (formSection.submitButtonText as string) || defaultContactContent.form.submitButtonText,
+      responseText: (formSection.responseText as string) || defaultContactContent.form.responseText,
+    },
   }
 }
 
@@ -564,6 +602,9 @@ function contactContentToSections(content: ContactPageContent): { sectionKey: st
         subtitle: content.hero.subtitle,
         description: content.hero.description,
         backgroundImages: content.hero.backgroundImages,
+        badge: content.hero.badge,
+        quickActions: content.hero.quickActions,
+        trustIndicators: content.hero.trustIndicators,
       }
     },
     {
@@ -573,6 +614,49 @@ function contactContentToSections(content: ContactPageContent): { sectionKey: st
         phone: content.phone,
         whatsapp: content.whatsapp,
         address: content.address,
+      }
+    },
+    {
+      sectionKey: 'contact_info_card',
+      content: {
+        emailLabel: content.contactInfoCard.emailLabel,
+        emailBadge: content.contactInfoCard.emailBadge,
+        whatsappLabel: content.contactInfoCard.whatsappLabel,
+        whatsappText: content.contactInfoCard.whatsappText,
+        serviceAreaLabel: content.contactInfoCard.serviceAreaLabel,
+        serviceAreaText: content.contactInfoCard.serviceAreaText,
+        serviceAreaBadge: content.contactInfoCard.serviceAreaBadge,
+      }
+    },
+    {
+      sectionKey: 'response_guarantee',
+      content: {
+        title: content.responseGuarantee.title,
+        description: content.responseGuarantee.description,
+        badges: content.responseGuarantee.badges,
+      }
+    },
+    {
+      sectionKey: 'faq_section',
+      content: {
+        badge: content.faqSection.badge,
+        title: content.faqSection.title,
+        faqs: content.faqSection.faqs,
+      }
+    },
+    {
+      sectionKey: 'form_labels',
+      content: {
+        nameLabel: content.form.nameLabel,
+        emailLabel: content.form.emailLabel,
+        phoneLabel: content.form.phoneLabel,
+        phoneOptional: content.form.phoneOptional,
+        serviceLabel: content.form.serviceLabel,
+        servicePlaceholder: content.form.servicePlaceholder,
+        messageLabel: content.form.messageLabel,
+        messagePlaceholder: content.form.messagePlaceholder,
+        submitButtonText: content.form.submitButtonText,
+        responseText: content.form.responseText,
       }
     }
   ]
