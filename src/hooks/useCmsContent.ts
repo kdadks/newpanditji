@@ -13,6 +13,7 @@ import type {
   ContactPageContent,
   CharityPageContent,
   DakshinaPageContent,
+  GalleryPageContent,
   HeaderContent,
   FooterContent
 } from '../components/admin/types/cms-types'
@@ -26,6 +27,7 @@ import {
   defaultContactContent,
   defaultCharityContent,
   defaultDakshinaContent,
+  defaultGalleryContent,
   defaultHeaderContent,
   defaultFooterContent
 } from '../components/admin/defaults/cms-defaults'
@@ -35,7 +37,7 @@ const CMS_PAGES_KEY = ['cms_pages']
 const CMS_SECTIONS_KEY = ['cms_sections']
 
 // Page slug mapping
-export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina'
+export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery'
 
 // ============================================================================
 // Database Operations
@@ -704,6 +706,7 @@ function sectionsToCharityContent(sections: PageSectionRow[]): CharityPageConten
       description: (projectsSection.description as string) || defaultCharityContent.featuredProjects.description,
       videoUrl: (projectsSection.videoUrl as string) || defaultCharityContent.featuredProjects.videoUrl,
       stats: (projectsSection.stats as typeof defaultCharityContent.featuredProjects.stats) || defaultCharityContent.featuredProjects.stats,
+      projectTags: (projectsSection.projectTags as string[]) || defaultCharityContent.featuredProjects.projectTags,
     },
     serviceAreas: {
       badge: (areasSection.badge as string) || defaultCharityContent.serviceAreas.badge,
@@ -736,6 +739,7 @@ function sectionsToCharityContent(sections: PageSectionRow[]): CharityPageConten
       description: (ctaSection.description as string) || defaultCharityContent.ctaSection.description,
       buttons: (ctaSection.buttons as typeof defaultCharityContent.ctaSection.buttons) || defaultCharityContent.ctaSection.buttons,
       backgroundImage: (ctaSection.backgroundImage as string) || defaultCharityContent.ctaSection.backgroundImage,
+      footerNote: (ctaSection.footerNote as string) || defaultCharityContent.ctaSection.footerNote,
     },
   }
 }
@@ -775,6 +779,7 @@ function charityContentToSections(content: CharityPageContent): { sectionKey: st
         description: content.featuredProjects.description,
         videoUrl: content.featuredProjects.videoUrl,
         stats: content.featuredProjects.stats,
+        projectTags: content.featuredProjects.projectTags,
       }
     },
     {
@@ -822,6 +827,7 @@ function charityContentToSections(content: CharityPageContent): { sectionKey: st
         description: content.ctaSection.description,
         buttons: content.ctaSection.buttons,
         backgroundImage: content.ctaSection.backgroundImage,
+        footerNote: content.ctaSection.footerNote,
       }
     }
   ]
@@ -1057,6 +1063,63 @@ export function useDakshinaContent() {
     sectionsToDakshinaContent,
     dakshinaContentToSections,
     defaultDakshinaContent
+  )
+}
+
+// ============================================================================
+// Gallery Page Content
+// ============================================================================
+
+/**
+ * Convert database sections to GalleryPageContent
+ */
+function sectionsToGalleryContent(sections: PageSectionRow[]): GalleryPageContent {
+  const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
+  
+  const heroSection = getSection('hero') as Record<string, unknown>
+  
+  return {
+    hero: {
+      badge: (heroSection.badge as string) || defaultGalleryContent.hero.badge,
+      title: (heroSection.title as string) || defaultGalleryContent.hero.title,
+      subtitle: (heroSection.subtitle as string) || defaultGalleryContent.hero.subtitle,
+      description: (heroSection.description as string) || defaultGalleryContent.hero.description,
+      backgroundImages: (heroSection.backgroundImages as string[]) || defaultGalleryContent.hero.backgroundImages,
+      statistics: (heroSection.statistics as typeof defaultGalleryContent.hero.statistics) || defaultGalleryContent.hero.statistics,
+      ctaButtons: (heroSection.ctaButtons as typeof defaultGalleryContent.hero.ctaButtons) || defaultGalleryContent.hero.ctaButtons,
+    },
+  }
+}
+
+/**
+ * Convert GalleryPageContent to database sections
+ */
+function galleryContentToSections(content: GalleryPageContent): { sectionKey: string; content: Record<string, unknown> }[] {
+  return [
+    {
+      sectionKey: 'hero',
+      content: {
+        badge: content.hero.badge,
+        title: content.hero.title,
+        subtitle: content.hero.subtitle,
+        description: content.hero.description,
+        backgroundImages: content.hero.backgroundImages,
+        statistics: content.hero.statistics,
+        ctaButtons: content.hero.ctaButtons,
+      }
+    }
+  ]
+}
+
+/**
+ * Hook for Gallery page content
+ */
+export function useGalleryContent() {
+  return useCmsContent(
+    'gallery',
+    sectionsToGalleryContent,
+    galleryContentToSections,
+    defaultGalleryContent
   )
 }
 

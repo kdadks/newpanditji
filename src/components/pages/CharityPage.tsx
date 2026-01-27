@@ -24,6 +24,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { getOptimizedImageProps } from '../../utils/imageOptimization'
 import { useDisableAnimations } from '../../hooks/useMediaQuery'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface CharityProject {
   id: string
@@ -153,7 +154,7 @@ export default function CharityPage() {
                 key={`bg-1-${index}`}
                 src={img}
                 alt=""
-                className="h-full w-auto object-contain opacity-40 shrink-0"
+                className="h-full w-auto object-contain opacity-60 shrink-0"
                 loading="lazy"
                 decoding="async"
               />
@@ -163,7 +164,7 @@ export default function CharityPage() {
                 key={`bg-2-${index}`}
                 src={img}
                 alt=""
-                className="h-full w-auto object-contain opacity-40 shrink-0"
+                className="h-full w-auto object-contain opacity-60 shrink-0"
                 aria-hidden="true"
                 loading="lazy"
                 decoding="async"
@@ -207,18 +208,18 @@ export default function CharityPage() {
               </div>
 
               {/* Title */}
-              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-                {cmsContent.hero.title}
+              <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+                {renderHighlightedTitle(cmsContent.hero.title)}
               </h1>
 
               {/* Subtitle */}
-              <p className="text-lg md:text-xl lg:text-2xl font-semibold bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent mb-6 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {cmsContent.hero.subtitle}
+              <p className="text-xl md:text-2xl text-white/95 font-medium mb-6 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                {renderHighlightedTitle(cmsContent.hero.subtitle)}
               </p>
 
               {/* Description */}
               <p className="text-lg md:text-xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                {cmsContent.hero.description}
+                {renderHighlightedTitle(cmsContent.hero.description)}
               </p>
 
               {/* Statistics - Compact inline */}
@@ -269,10 +270,10 @@ export default function CharityPage() {
                   </Badge>
                 </div>
                 <h2 className="font-heading font-black text-4xl md:text-6xl mb-6">
-                  {cmsContent.featuredProjects.title}
+                  {renderHighlightedTitle(cmsContent.featuredProjects.title)}
                 </h2>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-                  {cmsContent.featuredProjects.description}
+                  {renderHighlightedTitle(cmsContent.featuredProjects.description)}
                 </p>
               </div>
             ) : (
@@ -293,13 +294,13 @@ export default function CharityPage() {
                   variants={fadeInUp}
                   className="font-heading font-black text-4xl md:text-6xl mb-6"
                 >
-                  {cmsContent.featuredProjects.title}
+                  {renderHighlightedTitle(cmsContent.featuredProjects.title)}
                 </motion.h2>
                 <motion.p
                   variants={fadeInUp}
                   className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
                 >
-                  {cmsContent.featuredProjects.description}
+                  {renderHighlightedTitle(cmsContent.featuredProjects.description)}
                 </motion.p>
               </motion.div>
             )}
@@ -447,18 +448,14 @@ export default function CharityPage() {
 
                           {/* Tags */}
                           <div className="flex flex-wrap gap-2 pt-4 border-t border-primary/10">
-                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
-                              <Globe size={12} className="mr-1" />
-                              Global Impact
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
-                              <Users size={12} className="mr-1" />
-                              Community
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs px-2.5 py-1">
-                              <Heart size={12} className="mr-1" weight="fill" />
-                              Spiritual
-                            </Badge>
+                            {(cmsContent.featuredProjects.projectTags || []).map((tag, tagIndex) => (
+                              <Badge key={tagIndex} variant="secondary" className="text-xs px-2.5 py-1">
+                                {tag === 'Global Impact' && <Globe size={12} className="mr-1" />}
+                                {tag === 'Community' && <Users size={12} className="mr-1" />}
+                                {tag === 'Spiritual' && <Heart size={12} className="mr-1" weight="fill" />}
+                                {tag}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
                       </CardContent>
@@ -506,10 +503,10 @@ export default function CharityPage() {
                       <Target className="text-primary" size={24} weight="fill" />
                     </div>
                     <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
-                      {cmsContent.missionVision.missionTitle}
+                      {renderHighlightedTitle(cmsContent.missionVision.missionTitle)}
                     </h3>
                     <p className="text-base text-muted-foreground leading-relaxed">
-                      {cmsContent.missionVision.missionDescription}
+                      {renderHighlightedTitle(cmsContent.missionVision.missionDescription)}
                     </p>
                   </CardContent>
                 </Card>
@@ -528,10 +525,10 @@ export default function CharityPage() {
                       <Sparkle className="text-primary" size={24} weight="fill" />
                     </div>
                     <h3 className="font-heading font-black text-2xl md:text-3xl mb-4">
-                      {cmsContent.missionVision.visionTitle}
+                      {renderHighlightedTitle(cmsContent.missionVision.visionTitle)}
                     </h3>
                     <p className="text-base text-muted-foreground leading-relaxed">
-                      {cmsContent.missionVision.visionDescription}
+                      {renderHighlightedTitle(cmsContent.missionVision.visionDescription)}
                     </p>
                   </CardContent>
                 </Card>
@@ -553,9 +550,9 @@ export default function CharityPage() {
                       <div className="mb-3 inline-block p-2 bg-linear-to-br from-primary/10 to-accent/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
                         {getIconComponent(value.icon, 24, 'text-primary')}
                       </div>
-                      <h4 className="font-heading font-bold text-lg mb-2">{value.title}</h4>
+                      <h4 className="font-heading font-bold text-lg mb-2">{renderHighlightedTitle(value.title)}</h4>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {value.description}
+                        {renderHighlightedTitle(value.description)}
                       </p>
                     </CardContent>
                   </Card>
@@ -599,14 +596,14 @@ export default function CharityPage() {
                 variants={fadeInUp}
                 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl mb-4 drop-shadow-lg"
               >
-                {cmsContent.ctaSection.title}
+                {renderHighlightedTitle(cmsContent.ctaSection.title)}
               </motion.h2>
 
               <motion.p
                 variants={fadeInUp}
                 className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow-md max-w-2xl mx-auto"
               >
-                {cmsContent.ctaSection.description}
+                {renderHighlightedTitle(cmsContent.ctaSection.description)}
               </motion.p>
 
               <motion.div
@@ -633,7 +630,7 @@ export default function CharityPage() {
                 variants={fadeInUp}
                 className="text-xs md:text-sm text-white/70 mt-6 drop-shadow-sm"
               >
-                All contributions directly support our educational programs and community service initiatives
+                {renderHighlightedTitle(cmsContent.ctaSection.footerNote || '')}
               </motion.p>
             </motion.div>
           </div>
@@ -642,3 +639,5 @@ export default function CharityPage() {
     </div>
   )
 }
+
+

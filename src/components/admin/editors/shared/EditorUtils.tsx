@@ -47,7 +47,8 @@ export const getPageTitle = (key: PageKey): string => {
     books: 'Books',
     contact: 'Contact',
     charity: 'Charity',
-    dakshina: 'Dakshina'
+    dakshina: 'Dakshina',
+    gallery: 'Gallery'
   }
   return titles[key]
 }

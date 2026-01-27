@@ -6,6 +6,7 @@ export { default as BooksPageEditor } from './BooksPageEditor'
 export { default as ContactPageEditor } from './ContactPageEditor'
 export { default as CharityPageEditor } from './CharityPageEditor'
 export { default as DakshinaPageEditor } from './DakshinaPageEditor'
+export { default as GalleryPageEditor } from './GalleryPageEditor'
 
 // Section Editors
 export { default as HeaderEditor } from './HeaderEditor'

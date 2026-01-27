@@ -260,3 +260,27 @@
     --color-bg-overlay: var(--color-neutral-3);
   }
 }
+
+@layer utilities {
+  .bg-linear-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  }
+  .bg-linear-to-t {
+    background-image: linear-gradient(to top, var(--tw-gradient-stops));
+  }
+  .bg-linear-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+  }
+  .bg-linear-to-bl {
+    background-image: linear-gradient(to bottom left, var(--tw-gradient-stops));
+  }
+  .bg-linear-to-l {
+    background-image: linear-gradient(to left, var(--tw-gradient-stops));
+  }
+  .bg-linear-to-b {
+    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+  }
+  .bg-gradient-radial {
+    background-image: radial-gradient(var(--tw-gradient-stops));
+  }
+}

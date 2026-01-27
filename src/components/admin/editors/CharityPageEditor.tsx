@@ -64,8 +64,9 @@ export default function CharityPageEditor({ content, setContent, onSave, isSavin
               <Input
                 value={content.hero.title || ''}
                 onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, title: e.target.value } }))}
-                placeholder="eYogi Gurukul"
+                placeholder="eYogi Gurukul - <highlight>Spreading Dharma</highlight>"
               />
+              <p className="text-xs text-muted-foreground">Use &lt;highlight&gt;text&lt;/highlight&gt; for gradient text</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -73,8 +74,9 @@ export default function CharityPageEditor({ content, setContent, onSave, isSavin
             <Input
               value={content.hero.subtitle || ''}
               onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, subtitle: e.target.value } }))}
-              placeholder="Spreading Sanatan Dharma..."
+              placeholder="<highlight>Spreading Dharma</highlight> One Heart at a Time"
             />
+            <p className="text-xs text-muted-foreground">Use &lt;highlight&gt;text&lt;/highlight&gt; for gradient text</p>
           </div>
           <div className="space-y-2">
             <Label>Description</Label>
@@ -215,6 +217,29 @@ export default function CharityPageEditor({ content, setContent, onSave, isSavin
               onChange={(e) => setContent(prev => ({ ...prev, featuredProjects: { ...prev.featuredProjects!, videoUrl: e.target.value } }))}
               placeholder="https://www.youtube.com/watch?v=..."
             />
+          </div>
+          <div className="border-t pt-4 mt-4">
+            <Label className="text-base font-semibold mb-3 block">Project Tags</Label>
+            <div className="space-y-2">
+              {content.featuredProjects?.projectTags?.map((tag, idx) => (
+                <div key={idx} className="flex gap-2 items-center bg-muted/30 p-3 rounded-lg">
+                  <Badge variant="secondary" className="shrink-0">{idx + 1}</Badge>
+                  <Input
+                    value={tag}
+                    onChange={(e) => setContent(prev => ({ ...prev, featuredProjects: { ...prev.featuredProjects!, projectTags: prev.featuredProjects?.projectTags?.map((t, i) => i === idx ? e.target.value : t) || [] } }))}
+                    placeholder="e.g., Global Impact, Community, Spiritual"
+                    className="flex-1"
+                  />
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setContent(prev => ({ ...prev, featuredProjects: { ...prev.featuredProjects!, projectTags: prev.featuredProjects?.projectTags?.filter((_, i) => i !== idx) || [] } }))}>
+                    <Trash size={14} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" className="mt-2" onClick={() => setContent(prev => ({ ...prev, featuredProjects: { ...prev.featuredProjects!, projectTags: [...(prev.featuredProjects?.projectTags || []), ''] } }))}>
+              <Plus size={14} className="mr-2" />
+              Add Tag
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -357,12 +382,18 @@ export default function CharityPageEditor({ content, setContent, onSave, isSavin
               rows={2}
             />
           </div>
+          <MediaPickerInput
+            label="Background Image"
+            value={content.ctaSection?.backgroundImage || ''}
+            onChange={(url) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection!, backgroundImage: url } }))}
+            placeholder="Select or paste background image URL"
+          />
           <div className="space-y-2">
-            <Label>Background Image URL (optional)</Label>
+            <Label>Footer Note (appears below buttons)</Label>
             <Input
-              value={content.ctaSection?.backgroundImage || ''}
-              onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection!, backgroundImage: e.target.value } }))}
-              placeholder="/images/temple.png"
+              value={content.ctaSection?.footerNote || ''}
+              onChange={(e) => setContent(prev => ({ ...prev, ctaSection: { ...prev.ctaSection!, footerNote: e.target.value } }))}
+              placeholder="All contributions directly support our educational programs..."
             />
           </div>
           <div className="border-t pt-4 mt-4">

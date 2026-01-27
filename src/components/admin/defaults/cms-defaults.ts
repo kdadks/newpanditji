@@ -6,6 +6,7 @@ import type {
   ContactPageContent,
   CharityPageContent,
   DakshinaPageContent,
+  GalleryPageContent,
   HeaderContent,
   FooterContent,
   MenuItem
@@ -424,8 +425,8 @@ export const defaultCharityContent: CharityPageContent = {
   hero: {
     badge: 'Serving Since 2001',
     title: 'eYogi Gurukul',
-    subtitle: 'Spreading Sanatan Dharma, One Heart at a Time',
-    description: 'Founded by Rajesh Joshi ji, eYogi Gurukul is dedicated to preserving and propagating the timeless wisdom of Sanatan Dharma through education, service, and community development.',
+    subtitle: '<highlight>Spreading Dharma</highlight> One Heart at a Time',
+    description: 'Rajesh ji is dedicated to preserving and propagating the timeless wisdom of Indian Knowledge System through education, service, and community development.',
     logoImage: '/images/Logo/Raj ji.png',
     backgroundImages: [
       '/images/South Asian Temple Complex.png',
@@ -436,7 +437,7 @@ export const defaultCharityContent: CharityPageContent = {
     statistics: [
       { value: '500+', label: 'Students Taught' },
       { value: '10+', label: 'Countries Reached' },
-      { value: '5+', label: 'Published Books' },
+      { value: '1000+', label: 'Gita Donated' },
       { value: '1000+', label: 'Lives Impacted' }
     ],
     ctaButtons: [
@@ -464,7 +465,8 @@ export const defaultCharityContent: CharityPageContent = {
       { value: '10+', label: 'Years of Service' },
       { value: '24/7', label: 'Spiritual Support' },
       { value: '100%', label: 'Free Education' }
-    ]
+    ],
+    projectTags: ['Global Impact', 'Community', 'Spiritual']
   },
   serviceAreas: {
     badge: 'What We Do',
@@ -614,7 +616,8 @@ export const defaultCharityContent: CharityPageContent = {
       { text: 'Get Involved Today', link: '/contact', variant: 'primary' },
       { text: 'Explore Our Work', link: '#mission', variant: 'outline' }
     ],
-    backgroundImage: '/images/Golden Temples of Devotion.png'
+    backgroundImage: '/images/Golden Temples of Devotion.png',
+    footerNote: 'All contributions directly support our educational programs and community service initiatives'
   }
 }
 
@@ -709,6 +712,31 @@ export const defaultDakshinaContent: DakshinaPageContent = {
     description: 'Contact us today to discuss your ceremony needs and receive personalized guidance for your spiritual practices.',
     primaryButtonText: 'Contact Us',
     secondaryButtonText: 'View Services'
+  }
+}
+
+export const defaultGalleryContent: GalleryPageContent = {
+  hero: {
+    badge: 'Divine Moments',
+    title: 'Sacred <highlight>Gallery</highlight>',
+    subtitle: 'Immerse yourself in the divine beauty of Hindu ceremonies, pooja rituals, and spiritual moments captured in sacred time',
+    description: 'Explore our collection of sacred videos and photos from ceremonies and spiritual events',
+    backgroundImages: [
+      '/images/Raj 1.jpg',
+      '/images/Raj 2.jpg',
+      '/images/Pooja 1.jpg',
+      '/images/Golden Temples of Devotion.png'
+    ],
+    statistics: [
+      { value: '200+', label: 'Ceremonies' },
+      { value: '50+', label: 'Videos' },
+      { value: '1000+', label: 'Photos' },
+      { value: '15+', label: 'Years' }
+    ],
+    ctaButtons: [
+      { text: 'Watch Sacred Videos', link: '#videos', variant: 'outline' },
+      { text: 'View Divine Photos', link: '#photos', variant: 'primary' }
+    ]
   }
 }
 

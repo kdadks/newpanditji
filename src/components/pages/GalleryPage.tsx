@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useVideos, type Video } from '../../hooks/useVideos'
 import { usePhotos } from '../../hooks/usePhotos'
+import { useGalleryContent } from '../../hooks/useCmsContent'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch } from '@phosphor-icons/react'
 import { videos as defaultVideos } from '../../lib/data'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface Photo {
   id: string
@@ -58,6 +60,7 @@ const defaultPhotos: Photo[] = [
 export default function GalleryPage() {
   usePageMetadata('gallery')
 
+  const { content: galleryContent, isLoading: loadingGalleryContent } = useGalleryContent()
   const { videos: dbVideos, isLoading: loadingVideos } = useVideos()
   const { photos: dbPhotos, isLoading: loadingPhotos } = usePhotos()
   
@@ -118,7 +121,7 @@ export default function GalleryPage() {
         {/* Background decoration with animated rolling images */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex gap-0 animate-scroll-left w-max h-full">
-            {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
+            {galleryContent.hero.backgroundImages.map((img, index) => (
               <img
                 key={`bg-1-${index}`}
                 src={img}
@@ -128,7 +131,7 @@ export default function GalleryPage() {
                 decoding="async"
               />
             ))}
-            {['/images/Raj 1.jpg', '/images/Raj 2.jpg', '/images/Pooja 1.jpg', '/images/Golden Temples of Devotion.png'].map((img, index) => (
+            {galleryContent.hero.backgroundImages.map((img, index) => (
               <img
                 key={`bg-2-${index}`}
                 src={img}
@@ -156,54 +159,56 @@ export default function GalleryPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <Images size={18} weight="fill" className="animate-pulse" />
-              Divine Moments
+              {galleryContent.hero.badge}
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              Sacred <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Gallery</span>
+              {renderHighlightedTitle(galleryContent.hero.title)}
             </h1>
 
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium">
-              Immerse yourself in the divine beauty of Hindu ceremonies, pooja rituals, and spiritual moments captured in sacred time
+              {galleryContent.hero.subtitle}
             </p>
 
             {/* Stats - Compact inline version */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8">
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">200+</span>{' '}
-                <span className="font-semibold text-white/95">Ceremonies</span>
-              </span>
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">50+</span>{' '}
-                <span className="font-semibold text-white/95">Videos</span>
-              </span>
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">1000+</span>{' '}
-                <span className="font-semibold text-white/95">Photos</span>
-              </span>
-              <span className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-                <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">15+</span>{' '}
-                <span className="font-semibold text-white/95">Years</span>
-              </span>
+              {galleryContent.hero.statistics?.map((stat, index) => (
+                <span key={index} className="text-base md:text-lg text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap min-w-[110px] text-center" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+                  <span className="font-extrabold text-transparent bg-linear-to-br from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-xl md:text-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">{stat.value}</span>{' '}
+                  <span className="font-semibold text-white/95">{stat.label}</span>
+                </span>
+              ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                size="lg"
-                onClick={() => setActiveTab('videos')}
-                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 text-white hover:from-slate-800 hover:via-slate-900 hover:to-black shadow-2xl hover:shadow-3xl shadow-slate-900/50 transition-all duration-300 hover:scale-105 border-2 border-slate-600/40"
-              >
-                <PlayCircle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
-                Watch Sacred Videos
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => setActiveTab('photos')}
-                className="group px-8 py-4 text-lg font-semibold bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 shadow-2xl hover:shadow-3xl shadow-orange-800/50 transition-all duration-300 hover:scale-105 border-2 border-orange-600/40"
-              >
-                <Images size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
-                View Divine Photos
-              </Button>
+              {galleryContent.hero.ctaButtons?.map((btn, index) => (
+                <Button
+                  key={index}
+                  size="lg"
+                  onClick={() => {
+                    if (btn.link === '#videos') setActiveTab('videos')
+                    else if (btn.link === '#photos') setActiveTab('photos')
+                    else if (btn.link.startsWith('#')) {
+                      const el = document.querySelector(btn.link)
+                      el?.scrollIntoView({ behavior: 'smooth' })
+                    } else {
+                      window.location.href = btn.link
+                    }
+                  }}
+                  className={`group px-8 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 border-2 ${
+                    btn.variant === 'outline' 
+                      ? 'bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 text-white hover:from-slate-800 hover:via-slate-900 hover:to-black shadow-slate-900/50 border-slate-600/40'
+                      : 'bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 shadow-orange-800/50 border-orange-600/40'
+                  }`}
+                >
+                  {btn.variant === 'outline' ? (
+                    <PlayCircle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                  ) : (
+                    <Images size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />
+                  )}
+                  {btn.text}
+                </Button>
+              ))}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 // CMS Content Type Definitions
 
-export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina'
+export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery'
 export type SectionKey = 'header' | 'footer' | 'menu'
 
 // Base Interfaces
@@ -286,6 +286,7 @@ export interface CharityPageContent {
     description: string
     videoUrl?: string
     stats: StatisticItem[]
+    projectTags?: string[]
   }
   serviceAreas: {
     badge: string
@@ -318,6 +319,7 @@ export interface CharityPageContent {
     description: string
     buttons: CTAButton[]
     backgroundImage?: string
+    footerNote?: string
   }
 }
 
@@ -357,6 +359,19 @@ export interface DakshinaPageContent {
     description: string
     primaryButtonText: string
     secondaryButtonText: string
+  }
+}
+
+// Gallery Page Content
+export interface GalleryPageContent {
+  hero: {
+    badge: string
+    title: string
+    subtitle: string
+    description: string
+    backgroundImages: string[]
+    statistics: StatisticItem[]
+    ctaButtons?: CTAButton[]
   }
 }
 

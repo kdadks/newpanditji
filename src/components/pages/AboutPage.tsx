@@ -83,7 +83,7 @@ export default function AboutPage({ }: AboutPageProps) {
               </div>
 
               <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-                {cmsContent.hero.title} <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
+                {cmsContent.hero.title} <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
               </h1>
 
               <p className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
