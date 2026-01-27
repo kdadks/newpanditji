@@ -7,631 +7,325 @@ import type {
   CharityPageContent,
   DakshinaPageContent,
   GalleryPageContent,
+  TestimonialsPageContent,
   HeaderContent,
   FooterContent,
   MenuItem
 } from '../types/cms-types'
 
+// Empty defaults - Admin must fill content via CMS
+
 export const defaultHomeContent: HomePageContent = {
   hero: {
-    title: 'Experience Authentic Hindu Ceremonies',
-    subtitle: 'Traditional Hindu Priest & Spiritual Guide',
-    description: 'Discover the profound beauty of traditional Hindu rituals performed with devotion, wisdom, and centuries-old knowledge by Pandit Rajesh Joshi.',
-    backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png',
-      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
-    ],
-    profileImage: '/images/Logo/Raj ji.png',
-    statistics: [
-      { label: 'Poojas', value: '500+' },
-      { label: 'Clients', value: '250+' },
-      { label: 'Years', value: '15+' },
-      { label: 'Books', value: '5' }
-    ],
-    ctaButtons: [
-      { text: 'About Us', link: '/about', variant: 'primary' },
-      { text: 'Why Choose Us', link: '/why-choose-us', variant: 'outline' },
-      { text: 'Explore Services', link: '/services', variant: 'outline' }
-    ]
+    title: '',
+    subtitle: '',
+    description: '',
+    profileImage: '',
+    backgroundImages: [],
+    statistics: [],
+    ctaButtons: []
   },
   photoGallery: {
-    badge: 'Our Journey',
-    title: 'Moments of Devotion & Service',
-    description: 'Glimpses of sacred ceremonies and spiritual gatherings',
-    images: [
-      '/images/Raj 1.jpg',
-      '/images/Pooja 1.jpg',
-      '/images/Raj 2.jpg',
-      '/images/Pooja 2.jpg',
-      '/images/Raj 3.jpg',
-      '/images/Pooja 3.jpg'
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    images: []
   },
   services: {
-    badge: 'Our Sacred Services',
-    title: 'Comprehensive Spiritual Services',
-    description: 'From birth ceremonies to final rites, we provide authentic Hindu rituals and spiritual guidance for every sacred moment in life.',
-    buttonText: 'View All 40+ Services'
+    badge: '',
+    title: '',
+    description: '',
+    buttonText: ''
   },
   sacredSpaces: {
-    badge: 'Sacred Spaces',
-    title: 'Divine Temples & Sacred Altars',
-    description: 'Experience the beauty and serenity of traditional Hindu temples and ceremonial spaces',
-    spaces: [
-      { image: '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png', title: 'Divine Vaidyanath Temple', subtitle: 'Sacred Hindu Architecture' },
-      { image: '/images/Golden Temples of Devotion.png', title: 'Golden Temples', subtitle: 'Places of Worship & Devotion' },
-      { image: '/images/South Asian Temple Complex.png', title: 'Temple Complex', subtitle: 'Traditional Sacred Grounds' },
-      { image: '/images/Traditional Altar with Marigold Flowers.png', title: 'Sacred Altar', subtitle: 'Adorned with Marigold Flowers' }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    spaces: []
   },
-  featureCards: [
-    { title: 'Deep Knowledge', description: 'Extensive understanding of Hindu scriptures, rituals, and traditions passed through generations', icon: 'BookOpenText' },
-    { title: 'Devotional Service', description: 'Every ceremony performed with genuine devotion, care, and respect for sacred traditions', icon: 'Heart' },
-    { title: 'Community Focused', description: 'Dedicated to serving families and communities with accessible spiritual guidance', icon: 'Users' }
-  ],
+  featureCardsHeader: {
+    badge: '',
+    title: '',
+    description: ''
+  },
+  featureCards: [],
   ctaSection: {
-    title: 'Ready to Begin Your Spiritual Journey?',
-    description: 'Contact us to discuss your ceremony needs or for spiritual consultation',
-    ctaButtons: [
-      { text: 'Get in Touch', link: '/contact', variant: 'primary' }
-    ]
+    title: '',
+    description: '',
+    ctaButtons: []
   }
 }
 
 export const defaultAboutContent: AboutPageContent = {
   hero: {
-    title: 'Meet Rajesh Joshi',
-    subtitle: '"eYogi Raj"',
-    description: 'Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker bridging ancient wisdom with modern life.',
-    backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png',
-      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
-    ]
+    title: '',
+    subtitle: '',
+    description: '',
+    backgroundImages: []
   },
-  profileImage: '/images/Logo/Raj ji.png',
-  badge: 'Hindu Scholar & Spiritual Guide',
-  name: 'Rajesh Joshi',
-  title: '"eYogi Raj"',
-  shortBio: 'Indian-born Irish Industrialist, Hindu scholar, pandit, author, poet, and motivational speaker bridging ancient wisdom with modern life.',
-  statistics: [
-    { label: 'Poojas', value: '200+' },
-    { label: 'Poems', value: '100+' },
-    { label: 'Years Teaching', value: '10+' },
-    { label: 'Books', value: '6' }
-  ],
-  ctaButtons: [
-    { text: 'Published Books', link: '/books', variant: 'primary' },
-    { text: 'Charity Work', link: '/charity', variant: 'outline' },
-    { text: 'Testimonials', link: '/testimonials', variant: 'outline' }
-  ],
+  profileImage: '',
+  badge: '',
+  title: '',
+  shortBio: '',
+  statistics: [],
+  ctaButtons: [],
   spiritualJourney: {
-    title: 'The Spiritual Journey',
-    content: `<p>Over a decade ago, Rajesh Ji's life took a transformative turn when he experienced stress-induced high blood pressure. Understanding that the root cause was stress and anxiety, he embraced the path of spirituality and Sanatana Dharma. Beginning with meditation, he experienced immediate benefits that revealed the profound science behind the Indian Knowledge System.</p>
-<p>This awakening led him to explore the vast ocean of 10 million scriptures within the Indian Knowledge System.</p>
-<p>Realizing that ancient wisdom of the Indian subcontinent holds solutions for two-thirds of human mind's problems, he immersed himself in Hindu scriptures: Vedas, Upanishads, Ramayana, Mahabharata, Puranas, Yogic literature, Agama Tantras, and modern interpretations of ancient knowledge. This deep study led him to create his own meditation methodology, the <strong>"eYogi Yoga and Meditation Guide"</strong> for beginners.</p>
-<p>Rajesh Ji has conducted <strong>200+ poojas since 2001</strong> alongside his industrial career, performing all ceremonies without any monetary gain. His commitment to Karma Kanda (Daily Rituals) and the power of Bhakti has made him a beacon of authentic Vedic traditions.</p>`,
-    meditationPrograms: [
-      'Art of Living Sudarshan Kriya',
-      'Isha Kriya',
-      'Dalai Lama Meditation Programs',
-      'Dzogchen Longchen Nyingtik',
-      'S.N. Goenka Dhamma Deepa (10 Days)',
-      'Ramakrishna Mission Retreats'
-    ],
+    title: '',
+    content: '',
+    meditationPrograms: [],
     literaryContributions: {
-      title: 'Literary Contributions',
-      description: 'Rajesh Ji has written multiple books on Indian culture and Sanatana Dharma, connecting ancient wisdom to modern science. His books are published with hundreds of physical copies in circulation across Ireland and India.',
-      books: [
-        'Hinduism Basics for All',
-        'Hinduism and Science',
-        'eYogi Yoga & Meditation Guide',
-        'Navaratri: The Bhakti of Shakti',
-        'Diwali: The Oldest Festival',
-        'Leaving Cert Guide (co-authored)'
-      ]
+      title: '',
+      description: '',
+      books: []
     },
     poetrySection: {
-      title: 'Poetry & Public Speaking',
-      description: 'Composed 100+ Hindi poems, regularly recited at various prestigious stages in Ireland and USA. As a motivational speaker, Rajesh Ji weaves ancient wisdom into inspiring talks that resonate with modern audiences.'
+      title: '',
+      description: ''
     }
   },
-  expertiseAreas: [
-    'Quantum Mechanics',
-    'Ancient Scriptures',
-    'Indian History',
-    'Positive Psychology',
-    'Poetry',
-    'Yoga & Meditation',
-    'Astronomy',
-    'Sanatana Dharma'
-  ],
-  academicCard: {
-    title: 'Academic Excellence',
-    description: 'ME in Electronics Engineering from Dublin City University, Ireland',
-    badge: 'DCU Graduate'
-  },
-  industrialistCard: {
-    title: 'Irish Industrialist',
-    description: 'Successful industrial career alongside spiritual pursuits and community service',
-    badge: 'Business Leader'
-  },
-  gurukulCard: {
-    title: 'eYogi Gurukul',
-    description: 'Founded volunteer-based non-profit charity for Indic studies in Ireland (2017)',
-    badge: 'Founder'
-  },
+  expertiseAreas: [],
+  academicCard: { title: '', description: '', badge: '' },
+  industrialistCard: { title: '', description: '', badge: '' },
+  gurukulCard: { title: '', description: '', badge: '' },
   photoGallery: {
-    badge: 'Our Journey',
-    title: 'Moments of Devotion & Service',
-    description: 'Glimpses of sacred ceremonies, spiritual gatherings, and community service performed with devotion and authenticity',
-    images: [
-      { src: '/images/Raj 1.jpg', alt: 'Rajesh Joshi Ji' },
-      { src: '/images/Pooja 1.jpg', alt: 'Traditional Pooja Ceremony' },
-      { src: '/images/Raj 2.jpg', alt: 'Spiritual Guidance' },
-      { src: '/images/Pooja 2.jpg', alt: 'Hindu Ritual' },
-      { src: '/images/Raj 3.jpg', alt: 'Religious Ceremony' },
-      { src: '/images/Pooja 3.jpg', alt: 'Sacred Ritual' }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    images: []
   },
   whatToExpect: {
-    badge: 'What Makes Rajesh Ji Unique',
-    title: 'What to Expect When You Invite Rajesh Ji',
-    description: 'When you invite Rajesh Ji to perform a pooja, he comes as a complete package - blending deep scholarship, authentic rituals, and modern relevance in a way that touches hearts and minds.',
-    features: [
-      { title: 'Deep Knowledge of Sanatana Dharma', description: 'Scholar of Indian Knowledge System with extensive study of Vedas, Upanishads, Puranas, and Itihasas. He quotes exact references and explains the meaning and context.' },
-      { title: 'Ancient Wisdom Meets Modern Science', description: 'Bridges ancient spiritual practices with quantum mechanics, astronomy, and positive psychology, making traditions relevant for contemporary understanding.' },
-      { title: 'Complete Pooja Explanation', description: 'Every step of the pooja is explained - why we do it, what it means, and how it relates to modern life. No ritual is performed without understanding.' },
-      { title: 'Special Connection with Children', description: 'Having taught hundreds of children (ages 4-18) through eYogi Gurukul, he knows how to engage young minds. Kids are typically glued to the pooja in his presence.' },
-      { title: 'Authentic Vedic Rituals', description: "Performs poojas as per Shastras with exact scriptural references. You'll know which verse comes from which scripture and its precise meaning." },
-      { title: 'Motivational & Inspiring', description: 'As a motivational speaker, his subtle messages bind families together. He weaves words with examples that rejuvenate relationships and inspire spiritual growth.' },
-      { title: 'Creating Sacred Environments', description: 'Rajesh Ji creates an atmosphere of purity, bhakti, and devotion that leaves forever imprints in the minds of the Yajamana (host). His presence brings families and friends together, encouraging spiritual growth while fostering harmony and understanding.' }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    features: []
   },
   communityService: {
-    badge: 'Community Service',
-    title: 'Seva and Social Impact',
-    services: [
-      { title: 'One Notary One Gita Project', description: 'A unique community service initiative aimed at spreading the wisdom of the Bhagavad Gita to communities across Ireland, making ancient wisdom accessible to all.' },
-      { title: 'Seva Without Monetary Gain', description: 'Rajesh Ji strongly believes in the power of Bhakti and selfless service. All 200+ poojas performed since 2001 have been conducted alongside his industrial career without taking any monetary gains for himself - a true testament to his dedication to spiritual service.' }
-    ]
+    badge: '',
+    title: '',
+    services: []
   }
 }
 
 export const defaultWhyChooseContent: WhyChooseContent = {
   hero: {
-    title: 'Why Choose Pandit Rajesh Joshi',
-    subtitle: 'Experience the perfect blend of authentic Vedic traditions, scholarly wisdom, and heartfelt devotion',
+    title: '',
+    subtitle: '',
     description: '',
-    backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png',
-      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
-    ]
+    backgroundImages: []
   },
-  quickBenefits: [
-    { icon: 'Heart', label: 'Genuine Bhakti' },
-    { icon: 'GraduationCap', label: '20+ Years' },
-    { icon: 'FlowerLotus', label: '100% Vedic' },
-    { icon: 'ListChecks', label: '30+ Poojas' },
-    { icon: 'UsersFour', label: 'Personalized' },
-    { icon: 'Globe', label: 'E-Pooja' }
-  ],
-  reasons: [
-    {
-      title: 'Passion – Devotion That Flows From the Heart',
-      description: "Every pooja performed by Rajesh Ji is rooted in genuine bhakti, compassion, and a lifelong commitment to Sanatana Dharma. His spiritual journey began when stress and anxiety once touched his life, leading him towards meditation, scriptures, and inner transformation. This awakening created an unshakeable passion to serve, guide, and uplift families.",
-      impact: "When you invite Rajesh Ji, you receive a priest who brings love, sincerity, and a pure intention into your home—making every ritual emotionally meaningful and spiritually elevating.",
-      highlights: [],
-      shloka: {
-        sanskrit: 'मन: प्रसाद: सौम्यत्वं मौनमात्मविनिग्रह: | भावसंशुद्धिरित्येतत्तपो मानसमुच्यते ||',
-        reference: 'Bhagavad Gita 17.16',
-        hindi: 'मन की शांति, विनम्रता, मौन, आत्म-संयम और पवित्रता को मन की तपस्या कहा जाता है।',
-        english: 'Tranquillity of mind, gentleness, silence, self-control and purity of purpose are known as austerities of the mind.'
-      }
-    },
-    {
-      title: 'Experience & a Scholarly Mind – 20+ Years of Jnana & Seva',
-      description: "Rajesh Ji has been performing poojas since 2001 and is recognised as a scholar of Hinduism and the Indian Knowledge System. With deep study of Vedas, Upanishads, the Puranas, Itihasas, Yogic literature, Tantra texts and 10,000+ years of Indian wisdom, he brings unmatched authenticity to every ritual.",
-      impact: "He doesn't just perform—he explains the origin of slokas, the meaning behind mantras, and the exact shastric references, blending ancient spiritual wisdom with modern scientific understanding. His experience also comes from teaching hundreds of students, giving lectures, writing books, and sharing knowledge across Ireland and beyond.",
-      highlights: [
-        '200+ poojas performed since 2001',
-        'Scholar of Vedas, Upanishads, Puranas & Itihasas',
-        'Published author of 5+ books on Hinduism',
-        'Taught hundreds of students through eYogi Gurukul',
-        'Bridges ancient wisdom with modern science'
-      ]
-    },
-    {
-      title: 'Authentic & Vedic – No Shortcuts, Only Purity',
-      description: "In an age where many rituals are shortened or diluted, Rajesh Ji stands firm in offering complete, traditional, and Vedic poojas. Every step—from sankalpa to samarpan—is performed with precision, clarity, and devotion.",
-      impact: "He never rushes or skips mantras. Instead, he performs rituals exactly as prescribed in the scriptures, ensuring that the energy, sanctity, and blessings reach your home in their fullest essence. His presence creates an atmosphere of purity, peace, and divine connection that stays with the family long after the pooja ends.",
-      highlights: [
-        'Complete traditional Vedic rituals',
-        'Every mantra chanted with precision',
-        'Follows scriptural procedures exactly',
-        'No shortcuts or dilution of practices',
-        'Creates lasting spiritual atmosphere'
-      ]
-    },
-    {
-      title: 'Wide Range of Services – Over 30+ Pooja Offerings',
-      description: "From Griha Pravesh to Naamkaran, Satyanarayana Katha to Durga Puja, Lakshmi Puja to Rudrabhishek, Rajesh Ji performs over 30 different poojas and samskaras according to Vedic tradition.",
-      impact: "Whether you want a spiritual ceremony for your family, a sacred function, or a community-level group pooja, you benefit from his broad expertise, clear guidance, and calm leadership. Each ritual is conducted with care, ensuring that every family receives the exact blessings they seek.",
-      highlights: [
-        '30+ different poojas and samskaras',
-        'Family ceremonies to community events',
-        'Life cycle rituals from birth to marriage',
-        'Festival poojas for all major occasions',
-        'Custom ceremonies based on needs'
-      ]
-    },
-    {
-      title: 'Convenient & Personalised Rituals – Regional Traditions Honoured',
-      description: "Every Hindu family carries unique customs, regional practices, and ancestral traditions. Rajesh Ji fully respects this diversity. Before each ceremony, he collaborates with the Yajamana (host) to understand their background—North Indian, South Indian, Nepali, Marathi, Gujarati, Tamil, Bengali, or mixed traditions.",
-      impact: "He then personalises the pooja accordingly, ensuring the rituals feel familiar, comfortable, and authentic to your family's roots. His warm connection with children, elders, and guests ensures that everyone participates, learns, and feels blessed.",
-      highlights: [
-        'Respects all regional traditions',
-        'Customizes rituals to family customs',
-        'North Indian, South Indian & all regions',
-        'Engages children, elders & all guests',
-        'Makes everyone feel included'
-      ]
-    },
-    {
-      title: 'E-Pooja & Online Options – Connecting Families Worldwide',
-      description: "Distance is no barrier to devotion. For families across Ireland, Europe, India, or anywhere in the world, Rajesh Ji offers E-Pooja (Online Pooja) options. With clear instructions, digital guidance, and live chanting, families can participate from their home, even if unable to attend physically.",
-      impact: "Online poojas are conducted with the same sincerity and shastric authenticity, making spiritual connection accessible to all.",
-      highlights: [
-        'Students living abroad can participate',
-        'Families spread across multiple locations',
-        'Health or travel restrictions accommodated',
-        'Same authenticity as in-person ceremonies',
-        'Available worldwide with digital guidance'
-      ]
-    }
-  ],
+  quickBenefits: [],
+  reasons: [],
   ctaSection: {
-    title: 'Experience the Difference',
-    description: "When you choose Rajesh Ji, you're not just booking a priest—you're inviting a scholar, a devotee, and a guide who will make your spiritual ceremony truly unforgettable. Every pooja is performed with authenticity, explained with wisdom, and infused with genuine bhakti.",
-    buttons: [
-      { text: 'View All Services', link: '/services', variant: 'primary' },
-      { text: 'Book a Consultation', link: '/contact', variant: 'outline' }
-    ]
+    title: '',
+    description: '',
+    buttons: []
   }
 }
 
 export const defaultBooksContent: BooksPageContent = {
   hero: {
-    title: 'Books by Rajesh Joshi Ji',
-    subtitle: 'Wisdom & Knowledge',
-    description: 'Explore enlightening works on Hinduism, Yoga, Meditation, and spirituality. Ancient wisdom presented with modern scientific understanding.',
-    backgroundImages: [
-      '/images/books/hinduism-basics-for-all.jpeg',
-      '/images/books/hinduism-and-science.jpeg',
-      '/images/books/diwali.jpeg',
-      '/images/books/navaratri.jpeg'
-    ]
+    title: '',
+    subtitle: '',
+    description: '',
+    backgroundImages: []
   },
-  stats: [
-    { label: 'Books Published', value: '8+', subtext: '' },
-    { label: 'Years of Wisdom', value: '15K+', subtext: '' },
-    { label: 'Topics Covered', value: 'Multiple', subtext: '' }
-  ],
+  stats: [],
   cta: {
-    title: 'Interested in These Books?',
-    description: 'To learn more about these books or to inquire about availability, please feel free to contact us.',
-    buttonText: 'Contact Us for More Information',
-    buttonLink: '/contact'
+    title: '',
+    description: '',
+    buttonText: '',
+    buttonLink: ''
   }
 }
 
 export const defaultContactContent: ContactPageContent = {
   hero: {
-    title: "Get in <highlight>Touch</highlight>",
-    subtitle: 'Connect With Us',
-    description: "Ready to begin your spiritual journey? Whether you're planning a sacred ceremony or seeking spiritual guidance, I'm here to serve you with devotion and authenticity.",
-    backgroundImages: [
-      '/images/Raj 1.jpg',
-      '/images/Raj 3.jpg',
-      '/images/Pooja 2.jpg',
-      '/images/Traditional Altar with Marigold Flowers.png'
-    ],
-    badge: 'Connect with Divine Guidance',
-    quickActions: [
-      { text: 'Send Message', link: '#contact-form', icon: 'envelope' },
-      { text: 'WhatsApp Now', link: 'https://wa.me/353123456789', icon: 'whatsapp' },
-      { text: 'FAQ', link: '#faq-section', icon: 'question' }
-    ],
-    trustIndicators: [
-      { title: '24/7 Response', description: 'Quick replies to all inquiries' },
-      { title: 'Confidential', description: 'Your privacy matters' },
-      { title: 'Personalized', description: 'Tailored to your needs' }
-    ]
+    title: '',
+    subtitle: '',
+    description: '',
+    backgroundImages: [],
+    badge: '',
+    quickActions: [],
+    trustIndicators: []
   },
-  email: 'panditjoshirajesh@gmail.com',
-  phone: '+353 123 456 789',
-  whatsapp: '+353 123 456 789',
-  address: 'Serving communities worldwide',
+  email: '',
+  phone: '',
+  whatsapp: '',
+  address: '',
   contactInfoCard: {
-    emailLabel: 'Email',
-    emailBadge: 'Primary Contact',
-    whatsappLabel: 'WhatsApp',
-    whatsappText: 'Click to chat directly • Instant response',
-    serviceAreaLabel: 'Service Area',
-    serviceAreaText: 'Serving communities worldwide with in-person and virtual ceremonies',
-    serviceAreaBadge: 'Global Reach'
+    emailLabel: '',
+    emailBadge: '',
+    whatsappLabel: '',
+    whatsappText: '',
+    serviceAreaLabel: '',
+    serviceAreaText: '',
+    serviceAreaBadge: ''
   },
   responseGuarantee: {
-    title: 'Quick Response Guarantee',
-    description: 'We typically respond to inquiries within 24 hours. For urgent ceremony needs, please contact us directly via WhatsApp or phone for immediate assistance.',
-    badges: ['24hr Response', 'Weekend Available', 'Emergency Support']
+    title: '',
+    description: '',
+    badges: []
   },
   faqSection: {
-    badge: 'Common Questions',
-    title: 'Frequently Asked Questions',
-    faqs: [
-      {
-        id: 'faq-1',
-        question: 'How do I book a ceremony?',
-        answer: 'Simply contact us through the form above, WhatsApp, or email with your ceremony requirements. We\'ll discuss the details, date, and arrangements to ensure everything is perfect for your sacred occasion.'
-      },
-      {
-        id: 'faq-2',
-        question: 'Do you provide the pooja materials (samagri)?',
-        answer: 'Yes, we can provide all necessary pooja materials and samagri for ceremonies. We can also guide you on what to arrange if you prefer to gather items yourself. This will be discussed during booking.'
-      },
-      {
-        id: 'faq-3',
-        question: 'What is the dakshina/fee structure?',
-        answer: 'Dakshina varies based on the type and duration of ceremony. We believe in transparent and fair pricing. Please contact us to discuss specific ceremony costs. We work with families to ensure sacred services are accessible.'
-      },
-      {
-        id: 'faq-4',
-        question: 'Can ceremonies be performed virtually?',
-        answer: 'Yes, we offer virtual ceremony options for families who cannot attend in person. While in-person is preferred for traditional rituals, we\'ve adapted to serve devotees worldwide through video consultations and guided virtual ceremonies.'
-      },
-      {
-        id: 'faq-5',
-        question: 'How far in advance should I book?',
-        answer: 'For major ceremonies like weddings and large poojas, we recommend booking 2-4 weeks in advance. For smaller ceremonies and consultations, we can often accommodate requests within a few days. Contact us as early as possible for your preferred date.'
-      },
-      {
-        id: 'faq-6',
-        question: 'Do you explain the rituals during ceremonies?',
-        answer: 'Absolutely! We believe understanding enhances the spiritual experience. Each step and mantra is explained in a way that helps participants connect with the deeper meaning of the ceremony.'
-      }
-    ]
+    badge: '',
+    title: '',
+    faqs: []
   },
   form: {
-    nameLabel: 'Your Full Name',
-    emailLabel: 'Email Address',
-    phoneLabel: 'Phone Number',
-    phoneOptional: 'optional',
-    serviceLabel: 'Service of Interest',
-    servicePlaceholder: 'Select a service (optional)',
-    messageLabel: 'Your Message',
-    messagePlaceholder: 'Share your thoughts, questions, or how I can help you on your spiritual journey...',
-    submitButtonText: 'Send Sacred Message',
-    responseText: 'I typically respond within 24 hours. For urgent matters, please call directly.'
+    nameLabel: '',
+    emailLabel: '',
+    phoneLabel: '',
+    phoneOptional: '',
+    serviceLabel: '',
+    servicePlaceholder: '',
+    messageLabel: '',
+    messagePlaceholder: '',
+    submitButtonText: '',
+    responseText: ''
   }
 }
 
 export const defaultCharityContent: CharityPageContent = {
   hero: {
-    badge: 'Serving Since 2001',
-    title: 'eYogi Gurukul',
-    subtitle: '<highlight>Spreading Dharma</highlight> One Heart at a Time',
-    description: 'Rajesh ji is dedicated to preserving and propagating the timeless wisdom of Indian Knowledge System through education, service, and community development.',
-    logoImage: '/images/Logo/Raj ji.png',
-    backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png',
-      '/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png'
-    ],
-    statistics: [
-      { value: '500+', label: 'Students Taught' },
-      { value: '10+', label: 'Countries Reached' },
-      { value: '1000+', label: 'Gita Donated' },
-      { value: '1000+', label: 'Lives Impacted' }
-    ],
-    ctaButtons: [
-      { text: 'Join Our Mission', link: '/contact', variant: 'primary' },
-      { text: 'Learn More', link: '#mission', variant: 'outline' }
-    ]
+    title: '',
+    subtitle: '',
+    description: '',
+    backgroundImages: [],
+    statistics: [],
+    ctaButtons: []
   },
   impactSection: {
-    badge: 'Our Impact',
-    title: 'Transforming Lives Through Dharma',
-    description: 'Through dedicated service and authentic spiritual education, eYogi Gurukul has touched thousands of lives across the globe, creating a ripple effect of positive change.',
-    statistics: [
-      { value: '500+', label: 'Students Taught', subtext: 'Ages 4-18' },
-      { value: '10+', label: 'Countries Reached', subtext: 'Worldwide presence' },
-      { value: '5,000+', label: 'Sacred Texts Distributed', subtext: 'Bhagavad Gita, Ramayana & more' },
-      { value: '1,000+', label: 'Lives Transformed', subtext: 'Through spiritual guidance' }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    statistics: []
   },
   featuredProjects: {
-    badge: 'Our Mission',
-    title: 'Spreading the Light of Dharma',
-    description: 'eYogi Gurukul offers free spiritual education, distributes sacred texts, and supports temple activities—empowering seekers from all backgrounds to connect with their spiritual roots.',
-    videoUrl: 'https://www.youtube.com/watch?v=D4f3cGX9iNg',
-    stats: [
-      { value: '10+', label: 'Years of Service' },
-      { value: '24/7', label: 'Spiritual Support' },
-      { value: '100%', label: 'Free Education' }
-    ],
-    projectTags: ['Global Impact', 'Community', 'Spiritual']
+    badge: '',
+    title: '',
+    description: '',
+    stats: []
   },
   serviceAreas: {
-    badge: 'What We Do',
-    title: 'Our Service Areas',
-    description: 'Dedicated to serving the community through comprehensive spiritual education, sacred text distribution, and heartfelt support.',
-    areas: [
-      {
-        icon: 'BookOpenText',
-        title: 'Scripture Distribution',
-        description: 'Distributing sacred Hindu texts including Bhagavad Gita, Ramayana, and Upanishads to temples, institutions, and individuals worldwide.',
-        stats: '5,000+ Texts'
-      },
-      {
-        icon: 'GraduationCap',
-        title: 'Community Education',
-        description: 'Online and offline classes on Vedic scriptures, Sanskrit mantras, meditation techniques, and Hindu philosophy for all ages.',
-        stats: '500+ Students'
-      },
-      {
-        icon: 'Heart',
-        title: 'Spiritual Support',
-        description: 'Providing free spiritual counselling, guidance for religious ceremonies, and support during life transitions and challenging times.',
-        stats: 'Always Available'
-      }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    areas: []
   },
   impactStories: {
-    badge: 'Real Stories',
-    title: 'Lives We\'ve Touched',
-    description: 'Hear from the hearts of those whose lives have been transformed through our spiritual education and community service.',
-    stories: [
-      {
-        name: 'Priya Sharma',
-        role: 'Student',
-        story: 'eYogi Gurukul introduced me to the profound wisdom of the Bhagavad Gita. The classes helped me find peace and direction during a challenging phase in my life. The teachings are practical, relatable, and life-changing.',
-        image: '/images/Raj 1.jpg',
-        location: 'Dublin, Ireland'
-      },
-      {
-        name: 'Anil Kapoor',
-        role: 'Parent',
-        story: 'My children have been attending eYogi Gurukul classes for two years. They have developed a deep respect for our culture and traditions. Rajesh Ji\'s ability to engage children is remarkable.',
-        image: '/images/Raj 2.jpg',
-        location: 'Cork, Ireland'
-      },
-      {
-        name: 'Lakshmi Patel',
-        role: 'Devotee',
-        story: 'The free spiritual counseling I received during a difficult time was invaluable. The guidance was rooted in scriptures yet completely relevant to modern life challenges. I am forever grateful.',
-        image: '/images/Raj 3.jpg',
-        location: 'Galway, Ireland'
-      }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    stories: []
   },
   missionVision: {
-    badge: 'Our Purpose',
-    missionTitle: 'Our Mission',
-    missionDescription: 'To preserve, propagate, and make the transformative knowledge of Sanatan Dharma accessible to everyone, regardless of background or means, through authentic education and selfless service.',
-    visionTitle: 'Our Vision',
-    visionDescription: 'A world where the timeless wisdom of Vedic knowledge enlightens hearts and minds, creating a global community rooted in dharma, compassion, and spiritual growth.',
-    coreValues: [
-      {
-        icon: 'Sparkle',
-        title: 'Authenticity',
-        description: 'We stay true to the authentic Vedic teachings and scriptural knowledge passed down through generations.'
-      },
-      {
-        icon: 'Heart',
-        title: 'Seva (Selfless Service)',
-        description: 'All our educational services are offered freely as an act of devotion and commitment to the community.'
-      },
-      {
-        icon: 'Globe',
-        title: 'Inclusivity',
-        description: 'We welcome seekers from all backgrounds and make spiritual knowledge accessible to everyone.'
-      },
-      {
-        icon: 'BookOpenText',
-        title: 'Education',
-        description: 'We believe in empowering individuals through knowledge, understanding, and practical application of dharma.'
-      }
-    ]
+    badge: '',
+    missionTitle: '',
+    missionDescription: '',
+    visionTitle: '',
+    visionDescription: '',
+    coreValues: []
   },
   waysToContribute: {
-    badge: 'Get Involved',
-    title: 'Ways to Support Our Mission',
-    description: 'Your contribution, whether through donations, volunteering, or partnership, helps us continue spreading the light of dharma and supporting spiritual seekers worldwide.',
-    options: [
-      {
-        icon: 'HandHeart',
-        title: 'Make a Donation',
-        description: 'Support our free educational programs, sacred text distribution, and community service initiatives.',
-        buttonText: 'Donate Now',
-        buttonLink: '/contact',
-        features: [
-          'Fund free spiritual education',
-          'Support sacred text distribution',
-          'Sponsor community events',
-          'Help maintain resources'
-        ]
-      },
-      {
-        icon: 'Users',
-        title: 'Volunteer With Us',
-        description: 'Share your time and skills to help organize classes, events, and outreach programs.',
-        buttonText: 'Join as Volunteer',
-        buttonLink: '/contact',
-        features: [
-          'Teach or assist in classes',
-          'Help with event organization',
-          'Support online initiatives',
-          'Contribute your expertise'
-        ]
-      },
-      {
-        icon: 'Handshake',
-        title: 'Partner With Us',
-        description: 'Collaborate with eYogi Gurukul to spread dharma through joint initiatives and programs.',
-        buttonText: 'Become a Partner',
-        buttonLink: '/contact',
-        features: [
-          'Institutional collaborations',
-          'Temple partnerships',
-          'Educational programs',
-          'Community outreach'
-        ]
-      },
-      {
-        icon: 'Gift',
-        title: 'Sponsor a Program',
-        description: 'Sponsor specific programs like book distribution, student scholarships, or festival celebrations.',
-        buttonText: 'Sponsor Now',
-        buttonLink: '/contact',
-        features: [
-          'Book distribution campaigns',
-          'Student sponsorships',
-          'Festival celebrations',
-          'Special workshops'
-        ]
-      }
-    ]
+    badge: '',
+    title: '',
+    description: '',
+    options: []
   },
   ctaSection: {
-    title: 'Join Us in Spreading the Light of Dharma',
-    description: 'Together, we can preserve the sacred wisdom of Sanatan Dharma and empower future generations with spiritual knowledge that transforms lives.',
-    buttons: [
-      { text: 'Get Involved Today', link: '/contact', variant: 'primary' },
-      { text: 'Explore Our Work', link: '#mission', variant: 'outline' }
-    ],
-    backgroundImage: '/images/Golden Temples of Devotion.png',
-    footerNote: 'All contributions directly support our educational programs and community service initiatives'
+    title: '',
+    description: '',
+    buttons: []
   }
 }
 
+export const defaultDakshinaContent: DakshinaPageContent = {
+  hero: {
+    subtitle: '',
+    title: '',
+    description: '',
+    backgroundImages: []
+  },
+  whatIsDakshina: {
+    title: '',
+    subtitle: '',
+    content: '',
+    keyPoints: []
+  },
+  pricingSection: {
+    badge: '',
+    title: '',
+    description: '',
+    services: [],
+    notes: []
+  },
+  ctaSection: {
+    title: '',
+    description: '',
+    primaryButtonText: '',
+    secondaryButtonText: ''
+  }
+}
+
+export const defaultGalleryContent: GalleryPageContent = {
+  hero: {
+    badge: '',
+    title: '',
+    subtitle: '',
+    description: '',
+    backgroundImages: [],
+    statistics: [],
+    ctaButtons: []
+  }
+}
+
+export const defaultTestimonialsContent: TestimonialsPageContent = {
+  hero: {
+    badge: 'Voices of Devotion',
+    title: 'What Our <highlight>Community</highlight> Says',
+    description: 'Discover the heartfelt experiences of families who have found spiritual guidance, peace, and sacred moments through our traditional Hindu ceremonies.',
+    backgroundImages: [],
+    statistics: [
+      { value: '250+', label: 'Families' },
+      { value: '500+', label: 'Ceremonies' },
+      { value: '4.9/5', label: 'Rating' },
+      { value: '15+', label: 'Years' }
+    ]
+  },
+  shareExperience: {
+    title: 'Share Your Sacred Experience',
+    description: 'Your testimonial helps others discover the beauty of traditional Hindu ceremonies and guides families in their spiritual journey. We would be honored to hear your story.',
+    primaryButtonText: 'Write a Testimonial',
+    secondaryButtonText: 'Leave a Review',
+    shareText: 'Share your experience on:',
+    googleReviewUrl: 'https://www.google.com/search?q=pandit+rajesh+joshi',
+    email: 'panditjoshirajesh@gmail.com',
+    emailSubject: 'Testimonial'
+  },
+  whyChooseUs: {
+    title: 'Why Families Choose Us',
+    cards: [
+      { icon: 'Trophy', title: 'Authentic Traditions', description: 'Every ceremony is performed according to proper Vedic procedures with genuine devotion and traditional knowledge passed through generations.' },
+      { icon: 'Users', title: 'Personalized Service', description: 'Each ceremony is adapted to your family\'s unique needs, traditions, and preferences while maintaining sacred authenticity.' },
+      { icon: 'Heart', title: 'Compassionate Guidance', description: 'We approach every family with genuine care, understanding, and spiritual sensitivity to ensure meaningful and comforting experiences.' },
+      { icon: 'Sparkle', title: 'Educational Experience', description: 'Every ritual becomes a learning opportunity, helping families understand and appreciate the deeper meaning of Hindu spiritual traditions.' }
+    ]
+  }
+}
+
+export const defaultMenuItems: MenuItem[] = []
+
 export const defaultHeaderContent: HeaderContent = {
-  logoUrl: '/images/Logo/Raj ji.png',
-  siteName: 'Pandit Rajesh Joshi',
-  tagline: 'Hindu Priest & Spiritual Guide',
-  ctaText: 'Book Consultation',
-  ctaLink: '/contact'
+  logoUrl: '',
+  siteName: '',
+  tagline: '',
+  ctaText: '',
+  ctaLink: ''
 }
 
 export const defaultFooterContent: FooterContent = {
-  description: 'Traditional Hindu religious services, spiritual consultations, and cultural education serving the community with authenticity and devotion.',
-  copyrightText: '© {year} Pandit Rajesh Joshi. All rights reserved.',
+  description: '',
+  copyrightText: '',
   facebookUrl: '',
   instagramUrl: '',
   youtubeUrl: '',
@@ -639,112 +333,3 @@ export const defaultFooterContent: FooterContent = {
   twitterUrl: '',
   pinterestUrl: ''
 }
-
-export const defaultDakshinaContent: DakshinaPageContent = {
-  hero: {
-    subtitle: 'Sacred Economics',
-    title: 'Understanding Dakshina',
-    description: 'In Hindu tradition, Dakshina represents the sacred exchange of energy between spiritual service and gratitude. It is not merely payment, but a blessing that sustains the continuity of spiritual knowledge and service.',
-    backgroundImages: [
-      '/images/South Asian Temple Complex.png',
-      '/images/Golden Temples of Devotion.png',
-      '/images/Traditional Altar with Marigold Flowers.png'
-    ]
-  },
-  whatIsDakshina: {
-    title: 'What is Dakshina?',
-    subtitle: 'The Sacred Exchange of Spiritual Service',
-    content: '<p>In Hindu tradition, Dakshina (दक्षिणा) is a fundamental concept that goes beyond monetary transaction. It represents the sacred exchange between spiritual knowledge and service, and the gratitude of those who receive it.</p><p>The word "Dakshina" comes from the Sanskrit "dakṣiṇā" meaning "gift" or "offering to the right." In ancient times, when knowledge was transmitted orally, students would offer their teacher a gift with their right hand as a token of respect and gratitude.</p><p>Today, Dakshina serves multiple purposes: it sustains the priest\'s livelihood, ensures the continuity of spiritual traditions, and creates positive karma for both the giver and receiver.</p>',
-    keyPoints: [
-      {
-        title: 'Sacred Exchange',
-        description: 'Dakshina is not payment for services, but a sacred exchange of spiritual energy and gratitude.'
-      },
-      {
-        title: 'Teacher\'s Sustenance',
-        description: 'It ensures that spiritual teachers and priests can dedicate their lives to service without material concerns.'
-      },
-      {
-        title: 'Karma Creation',
-        description: 'Giving Dakshina creates positive karma and strengthens the bond between teacher and student.'
-      }
-    ]
-  },
-  pricingSection: {
-    badge: 'Transparent Pricing',
-    title: 'Our Dakshina Guidelines',
-    description: 'We believe in transparent and fair pricing that reflects the time, preparation, and spiritual dedication required for each ceremony.',
-    services: [
-      {
-        name: 'Simple Pooja (1-2 hours)',
-        description: 'Basic ceremonies like daily worship, small blessings',
-        duration: '1-2 hours',
-        price: '50-100'
-      },
-      {
-        name: 'Special Ceremony (2-4 hours)',
-        description: 'Festive poojas, naming ceremonies, house warming',
-        duration: '2-4 hours',
-        price: '150-300'
-      },
-      {
-        name: 'Major Rituals (4-8 hours)',
-        description: 'Weddings, funerals, major life cycle events',
-        duration: '4-8 hours',
-        price: '400-800'
-      },
-      {
-        name: 'Extended Services (Multiple days)',
-        description: 'Multi-day ceremonies, special consultations',
-        duration: 'Varies',
-        price: '1000+'
-      }
-    ],
-    notes: [
-      'Prices are guidelines and may vary based on specific requirements and materials needed',
-      'Travel expenses may be additional for ceremonies outside Dublin area',
-      'All prices include preparation time, materials, and post-ceremony guidance',
-      'Payment can be made via bank transfer, cash, or traditional offerings'
-    ]
-  },
-  ctaSection: {
-    title: 'Ready to Begin Your Spiritual Journey?',
-    description: 'Contact us today to discuss your ceremony needs and receive personalized guidance for your spiritual practices.',
-    primaryButtonText: 'Contact Us',
-    secondaryButtonText: 'View Services'
-  }
-}
-
-export const defaultGalleryContent: GalleryPageContent = {
-  hero: {
-    badge: 'Divine Moments',
-    title: 'Sacred <highlight>Gallery</highlight>',
-    subtitle: 'Immerse yourself in the divine beauty of Hindu ceremonies, pooja rituals, and spiritual moments captured in sacred time',
-    description: 'Explore our collection of sacred videos and photos from ceremonies and spiritual events',
-    backgroundImages: [
-      '/images/Raj 1.jpg',
-      '/images/Raj 2.jpg',
-      '/images/Pooja 1.jpg',
-      '/images/Golden Temples of Devotion.png'
-    ],
-    statistics: [
-      { value: '200+', label: 'Ceremonies' },
-      { value: '50+', label: 'Videos' },
-      { value: '1000+', label: 'Photos' },
-      { value: '15+', label: 'Years' }
-    ],
-    ctaButtons: [
-      { text: 'Watch Sacred Videos', link: '#videos', variant: 'outline' },
-      { text: 'View Divine Photos', link: '#photos', variant: 'primary' }
-    ]
-  }
-}
-
-export const defaultMenuItems: MenuItem[] = [
-  { label: 'Home', url: '/', order: 1 },
-  { label: 'About', url: '/about', order: 2 },
-  { label: 'Services', url: '/services', order: 3 },
-  { label: 'Gallery', url: '/gallery', order: 4 },
-  { label: 'Testimonials', url: '/testimonials', order: 5 },
-  { label: 'Contact', url: '/contact', order: 6 }
-]

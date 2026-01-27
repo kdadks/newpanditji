@@ -48,23 +48,21 @@ export default function AboutPageEditor({ content, setContent, onSave, isSaving 
           <CardDescription>Banner content with profile image and intro text</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input
-                value={content.name || ''}
-                onChange={(e) => setContent(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Rajesh Joshi"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Title / Alias</Label>
-              <Input
-                value={content.title || ''}
-                onChange={(e) => setContent(prev => ({ ...prev, title: e.target.value }))}
-                placeholder='"eYogi Raj"'
-              />
-            </div>
+          <div className="space-y-2">
+            <Label>Hero Title (use &lt;highlight&gt;text&lt;/highlight&gt; for golden gradient)</Label>
+            <Input
+              value={content.hero.title || ''}
+              onChange={(e) => setContent(prev => ({ ...prev, hero: { ...prev.hero, title: e.target.value } }))}
+              placeholder="Meet <highlight>Pandit Rajesh Joshi</highlight>"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Title / Alias</Label>
+            <Input
+              value={content.title || ''}
+              onChange={(e) => setContent(prev => ({ ...prev, title: e.target.value }))}
+              placeholder='"eYogi Raj"'
+            />
           </div>
           <div className="space-y-2">
             <Label>Badge Text</Label>

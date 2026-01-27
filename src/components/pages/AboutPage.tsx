@@ -9,6 +9,7 @@ import { FlowerLotus, Book, GraduationCap, Heart, Users, Trophy, Sparkle, Pencil
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useAboutContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface AboutPageProps {
 }
@@ -34,16 +35,18 @@ export default function AboutPage({ }: AboutPageProps) {
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="flex gap-0 animate-scroll-left w-max h-full">
-            {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
-            ))}
-            {cmsContent.hero.backgroundImages.map((img, index) => (
-              <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
-            ))}
+        {cmsContent.hero.backgroundImages.filter(img => img).length > 0 && (
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="flex gap-0 animate-scroll-left w-max h-full">
+              {cmsContent.hero.backgroundImages.filter(img => img).map((img, index) => (
+                <img key={`bg-1-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" />
+              ))}
+              {cmsContent.hero.backgroundImages.filter(img => img).map((img, index) => (
+                <img key={`bg-2-${index}`} src={img} alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Sunrise gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
@@ -57,23 +60,25 @@ export default function AboutPage({ }: AboutPageProps) {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left side - Image */}
-            <div className="order-1 lg:order-1 flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
-                <img
-                  src={cmsContent.profileImage}
-                  alt="Pandit Rajesh Joshi"
-                  className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
-                  style={{
-                    imageRendering: '-webkit-optimize-contrast',
-                    backfaceVisibility: 'hidden',
-                    transform: 'translateZ(0)',
-                    willChange: 'transform'
-                  }}
-                  loading="eager"
-                />
+            {cmsContent.profileImage && (
+              <div className="order-1 lg:order-1 flex justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
+                  <img
+                    src={cmsContent.profileImage}
+                    alt="Pandit Rajesh Joshi"
+                    className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
+                    style={{
+                      imageRendering: '-webkit-optimize-contrast',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)',
+                      willChange: 'transform'
+                    }}
+                    loading="eager"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
@@ -83,7 +88,12 @@ export default function AboutPage({ }: AboutPageProps) {
               </div>
 
               <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-                {cmsContent.hero.title} <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">{cmsContent.name}</span>
+                {renderHighlightedTitle(cmsContent.hero.title)}
+                {cmsContent.title && (
+                  <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 font-bold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                    {cmsContent.title}
+                  </span>
+                )}
               </h1>
 
               <p className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
@@ -253,7 +263,7 @@ export default function AboutPage({ }: AboutPageProps) {
           >
             <div className={`absolute inset-0 flex gap-4 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
               <div className="flex gap-4">
-                {cmsContent.photoGallery.images.map((image, index) => (
+                {cmsContent.photoGallery.images.filter(image => image.src).map((image, index) => (
                   <img 
                     key={index}
                     src={image.src} 
@@ -263,7 +273,7 @@ export default function AboutPage({ }: AboutPageProps) {
                 ))}
               </div>
               <div className="flex gap-4" aria-hidden="true">
-                {cmsContent.photoGallery.images.map((image, index) => (
+                {cmsContent.photoGallery.images.filter(image => image.src).map((image, index) => (
                   <img 
                     key={`dup-${index}`}
                     src={image.src} 

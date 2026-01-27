@@ -6,13 +6,20 @@ import { AppPage, AppNavigationData } from '../../lib/types'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { FlowerLotus, BookOpen, Heart, Users, Sparkle } from '@phosphor-icons/react'
-import { services, categoryNames, Service } from '../../lib/data'
+import { categoryNames, Service } from '../../lib/data'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useServices } from '../../hooks/useServices'
 import { useHomeContent } from '../../hooks/useCmsContent'
 import { getOptimizedImageProps } from '../../utils/imageOptimization'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface HomePageProps {
+}
+
+// Helper function to strip HTML tags from text
+const stripHtmlTags = (html: string): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
 }
 
 export default function HomePage({ }: HomePageProps) {
@@ -32,9 +39,8 @@ export default function HomePage({ }: HomePageProps) {
     }
   }
   const { services: dbServices } = useServices()
-  // Use database services if available, otherwise fall back to defaults
-  const allServices = (dbServices && dbServices.length > 0) ? dbServices : services
-  const featuredServices = allServices.slice(0, 12) // Get more services for the carousel
+  // Use services from database only - no hardcoded fallback
+  const featuredServices = (dbServices || []).slice(0, 12) // Get services for the carousel
   
   // CMS Content from database
   const { content: cmsContent, isLoading: cmsLoading } = useHomeContent()
@@ -87,19 +93,21 @@ export default function HomePage({ }: HomePageProps) {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left side - Image */}
-            <div className="order-1 lg:order-1 flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
-                <img
-                  {...getOptimizedImageProps({
-                    src: cmsContent.hero.profileImage || '/images/Logo/Raj ji.png',
-                    alt: 'Pandit Rajesh Joshi',
-                    priority: true,
-                    className: 'relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer'
-                  })}
-                />
+            {cmsContent.hero.profileImage && (
+              <div className="order-1 lg:order-1 flex justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-linear-to-r from-amber-300/30 to-orange-300/30 rounded-full blur-2xl scale-110"></div>
+                  <img
+                    {...getOptimizedImageProps({
+                      src: cmsContent.hero.profileImage,
+                      alt: 'Pandit Rajesh Joshi',
+                      priority: true,
+                      className: 'relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer'
+                    })}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Right side - Content */}
             <div className="order-2 lg:order-2 text-center lg:text-left">
@@ -109,15 +117,7 @@ export default function HomePage({ }: HomePageProps) {
               </div>
 
               <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-[1.15] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe max-w-[700px] mx-auto lg:mx-0">
-                {cmsContent.hero.title.includes('Authentic') ? (
-                  <>
-                    {cmsContent.hero.title.split('Authentic')[0]}
-                    <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Authentic</span>
-                    {cmsContent.hero.title.split('Authentic')[1]}
-                  </>
-                ) : (
-                  cmsContent.hero.title
-                )}
+                {renderHighlightedTitle(cmsContent.hero.title)}
               </h1>
 
               <p className="text-lg md:text-xl lg:text-2xl text-white font-medium mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_3px_6px_rgba(0,0,0,0.95)] tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
@@ -350,13 +350,13 @@ export default function HomePage({ }: HomePageProps) {
 
         {/* Premium 3D-style Carousel */}
         <div
-          className="relative w-full overflow-x-auto md:overflow-hidden scrollbar-hide"
+          className="relative w-full overflow-hidden scrollbar-hide"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
         >
-          <div className={`flex gap-6 py-8 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}>
+          <div className={`flex gap-6 py-8 px-4 md:px-0 w-max ${isPaused ? '' : 'animate-scroll-services'}`}>
             {/* First set of cards */}
             {featuredServices.map((service, index) => (
               <Card
@@ -375,18 +375,20 @@ export default function HomePage({ }: HomePageProps) {
                 <CardContent className="relative p-0 flex flex-col">
                   {/* Service Image */}
                   <div className="relative h-40 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950">
-                    <img
-                      src={`/images/Pooja ${(index % 3) + 1}.jpg`}
-                      alt={service.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading={index < 3 ? 'eager' : 'lazy'}
-                      decoding="async"
-                      fetchPriority={index < 3 ? 'high' : 'auto'}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/images/Traditional Altar with Marigold Flowers.png';
-                      }}
-                    />
+                    {service.imageUrl ? (
+                      <img
+                        src={service.imageUrl}
+                        alt={service.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading={index < 3 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        fetchPriority={index < 3 ? 'high' : 'auto'}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FlowerLotus size={48} weight="fill" className="text-orange-300 dark:text-orange-700" />
+                      </div>
+                    )}
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
 
@@ -413,13 +415,13 @@ export default function HomePage({ }: HomePageProps) {
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:bg-linear-to-r group-hover:from-amber-600 group-hover:to-orange-600 dark:group-hover:from-amber-400 dark:group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-500 leading-tight">
+                    <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:bg-linear-to-r group-hover:from-amber-600 group-hover:to-orange-600 dark:group-hover:from-amber-400 dark:group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-500 leading-tight truncate" title={service.name}>
                       {service.name}
                     </h3>
 
                     {/* Description */}
                     <p className="text-muted-foreground text-sm leading-relaxed mb-4 grow line-clamp-2">
-                      {service.description}
+                      {stripHtmlTags(service.description)}
                     </p>
 
                     {/* Footer with duration and CTA */}
@@ -471,18 +473,19 @@ export default function HomePage({ }: HomePageProps) {
                 <CardContent className="relative p-0 flex flex-col">
                   {/* Service Image */}
                   <div className="relative h-40 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950">
-                    <img
-                      src={`/images/Pooja ${(index % 3) + 1}.jpg`}
-                      alt={service.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading={index < 3 ? 'eager' : 'lazy'}
-                      decoding="async"
-                      fetchPriority={index < 3 ? 'high' : 'auto'}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/images/Traditional Altar with Marigold Flowers.png';
-                      }}
-                    />
+                    {service.imageUrl ? (
+                      <img
+                        src={service.imageUrl}
+                        alt={service.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FlowerLotus size={48} weight="fill" className="text-orange-300 dark:text-orange-700" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
 
                     <div className="absolute top-3 left-3">
@@ -503,12 +506,12 @@ export default function HomePage({ }: HomePageProps) {
                       <FlowerLotus size={24} weight="fill" className="text-orange-600 dark:text-orange-400" />
                     </div>
 
-                    <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:bg-linear-to-r group-hover:from-amber-600 group-hover:to-orange-600 dark:group-hover:from-amber-400 dark:group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-500 leading-tight">
+                    <h3 className="font-heading font-bold text-xl mb-3 text-gray-900 dark:text-white group-hover:bg-linear-to-r group-hover:from-amber-600 group-hover:to-orange-600 dark:group-hover:from-amber-400 dark:group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-500 leading-tight truncate" title={service.name}>
                       {service.name}
                     </h3>
 
                     <p className="text-muted-foreground text-sm leading-relaxed mb-4 grow line-clamp-2">
-                      {service.description}
+                      {stripHtmlTags(service.description)}
                     </p>
 
                     <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
@@ -574,13 +577,13 @@ export default function HomePage({ }: HomePageProps) {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-linear-to-r from-amber-500/10 to-orange-500/10 text-orange-700 dark:text-orange-300 px-6 py-2.5 rounded-full text-sm font-semibold mb-4 border border-amber-300/30 backdrop-blur-sm shadow-lg">
               <Sparkle size={18} weight="fill" className="animate-pulse" />
-              Why Choose Us
+              {cmsContent.featureCardsHeader?.badge || 'Why Choose Us'}
             </div>
             <h2 className="font-heading font-bold text-3xl md:text-5xl mb-4 bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
-              Your Trusted Spiritual Guide
+              {cmsContent.featureCardsHeader?.title || 'Your Trusted Spiritual Guide'}
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Experience authentic Hindu ceremonies with dedication, expertise, and compassion
+              {cmsContent.featureCardsHeader?.description || 'Experience authentic Hindu ceremonies with dedication, expertise, and compassion'}
             </p>
           </div>
 

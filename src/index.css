@@ -165,17 +165,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-scroll-services {
-  animation: scroll-services 60s linear infinite;
+  animation: scroll-services 40s linear infinite;
+  will-change: transform;
 }
 
 .animate-scroll-services:hover {
   animation-play-state: paused;
 }
 
-/* Desktop only animation */
+/* Desktop only animation - fallback */
 @media (min-width: 768px) {
   .md\:animate-scroll-services {
-    animation: scroll-services 60s linear infinite;
+    animation: scroll-services 40s linear infinite;
+    will-change: transform;
   }
   
   .md\:animate-scroll-services:hover {

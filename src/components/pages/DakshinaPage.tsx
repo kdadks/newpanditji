@@ -248,7 +248,6 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
 
         {/* CTA Section */}
         <Card className="border-0 shadow-2xl bg-linear-to-br from-primary via-accent to-secondary text-white overflow-hidden relative">
-          <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10"></div>
           <CardContent className="p-8 md:p-16 text-center relative z-10">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6">
               <HandHeart size={40} className="text-white" weight="fill" />

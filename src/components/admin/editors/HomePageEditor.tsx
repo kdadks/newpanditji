@@ -402,6 +402,36 @@ export default function HomePageEditor({ content, setContent, onSave, isSaving }
           <CardDescription>Three feature cards highlighting key qualities</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Section Header Fields */}
+          <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
+            <Badge variant="outline">Section Header</Badge>
+            <div className="space-y-2">
+              <Label>Badge Text</Label>
+              <Input
+                value={content.featureCardsHeader?.badge || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, featureCardsHeader: { ...prev.featureCardsHeader, badge: e.target.value, title: prev.featureCardsHeader?.title || '', description: prev.featureCardsHeader?.description || '' } }))}
+                placeholder="Why Choose Us"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={content.featureCardsHeader?.title || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, featureCardsHeader: { ...prev.featureCardsHeader, title: e.target.value, badge: prev.featureCardsHeader?.badge || '', description: prev.featureCardsHeader?.description || '' } }))}
+                placeholder="Your Trusted Spiritual Guide"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Section Description</Label>
+              <Textarea
+                value={content.featureCardsHeader?.description || ''}
+                onChange={(e) => setContent(prev => ({ ...prev, featureCardsHeader: { ...prev.featureCardsHeader, description: e.target.value, badge: prev.featureCardsHeader?.badge || '', title: prev.featureCardsHeader?.title || '' } }))}
+                rows={2}
+                placeholder="Experience authentic Hindu ceremonies with dedication..."
+              />
+            </div>
+          </div>
+
           {content.featureCards?.map((card, idx) => (
             <div key={idx} className="border rounded-lg p-4 space-y-3 bg-muted/20">
               <div className="flex justify-between items-center">

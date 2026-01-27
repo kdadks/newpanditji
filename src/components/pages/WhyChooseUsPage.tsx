@@ -3,6 +3,7 @@ import { Badge } from '../ui/badge'
 import { Heart, GraduationCap, FlowerLotus, ListChecks, UsersFour, Globe, Sparkle, BookOpen, CheckCircle } from '@phosphor-icons/react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useWhyChooseContent } from '../../hooks/useCmsContent'
+import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 export default function WhyChooseUsPage() {
   // CMS Content
@@ -56,18 +57,14 @@ export default function WhyChooseUsPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white px-6 py-3 rounded-full text-base font-semibold mb-6 shadow-2xl shadow-orange-800/40 backdrop-blur-sm border border-orange-600/30 tracking-wide" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.05em' }}>
               <Sparkle size={18} weight="fill" className="animate-pulse" />
-              Excellence in Service
+              {cmsContent.hero.subtitle || 'Excellence in Service'}
             </div>
 
             <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
-              {cmsContent.hero.title.includes('Pandit') ? (
-                <>Why Choose <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Pandit Rajesh Joshi</span></>
-              ) : (
-                cmsContent.hero.title
-              )}
+              {renderHighlightedTitle(cmsContent.hero.title)}
             </h1>
             <p className="text-xl md:text-2xl text-white/95 max-w-4xl mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-medium mb-8">
-              {cmsContent.hero.subtitle}
+              {cmsContent.hero.description}
             </p>
           </div>
 

@@ -15,6 +15,7 @@ import {
   useCharityContent,
   useDakshinaContent,
   useGalleryContent,
+  useTestimonialsContent,
   useHeaderContent,
   useFooterContent
 } from '../../hooks/useCmsContent'
@@ -36,6 +37,7 @@ import {
   CharityPageEditor,
   DakshinaPageEditor,
   GalleryPageEditor,
+  TestimonialsPageEditor,
   HeaderEditor,
   FooterEditor,
   MenuEditor
@@ -58,6 +60,7 @@ export default function AdminContent() {
   const charityContent = useCharityContent()
   const dakshinaContent = useDakshinaContent()
   const galleryContent = useGalleryContent()
+  const testimonialsContent = useTestimonialsContent()
   const headerContentHook = useHeaderContent()
   const footerContentHook = useFooterContent()
 
@@ -73,6 +76,7 @@ export default function AdminContent() {
   const [charityState, setCharityState] = useState(charityContent.content)
   const [dakshinaState, setDakshinaState] = useState(dakshinaContent.content)
   const [galleryState, setGalleryState] = useState(galleryContent.content)
+  const [testimonialsState, setTestimonialsState] = useState(testimonialsContent.content)
   const [headerState, setHeaderState] = useState(headerContentHook.content)
   const [footerState, setFooterState] = useState(footerContentHook.content)
   const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems)
@@ -109,6 +113,10 @@ export default function AdminContent() {
   useEffect(() => {
     if (!galleryContent.isLoading) setGalleryState(galleryContent.content)
   }, [galleryContent.content, galleryContent.isLoading])
+
+  useEffect(() => {
+    if (!testimonialsContent.isLoading) setTestimonialsState(testimonialsContent.content)
+  }, [testimonialsContent.content, testimonialsContent.isLoading])
 
   useEffect(() => {
     if (!headerContentHook.isLoading) setHeaderState(headerContentHook.content)
@@ -158,6 +166,9 @@ export default function AdminContent() {
         case 'gallery':
           await galleryContent.save(galleryState)
           break
+        case 'testimonials':
+          await testimonialsContent.save(testimonialsState)
+          break
       }
     } catch (error) {
       // Error already handled by hook
@@ -200,6 +211,7 @@ export default function AdminContent() {
     charityContent.isLoading ||
     dakshinaContent.isLoading ||
     galleryContent.isLoading ||
+    testimonialsContent.isLoading ||
     headerContentHook.isLoading ||
     footerContentHook.isLoading
 
@@ -214,6 +226,7 @@ export default function AdminContent() {
       case 'charity': return charityContent.isSaving
       case 'dakshina': return dakshinaContent.isSaving
       case 'gallery': return galleryContent.isSaving
+      case 'testimonials': return testimonialsContent.isSaving
       default: return false
     }
   }
@@ -244,7 +257,7 @@ export default function AdminContent() {
 
         <TabsContent value="pages" className="mt-6">
           <Tabs value={activePageTab} onValueChange={(value) => setActivePageTab(value as PageKey)}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto gap-2 bg-muted/50 p-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-9 h-auto gap-2 bg-muted/50 p-2">
               <TabsTrigger value="home" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Home</TabsTrigger>
               <TabsTrigger value="about" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">About Us</TabsTrigger>
               <TabsTrigger value="whyChoose" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Why Choose Us</TabsTrigger>
@@ -253,6 +266,7 @@ export default function AdminContent() {
               <TabsTrigger value="charity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Charity</TabsTrigger>
               <TabsTrigger value="dakshina" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Dakshina</TabsTrigger>
               <TabsTrigger value="gallery" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Gallery</TabsTrigger>
+              <TabsTrigger value="testimonials" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Testimonials</TabsTrigger>
             </TabsList>
 
             <TabsContent value="home" className="mt-6">
@@ -317,6 +331,14 @@ export default function AdminContent() {
                 setContent={setGalleryState}
                 onSave={() => handleSavePageContent('gallery')}
                 isSaving={getSavingState('gallery')}
+              />
+            </TabsContent>
+            <TabsContent value="testimonials" className="mt-6">
+              <TestimonialsPageEditor
+                content={testimonialsState}
+                setContent={setTestimonialsState}
+                onSave={() => handleSavePageContent('testimonials')}
+                isSaving={getSavingState('testimonials')}
               />
             </TabsContent>
           </Tabs>

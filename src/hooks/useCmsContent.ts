@@ -14,6 +14,7 @@ import type {
   CharityPageContent,
   DakshinaPageContent,
   GalleryPageContent,
+  TestimonialsPageContent,
   HeaderContent,
   FooterContent
 } from '../components/admin/types/cms-types'
@@ -28,6 +29,7 @@ import {
   defaultCharityContent,
   defaultDakshinaContent,
   defaultGalleryContent,
+  defaultTestimonialsContent,
   defaultHeaderContent,
   defaultFooterContent
 } from '../components/admin/defaults/cms-defaults'
@@ -37,7 +39,7 @@ const CMS_PAGES_KEY = ['cms_pages']
 const CMS_SECTIONS_KEY = ['cms_sections']
 
 // Page slug mapping
-export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery'
+export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials'
 
 // ============================================================================
 // Database Operations
@@ -207,6 +209,11 @@ function sectionsToHomeContent(sections: PageSectionRow[]): HomePageContent {
       description: (spacesSection.description as string) || defaultHomeContent.sacredSpaces.description,
       spaces: (spacesSection.spaces as typeof defaultHomeContent.sacredSpaces.spaces) || defaultHomeContent.sacredSpaces.spaces,
     },
+    featureCardsHeader: {
+      badge: (featuresSection.badge as string) || defaultHomeContent.featureCardsHeader.badge,
+      title: (featuresSection.title as string) || defaultHomeContent.featureCardsHeader.title,
+      description: (featuresSection.description as string) || defaultHomeContent.featureCardsHeader.description,
+    },
     featureCards: (featuresSection.cards as typeof defaultHomeContent.featureCards) || defaultHomeContent.featureCards,
     ctaSection: {
       title: (ctaSection.title as string) || defaultHomeContent.ctaSection.title,
@@ -262,7 +269,12 @@ function homeContentToSections(content: HomePageContent): { sectionKey: string; 
     },
     {
       sectionKey: 'feature_cards',
-      content: { cards: content.featureCards }
+      content: { 
+        badge: content.featureCardsHeader.badge,
+        title: content.featureCardsHeader.title,
+        description: content.featureCardsHeader.description,
+        cards: content.featureCards 
+      }
     },
     {
       sectionKey: 'cta_section',
@@ -301,7 +313,6 @@ function sectionsToAboutContent(sections: PageSectionRow[]): AboutPageContent {
     },
     profileImage: (profileSection.profileImage as string) || defaultAboutContent.profileImage,
     badge: (profileSection.badge as string) || defaultAboutContent.badge,
-    name: (profileSection.name as string) || defaultAboutContent.name,
     title: (profileSection.title as string) || defaultAboutContent.title,
     shortBio: (profileSection.shortBio as string) || defaultAboutContent.shortBio,
     statistics: (profileSection.statistics as typeof defaultAboutContent.statistics) || defaultAboutContent.statistics,
@@ -356,7 +367,6 @@ function aboutContentToSections(content: AboutPageContent): { sectionKey: string
       content: {
         profileImage: content.profileImage,
         badge: content.badge,
-        name: content.name,
         title: content.title,
         shortBio: content.shortBio,
         statistics: content.statistics,
@@ -1120,6 +1130,95 @@ export function useGalleryContent() {
     sectionsToGalleryContent,
     galleryContentToSections,
     defaultGalleryContent
+  )
+}
+
+// ============================================================================
+// Testimonials Page Content
+// ============================================================================
+
+/**
+ * Convert database sections to TestimonialsPageContent
+ */
+function sectionsToTestimonialsContent(sections: PageSectionRow[]): TestimonialsPageContent {
+  const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
+  
+  const heroSection = getSection('hero') as Record<string, unknown>
+  const shareSection = getSection('shareExperience') as Record<string, unknown>
+  const whyChooseSection = getSection('whyChooseUs') as Record<string, unknown>
+  
+  return {
+    hero: {
+      badge: (heroSection.badge as string) || defaultTestimonialsContent.hero.badge,
+      title: (heroSection.title as string) || defaultTestimonialsContent.hero.title,
+      description: (heroSection.description as string) || defaultTestimonialsContent.hero.description,
+      backgroundImages: (heroSection.backgroundImages as string[]) || defaultTestimonialsContent.hero.backgroundImages,
+      statistics: (heroSection.statistics as typeof defaultTestimonialsContent.hero.statistics) || defaultTestimonialsContent.hero.statistics,
+    },
+    shareExperience: {
+      title: (shareSection.title as string) || defaultTestimonialsContent.shareExperience.title,
+      description: (shareSection.description as string) || defaultTestimonialsContent.shareExperience.description,
+      primaryButtonText: (shareSection.primaryButtonText as string) || defaultTestimonialsContent.shareExperience.primaryButtonText,
+      secondaryButtonText: (shareSection.secondaryButtonText as string) || defaultTestimonialsContent.shareExperience.secondaryButtonText,
+      shareText: (shareSection.shareText as string) || defaultTestimonialsContent.shareExperience.shareText,
+      googleReviewUrl: (shareSection.googleReviewUrl as string) || defaultTestimonialsContent.shareExperience.googleReviewUrl,
+      email: (shareSection.email as string) || defaultTestimonialsContent.shareExperience.email,
+      emailSubject: (shareSection.emailSubject as string) || defaultTestimonialsContent.shareExperience.emailSubject,
+    },
+    whyChooseUs: {
+      title: (whyChooseSection.title as string) || defaultTestimonialsContent.whyChooseUs.title,
+      cards: (whyChooseSection.cards as typeof defaultTestimonialsContent.whyChooseUs.cards) || defaultTestimonialsContent.whyChooseUs.cards,
+    },
+  }
+}
+
+/**
+ * Convert TestimonialsPageContent to database sections
+ */
+function testimonialsContentToSections(content: TestimonialsPageContent): { sectionKey: string; content: Record<string, unknown> }[] {
+  return [
+    {
+      sectionKey: 'hero',
+      content: {
+        badge: content.hero.badge,
+        title: content.hero.title,
+        description: content.hero.description,
+        backgroundImages: content.hero.backgroundImages,
+        statistics: content.hero.statistics,
+      }
+    },
+    {
+      sectionKey: 'shareExperience',
+      content: {
+        title: content.shareExperience.title,
+        description: content.shareExperience.description,
+        primaryButtonText: content.shareExperience.primaryButtonText,
+        secondaryButtonText: content.shareExperience.secondaryButtonText,
+        shareText: content.shareExperience.shareText,
+        googleReviewUrl: content.shareExperience.googleReviewUrl,
+        email: content.shareExperience.email,
+        emailSubject: content.shareExperience.emailSubject,
+      }
+    },
+    {
+      sectionKey: 'whyChooseUs',
+      content: {
+        title: content.whyChooseUs.title,
+        cards: content.whyChooseUs.cards,
+      }
+    }
+  ]
+}
+
+/**
+ * Hook for Testimonials page content
+ */
+export function useTestimonialsContent() {
+  return useCmsContent(
+    'testimonials',
+    sectionsToTestimonialsContent,
+    testimonialsContentToSections,
+    defaultTestimonialsContent
   )
 }
 

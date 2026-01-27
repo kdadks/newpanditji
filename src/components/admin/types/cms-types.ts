@@ -1,6 +1,6 @@
 // CMS Content Type Definitions
 
-export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery'
+export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials'
 export type SectionKey = 'header' | 'footer' | 'menu'
 
 // Base Interfaces
@@ -81,6 +81,11 @@ export interface HomePageContent {
       subtitle?: string
     }[]
   }
+  featureCardsHeader: {
+    badge: string
+    title: string
+    description: string
+  }
   featureCards: {
     title: string
     description: string
@@ -97,7 +102,6 @@ export interface AboutPageContent {
   hero: HeroContent
   profileImage: string
   badge: string
-  name: string
   title: string
   shortBio: string
   statistics: StatisticItem[]
@@ -372,6 +376,37 @@ export interface GalleryPageContent {
     backgroundImages: string[]
     statistics: StatisticItem[]
     ctaButtons?: CTAButton[]
+  }
+}
+
+// Testimonials Page Content
+export interface WhyChooseUsCard {
+  icon: string
+  title: string
+  description: string
+}
+
+export interface TestimonialsPageContent {
+  hero: {
+    badge: string
+    title: string
+    description: string
+    backgroundImages: string[]
+    statistics: StatisticItem[]
+  }
+  shareExperience: {
+    title: string
+    description: string
+    primaryButtonText: string
+    secondaryButtonText: string
+    shareText: string
+    googleReviewUrl: string
+    email: string
+    emailSubject: string
+  }
+  whyChooseUs: {
+    title: string
+    cards: WhyChooseUsCard[]
   }
 }
 
