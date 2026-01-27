@@ -411,3 +411,61 @@ export function useTotalStats() {
     staleTime: 5 * 60 * 1000,
   })
 }
+
+// Fetch cookie consent statistics
+async function fetchConsentStats() {
+  try {
+    const { data, error } = await supabase
+      .from('user_cookie_consents')
+      .select('necessary_cookies, analytics_cookies, marketing_cookies, preferences_cookies, consented_at')
+      .order('consented_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching consent stats:', error)
+      return {
+        totalConsents: 0,
+        analyticsAccepted: 0,
+        marketingAccepted: 0,
+        preferencesAccepted: 0,
+        analyticsPercentage: 0,
+        marketingPercentage: 0,
+        preferencesPercentage: 0
+      }
+    }
+
+    const totalConsents = data?.length || 0
+    const analyticsAccepted = data?.filter(c => c.analytics_cookies).length || 0
+    const marketingAccepted = data?.filter(c => c.marketing_cookies).length || 0
+    const preferencesAccepted = data?.filter(c => c.preferences_cookies).length || 0
+
+    return {
+      totalConsents,
+      analyticsAccepted,
+      marketingAccepted,
+      preferencesAccepted,
+      analyticsPercentage: totalConsents > 0 ? Math.round((analyticsAccepted / totalConsents) * 100) : 0,
+      marketingPercentage: totalConsents > 0 ? Math.round((marketingAccepted / totalConsents) * 100) : 0,
+      preferencesPercentage: totalConsents > 0 ? Math.round((preferencesAccepted / totalConsents) * 100) : 0
+    }
+  } catch (err) {
+    console.error('Error in fetchConsentStats:', err)
+    return {
+      totalConsents: 0,
+      analyticsAccepted: 0,
+      marketingAccepted: 0,
+      preferencesAccepted: 0,
+      analyticsPercentage: 0,
+      marketingPercentage: 0,
+      preferencesPercentage: 0
+    }
+  }
+}
+
+// Hook for consent statistics
+export function useConsentStats() {
+  return useQuery({
+    queryKey: ['analytics', 'consent-stats'],
+    queryFn: fetchConsentStats,
+    staleTime: 5 * 60 * 1000,
+  })
+}

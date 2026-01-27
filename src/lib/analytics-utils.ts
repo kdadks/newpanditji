@@ -3,10 +3,14 @@
  * Helper functions for analytics tracking
  */
 
+import { canTrackAnalytics } from '../hooks/useCookieConsent'
+
 /**
  * Check if we should track analytics
- * Returns false for localhost/development environments
- * Returns true for production environments
+ * Returns false for:
+ * - localhost/development environments
+ * - When user hasn't consented to analytics cookies (GDPR)
+ * Returns true for production environments with user consent
  */
 export function shouldTrackAnalytics(): boolean {
   if (typeof window === 'undefined') {
@@ -31,7 +35,15 @@ export function shouldTrackAnalytics(): boolean {
     hostname.includes('staging') ||
     hostname.includes('test')
 
-  return !isLocalhost && !isDevelopment
+  // Check if in production/not localhost
+  const isProduction = !isLocalhost && !isDevelopment
+
+  // In production, also check for cookie consent (GDPR compliance)
+  if (isProduction) {
+    return canTrackAnalytics()
+  }
+
+  return false
 }
 
 /**

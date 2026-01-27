@@ -138,3 +138,24 @@ BEGIN
     last_visit = NOW();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- Cookie Consent RLS Policies
+-- ============================================================================
+
+-- Drop existing consent policies if they exist
+DROP POLICY IF EXISTS user_cookie_consents_public_insert ON user_cookie_consents;
+DROP POLICY IF EXISTS user_cookie_consents_admin_read ON user_cookie_consents;
+
+-- User Cookie Consents: Allow public inserts, admin read
+CREATE POLICY user_cookie_consents_public_insert ON user_cookie_consents
+  FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY user_cookie_consents_admin_read ON user_cookie_consents
+  FOR SELECT TO authenticated
+  USING ((select auth.uid()) IS NOT NULL);
+
+-- Grant necessary permissions for cookie consent
+GRANT INSERT ON user_cookie_consents TO anon;
+GRANT SELECT ON user_cookie_consents TO authenticated;

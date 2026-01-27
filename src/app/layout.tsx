@@ -13,6 +13,7 @@ import Footer from '../components/Footer'
 import WhatsAppButton from '../components/WhatsAppButton'
 import { AuthErrorHandler } from '../components/AuthErrorHandler'
 import { AnalyticsProvider } from '../components/AnalyticsProvider'
+import CookieConsentBanner from '../components/CookieConsentBanner'
 import { Toaster } from '../components/ui/sonner'
 import { ErrorFallback } from '../ErrorFallback'
 import { AppPage, AppNavigationData } from '../lib/types'
@@ -134,6 +135,7 @@ export default function RootLayout({
             >
               <AuthErrorHandler />
               <AnalyticsProvider />
+              <CookieConsentBanner />
               <div className="min-h-screen flex flex-col bg-background">
                 <Header />
                 <main className="flex-1">

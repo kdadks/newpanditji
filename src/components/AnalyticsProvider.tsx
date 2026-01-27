@@ -14,14 +14,21 @@ export function AnalyticsProvider() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Don't track in development/localhost
-    if (!shouldTrackAnalytics()) {
-      console.log('[Analytics] Skipping tracking - development/localhost environment')
+    // Don't track admin routes
+    if (pathname?.startsWith('/admin')) {
       return
     }
 
-    // Don't track admin routes
-    if (pathname?.startsWith('/admin')) {
+    // Don't track in development/localhost or without consent
+    if (!shouldTrackAnalytics()) {
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : ''
+      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
+
+      if (isLocalhost) {
+        console.log('[Analytics] Skipping tracking - localhost environment')
+      } else {
+        console.log('[Analytics] Skipping tracking - user has not consented to analytics cookies')
+      }
       return
     }
 

@@ -9,7 +9,9 @@ import {
   Desktop,
   MapPin,
   ArrowRight,
-  Spinner
+  Spinner,
+  Cookie,
+  ShieldCheck
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Badge } from '../ui/badge'
@@ -22,6 +24,7 @@ import {
   useTopReferrers,
   useRecentPageViews,
   useTotalStats,
+  useConsentStats,
 } from '../../hooks/useAnalytics'
 
 export default function AdminAnalytics() {
@@ -34,6 +37,7 @@ export default function AdminAnalytics() {
   const { data: topReferrers, isLoading: referrersLoading } = useTopReferrers()
   const { data: recentViews, isLoading: recentLoading } = useRecentPageViews(20)
   const { data: totalStats, isLoading: totalStatsLoading } = useTotalStats()
+  const { data: consentStats, isLoading: consentLoading } = useConsentStats()
 
   if (summaryLoading && totalStatsLoading) {
     return (
@@ -175,6 +179,70 @@ export default function AdminAnalytics() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Cookie Consent Statistics (GDPR Compliance) */}
+      <Card className="border-orange-200 bg-linear-to-br from-orange-50/50 to-amber-50/30">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Cookie size={24} className="text-orange-600" weight="fill" />
+            <div>
+              <CardTitle className="text-lg">GDPR Cookie Consent</CardTitle>
+              <CardDescription>User consent preferences breakdown</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {consentLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Spinner className="animate-spin text-primary" size={24} />
+            </div>
+          ) : consentStats ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="flex items-center gap-4 p-4 bg-white/80 rounded-lg border border-orange-200 shadow-sm">
+                  <ShieldCheck size={32} className="text-orange-600" weight="fill" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Consents</p>
+                    <p className="text-2xl font-bold">{consentStats.totalConsents.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg">
+                  <ChartBar size={32} className="text-blue-600" weight="fill" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Analytics</p>
+                    <p className="text-2xl font-bold">{consentStats.analyticsPercentage}%</p>
+                    <p className="text-xs text-muted-foreground">{consentStats.analyticsAccepted} users</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg">
+                  <Globe size={32} className="text-purple-600" weight="fill" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Marketing</p>
+                    <p className="text-2xl font-bold">{consentStats.marketingPercentage}%</p>
+                    <p className="text-xs text-muted-foreground">{consentStats.marketingAccepted} users</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg">
+                  <Users size={32} className="text-green-600" weight="fill" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Preferences</p>
+                    <p className="text-2xl font-bold">{consentStats.preferencesPercentage}%</p>
+                    <p className="text-xs text-muted-foreground">{consentStats.preferencesAccepted} users</p>
+                  </div>
+                </div>
+              </div>
+              <div className="text-sm text-muted-foreground bg-white/60 border border-orange-200 rounded-lg p-4">
+                <p className="flex items-center gap-2">
+                  <Cookie size={16} className="text-orange-600" />
+                  <strong>GDPR Compliance:</strong> Only users who have consented to analytics cookies are being tracked.
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="text-center py-8 text-muted-foreground">No consent data available</p>
+          )}
         </CardContent>
       </Card>
 

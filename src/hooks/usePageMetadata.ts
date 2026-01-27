@@ -3,7 +3,13 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import { updateMetaTags, generateOrganizationSchema } from '../utils/seo'
+import {
+  updateMetaTags,
+  generateOrganizationSchema,
+  generateLocalBusinessSchema,
+  generatePersonSchema,
+  generateHinduPoojaFAQs
+} from '../utils/seo'
 
 interface PageMetadata {
   id: string
@@ -77,6 +83,42 @@ export function usePageMetadata(pageSlug: string) {
       const description = pageData?.meta_description || siteDefaults?.description || ''
       const keywords = pageData?.meta_keywords?.join(', ') || siteDefaults?.keywords || ''
 
+      // Generate appropriate schema based on page
+      let schema
+      if (pageSlug === 'home') {
+        // Home page gets comprehensive schema with @graph
+        schema = {
+          '@context': 'https://schema.org',
+          '@graph': [
+            generateOrganizationSchema(),
+            generateLocalBusinessSchema(),
+            generatePersonSchema(),
+            generateHinduPoojaFAQs()
+          ]
+        }
+      } else if (pageSlug === 'services') {
+        // Services page gets Organization + LocalBusiness schema
+        schema = {
+          '@context': 'https://schema.org',
+          '@graph': [
+            generateOrganizationSchema(),
+            generateLocalBusinessSchema()
+          ]
+        }
+      } else if (pageSlug === 'about') {
+        // About page gets Organization + Person schema
+        schema = {
+          '@context': 'https://schema.org',
+          '@graph': [
+            generateOrganizationSchema(),
+            generatePersonSchema()
+          ]
+        }
+      } else {
+        // Other pages get organization schema only
+        schema = generateOrganizationSchema()
+      }
+
       updateMetaTags({
         title,
         description,
@@ -85,13 +127,13 @@ export function usePageMetadata(pageSlug: string) {
         ogDescription: pageData?.og_description || description,
         ogImage: pageData?.og_image_url || undefined,
         canonicalUrl: pageData?.canonical_url || undefined,
-        schema: generateOrganizationSchema(),
+        schema,
         robots: 'index, follow'
       })
 
       setIsApplied(true)
     }
-  }, [pageData, siteDefaults, isLoading, isApplied])
+  }, [pageData, siteDefaults, isLoading, isApplied, pageSlug])
 
   // Scroll to top on page load
   useEffect(() => {
