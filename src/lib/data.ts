@@ -23,7 +23,7 @@ export interface ServiceDetail {
 export interface Service {
   id: string
   name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'package'
+  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
   duration: string
   description: string
   imageUrl?: string // Image URL for service card display
@@ -42,6 +42,19 @@ export interface Service {
     url?: string // URL to file in Supabase Storage
     type: string // MIME type
   }
+  // Package-specific fields
+  isPackage?: boolean
+  packageSavingsText?: string
+  packageHighlights?: string[]
+  includedServices?: Array<{
+    id: string
+    name: string
+    slug: string
+    price?: string
+    duration?: string
+    description: string
+    imageUrl?: string
+  }>
 }
 
 export const services: Service[] = [
@@ -492,7 +505,7 @@ export const categoryNames = {
   paath: 'Paath/Recitations',
   consultation: 'Consultations',
   wellness: 'Meditation & Yoga',
-  package: 'Package Options'
+  packages: 'Service Packages'
 }
 
 export const testimonials = [

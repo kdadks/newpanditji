@@ -28,7 +28,10 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  
+
+  // Package navigation state - track parent package when viewing included service
+  const [parentPackage, setParentPackage] = useState<Service | null>(null)
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 12
@@ -69,12 +72,38 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
     setIsDetailsOpen(true)
+    setParentPackage(null) // Clear parent package when opening a new service
 
     // Track service view (only in production, not localhost/development)
     if (shouldTrackAnalytics() && service.id) {
       trackServiceView(service.id, service.name).catch(err => {
         console.error('Failed to track service view:', err)
       })
+    }
+  }
+
+  // Handle clicking on a service within a package
+  const handleIncludedServiceClick = (serviceSlug: string, packageService: Service) => {
+    // Find the full service details
+    const fullService = services.find(s => s.id === serviceSlug)
+    if (fullService) {
+      setParentPackage(packageService) // Remember the package we came from
+      setSelectedService(fullService)
+
+      // Track service view
+      if (shouldTrackAnalytics() && fullService.id) {
+        trackServiceView(fullService.id, fullService.name).catch(err => {
+          console.error('Failed to track service view:', err)
+        })
+      }
+    }
+  }
+
+  // Go back to the parent package
+  const handleBackToPackage = () => {
+    if (parentPackage) {
+      setSelectedService(parentPackage)
+      setParentPackage(null)
     }
   }
 
@@ -221,11 +250,18 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   />
                 )}
                 {/* Category Badge */}
-                <div className="absolute top-4 left-4 z-20">
+                <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
                     <FlowerLotus size={14} weight="fill" />
                     {categoryNames[service.category]}
                   </span>
+                  {/* Package Badge */}
+                  {service.isPackage && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-purple-600 via-pink-600 to-purple-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm animate-pulse">
+                      <Package size={14} weight="fill" />
+                      Multi-Service Package
+                    </span>
+                  )}
                 </div>
                 {/* Number Badge */}
                 <div className="absolute top-4 right-4 z-20">
@@ -254,13 +290,29 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   dangerouslySetInnerHTML={{ __html: service.description }}
                 />
                 
+                {/* Package Info */}
+                {service.isPackage && service.includedServices && service.includedServices.length > 0 && (
+                  <div className="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-purple-700">
+                      <Package size={16} weight="fill" />
+                      <span>Includes {service.includedServices.length} Services</span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Action Button */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                   <div className="flex items-center gap-2">
                     <div className="p-2 bg-linear-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                      <FlowerLotus className="text-amber-700 dark:text-amber-400" size={18} weight="fill" />
+                      {service.isPackage ? (
+                        <Package className="text-purple-700 dark:text-purple-400" size={18} weight="fill" />
+                      ) : (
+                        <FlowerLotus className="text-amber-700 dark:text-amber-400" size={18} weight="fill" />
+                      )}
                     </div>
-                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Sacred Ritual</span>
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      {service.isPackage ? 'Service Package' : 'Sacred Ritual'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1 text-amber-700 dark:text-amber-400 font-bold text-sm group-hover:gap-2 transition-all duration-300 whitespace-nowrap">
                     <span>View Details</span>
@@ -409,6 +461,20 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* Title and Info Section */}
                   <div className="flex-1">
+                    {/* Back to Package Button */}
+                    {parentPackage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleBackToPackage}
+                        className="mb-4 gap-2 hover:bg-purple-100 text-purple-700"
+                      >
+                        <CaretLeft size={16} weight="bold" />
+                        <Package size={16} weight="fill" />
+                        Back to {parentPackage.name}
+                      </Button>
+                    )}
+
                     <div className="mb-3">
                       <Badge className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white border-white/30">
                         <FlowerLotus size={14} weight="fill" className="mr-1.5" />
@@ -493,6 +559,149 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                       </div>
                     )}
                   </div>
+
+                  {/* Package-Specific Sections */}
+                  {selectedService.isPackage && (
+                    <>
+                      {/* Package Savings */}
+                      {selectedService.packageSavingsText && (
+                        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-500 rounded-full">
+                              <Sparkle size={20} className="text-white" weight="fill" />
+                            </div>
+                            <p className="text-green-800 font-semibold text-lg">
+                              {selectedService.packageSavingsText}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Package Highlights */}
+                      {selectedService.packageHighlights && selectedService.packageHighlights.length > 0 && (
+                        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-pink-50">
+                          <CardContent className="p-6">
+                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                              <Star className="text-primary" size={24} weight="fill" />
+                              Package Highlights
+                            </h3>
+                            <ul className="space-y-3">
+                              {selectedService.packageHighlights.map((highlight, index) => (
+                                <li key={index} className="flex items-start gap-3">
+                                  <CheckCircle className="text-primary mt-0.5 shrink-0" size={20} weight="fill" />
+                                  <span className="text-muted-foreground">{highlight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Included Services */}
+                      {selectedService.includedServices && selectedService.includedServices.length > 0 && (
+                        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-orange-50">
+                          <CardContent className="p-6">
+                            <h3 className="font-heading font-bold text-2xl mb-4 text-foreground flex items-center gap-2">
+                              <Package className="text-primary" size={28} weight="fill" />
+                              Services Included in This Package
+                            </h3>
+                            <p className="text-muted-foreground mb-6">
+                              This package includes {selectedService.includedServices.length} carefully curated services:
+                            </p>
+                            <div className="space-y-4">
+                              {selectedService.includedServices.map((includedService, index) => (
+                                <div
+                                  key={includedService.id}
+                                  onClick={() => handleIncludedServiceClick(includedService.id, selectedService)}
+                                  className="group p-5 bg-white rounded-lg border border-orange-200 hover:border-orange-400 hover:shadow-lg transition-all duration-200 cursor-pointer hover:scale-[1.02]"
+                                >
+                                  <div className="flex items-start gap-4">
+                                    {/* Service Number Badge */}
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-bold shadow-md group-hover:scale-110 transition-transform">
+                                      {index + 1}
+                                    </div>
+
+                                    {/* Service Image (if available) */}
+                                    {includedService.imageUrl && (
+                                      <div className="flex-shrink-0">
+                                        <img
+                                          src={includedService.imageUrl}
+                                          alt={includedService.name}
+                                          className="w-20 h-20 object-cover rounded-lg border-2 border-orange-300 group-hover:border-orange-500 transition-colors"
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Service Details */}
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <h4 className="font-heading font-bold text-lg mb-2 text-foreground group-hover:text-orange-600 transition-colors">
+                                          {includedService.name}
+                                        </h4>
+                                        <div className="flex items-center gap-1 text-orange-600 text-sm font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <span className="text-xs">View Details</span>
+                                          <ArrowRight size={14} weight="bold" className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                        {includedService.description}
+                                      </p>
+                                      <div className="flex flex-wrap gap-3 text-sm">
+                                        {includedService.duration && (
+                                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                                            <Clock size={16} className="text-primary" weight="bold" />
+                                            <span>{includedService.duration}</span>
+                                          </div>
+                                        )}
+                                        {includedService.price && (
+                                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                                            <CurrencyDollar size={16} className="text-primary" weight="bold" />
+                                            <span>
+                                              {!includedService.price.includes('€') && /^\d+/.test(includedService.price)
+                                                ? `€${includedService.price}`
+                                                : includedService.price}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Click Hint */}
+                                  <div className="mt-3 pt-3 border-t border-orange-100 flex items-center justify-center gap-2 text-xs text-muted-foreground group-hover:text-orange-600 transition-colors">
+                                    <Info size={14} weight="fill" />
+                                    <span>Click to view full service details</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Package Summary */}
+                            <div className="mt-6 p-4 bg-gradient-to-r from-orange-100 to-amber-100 rounded-lg border border-orange-300">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="text-green-600" size={24} weight="fill" />
+                                  <span className="font-semibold text-foreground">
+                                    All {selectedService.includedServices.length} services included
+                                  </span>
+                                </div>
+                                {selectedService.price && (
+                                  <div className="text-right">
+                                    <p className="text-sm text-muted-foreground">Package Price</p>
+                                    <p className="text-2xl font-bold text-primary">
+                                      {!selectedService.price.includes('€') && /^\d+/.test(selectedService.price)
+                                        ? `€${selectedService.price}`
+                                        : selectedService.price}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </>
+                  )}
 
                   {/* Deity Information */}
                   {selectedService.details?.deity && (

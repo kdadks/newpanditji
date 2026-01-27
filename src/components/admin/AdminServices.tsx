@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useAdminServices, convertLegacyService } from '../../hooks/useServices'
 import { usePhotos } from '../../hooks/usePhotos'
 import { uploadDocument, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl } from '../../lib/storage'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp, Image as ImageIcon, Clock, CaretLeft, CaretRight } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, UploadSimple, FilePdf, FileDoc, Spinner, Package, CloudArrowUp, Image as ImageIcon, Clock, CaretLeft, CaretRight, Sparkle } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -16,10 +16,17 @@ import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import { categoryNames } from '../../lib/data'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
-import type { AdminServiceRow } from '../../lib/supabase'
-import { generateSlug } from '../../lib/supabase'
+import type { AdminServiceRow, AdminPackageRow } from '../../lib/supabase'
+import { generateSlug, supabase } from '../../lib/supabase'
 
-type ServiceCategory = 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
+type ServiceCategory = 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
+
+interface PackageServiceItem {
+  service_id: string
+  sort_order: number
+  package_price_override?: string
+  notes?: string
+}
 
 interface ServiceFormData {
   id: string
@@ -35,6 +42,11 @@ interface ServiceFormData {
   imageUrl?: string
   samagriFile?: { name: string; data: string; type: string }
   samagriFileUrl?: string
+  // Package-specific fields
+  isPackage?: boolean
+  packageSavingsText?: string
+  packageHighlights?: string[]
+  packageServices?: PackageServiceItem[]
 }
 
 export default function AdminServicesNew() {
@@ -73,6 +85,11 @@ export default function AdminServicesNew() {
   const [includesInput, setIncludesInput] = useState('')
   const [requirementInput, setRequirementInput] = useState('')
 
+  // Package-specific states
+  const [packageHighlightInput, setPackageHighlightInput] = useState('')
+  const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set())
+  const [showServiceSelector, setShowServiceSelector] = useState(false)
+
   // Filter services
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -110,19 +127,29 @@ export default function AdminServicesNew() {
       includes: [],
       requirements: [],
       dakshina: '',
-      imageUrl: ''
+      imageUrl: '',
+      isPackage: false,
+      packageSavingsText: '',
+      packageHighlights: [],
+      packageServices: []
     })
     setBenefitInput('')
     setIncludesInput('')
     setRequirementInput('')
+    setPackageHighlightInput('')
+    setSelectedServices(new Set())
     setEditingService(null)
     setCurrentTab('basic')
     setSelectedSamagriFile(null)
     setShowImagePicker(false)
+    setShowServiceSelector(false)
     setIsDialogOpen(true)
   }
 
   const handleEdit = (service: AdminServiceRow) => {
+    const packageService = service as AdminPackageRow
+    const packageServiceIds = packageService.included_services?.map(s => s.id) || []
+
     setFormData({
       id: service.id,
       name: service.name,
@@ -140,12 +167,23 @@ export default function AdminServicesNew() {
         name: 'Samagri List',
         type: service.samagri_file_url.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
         data: ''
-      } : undefined
+      } : undefined,
+      isPackage: service.is_package,
+      packageSavingsText: service.package_savings_text || '',
+      packageHighlights: service.package_highlights || [],
+      packageServices: packageService.included_services?.map(s => ({
+        service_id: s.id,
+        sort_order: s.sort_order,
+        package_price_override: s.package_price_override || undefined,
+        notes: s.notes || undefined
+      })) || []
     })
+    setSelectedServices(new Set(packageServiceIds))
     setEditingService(service)
     setCurrentTab('basic')
     setSelectedSamagriFile(null)
     setShowImagePicker(false)
+    setShowServiceSelector(false)
     setIsDialogOpen(true)
   }
 
@@ -190,8 +228,41 @@ export default function AdminServicesNew() {
           requirements: formData.requirements.length > 0 ? formData.requirements : null,
           price: formData.dakshina || null,
           featured_image_url: formData.imageUrl || null,
-          samagri_file_url: samagriFileUrl
+          samagri_file_url: samagriFileUrl,
+          is_package: formData.category === 'packages',
+          package_savings_text: formData.packageSavingsText || null,
+          package_highlights: formData.packageHighlights && formData.packageHighlights.length > 0 ? formData.packageHighlights : null
         })
+
+        // Handle package items if this is a package
+        if (formData.category === 'packages' && formData.packageServices) {
+          // Delete existing package items
+          await supabase
+            .from('service_package_items')
+            .delete()
+            .eq('package_id', editingService.id)
+
+          // Insert new package items
+          if (formData.packageServices.length > 0) {
+            const packageItems = formData.packageServices.map((item, index) => ({
+              package_id: editingService.id,
+              service_id: item.service_id,
+              sort_order: index,
+              package_price_override: item.package_price_override || null,
+              notes: item.notes || null,
+              service_snapshot: null // Will be populated by trigger or application logic
+            }))
+
+            const { error: itemsError } = await supabase
+              .from('service_package_items')
+              .insert(packageItems)
+
+            if (itemsError) {
+              console.error('Error saving package items:', itemsError)
+              toast.error('Package saved but error adding services')
+            }
+          }
+        }
       } else {
         const newService = convertLegacyService({
           name: formData.name,
@@ -209,7 +280,42 @@ export default function AdminServicesNew() {
         if (samagriFileUrl) {
           newService.samagri_file_url = samagriFileUrl
         }
-        await createService(newService)
+        newService.is_package = formData.category === 'packages'
+        newService.package_savings_text = formData.packageSavingsText || null
+        newService.package_highlights = formData.packageHighlights && formData.packageHighlights.length > 0 ? formData.packageHighlights : null
+
+        // Create the service first to get its ID
+        const createdService = await createService(newService)
+
+        // Handle package items if this is a package
+        if (formData.category === 'packages' && formData.packageServices && formData.packageServices.length > 0 && createdService) {
+          // Get the created service ID from the response
+          const { data: createdServices } = await supabase
+            .from('services')
+            .select('id')
+            .eq('slug', generateSlug(formData.name))
+            .single()
+
+          if (createdServices) {
+            const packageItems = formData.packageServices.map((item, index) => ({
+              package_id: createdServices.id,
+              service_id: item.service_id,
+              sort_order: index,
+              package_price_override: item.package_price_override || null,
+              notes: item.notes || null,
+              service_snapshot: null
+            }))
+
+            const { error: itemsError } = await supabase
+              .from('service_package_items')
+              .insert(packageItems)
+
+            if (itemsError) {
+              console.error('Error saving package items:', itemsError)
+              toast.error('Package created but error adding services')
+            }
+          }
+        }
       }
       setIsDialogOpen(false)
       setEditingService(null)
@@ -297,6 +403,7 @@ export default function AdminServicesNew() {
                   <SelectItem value="paath">Paath/Recitations</SelectItem>
                   <SelectItem value="consultation">Consultations</SelectItem>
                   <SelectItem value="wellness">Meditation & Yoga</SelectItem>
+                  <SelectItem value="packages">📦 Service Packages</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -570,6 +677,7 @@ export default function AdminServicesNew() {
                             <SelectItem value="paath">📿 Paath/Recitations</SelectItem>
                             <SelectItem value="consultation">🔮 Consultations</SelectItem>
                             <SelectItem value="wellness">🧘 Meditation & Yoga</SelectItem>
+                            <SelectItem value="packages">📦 Service Packages</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -667,6 +775,242 @@ export default function AdminServicesNew() {
                     </div>
                   </div>
                 </div>
+
+                {/* Package-Specific Section - Only show when category is 'packages' */}
+                {formData.category === 'packages' && (
+                  <>
+                    {/* Package Services Selection */}
+                    <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-primary/20">
+                      <div className="absolute top-0 left-0 w-40 h-40 bg-linear-to-br from-primary/10 to-transparent rounded-full blur-2xl" />
+                      <div className="relative p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <Package size={20} className="text-primary" weight="fill" />
+                            </div>
+                            <div>
+                              <h3 className="font-heading font-semibold text-lg">Included Services</h3>
+                              <p className="text-xs text-muted-foreground">Select services included in this package</p>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowServiceSelector(!showServiceSelector)}
+                            className="gap-2"
+                          >
+                            <Plus size={16} />
+                            Add Services
+                          </Button>
+                        </div>
+
+                        {/* Service Selector */}
+                        {showServiceSelector && (
+                          <div className="mb-6 p-4 border rounded-lg bg-muted/30">
+                            <p className="text-sm font-medium mb-3">Select services to include:</p>
+                            <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
+                              {services
+                                .filter(s => s.category !== 'packages' && s.id !== formData.id)
+                                .map(service => (
+                                  <label
+                                    key={service.id}
+                                    className="flex items-center gap-3 p-3 rounded-lg border bg-background hover:bg-accent/50 cursor-pointer transition-colors"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedServices.has(service.id)}
+                                      onChange={(e) => {
+                                        const newSelected = new Set(selectedServices)
+                                        if (e.target.checked) {
+                                          newSelected.add(service.id)
+                                        } else {
+                                          newSelected.delete(service.id)
+                                        }
+                                        setSelectedServices(newSelected)
+
+                                        // Update formData packageServices
+                                        const currentServices = formData.packageServices || []
+                                        if (e.target.checked) {
+                                          setFormData({
+                                            ...formData,
+                                            packageServices: [
+                                              ...currentServices,
+                                              {
+                                                service_id: service.id,
+                                                sort_order: currentServices.length
+                                              }
+                                            ]
+                                          })
+                                        } else {
+                                          setFormData({
+                                            ...formData,
+                                            packageServices: currentServices.filter(s => s.service_id !== service.id)
+                                          })
+                                        }
+                                      }}
+                                      className="rounded"
+                                    />
+                                    <div className="flex-1">
+                                      <p className="font-medium text-sm">{service.name}</p>
+                                      <p className="text-xs text-muted-foreground">{service.category} • {service.duration}</p>
+                                    </div>
+                                    {service.price && (
+                                      <Badge variant="secondary" className="text-xs">{service.price}</Badge>
+                                    )}
+                                  </label>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Selected Services List */}
+                        {selectedServices.size > 0 && (
+                          <div className="space-y-2">
+                            <p className="text-sm font-medium">Selected Services ({selectedServices.size}):</p>
+                            <div className="space-y-2">
+                              {Array.from(selectedServices).map((serviceId, index) => {
+                                const service = services.find(s => s.id === serviceId)
+                                if (!service) return null
+
+                                return (
+                                  <div key={serviceId} className="flex items-center gap-3 p-3 rounded-lg border bg-background">
+                                    <span className="text-sm text-muted-foreground font-medium w-8">{index + 1}.</span>
+                                    <div className="flex-1">
+                                      <p className="font-medium text-sm">{service.name}</p>
+                                      <p className="text-xs text-muted-foreground">{service.duration}</p>
+                                    </div>
+                                    {service.price && (
+                                      <span className="text-sm text-muted-foreground">{service.price}</span>
+                                    )}
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const newSelected = new Set(selectedServices)
+                                        newSelected.delete(serviceId)
+                                        setSelectedServices(newSelected)
+                                        setFormData({
+                                          ...formData,
+                                          packageServices: (formData.packageServices || []).filter(s => s.service_id !== serviceId)
+                                        })
+                                      }}
+                                    >
+                                      <X size={16} />
+                                    </Button>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedServices.size === 0 && !showServiceSelector && (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Package size={32} className="mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">No services selected yet</p>
+                            <p className="text-xs">Click "Add Services" to include services in this package</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Package Details */}
+                    <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                      <div className="absolute bottom-0 right-0 w-32 h-32 bg-linear-to-tl from-accent/10 to-transparent rounded-full blur-2xl" />
+                      <div className="relative p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="p-2 bg-accent/10 rounded-lg">
+                            <Sparkle size={20} className="text-primary" weight="fill" />
+                          </div>
+                          <div>
+                            <h3 className="font-heading font-semibold text-lg">Package Details</h3>
+                            <p className="text-xs text-muted-foreground">Additional package information</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="packageSavings" className="text-sm font-medium">
+                              Savings Text
+                            </Label>
+                            <Input
+                              id="packageSavings"
+                              value={formData.packageSavingsText || ''}
+                              onChange={(e) => setFormData({ ...formData, packageSavingsText: e.target.value })}
+                              placeholder="e.g., Save €50 when you book this package"
+                              className="h-12 bg-background border-border/50"
+                            />
+                            <p className="text-xs text-muted-foreground">Marketing text explaining package savings</p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Package Highlights</Label>
+                            <p className="text-xs text-muted-foreground mb-2">Key benefits of booking this package</p>
+                            <div className="flex gap-2">
+                              <Input
+                                value={packageHighlightInput}
+                                onChange={(e) => setPackageHighlightInput(e.target.value)}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    if (packageHighlightInput.trim()) {
+                                      setFormData({
+                                        ...formData,
+                                        packageHighlights: [...(formData.packageHighlights || []), packageHighlightInput.trim()]
+                                      })
+                                      setPackageHighlightInput('')
+                                    }
+                                  }
+                                }}
+                                placeholder="Enter a highlight and press Enter"
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  if (packageHighlightInput.trim()) {
+                                    setFormData({
+                                      ...formData,
+                                      packageHighlights: [...(formData.packageHighlights || []), packageHighlightInput.trim()]
+                                    })
+                                    setPackageHighlightInput('')
+                                  }
+                                }}
+                              >
+                                <Plus size={16} />
+                              </Button>
+                            </div>
+                            {formData.packageHighlights && formData.packageHighlights.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {formData.packageHighlights.map((highlight, index) => (
+                                  <Badge key={index} variant="secondary" className="gap-2 py-2">
+                                    <span>{highlight}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setFormData({
+                                          ...formData,
+                                          packageHighlights: formData.packageHighlights?.filter((_, i) => i !== index)
+                                        })
+                                      }}
+                                      className="hover:text-destructive"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </TabsContent>
 
               {/* Details Tab */}

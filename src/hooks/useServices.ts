@@ -20,7 +20,7 @@ interface ServiceRowWithCategory extends ServiceRow {
 function mapServiceRowToService(row: ServiceRowWithCategory): Service {
   // Get category from joined table or default
   const category = row.service_categories?.slug || 'pooja'
-  
+
   return {
     id: row.id,
     name: row.name,
@@ -51,6 +51,11 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
       url: row.samagri_file_url,
       type: row.samagri_file_url.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
     } : undefined,
+    // Package-specific fields
+    isPackage: row.is_package,
+    packageSavingsText: row.package_savings_text || undefined,
+    packageHighlights: row.package_highlights || undefined,
+    // Note: includedServices will be fetched separately for packages
   }
 }
 
@@ -89,7 +94,48 @@ async function fetchServices(): Promise<Service[]> {
     throw error
   }
 
-  return (data || []).map(mapServiceRowToService)
+  // For each service that is a package, fetch its included services
+  const servicesWithPackages = await Promise.all(
+    (data || []).map(async (service) => {
+      const mappedService = mapServiceRowToService(service)
+
+      if (service.is_package) {
+        const { data: packageItems } = await supabase
+          .from('service_package_items')
+          .select(`
+            *,
+            service:services!service_package_items_service_id_fkey (
+              id,
+              name,
+              slug,
+              price,
+              duration,
+              short_description,
+              featured_image_url
+            )
+          `)
+          .eq('package_id', service.id)
+          .order('sort_order', { ascending: true })
+
+        return {
+          ...mappedService,
+          includedServices: packageItems?.map((item: any) => ({
+            id: item.service.id,
+            name: item.service.name,
+            slug: item.service.slug,
+            price: item.service.price || undefined,
+            duration: item.service.duration || undefined,
+            description: item.service.short_description,
+            imageUrl: item.service.featured_image_url || undefined
+          })) || []
+        }
+      }
+
+      return mappedService
+    })
+  )
+
+  return servicesWithPackages
 }
 
 /**
@@ -109,7 +155,48 @@ async function fetchAdminServices(): Promise<AdminServiceRow[]> {
     throw error
   }
 
-  return (data || []).map(mapServiceRowToAdminRow)
+  // For each service that is a package, fetch its included services
+  const servicesWithPackages = await Promise.all(
+    (data || []).map(async (service) => {
+      if (service.is_package) {
+        const { data: packageItems } = await supabase
+          .from('service_package_items')
+          .select(`
+            *,
+            service:services (
+              id,
+              name,
+              slug,
+              price,
+              duration,
+              short_description,
+              featured_image_url
+            )
+          `)
+          .eq('package_id', service.id)
+          .order('sort_order', { ascending: true })
+
+        return {
+          ...service,
+          included_services: packageItems?.map((item: any) => ({
+            id: item.service.id,
+            name: item.service.name,
+            slug: item.service.slug,
+            price: item.service.price,
+            duration: item.service.duration,
+            short_description: item.service.short_description,
+            featured_image_url: item.service.featured_image_url,
+            sort_order: item.sort_order,
+            package_price_override: item.package_price_override,
+            notes: item.notes
+          })) || []
+        }
+      }
+      return service
+    })
+  )
+
+  return servicesWithPackages.map(mapServiceRowToAdminRow)
 }
 
 /**
@@ -316,7 +403,7 @@ export function useAdminServices() {
 export function convertLegacyService(service: {
   id?: string
   name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
+  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
   duration: string
   description: string
   detailedDescription?: string
@@ -371,6 +458,9 @@ export function convertLegacyService(service: {
     meta_description: null,
     meta_keywords: null,
     is_published: true,
-    sort_order: 0
+    sort_order: 0,
+    is_package: service.category === 'packages',
+    package_savings_text: null,
+    package_highlights: null
   }
 }

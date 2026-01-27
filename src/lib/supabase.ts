@@ -87,7 +87,7 @@ export interface Database {
   }
 }
 
-// Service types - matches migration 20241203000003_services.sql
+// Service types - matches migration 20241203000003_services.sql + 20260127000001_add_service_packages.sql
 export interface ServiceRow {
   id: string
   slug: string
@@ -123,6 +123,10 @@ export interface ServiceRow {
   meta_keywords: string[] | null
   is_published: boolean
   sort_order: number
+  // Package-specific fields
+  is_package: boolean
+  package_savings_text: string | null
+  package_highlights: string[] | null
   created_at: string
   updated_at: string
 }
@@ -130,12 +134,44 @@ export interface ServiceRow {
 export type ServiceInsert = Omit<ServiceRow, 'id' | 'created_at' | 'updated_at'>
 export type ServiceUpdate = Partial<ServiceInsert>
 
+// Service Package Item types - matches migration 20260127000001_add_service_packages.sql
+export interface ServicePackageItemRow {
+  id: string
+  package_id: string
+  service_id: string
+  sort_order: number
+  service_snapshot: Record<string, unknown> | null
+  package_price_override: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ServicePackageItemInsert = Omit<ServicePackageItemRow, 'id' | 'created_at' | 'updated_at'>
+export type ServicePackageItemUpdate = Partial<ServicePackageItemInsert>
+
 // Extended service row with category slug for admin UI
 export interface AdminServiceRow extends ServiceRow {
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness'
+  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
   description: string
   detailed_description: string | null
   special_for_nris: string[] | null
+}
+
+// Package with included services for admin UI
+export interface AdminPackageRow extends AdminServiceRow {
+  included_services?: Array<{
+    id: string
+    name: string
+    slug: string
+    price: string | null
+    duration: string | null
+    short_description: string
+    featured_image_url: string | null
+    sort_order: number
+    package_price_override: string | null
+    notes: string | null
+  }>
 }
 
 // Blog post types - matches migration 20241203000004_blog.sql
