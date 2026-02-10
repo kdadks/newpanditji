@@ -57,8 +57,6 @@ export default function AdminSEO() {
 
       if (error) throw error
       
-      console.log('Pages with sort order:', data?.map(p => ({ slug: p.slug, sort_order: p.sort_order })))
-      
       setPages(data || [])
       if (data && data.length > 0) {
         setSelectedPage(data[0])
