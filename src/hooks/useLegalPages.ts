@@ -104,6 +104,15 @@ async function createLegalPage(data: {
   metaTitle?: string
   metaDescription?: string
 }): Promise<PageRow> {
+  // Get the highest sort order among existing pages
+  const { data: maxSortData } = await supabase
+    .from('pages')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+
+  const nextSortOrder = (maxSortData?.[0]?.sort_order || 800) + 1
+
   const { data: page, error } = await supabase
     .from('pages')
     .insert({
@@ -114,7 +123,7 @@ async function createLegalPage(data: {
       template_type: 'legal',
       is_published: false,
       is_indexed: true,
-      sort_order: 0
+      sort_order: nextSortOrder
     })
     .select()
     .single()

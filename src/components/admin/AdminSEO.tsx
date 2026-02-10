@@ -51,11 +51,14 @@ export default function AdminSEO() {
     try {
       const { data, error } = await supabase
         .from('pages')
-        .select('id, slug, title, meta_title, meta_description, meta_keywords, og_title, og_description, og_image_url, canonical_url')
+        .select('id, slug, title, meta_title, meta_description, meta_keywords, og_title, og_description, og_image_url, canonical_url, sort_order')
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
 
       if (error) throw error
+      
+      console.log('Pages with sort order:', data?.map(p => ({ slug: p.slug, sort_order: p.sort_order })))
+      
       setPages(data || [])
       if (data && data.length > 0) {
         setSelectedPage(data[0])
