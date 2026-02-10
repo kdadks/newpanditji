@@ -25,10 +25,22 @@ export default function AboutPage({ }: AboutPageProps) {
   const [isPaused, setIsPaused] = useState(false)
   
   // CMS Content
-  const { content: cmsContent } = useAboutContent()
+  const { content: cmsContent, isLoading: cmsLoading } = useAboutContent()
 
   // SEO Configuration
   usePageMetadata('about')
+
+  // Show loading state while fetching content
+  if (cmsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-orange-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full">

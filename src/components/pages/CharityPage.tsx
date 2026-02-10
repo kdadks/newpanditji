@@ -136,11 +136,23 @@ function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { 
 }
 
 export default function CharityPage() {
-  const { content: cmsContent } = useCharityContent()
+  const { content: cmsContent, isLoading: cmsLoading } = useCharityContent()
   const { projects, isLoading } = useCharity()
   const disableAnimations = useDisableAnimations()
 
   usePageMetadata('charity')
+
+  // Show loading state while fetching content
+  if (cmsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-orange-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full overflow-hidden">

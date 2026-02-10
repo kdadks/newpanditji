@@ -52,6 +52,18 @@ export default function HomePage({ }: HomePageProps) {
   // SEO Configuration - Fetched from database
   usePageMetadata('home')
 
+  // Show loading state while fetching content to prevent flash of placeholder text
+  if (cmsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-orange-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full">
       <section className="relative pt-4 md:pt-6 pb-2 md:pb-4 overflow-hidden">

@@ -70,6 +70,18 @@ export default function GalleryPage() {
     other: 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
+  // Show loading state while fetching content to prevent flash of placeholder text
+  if (loadingGalleryContent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-orange-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full min-h-screen">
       {/* Hero Section with Sunrise Effect */}
