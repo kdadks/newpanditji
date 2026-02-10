@@ -39,7 +39,7 @@ const CMS_PAGES_KEY = ['cms_pages']
 const CMS_SECTIONS_KEY = ['cms_sections']
 
 // Page slug mapping
-export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials'
+export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials' | 'terms' | 'privacy'
 
 // ============================================================================
 // Database Operations

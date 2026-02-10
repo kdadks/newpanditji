@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { FileText, Article as HeaderIcon } from '@phosphor-icons/react'
+import { FileText, Article as HeaderIcon, Scales } from '@phosphor-icons/react'
 import { Card, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Button } from '../ui/button'
 import { toast } from 'sonner'
 import { useMenuItems } from '../../hooks/useMenus'
+import { supabase } from '../../lib/supabase'
 
 // Import CMS content hooks
 import {
@@ -40,16 +42,19 @@ import {
   TestimonialsPageEditor,
   HeaderEditor,
   FooterEditor,
-  MenuEditor
+  MenuEditor,
+  LegalPagesManager,
+  DynamicPageEditor
 } from './editors'
 
-// Default menu items as fallback
-import { defaultMenuItems } from './defaults/cms-defaults'
-
 export default function AdminContent() {
-  const [activeTab, setActiveTab] = useState<'pages' | 'sections'>('pages')
+  const [activeTab, setActiveTab] = useState<'pages' | 'sections' | 'legal'>('pages')
   const [activePageTab, setActivePageTab] = useState<PageKey>('home')
   const [activeSectionTab, setActiveSectionTab] = useState<SectionKey>('header')
+  const [selectedMenuLocation, setSelectedMenuLocation] = useState<'header' | 'footer' | 'legal'>('header')
+  
+  // Legal pages state
+  const [editingLegalPageSlug, setEditingLegalPageSlug] = useState<string | null>(null)
 
   // Database hooks for CMS content
   const homeContent = useHomeContent()
@@ -64,8 +69,8 @@ export default function AdminContent() {
   const headerContentHook = useHeaderContent()
   const footerContentHook = useFooterContent()
 
-  // Menu items from database
-  const headerMenuItems = useMenuItems('header')
+  // Menu items from database (based on selected location)
+  const menuItemsHook = useMenuItems(selectedMenuLocation)
 
   // Local state for editors (synced with database)
   const [homeState, setHomeState] = useState(homeContent.content)
@@ -79,7 +84,8 @@ export default function AdminContent() {
   const [testimonialsState, setTestimonialsState] = useState(testimonialsContent.content)
   const [headerState, setHeaderState] = useState(headerContentHook.content)
   const [footerState, setFooterState] = useState(footerContentHook.content)
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [isSavingMenu, setIsSavingMenu] = useState(false)
 
   // Sync local state when database content loads
   useEffect(() => {
@@ -126,17 +132,24 @@ export default function AdminContent() {
     if (!footerContentHook.isLoading) setFooterState(footerContentHook.content)
   }, [footerContentHook.content, footerContentHook.isLoading])
 
-  // Load menu items from database
+  // Load menu items from database when location changes
   useEffect(() => {
-    if (headerMenuItems.items.length > 0) {
-      setMenuItems(headerMenuItems.items.map(item => ({
-        id: item.id,
-        label: item.label,
-        url: item.url,
-        order: item.sort_order
-      })))
+    if (!menuItemsHook.isLoading) {
+      if (menuItemsHook.items.length > 0) {
+        setMenuItems(menuItemsHook.items.map(item => ({
+          id: item.id,
+          label: item.label,
+          url: item.url,
+          order: item.sort_order,
+          parent_id: item.parent_id,
+          icon: item.icon
+        })))
+      } else {
+        // Show empty state if no items in database
+        setMenuItems([])
+      }
     }
-  }, [headerMenuItems.items])
+  }, [menuItemsHook.items, menuItemsHook.isLoading, selectedMenuLocation])
 
   // Save handlers
   const handleSavePageContent = async (pageKey: PageKey) => {
@@ -193,12 +206,166 @@ export default function AdminContent() {
   }
 
   const handleSaveMenu = async () => {
+    setIsSavingMenu(true)
     try {
-      // Menu items are managed by useMenuItems hook
-      toast.success('Menu saved')
+      console.log(`Saving ${selectedMenuLocation} menu with items:`, menuItems)
+      let menuData = await fetchMenuByLocation(selectedMenuLocation)
+      
+      // If menu doesn't exist, create it
+      if (!menuData) {
+        console.log(`Creating ${selectedMenuLocation} menu...`)
+        const { data: newMenu, error: createError } = await supabase
+          .from('menus')
+          .insert({
+            name: `${selectedMenuLocation.charAt(0).toUpperCase() + selectedMenuLocation.slice(1)} Menu`,
+            location: selectedMenuLocation,
+            is_active: true
+          })
+          .select()
+          .single()
+        
+        if (createError) {
+          console.error('Error creating menu:', createError)
+          throw new Error(`Failed to create ${selectedMenuLocation} menu: ${createError.message}`)
+        }
+        
+        menuData = newMenu
+        console.log('Menu created:', menuData)
+        toast.success(`${selectedMenuLocation.charAt(0).toUpperCase() + selectedMenuLocation.slice(1)} menu created`)
+      } else {
+        console.log('Existing menu found:', menuData)
+      }
+
+      // Get existing items from database
+      const existingItems = menuItemsHook.items
+      const currentItems = menuItems
+
+      console.log('Existing items:', existingItems.length, 'Current items:', currentItems.length)
+
+      // Find items to delete (exist in DB but not in current state)
+      const itemsToDelete = existingItems.filter(
+        dbItem => !currentItems.find(item => item.id === dbItem.id)
+      )
+
+      // Find items to update (have real database IDs, not temporary ones)
+      const itemsToUpdate = currentItems
+        .filter(item => item.id && !item.id.startsWith('temp_'))
+        .map(item => ({
+          id: item.id!,
+          label: item.label,
+          url: item.url,
+          sort_order: item.order,
+          parent_id: item.parent_id || null,
+          icon: item.icon || null,
+          is_visible: true
+        }))
+
+      // Find items to create (don't have ID or have temporary ID)
+      const itemsToCreate = currentItems
+        .filter(item => !item.id || item.id.startsWith('temp_'))
+        .map(item => ({
+          tempId: item.id, // Keep track of temporary ID for parent-child relationships
+          menu_id: menuData.id,
+          label: item.label,
+          url: item.url,
+          sort_order: item.order,
+          parent_id: item.parent_id || null,
+          icon: item.icon || null,
+          is_visible: true,
+          target: '_self' as const,
+          page_id: null,
+          css_class: null
+        }))
+
+      console.log('Items to delete:', itemsToDelete.length)
+      console.log('Items to update:', itemsToUpdate.length)
+      console.log('Items to create:', itemsToCreate.length)
+
+      // Execute operations
+      for (const item of itemsToDelete) {
+        console.log('Deleting item:', item.id, item.label)
+        await menuItemsHook.deleteItem(item.id)
+      }
+
+      // Create items, handling parent-child relationships with temporary IDs
+      const tempIdMap = new Map<string, string>() // Map temp IDs to real database IDs
+      
+      // First pass: create items without parent or with existing parent
+      for (const item of itemsToCreate) {
+        const hasTemporaryParent = item.parent_id && item.parent_id.startsWith('temp_')
+        if (!hasTemporaryParent) {
+          console.log('Creating item (pass 1):', item.label, 'parent:', item.parent_id)
+          // Exclude tempId before sending to database
+          const { tempId, ...itemData } = item
+          const created = await menuItemsHook.createItem(itemData)
+          console.log('Created item:', created.id, created.label)
+          if (tempId) {
+            tempIdMap.set(tempId, created.id)
+          }
+        }
+      }
+      
+      // Second pass: create items with temporary parent IDs, replacing with real IDs
+      for (const item of itemsToCreate) {
+        const hasTemporaryParent = item.parent_id && item.parent_id.startsWith('temp_')
+        if (hasTemporaryParent && item.parent_id) {
+          const realParentId = tempIdMap.get(item.parent_id)
+          console.log('Creating item (pass 2):', item.label, 'temp parent:', item.parent_id, 'real parent:', realParentId)
+          // Exclude tempId before sending to database
+          const { tempId, ...itemData } = item
+          const created = await menuItemsHook.createItem({
+            ...itemData,
+            parent_id: realParentId || null
+          })
+          console.log('Created item:', created.id, created.label)
+          if (tempId) {
+            tempIdMap.set(tempId, created.id)
+          }
+        }
+      }
+
+      if (itemsToUpdate.length > 0) {
+        console.log('Updating items:', itemsToUpdate.length)
+        await menuItemsHook.batchUpdateItems(itemsToUpdate)
+      }
+
+      // Refresh data
+      console.log('Refreshing menu data...')
+      await menuItemsHook.refetch()
+      
+      console.log('Menu saved successfully!')
+      toast.success('Menu saved successfully')
     } catch (error) {
-      toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error('Error saving menu:', error)
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : typeof error === 'object' && error !== null
+        ? JSON.stringify(error)
+        : 'Unknown error'
+      toast.error(`Failed to save menu: ${errorMessage}`)
+    } finally {
+      setIsSavingMenu(false)
     }
+  }
+
+  // Helper function to fetch menu by location
+  const fetchMenuByLocation = async (location: string) => {
+    const { data, error } = await supabase
+      .from('menus')
+      .select('*')
+      .eq('location', location)
+      .eq('is_active', true)
+      .single()
+
+    if (error) {
+      // PGRST116 means no rows returned, which is fine - menu doesn't exist yet
+      if (error.code === 'PGRST116') {
+        return null
+      }
+      console.error('Error fetching menu:', error)
+      throw new Error(`Failed to fetch menu: ${error.message}`)
+    }
+    return data
   }
 
   // Check if any content is loading
@@ -243,8 +410,8 @@ export default function AdminContent() {
         </CardHeader>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'pages' | 'sections')}>
-        <TabsList className="grid w-full grid-cols-2 h-auto gap-2 bg-muted/50 p-2">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'pages' | 'sections' | 'legal')}>
+        <TabsList className="grid w-full grid-cols-3 h-auto gap-2 bg-muted/50 p-2">
           <TabsTrigger value="pages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <FileText size={16} className="mr-2" />
             Page Content
@@ -252,6 +419,10 @@ export default function AdminContent() {
           <TabsTrigger value="sections" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <HeaderIcon size={16} className="mr-2" />
             Header, Footer & Menu
+          </TabsTrigger>
+          <TabsTrigger value="legal" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Scales size={16} className="mr-2" />
+            Legal Pages
           </TabsTrigger>
         </TabsList>
 
@@ -369,14 +540,58 @@ export default function AdminContent() {
               />
             </TabsContent>
             <TabsContent value="menu" className="mt-6">
+              <Card className="mb-4">
+                <CardHeader>
+                  <CardTitle>Select Menu Location</CardTitle>
+                  <CardDescription>Choose which menu to edit</CardDescription>
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      variant={selectedMenuLocation === 'header' ? 'default' : 'outline'}
+                      onClick={() => setSelectedMenuLocation('header')}
+                      size="sm"
+                    >
+                      Header Menu
+                    </Button>
+                    <Button
+                      variant={selectedMenuLocation === 'footer' ? 'default' : 'outline'}
+                      onClick={() => setSelectedMenuLocation('footer')}
+                      size="sm"
+                    >
+                      Footer Menu
+                    </Button>
+                    <Button
+                      variant={selectedMenuLocation === 'legal' ? 'default' : 'outline'}
+                      onClick={() => setSelectedMenuLocation('legal')}
+                      size="sm"
+                    >
+                      Legal Menu
+                    </Button>
+                  </div>
+                </CardHeader>
+              </Card>
               <MenuEditor
                 items={menuItems}
                 setItems={setMenuItems}
                 onSave={handleSaveMenu}
-                isSaving={false}
+                isSaving={isSavingMenu}
+                menuLocation={selectedMenuLocation}
               />
             </TabsContent>
           </Tabs>
+        </TabsContent>
+
+        {/* Legal Pages Tab */}
+        <TabsContent value="legal" className="mt-6">
+          {editingLegalPageSlug ? (
+            <DynamicPageEditor
+              slug={editingLegalPageSlug}
+              onBack={() => setEditingLegalPageSlug(null)}
+            />
+          ) : (
+            <LegalPagesManager
+              onEditPage={(slug) => setEditingLegalPageSlug(slug)}
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>

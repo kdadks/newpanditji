@@ -85,6 +85,8 @@ async function fetchMenuItemsByLocation(location: string): Promise<MenuItemRow[]
  * Create a new menu item
  */
 async function createMenuItem(item: MenuItemInsert): Promise<MenuItemRow> {
+  console.log('Creating menu item with data:', JSON.stringify(item, null, 2))
+  
   const { data, error } = await supabase
     .from('menu_items')
     .insert(item)
@@ -92,10 +94,17 @@ async function createMenuItem(item: MenuItemInsert): Promise<MenuItemRow> {
     .single()
 
   if (error) {
-    console.error('Error creating menu item:', error)
+    console.error('Error creating menu item:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      full_error: error
+    })
     throw error
   }
 
+  console.log('Menu item created successfully:', data.id)
   return data
 }
 

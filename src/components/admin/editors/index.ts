@@ -9,6 +9,10 @@ export { default as DakshinaPageEditor } from './DakshinaPageEditor'
 export { default as GalleryPageEditor } from './GalleryPageEditor'
 export { default as TestimonialsPageEditor } from './TestimonialsPageEditor'
 
+// Dynamic Legal Pages
+export { default as LegalPagesManager } from './LegalPagesManager'
+export { default as DynamicPageEditor } from './DynamicPageEditor'
+
 // Section Editors
 export { default as HeaderEditor } from './HeaderEditor'
 export { default as FooterEditor } from './FooterEditor'

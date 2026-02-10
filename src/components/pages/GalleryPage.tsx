@@ -8,7 +8,6 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch } from '@phosphor-icons/react'
-import { videos as defaultVideos } from '../../lib/data'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface Photo {
@@ -18,55 +17,12 @@ interface Photo {
   category: string
 }
 
-const defaultPhotos: Photo[] = [
-  {
-    id: '1',
-    url: '/images/Raj 1.jpg',
-    title: 'Sacred Ceremony Moment',
-    category: 'ceremony'
-  },
-  {
-    id: '2',
-    url: '/images/Raj 2.jpg',
-    title: 'Spiritual Guidance',
-    category: 'ceremony'
-  },
-  {
-    id: '3',
-    url: '/images/Raj 3.jpg',
-    title: 'Traditional Rituals',
-    category: 'ceremony'
-  },
-  {
-    id: '4',
-    url: '/images/Pooja 1.jpg',
-    title: 'Pooja Ceremony',
-    category: 'pooja'
-  },
-  {
-    id: '5',
-    url: '/images/Pooja 2.jpg',
-    title: 'Divine Offerings',
-    category: 'pooja'
-  },
-  {
-    id: '6',
-    url: '/images/Pooja 3.jpg',
-    title: 'Sacred Worship',
-    category: 'pooja'
-  }
-]
-
 export default function GalleryPage() {
   usePageMetadata('gallery')
 
   const { content: galleryContent, isLoading: loadingGalleryContent } = useGalleryContent()
-  const { videos: dbVideos, isLoading: loadingVideos } = useVideos()
-  const { photos: dbPhotos, isLoading: loadingPhotos } = usePhotos()
-  
-  // Use database data if available, otherwise fall back to defaults
-  const videos = (dbVideos && dbVideos.length > 0) ? dbVideos : defaultVideos as Video[]
-  const photos = (dbPhotos && dbPhotos.length > 0) ? dbPhotos : defaultPhotos
+  const { videos, isLoading: loadingVideos } = useVideos()
+  const { photos, isLoading: loadingPhotos } = usePhotos()
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')

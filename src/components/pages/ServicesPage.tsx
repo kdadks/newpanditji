@@ -11,9 +11,9 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
 import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch, CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
-import { services as defaultServices, categoryNames, Service } from '../../lib/data'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
-import { AppPage, AppNavigationData } from '../../lib/types'
+import { AppPage, AppNavigationData, Service } from '../../lib/types'
+import { categoryNames } from '../../lib/constants'
 
 interface ServicesPageProps {
   initialCategory?: string
@@ -21,9 +21,7 @@ interface ServicesPageProps {
 }
 
 export default function ServicesPage({ initialCategory = 'all', onNavigate }: ServicesPageProps) {
-  const { services: dbServices, isLoading } = useServices()
-  // Use database services if available, otherwise fall back to defaults
-  const services = (dbServices && dbServices.length > 0) ? dbServices : defaultServices
+  const { services, isLoading } = useServices()
   const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>(initialCategory as Service['category'] | 'all')
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
@@ -201,8 +199,8 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
             <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Wellness ({services.filter(s => s.category === 'wellness').length})
             </TabsTrigger>
-            <TabsTrigger value="package" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Packages ({services.filter(s => s.category === 'package').length})
+            <TabsTrigger value="packages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Packages ({services.filter(s => s.category === 'packages').length})
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -292,7 +290,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 
                 {/* Package Info */}
                 {service.isPackage && service.includedServices && service.includedServices.length > 0 && (
-                  <div className="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+                  <div className="mb-4 p-3 bg-linear-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
                     <div className="flex items-center gap-2 text-sm font-semibold text-purple-700">
                       <Package size={16} weight="fill" />
                       <span>Includes {service.includedServices.length} Services</span>
@@ -565,7 +563,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                     <>
                       {/* Package Savings */}
                       {selectedService.packageSavingsText && (
-                        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                        <div className="p-4 bg-linear-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-green-500 rounded-full">
                               <Sparkle size={20} className="text-white" weight="fill" />
@@ -579,7 +577,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                       {/* Package Highlights */}
                       {selectedService.packageHighlights && selectedService.packageHighlights.length > 0 && (
-                        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-pink-50">
+                        <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-pink-50">
                           <CardContent className="p-6">
                             <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
                               <Star className="text-primary" size={24} weight="fill" />
@@ -599,7 +597,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                       {/* Included Services */}
                       {selectedService.includedServices && selectedService.includedServices.length > 0 && (
-                        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-orange-50">
+                        <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-orange-50">
                           <CardContent className="p-6">
                             <h3 className="font-heading font-bold text-2xl mb-4 text-foreground flex items-center gap-2">
                               <Package className="text-primary" size={28} weight="fill" />
@@ -617,13 +615,13 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                                 >
                                   <div className="flex items-start gap-4">
                                     {/* Service Number Badge */}
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-bold shadow-md group-hover:scale-110 transition-transform">
+                                    <div className="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-bold shadow-md group-hover:scale-110 transition-transform">
                                       {index + 1}
                                     </div>
 
                                     {/* Service Image (if available) */}
                                     {includedService.imageUrl && (
-                                      <div className="flex-shrink-0">
+                                      <div className="shrink-0">
                                         <img
                                           src={includedService.imageUrl}
                                           alt={includedService.name}
@@ -677,7 +675,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                             </div>
 
                             {/* Package Summary */}
-                            <div className="mt-6 p-4 bg-gradient-to-r from-orange-100 to-amber-100 rounded-lg border border-orange-300">
+                            <div className="mt-6 p-4 bg-linear-to-r from-orange-100 to-amber-100 rounded-lg border border-orange-300">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <CheckCircle className="text-green-600" size={24} weight="fill" />

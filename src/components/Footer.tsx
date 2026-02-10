@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { AppPage, AppNavigationData } from '../lib/types'
 import { FlowerLotus, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react'
 import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo, PinterestLogo } from '@phosphor-icons/react'
+import { useMenuItems } from '../hooks/useMenus'
 
 interface FooterProps {
 }
@@ -11,6 +12,10 @@ interface FooterProps {
 export default function Footer({ }: FooterProps) {
   const router = useRouter()
   const currentYear = new Date().getFullYear()
+  
+  // Load footer and legal menus from database
+  const { items: footerMenuItems } = useMenuItems('footer')
+  const { items: legalMenuItems } = useMenuItems('legal')
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
@@ -43,57 +48,38 @@ export default function Footer({ }: FooterProps) {
           <div>
             <h3 className="font-heading font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <button onClick={() => handleNavigate('services')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Services
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('about')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  About Pandit Ji
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('gallery')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Gallery
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('blog')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Blog
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('books')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Books
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('testimonials')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Testimonials
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('charity')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Charity Work
-                </button>
-              </li>
+              {footerMenuItems
+                .filter(item => item.is_visible)
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((item) => (
+                  <li key={item.id}>
+                    <button 
+                      onClick={() => router.push(item.url)} 
+                      className="text-sm hover:text-accent transition-colors cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
             </ul>
           </div>
 
           <div>
             <h3 className="font-heading font-semibold text-lg mb-4">Legal</h3>
             <ul className="space-y-2">
-              <li>
-                <button onClick={() => handleNavigate('terms')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Terms & Conditions
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavigate('privacy')} className="text-sm hover:text-accent transition-colors cursor-pointer">
-                  Privacy Policy
-                </button>
-              </li>
+              {legalMenuItems
+                .filter(item => item.is_visible)
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((item) => (
+                  <li key={item.id}>
+                    <button 
+                      onClick={() => router.push(item.url)} 
+                      className="text-sm hover:text-accent transition-colors cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
             </ul>
           </div>
 

@@ -13,36 +13,61 @@ import {
 } from './ui/dropdown-menu'
 import { List, X, FlowerLotus, Shield, CaretDown } from '@phosphor-icons/react'
 import { authService } from '../services/auth'
+import { useMenuItems } from '../hooks/useMenus'
 
 interface HeaderProps {
   currentPage?: AppPage
 }
-
-const navItems: { page: AppPage; label: string; submenu?: { page: AppPage; label: string }[] }[] = [
-  { page: 'home', label: 'Home' },
-  {
-    page: 'about',
-    label: 'About',
-    submenu: [
-      { page: 'about', label: 'About Us' },
-      { page: 'why-choose-us', label: 'Why Choose Us' },
-      { page: 'books', label: 'Books' },
-      { page: 'charity', label: 'Charity Work' }
-    ]
-  },
-  { page: 'services', label: 'Services' },
-  { page: 'dakshina', label: 'Dakshina' },
-  { page: 'gallery', label: 'Gallery' },
-  { page: 'blog', label: 'Blog' },
-  { page: 'testimonials', label: 'Testimonials' },
-  { page: 'contact', label: 'Contact' }
-]
 
 export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
+  
+  // Fetch menu items from database
+  const { items: dbMenuItems, isLoading: menuLoading } = useMenuItems('header')
+
+  // Transform database menu items into nav structure
+  const navItems: { page: AppPage; label: string; submenu?: { page: AppPage; label: string }[] }[] = (() => {
+    if (menuLoading || !dbMenuItems || dbMenuItems.length === 0) {
+      // Fallback to basic structure while loading
+      return [
+        { page: 'home', label: 'Home' },
+        { page: 'services', label: 'Services' },
+        { page: 'contact', label: 'Contact' }
+      ]
+    }
+
+    // Build hierarchical structure
+    const topLevelItems = dbMenuItems
+      .filter(item => !item.parent_id)
+      .sort((a, b) => a.sort_order - b.sort_order)
+
+    return topLevelItems.map(parent => {
+      const children = dbMenuItems
+        .filter(item => item.parent_id === parent.id)
+        .sort((a, b) => a.sort_order - b.sort_order)
+
+      const parentPage = parent.url.startsWith('/') ? parent.url.slice(1) : parent.url
+      
+      if (children.length > 0) {
+        return {
+          page: parentPage as AppPage,
+          label: parent.label,
+          submenu: children.map(child => ({
+            page: (child.url.startsWith('/') ? child.url.slice(1) : child.url) as AppPage,
+            label: child.label
+          }))
+        }
+      }
+
+      return {
+        page: parentPage as AppPage,
+        label: parent.label
+      }
+    })
+  })()
 
   // Determine current page from pathname if not provided
   const currentPage = propCurrentPage || (() => {
@@ -236,7 +261,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                 className="w-[85vw] sm:w-[400px] bg-linear-to-br from-slate-50/98 via-amber-50/95 to-orange-50/98 border-l-2 border-primary/40 shadow-2xl p-0 flex flex-col [&>button]:hidden"
               >
                 {/* Mobile Header - Fixed at top with enhanced gradient and glow */}
-                <div className="flex-shrink-0 relative">
+                <div className="shrink-0 relative">
                   {/* Background glow effect */}
                   <div className="absolute inset-0 bg-linear-to-br from-orange-100/40 via-amber-100/30 to-orange-50/40"></div>
                   <div className="relative flex items-center justify-between p-5 pb-4 border-b-2 border-primary/30 backdrop-blur-sm">
@@ -394,7 +419,7 @@ export default function Header({ currentPage: propCurrentPage }: HeaderProps) {
                 </div>
 
                 {/* Mobile Footer - Fixed at bottom */}
-                <div className="flex-shrink-0 relative border-t-2 border-primary/30 bg-linear-to-br from-orange-50/80 via-amber-50/70 to-orange-50/80 backdrop-blur-sm">
+                <div className="shrink-0 relative border-t-2 border-primary/30 bg-linear-to-br from-orange-50/80 via-amber-50/70 to-orange-50/80 backdrop-blur-sm">
                   <div className="p-5 text-center">
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       Experience divine guidance with

@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug, type ServiceRow, type ServiceInsert, type ServiceUpdate, type AdminServiceRow } from '../lib/supabase'
 import { toast } from 'sonner'
-import type { Service, ServiceDetail } from '../lib/data'
+import type { Service, ServiceDetail } from '../lib/types'
 
 // Query keys
 const SERVICES_KEY = ['services']

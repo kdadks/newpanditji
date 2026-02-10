@@ -8,7 +8,6 @@ import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch } from '@phosphor-icons/react'
-import { blogArticles as defaultBlogs } from '../../lib/data'
 import { AppPage, AppNavigationData } from '../../lib/types'
 
 interface BlogArticle {
@@ -51,27 +50,18 @@ export default function BlogPage({ }: BlogPageProps) {
 
   const { blogs: dbBlogs, isLoading } = useBlogs()
   
-  // Transform database blogs to BlogArticle format, or use defaults
-  const blogArticles: BlogArticle[] = (dbBlogs && dbBlogs.length > 0) 
-    ? dbBlogs.map(blog => ({
-        id: blog.id,
-        slug: blog.slug,
-        title: blog.title,
-        excerpt: blog.excerpt,
-        category: blog.category_name || 'Article',
-        content: blog.content,
-        featured_image_url: blog.featured_image_url,
-        reading_time_minutes: blog.reading_time_minutes,
-        published_at: blog.published_at
-      }))
-    : defaultBlogs.map(blog => ({
-        ...blog,
-        slug: undefined,
-        content: undefined,
-        featured_image_url: null,
-        reading_time_minutes: null,
-        published_at: null
-      }))
+  // Transform database blogs to BlogArticle format
+  const blogArticles: BlogArticle[] = dbBlogs.map(blog => ({
+    id: blog.id,
+    slug: blog.slug,
+    title: blog.title,
+    excerpt: blog.excerpt,
+    category: blog.category_name || 'Article',
+    content: blog.content,
+    featured_image_url: blog.featured_image_url,
+    reading_time_minutes: blog.reading_time_minutes,
+    published_at: blog.published_at
+  }))
 
   // Get unique categories (filter out undefined/null values)
   const categories = [...new Set(blogArticles.map(article => article.category).filter((c): c is string => Boolean(c)))]

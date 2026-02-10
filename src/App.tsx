@@ -19,8 +19,6 @@ const CharityPage = lazy(() => import('./components/pages/CharityPage'))
 const TestimonialsPage = lazy(() => import('./components/pages/TestimonialsPage'))
 const ContactPage = lazy(() => import('./components/pages/ContactPage'))
 const AdminPage = lazy(() => import('./components/pages/AdminPage'))
-const TermsPage = lazy(() => import('./components/pages/TermsPage'))
-const PrivacyPage = lazy(() => import('./components/pages/PrivacyPage'))
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -137,10 +135,7 @@ function App() {
         return <ContactPage />
       case 'admin':
         return <AdminPage />
-      case 'terms':
-        return <TermsPage />
-      case 'privacy':
-        return <PrivacyPage />
+
       default:
         return <HomePage />
     }

@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
-import { categoryNames } from '../../lib/data'
+import { categoryNames } from '../../lib/constants'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 import type { AdminServiceRow, AdminPackageRow } from '../../lib/supabase'
 import { generateSlug, supabase } from '../../lib/supabase'

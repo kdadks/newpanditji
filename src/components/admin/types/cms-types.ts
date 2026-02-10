@@ -435,6 +435,8 @@ export interface MenuItem {
   label: string
   url: string
   order: number
+  parent_id?: string | null
+  icon?: string | null
 }
 
 // CMS Context Type
