@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useVideos, type Video } from '../../hooks/useVideos'
 import { usePhotos } from '../../hooks/usePhotos'
@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch } from '@phosphor-icons/react'
+import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch, X, CaretLeft, CaretRight, MagnifyingGlass } from '@phosphor-icons/react'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
 
 interface Photo {
@@ -22,10 +22,23 @@ export default function GalleryPage() {
 
   const { content: galleryContent, isLoading: loadingGalleryContent } = useGalleryContent()
   const { videos, isLoading: loadingVideos } = useVideos()
-  const { photos, isLoading: loadingPhotos } = usePhotos()
+  const [selectedPhotoCategory, setSelectedPhotoCategory] = useState<string>('all')
+  const [photoPage, setPhotoPage] = useState(1)
+  const photoPageSize = 24
+  const { photos, isLoading: loadingPhotos, total: totalPhotos, totalPages: photoTotalPages } = usePhotos({
+    page: photoPage,
+    limit: photoPageSize,
+    category: selectedPhotoCategory !== 'all' ? selectedPhotoCategory : undefined
+  })
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
+  const [lightboxPhoto, setLightboxPhoto] = useState<{ url: string; title: string } | null>(null)
+
+  // Reset to page 1 when category changes
+  useEffect(() => {
+    setPhotoPage(1)
+  }, [selectedPhotoCategory])
 
   const filteredVideos = selectedVideoCategory === 'all'
     ? videos
@@ -211,7 +224,7 @@ export default function GalleryPage() {
                     <span className="text-xs sm:text-base">Divine Photos</span>
                   </div>
                   <Badge variant="secondary" className="sm:ml-2 bg-amber-800 data-[state=active]:bg-amber-900 text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 font-bold shadow-sm">
-                    {photos.length}
+                    {totalPhotos}
                   </Badge>
                 </TabsTrigger>
               </TabsList>
@@ -364,6 +377,32 @@ export default function GalleryPage() {
           </TabsContent>
 
           <TabsContent value="photos">
+            {/* Photo Category Filters */}
+            <div className="flex flex-wrap justify-center gap-3 mb-5">
+              {[
+                { value: 'all', label: 'All Photos', icon: '📸' },
+                { value: 'gallery', label: 'Gallery', icon: '🖼️' },
+                { value: 'ceremony', label: 'Ceremonies', icon: '🪔' },
+                { value: 'pooja', label: 'Pooja', icon: '🙏' },
+                { value: 'wedding', label: 'Weddings', icon: '💒' },
+                { value: 'charity', label: 'Charity', icon: '❤️' },
+                { value: 'events', label: 'Events', icon: '🎉' },
+                { value: 'books', label: 'Books', icon: '📚' },
+                { value: 'general', label: 'General', icon: '📁' },
+              ].map((cat) => (
+                <Button
+                  key={cat.value}
+                  variant={selectedPhotoCategory === cat.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedPhotoCategory(cat.value)}
+                  className="rounded-full"
+                >
+                  <span className="mr-1.5">{cat.icon}</span>
+                  {cat.label}
+                </Button>
+              ))}
+            </div>
+
             {loadingPhotos ? (
               <div className="flex justify-center items-center py-7">
                 <CircleNotch className="animate-spin text-primary" size={48} />
@@ -378,66 +417,181 @@ export default function GalleryPage() {
                     </div>
                   </div>
 
-                  <h3 className="font-heading font-semibold text-2xl mb-4">Photo Gallery Coming Soon</h3>
+                  <h3 className="font-heading font-semibold text-2xl mb-4">
+                    {selectedPhotoCategory !== 'all' 
+                      ? `No photos in this category yet` 
+                      : 'Photo Gallery Coming Soon'
+                    }
+                  </h3>
 
                   <p className="text-muted-foreground text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
-                    We're carefully curating a beautiful collection of ceremony photographs that capture
-                    the sacred moments and spiritual essence of Hindu traditions. These images will showcase
-                    the beauty and depth of our ceremonial work.
+                    {selectedPhotoCategory !== 'all'
+                      ? 'Try selecting a different category or browse all photos.'
+                      : 'We\'re carefully curating a beautiful collection of ceremony photographs that capture the sacred moments and spiritual essence of Hindu traditions.'
+                    }
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    {selectedPhotoCategory !== 'all' && (
+                      <Button variant="outline" className="px-6" onClick={() => setSelectedPhotoCategory('all')}>
+                        <Images className="mr-2" size={18} />
+                        View All Photos
+                      </Button>
+                    )}
                     <Button variant="outline" className="px-6" onClick={() => setActiveTab('videos')}>
                       <PlayCircle className="mr-2" size={18} />
                       Browse Videos Instead
-                    </Button>
-                    <Button variant="ghost" className="px-6">
-                      Get Notified When Ready
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-5">
-                {/* Rolling Photo Gallery */}
-                <div className="mb-5 overflow-hidden">
-                  <h2 className="font-heading font-bold text-2xl md:text-3xl mb-4 text-center">
-                    Moments of <span className="text-primary">Devotion & Service</span>
-                  </h2>
-                  <div className="relative w-full h-64 md:h-80 lg:h-96">
-                    <div className="absolute inset-0 flex gap-4">
-                      <div className="flex gap-4 animate-scroll-left">
-                        {photos.map((photo) => (
-                          <img
-                            key={photo.id}
-                            src={photo.url}
-                            alt={photo.title}
-                            className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ))}
-                        {/* Duplicate for seamless loop */}
-                        {photos.map((photo) => (
-                          <img
-                            key={`${photo.id}-duplicate`}
-                            src={photo.url}
-                            alt={photo.title}
-                            className="h-64 md:h-80 lg:h-96 w-auto object-cover rounded-lg shadow-lg"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ))}
+              <div className="space-y-6">
+                {/* Photo Grid / List */}
+                <div className={`grid gap-3 md:gap-4 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4' : 'grid-cols-1'}`}>
+                  {photos.map((photo) => (
+                    viewMode === 'grid' ? (
+                    <div
+                      key={photo.id}
+                      className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300"
+                      onClick={() => setLightboxPhoto({ url: photo.url, title: photo.title })}
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <div className="bg-white/90 text-primary p-3 rounded-full shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                          <MagnifyingGlass size={24} weight="bold" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white text-sm font-medium truncate drop-shadow-lg">{photo.title}</p>
+                        <Badge className="mt-1 bg-white/20 text-white border-white/30 text-[10px] capitalize">
+                          {photo.category}
+                        </Badge>
                       </div>
                     </div>
-                  </div>
+                    ) : (
+                    <Card
+                      key={photo.id}
+                      className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+                      onClick={() => setLightboxPhoto({ url: photo.url, title: photo.title })}
+                    >
+                      <CardContent className="p-0 flex flex-row items-center gap-4">
+                        <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 overflow-hidden rounded-l-xl">
+                          <img
+                            src={photo.url}
+                            alt={photo.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/30">
+                            <div className="bg-white/90 text-primary p-2 rounded-full shadow-xl">
+                              <MagnifyingGlass size={20} weight="bold" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="py-3 pr-4 flex-1 min-w-0">
+                          <h3 className="font-heading font-semibold text-base mb-1 group-hover:text-primary transition-colors truncate">
+                            {photo.title}
+                          </h3>
+                          <Badge className="capitalize text-[11px]">
+                            {photo.category}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    )
+                  ))}
                 </div>
+
+                {/* Pagination */}
+                {photoTotalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPhotoPage(p => Math.max(1, p - 1))}
+                      disabled={photoPage <= 1}
+                    >
+                      <CaretLeft size={16} className="mr-1" />
+                      Previous
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(photoTotalPages, 7) }, (_, i) => {
+                        let page: number
+                        if (photoTotalPages <= 7) {
+                          page = i + 1
+                        } else if (photoPage <= 4) {
+                          page = i + 1
+                        } else if (photoPage >= photoTotalPages - 3) {
+                          page = photoTotalPages - 6 + i
+                        } else {
+                          page = photoPage - 3 + i
+                        }
+                        return (
+                          <Button
+                            key={page}
+                            variant={photoPage === page ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setPhotoPage(page)}
+                            className="w-9 h-9 p-0"
+                          >
+                            {page}
+                          </Button>
+                        )
+                      })}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPhotoPage(p => Math.min(photoTotalPages, p + 1))}
+                      disabled={photoPage >= photoTotalPages}
+                    >
+                      Next
+                      <CaretRight size={16} className="ml-1" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>
         </Tabs>
       </div>
       </section>
+
+      {/* Lightbox */}
+      {lightboxPhoto && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setLightboxPhoto(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10"
+            onClick={() => setLightboxPhoto(null)}
+          >
+            <X size={32} weight="bold" />
+          </button>
+          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightboxPhoto.url}
+              alt={lightboxPhoto.title}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            />
+            {lightboxPhoto.title && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm">
+                {lightboxPhoto.title}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
