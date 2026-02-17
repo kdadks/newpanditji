@@ -1297,14 +1297,16 @@ export default function AdminServicesNew() {
                             >
                               <span className="mr-1">✓</span>
                               {benefit}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                              <button
+                                type="button"
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   benefits: formData.benefits.filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={14} />
+                              </button>
                             </Badge>
                           ))}
                         </div>
@@ -1377,14 +1379,16 @@ export default function AdminServicesNew() {
                             >
                               <span className="mr-1">📌</span>
                               {item}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                              <button
+                                type="button"
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   includes: formData.includes.filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={14} />
+                              </button>
                             </Badge>
                           ))}
                         </div>
@@ -1457,14 +1461,16 @@ export default function AdminServicesNew() {
                             >
                               <span className="mr-1">⚡</span>
                               {req}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                              <button
+                                type="button"
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   requirements: formData.requirements.filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={14} />
+                              </button>
                             </Badge>
                           ))}
                         </div>
@@ -1537,14 +1543,16 @@ export default function AdminServicesNew() {
                             >
                               <span className="mr-1">🎯</span>
                               {item}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                              <button
+                                type="button"
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   bestFor: formData.bestFor.filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={14} />
+                              </button>
                             </Badge>
                           ))}
                         </div>
@@ -1689,14 +1697,16 @@ export default function AdminServicesNew() {
                               className="py-2 px-4 bg-blue-500/10 text-blue-700 dark:text-blue-400 mr-2"
                             >
                               {item}
-                              <X
-                                size={14}
-                                className="ml-2 cursor-pointer"
+                              <button
+                                type="button"
+                                className="ml-2 cursor-pointer hover:text-destructive shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   purpose: (formData.purpose || []).filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={14} />
+                              </button>
                             </Badge>
                           ))}
                         </div>
@@ -1759,14 +1769,16 @@ export default function AdminServicesNew() {
                           className="py-2 px-4 bg-green-500/10 text-green-700 dark:text-green-400 mr-2"
                         >
                           {item}
-                          <X
-                            size={14}
-                            className="ml-2 cursor-pointer"
+                          <button
+                            type="button"
+                            className="ml-2 cursor-pointer hover:text-destructive shrink-0"
                             onClick={() => setFormData({
                               ...formData,
                               significance: (formData.significance || []).filter((_, i) => i !== index)
                             })}
-                          />
+                          >
+                            <X size={14} />
+                          </button>
                         </Badge>
                       ))}
                     </div>
@@ -1875,14 +1887,16 @@ export default function AdminServicesNew() {
                           className="py-2 px-4 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 mr-2"
                         >
                           {item}
-                          <X
-                            size={14}
-                            className="ml-2 cursor-pointer"
+                          <button
+                            type="button"
+                            className="ml-2 cursor-pointer hover:text-destructive shrink-0"
                             onClick={() => setFormData({
                               ...formData,
                               whenToPerform: (formData.whenToPerform || []).filter((_, i) => i !== index)
                             })}
-                          />
+                          >
+                            <X size={14} />
+                          </button>
                         </Badge>
                       ))}
                     </div>
@@ -1990,14 +2004,16 @@ export default function AdminServicesNew() {
                           className="py-2 px-4 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 mr-2"
                         >
                           {item}
-                          <X
-                            size={14}
-                            className="ml-2 cursor-pointer"
+                          <button
+                            type="button"
+                            className="ml-2 cursor-pointer hover:text-destructive shrink-0"
                             onClick={() => setFormData({
                               ...formData,
                               specialForNRIs: (formData.specialForNRIs || []).filter((_, i) => i !== index)
                             })}
-                          />
+                          >
+                            <X size={14} />
+                          </button>
                         </Badge>
                       ))}
                     </div>
@@ -2068,14 +2084,16 @@ export default function AdminServicesNew() {
                                 <h4 className="font-semibold text-sm mb-1">{aspect.title}</h4>
                                 <p className="text-xs text-muted-foreground">{aspect.content}</p>
                               </div>
-                              <X
-                                size={16}
-                                className="cursor-pointer text-muted-foreground hover:text-destructive ml-2"
+                              <button
+                                type="button"
+                                className="cursor-pointer text-muted-foreground hover:text-destructive ml-2 shrink-0"
                                 onClick={() => setFormData({
                                   ...formData,
                                   coreAspects: (formData.coreAspects || []).filter((_, i) => i !== index)
                                 })}
-                              />
+                              >
+                                <X size={16} />
+                              </button>
                             </div>
                           </div>
                         ))}
