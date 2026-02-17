@@ -35,10 +35,11 @@ interface BlogFormData {
 
 export default function AdminBlogs() {
   const { blogs, isLoading, createBlog, updateBlog, deleteBlog, isCreating, isUpdating, isDeleting } = useBlogs(true) // Pass true to fetch all blogs including drafts
-  const { photos } = usePhotos()
+  const { photos } = usePhotos({ limit: 1000 })
   const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
+  const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
   const [currentTab, setCurrentTab] = useState('basic')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [blogToDelete, setBlogToDelete] = useState<BlogPostRow | null>(null)
@@ -415,6 +416,8 @@ export default function AdminBlogs() {
                         <img
                           src={blog.featured_image_url}
                           alt={blog.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -711,6 +714,8 @@ export default function AdminBlogs() {
                               <img
                                 src={formData.featured_image_url}
                                 alt="Featured"
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-64 object-cover"
                               />
                               <Button
@@ -915,8 +920,8 @@ export default function AdminBlogs() {
           {/* Image Picker Modal - Inside DialogContent */}
           {showImagePicker && (
             <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-              <div className="bg-background rounded-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
-                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-blue-500/5 to-purple-500/5">
+              <div className="bg-background rounded-2xl max-w-5xl w-full h-[90vh] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-blue-500/5 to-purple-500/5 shrink-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <ImageIcon size={20} className="text-blue-600" weight="fill" />
@@ -930,55 +935,90 @@ export default function AdminBlogs() {
                     <X size={20} />
                   </Button>
                 </div>
-                <div className="p-5 overflow-y-auto flex-1">
-                  {photos.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {photos.map((photo) => (
-                        <div
-                          key={photo.id}
-                          className="cursor-pointer group relative aspect-video rounded-xl overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-lg"
-                          onClick={() => {
-                            setFormData({ ...formData, featured_image_url: photo.url })
-                            setShowImagePicker(false)
-                            toast.success('Featured image selected')
-                          }}
-                        >
-                          <img
-                            src={photo.url}
-                            alt={photo.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            <div className="bg-white text-blue-600 font-semibold px-4 py-2 rounded-full text-sm shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
-                              Select
+                
+                {/* Category Filter */}
+                <div className="px-5 pt-4 pb-2 border-b shrink-0">
+                  <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Category</Label>
+                  <Select value={imagePickerCategory} onValueChange={setImagePickerCategory}>
+                    <SelectTrigger className="w-full sm:w-[250px]">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent style={{ zIndex: 10000 }}>
+                      <SelectItem value="all">
+                        All Categories ({photos.length})
+                      </SelectItem>
+                      {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map(cat => {
+                        const count = photos.filter(p => p.category === cat).length
+                        return (
+                          <SelectItem key={cat} value={cat}>
+                            {cat.charAt(0).toUpperCase() + cat.slice(1)} ({count})
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="p-5 overflow-y-auto flex-1 min-h-0">
+                  {(() => {
+                    const filteredPhotos = imagePickerCategory === 'all' 
+                      ? photos 
+                      : photos.filter(p => p.category === imagePickerCategory)
+                    
+                    return filteredPhotos.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {filteredPhotos.map((photo) => (
+                          <div
+                            key={photo.id}
+                            className="cursor-pointer group relative aspect-video rounded-xl overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-lg"
+                            onClick={() => {
+                              setFormData({ ...formData, featured_image_url: photo.url })
+                              setShowImagePicker(false)
+                              toast.success('Featured image selected')
+                            }}
+                          >
+                            <img
+                              src={photo.url}
+                              alt={photo.title}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                              <div className="bg-white text-blue-600 font-semibold px-4 py-2 rounded-full text-sm shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                                Select
+                              </div>
+                            </div>
+                            <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <p className="text-white text-xs font-medium truncate drop-shadow-lg">{photo.title}</p>
+                              {photo.category && (
+                                <Badge variant="secondary" className="text-xs mt-1">
+                                  {photo.category}
+                                </Badge>
+                              )}
                             </div>
                           </div>
-                          <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <p className="text-white text-xs font-medium truncate drop-shadow-lg">{photo.title}</p>
-                            {photo.category && (
-                              <Badge variant="secondary" className="text-xs mt-1">
-                                {photo.category}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                        <ImageIcon size={32} className="text-muted-foreground" />
+                        ))}
                       </div>
-                      <p className="text-muted-foreground font-medium mb-2">No images found</p>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Upload images to the Media section first
-                      </p>
-                      <Button onClick={() => setShowImagePicker(false)} variant="outline">
-                        Close
-                      </Button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                          <ImageIcon size={32} className="text-muted-foreground" />
+                        </div>
+                        <p className="text-muted-foreground font-medium mb-2">No images found</p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {imagePickerCategory === 'all' 
+                            ? 'Upload images to the Media section first'
+                            : `No images in the "${imagePickerCategory}" category`
+                          }
+                        </p>
+                        <Button onClick={() => setShowImagePicker(false)} variant="outline">
+                          Close
+                        </Button>
+                      </div>
+                    )
+                  })()}
                 </div>
               </div>
             </div>
@@ -1001,6 +1041,8 @@ export default function AdminBlogs() {
                   <img
                     src={previewBlog.featured_image_url}
                     alt={previewBlog.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />

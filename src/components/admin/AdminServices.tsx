@@ -38,6 +38,7 @@ interface ServiceFormData {
   benefits: string[]
   includes: string[]
   requirements: string[]
+  bestFor: string[]
   dakshina: string
   imageUrl?: string
   samagriFile?: { name: string; data: string; type: string }
@@ -47,11 +48,40 @@ interface ServiceFormData {
   packageSavingsText?: string
   packageHighlights?: string[]
   packageServices?: PackageServiceItem[]
+  // Advanced Detail fields
+  deityName?: string
+  deityDescription?: string
+  deitySignificance?: string
+  nature?: string
+  purpose?: string[]
+  significance?: string[]
+  scripturalSource?: string
+  scripturalDescription?: string
+  whenToPerform?: string[]
+  whereAndWho?: string
+  specialForNRIs?: string[]
+  specialForNRIsTitle?: string
+  specialForNRIsIntro?: string
+  coreAspects?: Array<{ title: string; content: string }>
+  sectionTitles?: {
+    deity?: string
+    nature?: string
+    samagri?: string
+    samagriDescription?: string
+    significance?: string
+    scriptural?: string
+    when?: string
+    where?: string
+    nri?: string
+    includes?: string
+    requirements?: string
+    bestFor?: string
+  }
 }
 
 export default function AdminServicesNew() {
   const { services, isLoading, createService, updateService, deleteService, isCreating, isUpdating, isDeleting } = useAdminServices()
-  const { photos } = usePhotos()
+  const { photos } = usePhotos({ limit: 1000 }) // Load more photos for image picker
   const [editingService, setEditingService] = useState<AdminServiceRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -60,6 +90,7 @@ export default function AdminServicesNew() {
   const [isUploading, setIsUploading] = useState(false)
   const [selectedSamagriFile, setSelectedSamagriFile] = useState<File | null>(null)
   const [showImagePicker, setShowImagePicker] = useState(false)
+  const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [serviceToDelete, setServiceToDelete] = useState<AdminServiceRow | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -76,19 +107,30 @@ export default function AdminServicesNew() {
     benefits: [],
     includes: [],
     requirements: [],
+    bestFor: [],
     dakshina: '',
-    imageUrl: ''
+    imageUrl: '',
+    sectionTitles: {}
   })
 
   // Helper states for array inputs
   const [benefitInput, setBenefitInput] = useState('')
   const [includesInput, setIncludesInput] = useState('')
   const [requirementInput, setRequirementInput] = useState('')
+  const [bestForInput, setBestForInput] = useState('')
 
   // Package-specific states
   const [packageHighlightInput, setPackageHighlightInput] = useState('')
   const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set())
   const [showServiceSelector, setShowServiceSelector] = useState(false)
+
+  // Advanced detail states
+  const [purposeInput, setPurposeInput] = useState('')
+  const [significanceInput, setSignificanceInput] = useState('')
+  const [whenToPerformInput, setWhenToPerformInput] = useState('')
+  const [specialForNRIsInput, setSpecialForNRIsInput] = useState('')
+  const [coreAspectTitleInput, setCoreAspectTitleInput] = useState('')
+  const [coreAspectContentInput, setCoreAspectContentInput] = useState('')
 
   // Filter services
   const filteredServices = services.filter(service => {
@@ -126,17 +168,41 @@ export default function AdminServicesNew() {
       benefits: [],
       includes: [],
       requirements: [],
+      bestFor: [],
       dakshina: '',
       imageUrl: '',
       isPackage: false,
       packageSavingsText: '',
       packageHighlights: [],
-      packageServices: []
+      packageServices: [],
+      // Initialize advanced details
+      deityName: '',
+      deityDescription: '',
+      deitySignificance: '',
+      nature: '',
+      purpose: [],
+      significance: [],
+      scripturalSource: '',
+      scripturalDescription: '',
+      whenToPerform: [],
+      whereAndWho: '',
+      specialForNRIs: [],
+      specialForNRIsTitle: '',
+      specialForNRIsIntro: '',
+      coreAspects: [],
+      sectionTitles: {}
     })
     setBenefitInput('')
     setIncludesInput('')
     setRequirementInput('')
+    setBestForInput('')
     setPackageHighlightInput('')
+    setPurposeInput('')
+    setSignificanceInput('')
+    setWhenToPerformInput('')
+    setSpecialForNRIsInput('')
+    setCoreAspectTitleInput('')
+    setCoreAspectContentInput('')
     setSelectedServices(new Set())
     setEditingService(null)
     setCurrentTab('basic')
@@ -150,6 +216,13 @@ export default function AdminServicesNew() {
     const packageService = service as AdminPackageRow
     const packageServiceIds = packageService.included_services?.map(s => s.id) || []
 
+    // Parse deity_info JSON
+    const deityInfo = service.deity_info as any
+    // Parse scriptural_roots JSON
+    const scripturalRoots = service.scriptural_roots as any
+    // Parse core_aspects JSON
+    const coreAspects = service.core_aspects as any
+
     setFormData({
       id: service.id,
       name: service.name,
@@ -160,6 +233,7 @@ export default function AdminServicesNew() {
       benefits: service.benefits || [],
       includes: service.includes || [],
       requirements: service.requirements || [],
+      bestFor: service.best_for || [],
       dakshina: service.price || '',
       imageUrl: service.featured_image_url || '',
       samagriFileUrl: service.samagri_file_url || undefined,
@@ -176,7 +250,23 @@ export default function AdminServicesNew() {
         sort_order: s.sort_order,
         package_price_override: s.package_price_override || undefined,
         notes: s.notes || undefined
-      })) || []
+      })) || [],
+      // Load advanced details
+      deityName: deityInfo?.name || '',
+      deityDescription: deityInfo?.description || '',
+      deitySignificance: deityInfo?.significance || '',
+      nature: service.nature || '',
+      purpose: service.purpose || [],
+      significance: service.significance || [],
+      scripturalSource: scripturalRoots?.source || '',
+      scripturalDescription: scripturalRoots?.description || '',
+      whenToPerform: service.when_to_perform || [],
+      whereAndWho: service.where_and_who || '',
+      specialForNRIs: service.special_notes || [],
+      specialForNRIsTitle: service.special_for_nris_title || '',
+      specialForNRIsIntro: service.special_for_nris_intro || '',
+      coreAspects: coreAspects || [],
+      sectionTitles: service.section_titles as ServiceFormData['sectionTitles'] || {}
     })
     setSelectedServices(new Set(packageServiceIds))
     setEditingService(service)
@@ -215,23 +305,119 @@ export default function AdminServicesNew() {
         }
       }
 
+      // Look up category_id based on category slug (with auto-create fallback)
+      const categoryMeta: Record<string, { name: string; icon: string; sortOrder: number }> = {
+        pooja: { name: 'Poojas', icon: 'pray', sortOrder: 0 },
+        sanskar: { name: 'Sanskars', icon: 'heart', sortOrder: 1 },
+        paath: { name: 'Paath/Recitations', icon: 'book', sortOrder: 2 },
+        consultation: { name: 'Consultations', icon: 'users', sortOrder: 3 },
+        wellness: { name: 'Meditation & Yoga', icon: 'lotus', sortOrder: 4 },
+        packages: { name: 'Service Packages', icon: 'package', sortOrder: 5 },
+      }
+
+      let category_id: string | null = null
+
+      // First, try to find the category by slug
+      const { data: categoryData, error: categoryLookupError } = await supabase
+        .from('service_categories')
+        .select('id')
+        .eq('slug', formData.category)
+        .maybeSingle()
+
+      if (categoryLookupError) {
+        console.error('Category lookup error:', categoryLookupError)
+        if (categoryLookupError.code === '42P01') {
+          throw new Error('Database table "service_categories" not found. Check that NEXT_PUBLIC_SUPABASE_URL in .env.local points to your remote Supabase project.')
+        }
+      }
+
+      if (categoryData) {
+        category_id = categoryData.id
+      } else {
+        // Category slug not found — auto-create it so the admin form always works
+        console.log(`Category '${formData.category}' not found in DB, auto-creating...`)
+        const meta = categoryMeta[formData.category] || {
+          name: categoryNames[formData.category] || formData.category,
+          icon: 'star',
+          sortOrder: 99,
+        }
+
+        const { data: newCat, error: createCatError } = await supabase
+          .from('service_categories')
+          .upsert(
+            {
+              name: meta.name,
+              slug: formData.category,
+              description: `${meta.name} services`,
+              icon: meta.icon,
+              sort_order: meta.sortOrder,
+              is_active: true,
+            },
+            { onConflict: 'slug' }
+          )
+          .select('id')
+          .single()
+
+        if (createCatError || !newCat) {
+          console.error('Failed to auto-create category:', createCatError)
+          // Fallback: reuse existing category_id when editing
+          if (editingService?.category_id) {
+            console.log('Falling back to existing category_id:', editingService.category_id)
+            category_id = editingService.category_id
+          } else {
+            throw new Error(`Category '${formData.category}' not found and could not be created: ${createCatError?.message || 'Unknown error'}`)
+          }
+        } else {
+          category_id = newCat.id
+          console.log('Auto-created category:', { slug: formData.category, id: category_id })
+        }
+      }
+
       if (editingService) {
+        console.log('About to update service:', {
+          serviceId: editingService.id,
+          serviceName: formData.name,
+          category_id: category_id
+        })
+        
         await updateService({
           id: editingService.id,
           name: formData.name,
           slug: generateSlug(formData.name),
+          category_id: category_id,
           short_description: formData.description,
           full_description: formData.detailedDescription || null,
           duration: formData.duration,
           benefits: formData.benefits.length > 0 ? formData.benefits : null,
           includes: formData.includes.length > 0 ? formData.includes : null,
           requirements: formData.requirements.length > 0 ? formData.requirements : null,
+          best_for: formData.bestFor.length > 0 ? formData.bestFor : null,
           price: formData.dakshina || null,
           featured_image_url: formData.imageUrl || null,
           samagri_file_url: samagriFileUrl,
           is_package: formData.category === 'packages',
           package_savings_text: formData.packageSavingsText || null,
-          package_highlights: formData.packageHighlights && formData.packageHighlights.length > 0 ? formData.packageHighlights : null
+          package_highlights: formData.packageHighlights && formData.packageHighlights.length > 0 ? formData.packageHighlights : null,
+          // Add advanced details
+          deity_info: (formData.deityName || formData.deityDescription || formData.deitySignificance) ? {
+            name: formData.deityName || '',
+            description: formData.deityDescription || '',
+            significance: formData.deitySignificance || ''
+          } : null,
+          nature: formData.nature || null,
+          purpose: formData.purpose && formData.purpose.length > 0 ? formData.purpose : null,
+          significance: formData.significance && formData.significance.length > 0 ? formData.significance : null,
+          scriptural_roots: (formData.scripturalSource || formData.scripturalDescription) ? {
+            source: formData.scripturalSource || '',
+            description: formData.scripturalDescription || ''
+          } : null,
+          when_to_perform: formData.whenToPerform && formData.whenToPerform.length > 0 ? formData.whenToPerform : null,
+          where_and_who: formData.whereAndWho || null,
+          special_notes: formData.specialForNRIs && formData.specialForNRIs.length > 0 ? formData.specialForNRIs : null,
+          special_for_nris_title: formData.specialForNRIsTitle || null,
+          special_for_nris_intro: formData.specialForNRIsIntro || null,
+          core_aspects: formData.coreAspects && formData.coreAspects.length > 0 ? formData.coreAspects : null,
+          section_titles: formData.sectionTitles && Object.keys(formData.sectionTitles).length > 0 ? formData.sectionTitles : null
         })
 
         // Handle package items if this is a package
@@ -274,8 +460,9 @@ export default function AdminServicesNew() {
           includes: formData.includes,
           requirements: formData.requirements,
           price: formData.dakshina,
-          bestFor: []
+          bestFor: formData.bestFor
         })
+        newService.category_id = category_id
         newService.featured_image_url = formData.imageUrl || null
         if (samagriFileUrl) {
           newService.samagri_file_url = samagriFileUrl
@@ -283,6 +470,26 @@ export default function AdminServicesNew() {
         newService.is_package = formData.category === 'packages'
         newService.package_savings_text = formData.packageSavingsText || null
         newService.package_highlights = formData.packageHighlights && formData.packageHighlights.length > 0 ? formData.packageHighlights : null
+        // Add advanced details
+        newService.deity_info = (formData.deityName || formData.deityDescription || formData.deitySignificance) ? {
+          name: formData.deityName || '',
+          description: formData.deityDescription || '',
+          significance: formData.deitySignificance || ''
+        } : null
+        newService.nature = formData.nature || null
+        newService.purpose = formData.purpose && formData.purpose.length > 0 ? formData.purpose : null
+        newService.significance = formData.significance && formData.significance.length > 0 ? formData.significance : null
+        newService.scriptural_roots = (formData.scripturalSource || formData.scripturalDescription) ? {
+          source: formData.scripturalSource || '',
+          description: formData.scripturalDescription || ''
+        } : null
+        newService.when_to_perform = formData.whenToPerform && formData.whenToPerform.length > 0 ? formData.whenToPerform : null
+        newService.where_and_who = formData.whereAndWho || null
+        newService.special_notes = formData.specialForNRIs && formData.specialForNRIs.length > 0 ? formData.specialForNRIs : null
+        newService.special_for_nris_title = formData.specialForNRIsTitle || null
+        newService.special_for_nris_intro = formData.specialForNRIsIntro || null
+        newService.core_aspects = formData.coreAspects && formData.coreAspects.length > 0 ? formData.coreAspects : null
+        newService.section_titles = formData.sectionTitles && Object.keys(formData.sectionTitles).length > 0 ? formData.sectionTitles : null
 
         // Create the service first to get its ID
         const createdService = await createService(newService)
@@ -320,9 +527,26 @@ export default function AdminServicesNew() {
       setIsDialogOpen(false)
       setEditingService(null)
       setSelectedSamagriFile(null)
-    } catch (error) {
-      console.error('Save error:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to save service')
+      toast.success(editingService ? 'Service updated successfully!' : 'Service created successfully!')
+    } catch (error: any) {
+      console.error('=== SAVE ERROR ===')
+      console.error('Error object:', error)
+      console.error('Error type:', typeof error)
+      console.error('Error constructor:', error?.constructor?.name)
+      console.error('Error keys:', error ? Object.keys(error) : 'null')
+      console.error('Error string:', String(error))
+      console.error('Error JSON:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+      
+      let errorMessage = 'Failed to save service'
+      
+      if (error?.message) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      }
+      
+      console.error('Final error message:', errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsUploading(false)
     }
@@ -563,8 +787,8 @@ export default function AdminServicesNew() {
       )}
 
       {/* Edit/Add Dialog - Modern Stunning UX */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
+      <Dialog open={isDialogOpen && !showImagePicker} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
           {/* Stunning Header */}
           <DialogHeader className="relative px-8 pt-8 pb-6 bg-linear-to-r from-primary/10 via-accent/5 to-secondary/10 border-b bg-background">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -596,7 +820,8 @@ export default function AdminServicesNew() {
               {[
                 { id: 'basic', label: 'Basic Info', icon: '📝', step: 1 },
                 { id: 'details', label: 'Details', icon: '✨', step: 2 },
-                { id: 'media', label: 'Media', icon: '🖼️', step: 3 }
+                { id: 'advanced', label: 'Advanced', icon: '🕉️', step: 3 },
+                { id: 'media', label: 'Media', icon: '🖼️', step: 4 }
               ].map((tab, index) => (
                 <div key={tab.id} className="flex items-center flex-1">
                   <button
@@ -615,9 +840,9 @@ export default function AdminServicesNew() {
                       <div className="font-medium text-sm">{tab.label}</div>
                     </div>
                   </button>
-                  {index < 2 && (
+                  {index < 3 && (
                     <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
-                      ['basic', 'details', 'media'].indexOf(currentTab) > index 
+                      ['basic', 'details', 'advanced', 'media'].indexOf(currentTab) > index 
                         ? 'bg-primary' 
                         : 'bg-border'
                     }`} />
@@ -665,11 +890,12 @@ export default function AdminServicesNew() {
                           Category <span className="text-destructive">*</span>
                         </Label>
                         <Select
+                          key={`category-${editingService?.id || 'new'}-${formData.category}`}
                           value={formData.category}
                           onValueChange={(value: ServiceCategory) => setFormData({ ...formData, category: value })}
                         >
-                          <SelectTrigger id="category" className="h-12 bg-background border-border/50">
-                            <SelectValue />
+                          <SelectTrigger id="category" className="w-full h-12 bg-background border-border/50">
+                            <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="pooja">🪔 Poojas</SelectItem>
@@ -1091,14 +1317,22 @@ export default function AdminServicesNew() {
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
                   <div className="absolute top-0 left-0 w-32 h-32 bg-linear-to-br from-blue-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <div>
+                      <Label htmlFor="sectionTitleIncludes" className="text-sm font-semibold flex items-center gap-2">
                         <span className="text-xl">📦</span>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-semibold text-lg">What's Included</h3>
-                        <p className="text-xs text-muted-foreground">Items and services provided</p>
-                      </div>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleIncludes"
+                        value={formData.sectionTitles?.includes || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, includes: e.target.value }
+                        })}
+                        placeholder="e.g., What's Included"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
                     </div>
                     
                     <div className="flex gap-3">
@@ -1163,14 +1397,22 @@ export default function AdminServicesNew() {
                 <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
                   <div className="absolute bottom-0 right-0 w-32 h-32 bg-linear-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
                   <div className="relative p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-amber-500/10 rounded-lg">
+                    <div>
+                      <Label htmlFor="sectionTitleRequirements" className="text-sm font-semibold flex items-center gap-2">
                         <span className="text-xl">📋</span>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-semibold text-lg">Requirements</h3>
-                        <p className="text-xs text-muted-foreground">What devotees need to prepare</p>
-                      </div>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleRequirements"
+                        value={formData.sectionTitles?.requirements || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, requirements: e.target.value }
+                        })}
+                        placeholder="e.g., Requirements"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
                     </div>
                     
                     <div className="flex gap-3">
@@ -1230,6 +1472,617 @@ export default function AdminServicesNew() {
                     </div>
                   </div>
                 </div>
+
+                {/* Best For Card */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-linear-to-tl from-purple-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div>
+                      <Label htmlFor="sectionTitleBestFor" className="text-sm font-semibold flex items-center gap-2">
+                        <span className="text-xl">🎯</span>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleBestFor"
+                        value={formData.sectionTitles?.bestFor || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, bestFor: e.target.value }
+                        })}
+                        placeholder="e.g., Best For"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={bestForInput}
+                        onChange={(e) => setBestForInput(e.target.value)}
+                        placeholder="e.g., New parents, Career growth..."
+                        className="h-12 flex-1 bg-background"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && bestForInput.trim()) {
+                            setFormData({ ...formData, bestFor: [...formData.bestFor, bestForInput.trim()] })
+                            setBestForInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        className="h-12 px-6 bg-purple-600 hover:bg-purple-700"
+                        onClick={() => {
+                          if (bestForInput.trim()) {
+                            setFormData({ ...formData, bestFor: [...formData.bestFor, bestForInput.trim()] })
+                            setBestForInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={18} weight="bold" />
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-4 min-h-[80px] p-4 border border-dashed border-purple-500/30 rounded-xl bg-purple-500/5">
+                      {formData.bestFor.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Press Enter or click + to add target audience
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {formData.bestFor.map((item, index) => (
+                            <Badge 
+                              key={index} 
+                              className="py-2 px-4 bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20 hover:bg-purple-500/20 transition-colors group"
+                            >
+                              <span className="mr-1">🎯</span>
+                              {item}
+                              <X
+                                size={14}
+                                className="ml-2 cursor-pointer opacity-50 group-hover:opacity-100 hover:text-destructive transition-all"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  bestFor: formData.bestFor.filter((_, i) => i !== index)
+                                })}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Advanced Details Tab */}
+              <TabsContent value="advanced" className="space-y-6 mt-0 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+                <div className="bg-linear-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mb-6">
+                  <p className="text-sm text-orange-800 dark:text-orange-200 flex items-center gap-2">
+                    <span className="text-lg">🕉️</span>
+                    <span><strong>Advanced Details:</strong> These additional fields provide comprehensive spiritual and cultural context for your services. All fields are optional but enhance the user experience.</span>
+                  </p>
+                </div>
+
+                {/* Deity Information */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-orange-200">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-orange-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="sectionTitleDeity" className="text-sm font-semibold flex items-center gap-2">
+                          <span className="text-2xl">🙏</span>
+                          Section Title (displayed on live page)
+                        </Label>
+                        <Input
+                          id="sectionTitleDeity"
+                          value={formData.sectionTitles?.deity || ''}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            sectionTitles: { ...formData.sectionTitles, deity: e.target.value }
+                          })}
+                          placeholder="e.g., Who is Lord Ganesha?"
+                          className="mt-2 font-semibold"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Leave blank to hide this section's title</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="deityName">Deity Name</Label>
+                        <Input
+                          id="deityName"
+                          value={formData.deityName || ''}
+                          onChange={(e) => setFormData({ ...formData, deityName: e.target.value })}
+                          placeholder="e.g., Lord Ganesha, Goddess Lakshmi..."
+                          className="mt-2"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="deityDescription">Deity Description</Label>
+                        <Textarea
+                          id="deityDescription"
+                          value={formData.deityDescription || ''}
+                          onChange={(e) => setFormData({ ...formData, deityDescription: e.target.value })}
+                          placeholder="Who is this deity? Brief introduction..."
+                          className="mt-2 min-h-[100px]"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="deitySignificance">Deity Significance</Label>
+                        <Textarea
+                          id="deitySignificance"
+                          value={formData.deitySignificance || ''}
+                          onChange={(e) => setFormData({ ...formData, deitySignificance: e.target.value })}
+                          placeholder="Spiritual significance and symbolism..."
+                          className="mt-2 min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Nature and Purpose */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-blue-200">
+                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-linear-to-tr from-blue-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="sectionTitleNature" className="text-sm font-semibold flex items-center gap-2">
+                          <span className="text-2xl">📖</span>
+                          Section Title (displayed on live page)
+                        </Label>
+                        <Input
+                          id="sectionTitleNature"
+                          value={formData.sectionTitles?.nature || ''}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            sectionTitles: { ...formData.sectionTitles, nature: e.target.value }
+                          })}
+                          placeholder="e.g., Nature and Purpose of the Pooja"
+                          className="mt-2 font-semibold"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Leave blank to hide this section's title</p>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="nature">Nature of the Service</Label>
+                        <Textarea
+                          id="nature"
+                          value={formData.nature || ''}
+                          onChange={(e) => setFormData({ ...formData, nature: e.target.value })}
+                          placeholder="Describe the essential nature and character of this service..."
+                          className="mt-2 min-h-[120px]"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Purpose (Multiple items)</Label>
+                        <div className="flex gap-3 mt-2">
+                          <Input
+                            value={purposeInput}
+                            onChange={(e) => setPurposeInput(e.target.value)}
+                            placeholder="Add a purpose or objective..."
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter' && purposeInput.trim()) {
+                                setFormData({ ...formData, purpose: [...(formData.purpose || []), purposeInput.trim()] })
+                                setPurposeInput('')
+                                e.preventDefault()
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              if (purposeInput.trim()) {
+                                setFormData({ ...formData, purpose: [...(formData.purpose || []), purposeInput.trim()] })
+                                setPurposeInput('')
+                              }
+                            }}
+                          >
+                            <Plus size={16} />
+                          </Button>
+                        </div>
+                        <div className="mt-3 space-y-2">
+                          {(formData.purpose || []).map((item, index) => (
+                            <Badge 
+                              key={index} 
+                              className="py-2 px-4 bg-blue-500/10 text-blue-700 dark:text-blue-400 mr-2"
+                            >
+                              {item}
+                              <X
+                                size={14}
+                                className="ml-2 cursor-pointer"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  purpose: (formData.purpose || []).filter((_, i) => i !== index)
+                                })}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Significance */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-green-200">
+                  <div className="absolute top-0 left-0 w-40 h-40 bg-linear-to-br from-green-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div>
+                      <Label htmlFor="sectionTitleSignificance" className="text-sm font-semibold flex items-center gap-2">
+                        <span className="text-2xl">⭐</span>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleSignificance"
+                        value={formData.sectionTitles?.significance || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, significance: e.target.value }
+                        })}
+                        placeholder="e.g., Significance and Benefits"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={significanceInput}
+                        onChange={(e) => setSignificanceInput(e.target.value)}
+                        placeholder="Add a significance point..."
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && significanceInput.trim()) {
+                            setFormData({ ...formData, significance: [...(formData.significance || []), significanceInput.trim()] })
+                            setSignificanceInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (significanceInput.trim()) {
+                            setFormData({ ...formData, significance: [...(formData.significance || []), significanceInput.trim()] })
+                            setSignificanceInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={16} />
+                      </Button>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {(formData.significance || []).map((item, index) => (
+                        <Badge 
+                          key={index} 
+                          className="py-2 px-4 bg-green-500/10 text-green-700 dark:text-green-400 mr-2"
+                        >
+                          {item}
+                          <X
+                            size={14}
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setFormData({
+                              ...formData,
+                              significance: (formData.significance || []).filter((_, i) => i !== index)
+                            })}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scriptural Roots */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-purple-200">
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-linear-to-tl from-purple-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div>
+                      <Label htmlFor="sectionTitleScriptural" className="text-sm font-semibold flex items-center gap-2">
+                        <span className="text-2xl">📜</span>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleScriptural"
+                        value={formData.sectionTitles?.scriptural || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, scriptural: e.target.value }
+                        })}
+                        placeholder="e.g., Scriptural Roots"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="scripturalSource">Source</Label>
+                        <Input
+                          id="scripturalSource"
+                          value={formData.scripturalSource || ''}
+                          onChange={(e) => setFormData({ ...formData, scripturalSource: e.target.value })}
+                          placeholder="e.g., Vedas, Puranas, Upanishads..."
+                          className="mt-2"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="scripturalDescription">Description</Label>
+                        <Textarea
+                          id="scripturalDescription"
+                          value={formData.scripturalDescription || ''}
+                          onChange={(e) => setFormData({ ...formData, scripturalDescription: e.target.value })}
+                          placeholder="Explain the scriptural basis and references..."
+                          className="mt-2 min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* When to Perform */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-cyan-200">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-bl from-cyan-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div>
+                      <Label htmlFor="sectionTitleWhen" className="text-sm font-semibold flex items-center gap-2">
+                        <span className="text-2xl">📅</span>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleWhen"
+                        value={formData.sectionTitles?.when || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, when: e.target.value }
+                        })}
+                        placeholder="e.g., When to Perform"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        value={whenToPerformInput}
+                        onChange={(e) => setWhenToPerformInput(e.target.value)}
+                        placeholder="e.g., On Mondays, During Kartik month..."
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && whenToPerformInput.trim()) {
+                            setFormData({ ...formData, whenToPerform: [...(formData.whenToPerform || []), whenToPerformInput.trim()] })
+                            setWhenToPerformInput('')
+                            e.preventDefault()
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (whenToPerformInput.trim()) {
+                            setFormData({ ...formData, whenToPerform: [...(formData.whenToPerform || []), whenToPerformInput.trim()] })
+                            setWhenToPerformInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={16} />
+                      </Button>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {(formData.whenToPerform || []).map((item, index) => (
+                        <Badge 
+                          key={index} 
+                          className="py-2 px-4 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 mr-2"
+                        >
+                          {item}
+                          <X
+                            size={14}
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setFormData({
+                              ...formData,
+                              whenToPerform: (formData.whenToPerform || []).filter((_, i) => i !== index)
+                            })}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Where and Who */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-pink-200">
+                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-linear-to-tr from-pink-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div>
+                      <Label htmlFor="sectionTitleWhere" className="text-sm font-semibold flex items-center gap-2">
+                        <span className="text-2xl">📍</span>
+                        Section Title (displayed on live page)
+                      </Label>
+                      <Input
+                        id="sectionTitleWhere"
+                        value={formData.sectionTitles?.where || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          sectionTitles: { ...formData.sectionTitles, where: e.target.value }
+                        })}
+                        placeholder="e.g., Where and Who Can Perform?"
+                        className="mt-2 mb-2 font-semibold"
+                      />
+                      <p className="text-xs text-muted-foreground mb-4">Leave blank to hide this section's title</p>
+                    </div>
+                    
+                    <Textarea
+                      value={formData.whereAndWho || ''}
+                      onChange={(e) => setFormData({ ...formData, whereAndWho: e.target.value })}
+                      placeholder="Where can this be performed and who can perform it..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Special Notes for NRIs */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-indigo-200">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-bl from-indigo-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-indigo-500/10 rounded-lg">
+                        <span className="text-2xl">✈️</span>
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Special Notes for NRIs</h3>
+                        <p className="text-xs text-muted-foreground">Information for devotees living abroad</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3 mb-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground mb-1 block">Section Title</label>
+                        <Input
+                          value={formData.specialForNRIsTitle || ''}
+                          onChange={(e) => setFormData({ ...formData, specialForNRIsTitle: e.target.value })}
+                          placeholder="e.g., Special Notes for NRIs"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground mb-1 block">Introduction Paragraph</label>
+                        <Textarea
+                          value={formData.specialForNRIsIntro || ''}
+                          onChange={(e) => setFormData({ ...formData, specialForNRIsIntro: e.target.value })}
+                          placeholder="Introductory text that appears before the bullet points..."
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">Key Points (Bullet List)</label>
+                      <div className="flex gap-3">
+                        <Input
+                          value={specialForNRIsInput}
+                          onChange={(e) => setSpecialForNRIsInput(e.target.value)}
+                          placeholder="Add a note for NRIs..."
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && specialForNRIsInput.trim()) {
+                              setFormData({ ...formData, specialForNRIs: [...(formData.specialForNRIs || []), specialForNRIsInput.trim()] })
+                              setSpecialForNRIsInput('')
+                              e.preventDefault()
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            if (specialForNRIsInput.trim()) {
+                              setFormData({ ...formData, specialForNRIs: [...(formData.specialForNRIs || []), specialForNRIsInput.trim()] })
+                              setSpecialForNRIsInput('')
+                            }
+                          }}
+                        >
+                          <Plus size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {(formData.specialForNRIs || []).map((item, index) => (
+                        <Badge 
+                          key={index} 
+                          className="py-2 px-4 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 mr-2"
+                        >
+                          {item}
+                          <X
+                            size={14}
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setFormData({
+                              ...formData,
+                              specialForNRIs: (formData.specialForNRIs || []).filter((_, i) => i !== index)
+                            })}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Core Aspects */}
+                <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm border-amber-200">
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-linear-to-tl from-amber-500/10 to-transparent rounded-full blur-2xl" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-amber-500/10 rounded-lg">
+                        <span className="text-2xl">💎</span>
+                      </div>
+                      <div>
+                        <h3 className="font-heading font-semibold text-lg">Core Aspects</h3>
+                        <p className="text-xs text-muted-foreground">Key components with title and description</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Input
+                          value={coreAspectTitleInput}
+                          onChange={(e) => setCoreAspectTitleInput(e.target.value)}
+                          placeholder="Aspect title..."
+                        />
+                        <Input
+                          value={coreAspectContentInput}
+                          onChange={(e) => setCoreAspectContentInput(e.target.value)}
+                          placeholder="Aspect content..."
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && coreAspectTitleInput.trim() && coreAspectContentInput.trim()) {
+                              setFormData({ 
+                                ...formData, 
+                                coreAspects: [...(formData.coreAspects || []), { title: coreAspectTitleInput.trim(), content: coreAspectContentInput.trim() }] 
+                              })
+                              setCoreAspectTitleInput('')
+                              setCoreAspectContentInput('')
+                              e.preventDefault()
+                            }
+                          }}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        className="w-full"
+                        onClick={() => {
+                          if (coreAspectTitleInput.trim() && coreAspectContentInput.trim()) {
+                            setFormData({ 
+                              ...formData, 
+                              coreAspects: [...(formData.coreAspects || []), { title: coreAspectTitleInput.trim(), content: coreAspectContentInput.trim() }] 
+                            })
+                            setCoreAspectTitleInput('')
+                            setCoreAspectContentInput('')
+                          }
+                        }}
+                      >
+                        <Plus size={16} className="mr-2" />
+                        Add Core Aspect
+                      </Button>
+                      
+                      <div className="mt-4 space-y-3">
+                        {(formData.coreAspects || []).map((aspect, index) => (
+                          <div key={index} className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-sm mb-1">{aspect.title}</h4>
+                                <p className="text-xs text-muted-foreground">{aspect.content}</p>
+                              </div>
+                              <X
+                                size={16}
+                                className="cursor-pointer text-muted-foreground hover:text-destructive ml-2"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  coreAspects: (formData.coreAspects || []).filter((_, i) => i !== index)
+                                })}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
 
               {/* Media & Files Tab */}
@@ -1262,7 +2115,12 @@ export default function AdminServicesNew() {
                               variant="secondary"
                               size="sm"
                               className="flex-1 bg-white/90 hover:bg-white"
-                              onClick={() => setShowImagePicker(true)}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setImagePickerCategory('all')
+                                setShowImagePicker(true)
+                              }}
                             >
                               <PencilSimple size={14} className="mr-2" />
                               Change
@@ -1280,7 +2138,12 @@ export default function AdminServicesNew() {
                     ) : (
                       <div 
                         className="border-2 border-dashed border-purple-500/30 rounded-xl p-12 text-center cursor-pointer hover:border-purple-500/50 hover:bg-purple-500/5 transition-all duration-300 group"
-                        onClick={() => setShowImagePicker(true)}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setImagePickerCategory('all')
+                          setShowImagePicker(true)
+                        }}
                       >
                         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <ImageIcon size={32} className="text-purple-500" weight="duotone" />
@@ -1414,12 +2277,25 @@ export default function AdminServicesNew() {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
 
-          {/* Image Picker Modal */}
-          {showImagePicker && (
-            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-              <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
-                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-primary/5 to-accent/5">
+      {/* Image Picker Modal */}
+      {showImagePicker && (
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+              style={{ zIndex: 9999 }}
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) {
+                  setShowImagePicker(false)
+                }
+              }}
+            >
+              <div 
+                className="bg-background rounded-2xl max-w-4xl w-full h-[90vh] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300"
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-primary/5 to-accent/5 shrink-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <ImageIcon size={20} className="text-primary" weight="fill" />
@@ -1429,16 +2305,52 @@ export default function AdminServicesNew() {
                       <p className="text-xs text-muted-foreground">Choose from your media library</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowImagePicker(false)} className="rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowImagePicker(false)}
+                    className="rounded-full"
+                  >
                     <X size={20} />
                   </Button>
                 </div>
-                <div className="p-5 overflow-y-auto">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {photos.map((photo) => (
+                <div className="p-5 border-b bg-muted/30 shrink-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Label className="text-sm font-medium">Filter by Category:</Label>
+                      <Select value={imagePickerCategory} onValueChange={setImagePickerCategory}>
+                        <SelectTrigger className="w-[200px]" onMouseDown={(e) => e.stopPropagation()}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent style={{ zIndex: 10000 }}>
+                          <SelectItem value="all">All Categories ({photos.length})</SelectItem>
+                          <SelectItem value="books">📚 Books ({photos.filter(p => p.category === 'books').length})</SelectItem>
+                          <SelectItem value="gallery">🖼️ Gallery ({photos.filter(p => p.category === 'gallery').length})</SelectItem>
+                          <SelectItem value="ceremony">🪔 Ceremony ({photos.filter(p => p.category === 'ceremony').length})</SelectItem>
+                          <SelectItem value="pooja">🙏 Pooja ({photos.filter(p => p.category === 'pooja').length})</SelectItem>
+                          <SelectItem value="wedding">💒 Wedding ({photos.filter(p => p.category === 'wedding').length})</SelectItem>
+                          <SelectItem value="charity">❤️ Charity ({photos.filter(p => p.category === 'charity').length})</SelectItem>
+                          <SelectItem value="events">🎉 Events ({photos.filter(p => p.category === 'events').length})</SelectItem>
+                          <SelectItem value="general">📁 General ({photos.filter(p => p.category === 'general').length})</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {photos.filter(photo => imagePickerCategory === 'all' ? true : photo.category === imagePickerCategory).length} images
+                    </Badge>
+                  </div>
+                </div>
+                <div className="p-5 overflow-y-auto flex-1 min-h-0">
+                  {(() => {
+                    const filteredPhotos = imagePickerCategory === 'all' 
+                      ? photos 
+                      : photos.filter(photo => photo.category === imagePickerCategory)
+                    return filteredPhotos.length > 0 ? (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                    {filteredPhotos.map((photo) => (
                       <div
                         key={photo.id}
-                        className="cursor-pointer group relative aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="cursor-pointer group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
                         onClick={() => {
                           setFormData({ ...formData, imageUrl: photo.url })
                           setShowImagePicker(false)
@@ -1448,26 +2360,53 @@ export default function AdminServicesNew() {
                         <img
                           src={photo.url}
                           alt={photo.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <div className="bg-white text-primary font-semibold px-4 py-2 rounded-full text-sm shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                          <div className="bg-white text-primary font-semibold px-3 py-1.5 rounded-full text-xs shadow-lg">
                             Select
                           </div>
                         </div>
-                        <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <p className="text-white text-xs font-medium truncate drop-shadow-lg">{photo.title}</p>
+                        <div className="absolute top-1 right-1">
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 capitalize">
+                            {photo.category}
+                          </Badge>
+                        </div>
+                        <div className="absolute bottom-1 left-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <p className="text-white text-[10px] font-medium truncate drop-shadow-lg">{photo.title}</p>
                         </div>
                       </div>
                     ))}
                   </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                        <ImageIcon size={32} className="text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground font-medium mb-2">No images found</p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {imagePickerCategory === 'all' 
+                          ? 'No images available. Upload images in the Media section first.'
+                          : `No images in the "${imagePickerCategory}" category. Try selecting "All Categories" or upload images first.`
+                        }
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open('/admin', '_blank')}
+                      >
+                        Go to Media Section
+                      </Button>
+                    </div>
+                  )
+                  })()}
                 </div>
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}

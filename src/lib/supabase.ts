@@ -10,6 +10,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
+// Debug: Log the Supabase URL being used
+console.log('Supabase client configuration:', {
+  url: supabaseUrl,
+  isRemote: supabaseUrl?.includes('supabase.co'),
+  isLocal: supabaseUrl?.includes('localhost') || supabaseUrl?.includes('127.0.0.1')
+})
+
 // Create Supabase client with enhanced error handling
 export const supabase = createClient(
   supabaseUrl || '',
@@ -109,6 +116,9 @@ export interface ServiceRow {
   when_to_perform: string[] | null
   where_and_who: string | null
   special_notes: string[] | null
+  special_for_nris_title: string | null
+  special_for_nris_intro: string | null
+  section_titles: Record<string, string> | null
   core_aspects: Record<string, unknown>[] | null
   samagri_items: Record<string, unknown> | null
   samagri_file_url: string | null

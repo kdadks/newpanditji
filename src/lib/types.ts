@@ -24,10 +24,27 @@ export interface ServiceDetail {
   whenToPerform?: string[]
   whereAndWho?: string
   specialForNRIs?: string[]
+  specialForNRIsTitle?: string
+  specialForNRIsIntro?: string
   coreAspects?: {
     title: string
     content: string
   }[]
+  // Custom section titles
+  sectionTitles?: {
+    deity?: string
+    nature?: string
+    samagri?: string
+    samagriDescription?: string
+    significance?: string
+    scriptural?: string
+    when?: string
+    where?: string
+    nri?: string
+    includes?: string
+    requirements?: string
+    bestFor?: string
+  }
 }
 
 export interface Service {

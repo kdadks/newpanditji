@@ -131,10 +131,10 @@ END $$;
 
 -- Insert default service categories (upsert to handle re-runs)
 INSERT INTO service_categories (name, slug, description, icon, sort_order, is_active) VALUES
-  ('Puja Services', 'puja-services', 'Traditional Hindu puja ceremonies for homes and temples', 'pray', 0, true),
-  ('Wedding Ceremonies', 'wedding-ceremonies', 'Complete Hindu wedding rituals and ceremonies', 'heart', 1, true),
-  ('Hawan & Yagna', 'hawan-yagna', 'Sacred fire ceremonies for purification and blessings', 'flame', 2, true),
-  ('Life Events', 'life-events', 'Ceremonies for important life milestones', 'calendar', 3, true),
-  ('Spiritual Guidance', 'spiritual-guidance', 'Consultations and spiritual counseling services', 'book', 4, true),
-  ('Special Ceremonies', 'special-ceremonies', 'Specialized religious ceremonies and rituals', 'star', 5, true)
+  ('Poojas', 'pooja', 'Traditional Hindu puja ceremonies', 'pray', 0, true),
+  ('Sanskars', 'sanskar', 'Hindu sacraments and life ceremonies', 'heart', 1, true),
+  ('Paath/Recitations', 'paath', 'Sacred scripture recitations and readings', 'book', 2, true),
+  ('Consultations', 'consultation', 'Spiritual guidance and astrology consultations', 'users', 3, true),
+  ('Meditation & Yoga', 'wellness', 'Wellness and spiritual growth services', 'lotus', 4, true),
+  ('Service Packages', 'packages', 'Curated service bundles with special pricing', 'package', 5, true)
 ON CONFLICT (slug) DO NOTHING;

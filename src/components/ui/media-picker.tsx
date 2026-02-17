@@ -166,7 +166,7 @@ export function MediaPicker({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col gap-4">
+      <DialogContent className="max-w-4xl h-[90vh] max-h-[90vh] flex flex-col gap-4">
         <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={24} className="text-primary" />
@@ -247,6 +247,7 @@ export function MediaPicker({
                           alt={photo.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
                         {/* Hover overlay */}
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">

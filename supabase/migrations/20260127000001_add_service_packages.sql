@@ -89,7 +89,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   -- When a service's category is 'packages', set is_package to true
   IF EXISTS (
-    SELECT 1 FROM service_categories
+    SELECT 1 FROM public.service_categories
     WHERE id = NEW.category_id AND slug = 'packages'
   ) THEN
     NEW.is_package = true;

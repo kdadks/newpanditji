@@ -65,8 +65,9 @@ export default function AdminPhotos() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
-  // Get unique categories - need to fetch separately or use a cached list
-  const categories = Array.from(new Set(photos.map(p => p.category).filter(Boolean)))
+  // All available categories
+  const allCategories = ['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general']
+  const categories = allCategories
 
   // Reset to page 1 when filters change
   const handleSearchChange = (value: string) => {
@@ -437,11 +438,14 @@ export default function AdminPhotos() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </SelectItem>
-            ))}
+            <SelectItem value="books">📚 Books</SelectItem>
+            <SelectItem value="gallery">🖼️ Gallery</SelectItem>
+            <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
+            <SelectItem value="pooja">🙏 Pooja</SelectItem>
+            <SelectItem value="wedding">💒 Wedding</SelectItem>
+            <SelectItem value="charity">❤️ Charity</SelectItem>
+            <SelectItem value="events">🎉 Events</SelectItem>
+            <SelectItem value="general">📁 General</SelectItem>
           </SelectContent>
         </Select>
       </div>

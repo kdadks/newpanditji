@@ -43,7 +43,10 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
       whenToPerform: row.when_to_perform || undefined,
       whereAndWho: row.where_and_who || undefined,
       specialForNRIs: row.special_notes || undefined,
+      specialForNRIsTitle: row.special_for_nris_title || undefined,
+      specialForNRIsIntro: row.special_for_nris_intro || undefined,
       coreAspects: row.core_aspects as ServiceDetail['coreAspects'] | undefined,
+      sectionTitles: row.section_titles as ServiceDetail['sectionTitles'] | undefined,
     },
     // Map samagri file URL to the format expected by UI
     samagriFile: row.samagri_file_url ? {
@@ -221,6 +224,10 @@ async function createService(service: ServiceInsert): Promise<ServiceRow> {
  * Update an existing service in Supabase
  */
 async function updateService({ id, ...updates }: ServiceUpdate & { id: string }): Promise<ServiceRow> {
+  // Log the actual Supabase URL being used
+  console.log('UPDATE - Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log('UPDATE - Using supabase client with URL:', (supabase as any).supabaseUrl)
+  
   const { data, error } = await supabase
     .from('services')
     .update(updates)
@@ -229,7 +236,15 @@ async function updateService({ id, ...updates }: ServiceUpdate & { id: string })
     .single()
 
   if (error) {
-    console.error('Error updating service:', error)
+    console.error('Error updating service:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      fullError: error
+    })
+    console.error('Service ID:', id)
+    console.error('Updates being applied:', updates)
     throw error
   }
 
@@ -421,6 +436,8 @@ export function convertLegacyService(service: {
     whenToPerform?: string[]
     whereAndWho?: string
     specialForNRIs?: string[]
+    specialForNRIsTitle?: string
+    specialForNRIsIntro?: string
     coreAspects?: { title: string; content: string }[]
   }
   samagriFile?: { name: string; data: string; type: string }
@@ -445,7 +462,10 @@ export function convertLegacyService(service: {
     when_to_perform: service.details?.whenToPerform || null,
     where_and_who: service.details?.whereAndWho || null,
     special_notes: service.details?.specialForNRIs || null,
+    special_for_nris_title: service.details?.specialForNRIsTitle || null,
+    special_for_nris_intro: service.details?.specialForNRIsIntro || null,
     core_aspects: service.details?.coreAspects || null,
+    section_titles: null, // Section titles not used in legacy conversion
     samagri_items: null,
     samagri_file_url: null, // File upload handled separately
     featured_image_url: null,

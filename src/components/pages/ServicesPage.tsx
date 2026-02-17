@@ -179,27 +179,27 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         </div>
 
-        <Tabs value={selectedCategory} className="mb-8" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')}>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2">
-            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+        <Tabs value={selectedCategory} className="mb-8" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')} suppressHydrationWarning>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2" suppressHydrationWarning>
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               All Services ({services.length})
             </TabsTrigger>
-            <TabsTrigger value="pooja" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="pooja" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Poojas ({services.filter(s => s.category === 'pooja').length})
             </TabsTrigger>
-            <TabsTrigger value="sanskar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="sanskar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Sanskars ({services.filter(s => s.category === 'sanskar').length})
             </TabsTrigger>
-            <TabsTrigger value="paath" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="paath" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Paath ({services.filter(s => s.category === 'paath').length})
             </TabsTrigger>
-            <TabsTrigger value="consultation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="consultation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Consultations ({services.filter(s => s.category === 'consultation').length})
             </TabsTrigger>
-            <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Wellness ({services.filter(s => s.category === 'wellness').length})
             </TabsTrigger>
-            <TabsTrigger value="packages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="packages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               Packages ({services.filter(s => s.category === 'packages').length})
             </TabsTrigger>
           </TabsList>
@@ -480,10 +480,11 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                       </Badge>
                     </div>
                     <DialogTitle className="font-heading text-3xl mb-3">{selectedService.name}</DialogTitle>
+                    {/* Show detailed description if it exists, otherwise show short description */}
                     <DialogDescription asChild>
                       <div
                         className="text-muted-foreground text-base prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedService.description }}
+                        dangerouslySetInnerHTML={{ __html: selectedService.detailedDescription || selectedService.description }}
                       />
                     </DialogDescription>
                   </div>
@@ -557,6 +558,29 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                       </div>
                     )}
                   </div>
+
+                  {/* Basic Details Sections - Show immediately after header */}
+                  <>
+                    {/* Benefits */}
+                    {selectedService.benefits && selectedService.benefits.length > 0 && (
+                      <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
+                        <CardContent className="p-6">
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <Star className="text-primary" size={24} weight="fill" />
+                            Spiritual Benefits
+                          </h3>
+                          <ul className="space-y-3">
+                            {selectedService.benefits.map((benefit, index) => (
+                              <li key={index} className="flex items-start gap-3">
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={20} weight="fill" />
+                                <span className="text-muted-foreground">{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
 
                   {/* Package-Specific Sections */}
                   {selectedService.isPackage && (
@@ -708,9 +732,11 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         <div className="flex items-start gap-4">
                           <FlowerLotus className="text-primary shrink-0 mt-1" size={32} weight="fill" />
                           <div>
-                            <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
-                              Who is {selectedService.details.deity.name}?
-                            </h3>
+                            {selectedService.details.sectionTitles?.deity && (
+                              <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
+                                {selectedService.details.sectionTitles.deity}
+                              </h3>
+                            )}
                             <p className="text-muted-foreground leading-relaxed mb-3">
                               {selectedService.details.deity.description}
                             </p>
@@ -729,10 +755,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.nature && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <BookOpen className="text-primary" size={24} />
-                          Nature and Purpose of the Pooja
-                        </h3>
+                        {selectedService.details.sectionTitles?.nature && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <BookOpen className="text-primary" size={24} />
+                            {selectedService.details.sectionTitles.nature}
+                          </h3>
+                        )}
                         <p className="text-muted-foreground leading-relaxed mb-4">
                           {selectedService.details.nature}
                         </p>
@@ -754,10 +782,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.samagriFile && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-rose-50 to-pink-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <Package className="text-primary" size={24} weight="fill" />
-                          Pooja Samagri (Required Materials)
-                        </h3>
+                        {selectedService.details?.sectionTitles?.samagri && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <Package className="text-primary" size={24} weight="fill" />
+                            {selectedService.details.sectionTitles.samagri}
+                          </h3>
+                        )}
                         <div className="bg-white/60 border border-rose-200 rounded-lg p-5 space-y-4">
                           <div className="flex items-start gap-4">
                             {selectedService.samagriFile.type.includes('pdf') ? (
@@ -769,9 +799,11 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                               <p className="font-medium text-foreground mb-2">
                                 {selectedService.samagriFile.name}
                               </p>
-                              <p className="text-sm text-muted-foreground mb-4">
-                                Download or print the complete list of materials required for this pooja. This will help you prepare everything in advance.
-                              </p>
+                              {selectedService.details?.sectionTitles?.samagriDescription && (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                  {selectedService.details.sectionTitles.samagriDescription}
+                                </p>
+                              )}
                               <div className="flex flex-wrap gap-3">
                                 <Button
                                   size="sm"
@@ -830,10 +862,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.significance && selectedService.details.significance.length > 0 && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <Star className="text-primary" size={24} weight="fill" />
-                          Significance and Benefits
-                        </h3>
+                        {selectedService.details.sectionTitles?.significance && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <Star className="text-primary" size={24} weight="fill" />
+                            {selectedService.details.sectionTitles.significance}
+                          </h3>
+                        )}
                         <ul className="space-y-3">
                           {selectedService.details.significance.map((item, index) => (
                             <li key={index} className="flex items-start gap-3">
@@ -850,10 +884,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.scripturalRoots && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-violet-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <BookOpen className="text-primary" size={24} />
-                          Scriptural Roots
-                        </h3>
+                        {selectedService.details.sectionTitles?.scriptural && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <BookOpen className="text-primary" size={24} />
+                            {selectedService.details.sectionTitles.scriptural}
+                          </h3>
+                        )}
                         <Badge variant="outline" className="mb-3">
                           {selectedService.details.scripturalRoots.source}
                         </Badge>
@@ -868,10 +904,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.whenToPerform && selectedService.details.whenToPerform.length > 0 && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-cyan-50 to-sky-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <Calendar className="text-primary" size={24} />
-                          When to Perform
-                        </h3>
+                        {selectedService.details.sectionTitles?.when && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <Calendar className="text-primary" size={24} />
+                            {selectedService.details.sectionTitles.when}
+                          </h3>
+                        )}
                         <ul className="space-y-2">
                           {selectedService.details.whenToPerform.map((item, index) => (
                             <li key={index} className="flex items-start gap-2">
@@ -888,10 +926,12 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.whereAndWho && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-pink-50 to-rose-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <MapPin className="text-primary" size={24} />
-                          Where and Who Can Perform?
-                        </h3>
+                        {selectedService.details.sectionTitles?.where && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <MapPin className="text-primary" size={24} />
+                            {selectedService.details.sectionTitles.where}
+                          </h3>
+                        )}
                         <p className="text-muted-foreground leading-relaxed text-sm">
                           {selectedService.details.whereAndWho}
                         </p>
@@ -903,13 +943,17 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   {selectedService.details?.specialForNRIs && selectedService.details.specialForNRIs.length > 0 && (
                     <Card className="border-0 shadow-md bg-linear-to-br from-orange-50 to-red-50">
                       <CardContent className="p-6">
-                        <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                          <Heart className="text-primary" size={24} weight="fill" />
-                          Why This Pooja Is Especially Meaningful for Families Living Abroad (NRIs)
-                        </h3>
-                        <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                          For many families living outside India, life is busy, scattered across work, school, and different time zones. We may feel connected to our deities in the heart, but regular, structured worship can become difficult. This pooja offers a beautiful way to reconnect as a family and as a community:
-                        </p>
+                        {(selectedService.details.specialForNRIsTitle || selectedService.details.sectionTitles?.nri) && (
+                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                            <Heart className="text-primary" size={24} weight="fill" />
+                            {selectedService.details.specialForNRIsTitle || selectedService.details.sectionTitles?.nri}
+                          </h3>
+                        )}
+                        {selectedService.details.specialForNRIsIntro && (
+                          <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+                            {selectedService.details.specialForNRIsIntro}
+                          </p>
+                        )}
                         <ul className="space-y-3">
                           {selectedService.details.specialForNRIs.map((item, index) => (
                             <li key={index} className="flex items-start gap-3">
@@ -922,91 +966,76 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                     </Card>
                   )}
 
-                  {/* Legacy sections for services without detailed info */}
-                  {!selectedService.details && (
-                    <>
-                      {/* Description */}
-                      {selectedService.detailedDescription && (
-                        <div>
-                          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                            <Info className="text-primary" size={20} />
-                            About This Service
-                          </h3>
-                          <div
-                            className="text-muted-foreground leading-relaxed prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{ __html: selectedService.detailedDescription }}
-                          />
-                        </div>
-                      )}
-
-                      {/* Benefits */}
-                      {selectedService.benefits && selectedService.benefits.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                            <Star className="text-primary" size={20} />
-                            Benefits
-                          </h3>
-                          <ul className="space-y-2">
-                            {selectedService.benefits.map((benefit, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                                <span className="text-muted-foreground">{benefit}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* What's Included */}
-                      {selectedService.includes && selectedService.includes.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                            <Package className="text-primary" size={20} />
-                            What's Included
-                          </h3>
-                          <ul className="space-y-2">
+                  {/* What's Included, Requirements, and Best For sections */}
+                  <>
+                    {/* What's Included */}
+                    {selectedService.includes && selectedService.includes.length > 0 && (
+                      <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
+                        <CardContent className="p-6">
+                          {selectedService.details?.sectionTitles?.includes && (
+                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                              <Package className="text-primary" size={24} weight="fill" />
+                              {selectedService.details.sectionTitles.includes}
+                            </h3>
+                          )}
+                          <ul className="space-y-3">
                             {selectedService.includes.map((item, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
+                              <li key={index} className="flex items-start gap-3">
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={20} weight="fill" />
                                 <span className="text-muted-foreground">{item}</span>
                               </li>
                             ))}
                           </ul>
-                        </div>
-                      )}
+                        </CardContent>
+                      </Card>
+                    )}
 
-                      {/* Requirements */}
-                      {selectedService.requirements && selectedService.requirements.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-lg mb-3">Requirements</h3>
-                          <ul className="space-y-2">
+                    {/* Requirements */}
+                    {selectedService.requirements && selectedService.requirements.length > 0 && (
+                      <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-orange-50">
+                        <CardContent className="p-6">
+                          {selectedService.details?.sectionTitles?.requirements && (
+                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                              <Info className="text-primary" size={24} />
+                              {selectedService.details.sectionTitles.requirements}
+                            </h3>
+                          )}
+                          <ul className="space-y-3">
                             {selectedService.requirements.map((req, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <span className="text-muted-foreground">• {req}</span>
+                              <li key={index} className="flex items-start gap-3">
+                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
+                                <span className="text-muted-foreground">{req}</span>
                               </li>
                             ))}
                           </ul>
-                        </div>
-                      )}
+                        </CardContent>
+                      </Card>
+                    )}
 
-                      {/* Best For */}
-                      {selectedService.bestFor && selectedService.bestFor.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-lg mb-3">Best For</h3>
+                    {/* Best For */}
+                    {selectedService.bestFor && selectedService.bestFor.length > 0 && (
+                      <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-pink-50">
+                        <CardContent className="p-6">
+                          {selectedService.details?.sectionTitles?.bestFor && (
+                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
+                              <Heart className="text-primary" size={24} weight="fill" />
+                              {selectedService.details.sectionTitles.bestFor}
+                            </h3>
+                          )}
                           <div className="flex flex-wrap gap-2">
                             {selectedService.bestFor.map((item, index) => (
                               <span
                                 key={index}
-                                className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full"
+                                className="text-sm font-medium bg-primary/10 text-primary px-4 py-2 rounded-full"
                               >
                                 {item}
                               </span>
                             ))}
                           </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-border flex gap-3">

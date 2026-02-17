@@ -159,7 +159,8 @@ export function usePhotos(params?: PhotosQueryParams) {
   const query = useQuery<PhotosResponse>({
     queryKey: [...PHOTOS_KEY, params],
     queryFn: () => fetchPhotos(params),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    staleTime: 30 * 60 * 1000, // Consider data fresh for 30 minutes
+    gcTime: 60 * 60 * 1000, // Keep in cache for 1 hour
     enabled: params?.enabled !== false, // Default to true, can be disabled
   })
 
