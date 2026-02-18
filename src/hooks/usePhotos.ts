@@ -23,13 +23,30 @@ const PHOTOS_KEY = ['media_files', 'images']
 /**
  * Map database MediaFileRow to UI Photo format
  */
+export const NO_CATEGORY_VALUE = 'no_category'
+
 function mapPhotoRowToPhoto(row: MediaFileRow): Photo {
   return {
     id: row.id,
     url: row.file_url,
     title: row.alt_text || row.original_name || row.file_name,
-    category: row.folder || 'general',
+    category: row.folder || NO_CATEGORY_VALUE,
   }
+}
+
+/**
+ * Bulk-reassign all photos that belong to `fromCategory` → `toCategory` in Supabase.
+ */
+export async function bulkReassignCategory(fromCategory: string, toCategory: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('media_files')
+    .update({ folder: toCategory })
+    .eq('folder', fromCategory)
+    .eq('file_type', 'image')
+    .select('id')
+
+  if (error) throw error
+  return data?.length ?? 0
 }
 
 export interface PhotosQueryParams {
@@ -37,6 +54,7 @@ export interface PhotosQueryParams {
   limit?: number
   search?: string
   category?: string
+  categories?: string[]   // multi-category filter (OR); takes precedence over `category`
   enabled?: boolean
 }
 
@@ -55,6 +73,7 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
   const limit = params?.limit || 25
   const search = params?.search?.toLowerCase()
   const category = params?.category
+  const categories = params?.categories
 
   let query = supabase
     .from('media_files')
@@ -66,8 +85,10 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
     query = query.or(`alt_text.ilike.%${search}%,original_name.ilike.%${search}%,file_name.ilike.%${search}%`)
   }
 
-  // Apply category filter
-  if (category && category !== 'all') {
+  // Multi-category filter takes precedence
+  if (categories && categories.length > 0) {
+    query = query.in('folder', categories)
+  } else if (category && category !== 'all') {
     query = query.eq('folder', category)
   }
 
@@ -244,7 +265,7 @@ export function convertLegacyPhoto(photo: {
     alt_text: photo.title,
     caption: null,
     description: null,
-    folder: photo.category || 'general',
+    folder: photo.category || NO_CATEGORY_VALUE,
     tags: null
   }
 }

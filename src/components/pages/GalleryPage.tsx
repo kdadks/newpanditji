@@ -3,6 +3,7 @@ import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useVideos, type Video } from '../../hooks/useVideos'
 import { usePhotos } from '../../hooks/usePhotos'
 import { useGalleryContent } from '../../hooks/useCmsContent'
+import { supabase } from '../../lib/supabase'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
@@ -22,23 +23,47 @@ export default function GalleryPage() {
 
   const { content: galleryContent, isLoading: loadingGalleryContent } = useGalleryContent()
   const { videos, isLoading: loadingVideos } = useVideos()
-  const [selectedPhotoCategory, setSelectedPhotoCategory] = useState<string>('all')
+
+  // ── Published gallery categories ──────────────────────────────────────────
+  // Loaded from site_metadata; empty set = no filter applied (show all).
+  const [publishedCats, setPublishedCats] = useState<string[]>([])
+  const [loadingPublished, setLoadingPublished] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .from('site_metadata')
+      .select('setting_value')
+      .eq('setting_key', 'gallery_published_categories')
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.setting_value) {
+          try { setPublishedCats(JSON.parse(data.setting_value)) } catch { /* ignore */ }
+        }
+        setLoadingPublished(false)
+      })
+  }, [])
+
   const [photoPage, setPhotoPage] = useState(1)
   const photoPageSize = 24
+
+  // Show only published categories; if none configured show all
+  const photosCategories: string[] | undefined =
+    publishedCats.length > 0 ? publishedCats : undefined
+
   const { photos, isLoading: loadingPhotos, total: totalPhotos, totalPages: photoTotalPages } = usePhotos({
     page: photoPage,
     limit: photoPageSize,
-    category: selectedPhotoCategory !== 'all' ? selectedPhotoCategory : undefined
+    categories: photosCategories
   })
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
   const [lightboxPhoto, setLightboxPhoto] = useState<{ url: string; title: string } | null>(null)
 
-  // Reset to page 1 when category changes
+  // Reset to page 1 when published set changes
   useEffect(() => {
     setPhotoPage(1)
-  }, [selectedPhotoCategory])
+  }, [publishedCats])
 
   const filteredVideos = selectedVideoCategory === 'all'
     ? videos
@@ -377,31 +402,6 @@ export default function GalleryPage() {
           </TabsContent>
 
           <TabsContent value="photos">
-            {/* Photo Category Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mb-5">
-              {[
-                { value: 'all', label: 'All Photos', icon: '📸' },
-                { value: 'gallery', label: 'Gallery', icon: '🖼️' },
-                { value: 'ceremony', label: 'Ceremonies', icon: '🪔' },
-                { value: 'pooja', label: 'Pooja', icon: '🙏' },
-                { value: 'wedding', label: 'Weddings', icon: '💒' },
-                { value: 'charity', label: 'Charity', icon: '❤️' },
-                { value: 'events', label: 'Events', icon: '🎉' },
-                { value: 'books', label: 'Books', icon: '📚' },
-                { value: 'general', label: 'General', icon: '📁' },
-              ].map((cat) => (
-                <Button
-                  key={cat.value}
-                  variant={selectedPhotoCategory === cat.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedPhotoCategory(cat.value)}
-                  className="rounded-full"
-                >
-                  <span className="mr-1.5">{cat.icon}</span>
-                  {cat.label}
-                </Button>
-              ))}
-            </div>
 
             {loadingPhotos ? (
               <div className="flex justify-center items-center py-7">
@@ -418,26 +418,14 @@ export default function GalleryPage() {
                   </div>
 
                   <h3 className="font-heading font-semibold text-2xl mb-4">
-                    {selectedPhotoCategory !== 'all' 
-                      ? `No photos in this category yet` 
-                      : 'Photo Gallery Coming Soon'
-                    }
+                    Photo Gallery Coming Soon
                   </h3>
 
                   <p className="text-muted-foreground text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
-                    {selectedPhotoCategory !== 'all'
-                      ? 'Try selecting a different category or browse all photos.'
-                      : 'We\'re carefully curating a beautiful collection of ceremony photographs that capture the sacred moments and spiritual essence of Hindu traditions.'
-                    }
+                    We're carefully curating a beautiful collection of ceremony photographs that capture the sacred moments and spiritual essence of Hindu traditions.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    {selectedPhotoCategory !== 'all' && (
-                      <Button variant="outline" className="px-6" onClick={() => setSelectedPhotoCategory('all')}>
-                        <Images className="mr-2" size={18} />
-                        View All Photos
-                      </Button>
-                    )}
                     <Button variant="outline" className="px-6" onClick={() => setActiveTab('videos')}>
                       <PlayCircle className="mr-2" size={18} />
                       Browse Videos Instead
@@ -471,9 +459,6 @@ export default function GalleryPage() {
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <p className="text-white text-sm font-medium truncate drop-shadow-lg">{photo.title}</p>
-                        <Badge className="mt-1 bg-white/20 text-white border-white/30 text-[10px] capitalize">
-                          {photo.category}
-                        </Badge>
                       </div>
                     </div>
                     ) : (
@@ -501,9 +486,6 @@ export default function GalleryPage() {
                           <h3 className="font-heading font-semibold text-base mb-1 group-hover:text-primary transition-colors truncate">
                             {photo.title}
                           </h3>
-                          <Badge className="capitalize text-[11px]">
-                            {photo.category}
-                          </Badge>
                         </div>
                       </CardContent>
                     </Card>

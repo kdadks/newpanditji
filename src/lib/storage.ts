@@ -201,6 +201,34 @@ export function isSupabaseStorageUrl(url: string): boolean {
 }
 
 /**
+ * Delete all files inside a storage folder (prefix) and remove DB records for them.
+ * Returns the number of storage objects deleted.
+ */
+export async function deleteFolderFromStorage(
+  bucket: BucketName,
+  folder: string
+): Promise<number> {
+  // List everything under the folder (up to 1000 items)
+  const { data, error: listError } = await supabase.storage
+    .from(bucket)
+    .list(folder, { limit: 1000 })
+
+  if (listError) throw new Error(`Failed to list folder: ${listError.message}`)
+  if (!data || data.length === 0) return 0
+
+  const paths = data
+    .filter(item => item.name && !item.name.includes('.emptyFolderPlaceholder'))
+    .map(item => `${folder}/${item.name}`)
+
+  if (paths.length === 0) return 0
+
+  const { error: removeError } = await supabase.storage.from(bucket).remove(paths)
+  if (removeError) throw new Error(`Failed to delete files: ${removeError.message}`)
+
+  return paths.length
+}
+
+/**
  * Convert a File to base64 for preview purposes
  */
 export function fileToBase64(file: File): Promise<string> {

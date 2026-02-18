@@ -46,3 +46,6 @@ pids
 # Local Netlify folder
 .netlify
 .vercel
+
+# TypeScript incremental build cache
+*.tsbuildinfo

@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
-import { usePhotos, convertLegacyPhoto, type Photo } from '../../hooks/usePhotos'
+import { useState, useRef, useEffect } from 'react'
+import { usePhotos, convertLegacyPhoto, bulkReassignCategory, NO_CATEGORY_VALUE, type Photo } from '../../hooks/usePhotos'
 import { uploadImage, deleteFile, BUCKETS, extractPathFromUrl, isSupabaseStorageUrl, fileToBase64 } from '../../lib/storage'
-import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images, Eye, CaretLeft, CaretRight } from '@phosphor-icons/react'
+import { supabase } from '../../lib/supabase'
+import { Plus, Trash, Upload, PencilSimple, FloppyDisk, X, Spinner, Image as ImageIcon, CloudArrowUp, MagnifyingGlass, Package, Camera, FolderSimple, FileImage, Link, CheckCircle, WarningCircle, Images, Eye, CaretLeft, CaretRight, GearSix, Globe, EyeSlash } from '@phosphor-icons/react'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -65,9 +66,192 @@ export default function AdminPhotos() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const bulkFileInputRef = useRef<HTMLInputElement>(null)
 
-  // All available categories
-  const allCategories = ['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general']
-  const categories = allCategories
+  // ── Category management ──────────────────────────────────────────────────
+  const INITIAL_CATEGORIES = [
+    { value: 'books',    label: '📚 Books' },
+    { value: 'gallery',  label: '🖼️ Gallery' },
+    { value: 'ceremony', label: '🪔 Ceremony' },
+    { value: 'pooja',    label: '🙏 Pooja' },
+    { value: 'wedding',  label: '💒 Wedding' },
+    { value: 'charity',  label: '❤️ Charity' },
+    { value: 'events',   label: '🎉 Events' },
+    { value: 'general',  label: '📁 General' },
+  ]
+
+  const loadCategories = (): { value: string; label: string }[] => {
+    try {
+      const stored = localStorage.getItem('photo_categories')
+      if (stored) return JSON.parse(stored)
+    } catch { /* ignore */ }
+    return INITIAL_CATEGORIES
+  }
+
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>(loadCategories)
+  // The permanent "No Category" entry – always present, never deletable
+  const NO_CATEGORY_ENTRY = { value: NO_CATEGORY_VALUE, label: '🏷️ No Category' }
+
+  const [isCatManagerOpen, setIsCatManagerOpen] = useState(false)
+  const [catEditIndex, setCatEditIndex] = useState<number | null>(null)
+  const [catEditIcon, setCatEditIcon] = useState('')
+  const [catEditName, setCatEditName] = useState('')
+  const [newCatIcon, setNewCatIcon] = useState('')
+  const [newCatName, setNewCatName] = useState('')
+  const [catDeleting, setCatDeleting] = useState<number | null>(null)
+  const [inlineAssigning, setInlineAssigning] = useState<string | null>(null)
+
+  // ── Gallery publish state ────────────────────────────────────────────────
+  // Which category values are published to the public /gallery page.
+  // Persisted in site_metadata under key 'gallery_published_categories' (JSON array).
+  const METADATA_KEY = 'gallery_published_categories'
+  const [publishedCats, setPublishedCats] = useState<Set<string>>(new Set())
+  const [publishSaving, setPublishSaving] = useState(false)
+
+  useEffect(() => {
+    supabase
+      .from('site_metadata')
+      .select('setting_value')
+      .eq('setting_key', METADATA_KEY)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.setting_value) {
+          try { setPublishedCats(new Set(JSON.parse(data.setting_value))) } catch { /* ignore */ }
+        }
+      })
+  }, [])
+
+  const togglePublishCat = async (catValue: string) => {
+    const prev = new Set(publishedCats)           // capture before mutating for rollback
+    const next = new Set(prev)
+    if (next.has(catValue)) next.delete(catValue); else next.add(catValue)
+    setPublishedCats(next)                        // optimistic update
+    setPublishSaving(true)
+    try {
+      const payload = JSON.stringify([...next])
+
+      // Check if a row already exists for this key
+      const { data: existing, error: selectErr } = await supabase
+        .from('site_metadata')
+        .select('id')
+        .eq('setting_key', METADATA_KEY)
+        .maybeSingle()
+
+      if (selectErr) {
+        console.error('[togglePublishCat] SELECT error:', selectErr)
+        throw selectErr
+      }
+
+      let writeError: { message: string; code?: string } | null = null
+      if (existing?.id) {
+        // Row exists — UPDATE
+        const { error } = await supabase
+          .from('site_metadata')
+          .update({ setting_value: payload, updated_at: new Date().toISOString() })
+          .eq('setting_key', METADATA_KEY)
+        writeError = error
+      } else {
+        // No row yet — INSERT
+        const { error } = await supabase
+          .from('site_metadata')
+          .insert({ setting_key: METADATA_KEY, setting_value: payload, setting_type: 'json', category: 'gallery', description: 'Categories published to the public gallery page' })
+        writeError = error
+      }
+
+      if (writeError) {
+        console.error('[togglePublishCat] write error:', writeError)
+        throw writeError
+      }
+
+      toast.success(next.has(catValue) ? 'Category published to gallery' : 'Category hidden from gallery')
+    } catch (err) {
+      console.error('[togglePublishCat] failed:', err)
+      setPublishedCats(prev)                      // reliable rollback
+      toast.error('Failed to save gallery visibility. Please try again.')
+    } finally {
+      setPublishSaving(false)
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Common emoji presets for quick picking
+  const ICON_PRESETS = ['📚','🖼️','🪔','🙏','💒','❤️','🎉','📁','🎊','🌸','🕉️','🔱','🪷','🏛️','🎭','🌺','📿','🪅','🎆','🏔️','🌄','🌟','🎶','🛕','🌼','🌻','🎑','🎐','🎇','🪬']
+
+  const persistCategories = (cats: { value: string; label: string }[]) => {
+    localStorage.setItem('photo_categories', JSON.stringify(cats))
+    setCategories(cats)
+  }
+
+  const buildLabel = (icon: string, name: string) =>
+    icon.trim() ? `${icon.trim()} ${name.trim()}` : name.trim()
+
+  const splitLabel = (label: string): { icon: string; name: string } => {
+    // Grab a leading emoji cluster if present
+    const match = label.match(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*/u)
+    if (match) return { icon: match[0].trimEnd(), name: label.slice(match[0].length) }
+    return { icon: '', name: label }
+  }
+
+  const handleAddCategory = () => {
+    const name = newCatName.trim()
+    if (!name) { toast.error('Category name is required'); return }
+    const val = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+    if (!val) { toast.error('Category name must contain letters or numbers'); return }
+    if (categories.some(c => c.value === val)) { toast.error('Category already exists'); return }
+    const lbl = buildLabel(newCatIcon, name)
+    persistCategories([...categories, { value: val, label: lbl }])
+    setNewCatIcon('')
+    setNewCatName('')
+    toast.success(`Category "${lbl}" added`)
+  }
+
+  const handleStartEditCat = (idx: number) => {
+    const parts = splitLabel(categories[idx].label)
+    setCatEditIndex(idx)
+    setCatEditIcon(parts.icon)
+    setCatEditName(parts.name)
+  }
+
+  const handleSaveEditCat = (idx: number) => {
+    const name = catEditName.trim()
+    if (!name) { toast.error('Category name is required'); return }
+    const val = categories[idx].value // keep original value/key unchanged on rename
+    const lbl = buildLabel(catEditIcon, name)
+    const updated = categories.map((c, i) => i === idx ? { value: val, label: lbl } : c)
+    persistCategories(updated)
+    setCatEditIndex(null)
+    toast.success('Category updated')
+  }
+
+  const handleDeleteCat = async (idx: number) => {
+    const cat = categories[idx]
+    if (cat.value === NO_CATEGORY_VALUE) return
+    setCatDeleting(idx)
+    try {
+      // Reassign all photos in this category → no_category in the DB.
+      // Files in Supabase Storage are NOT deleted; they keep their URLs.
+      const moved = await bulkReassignCategory(cat.value, NO_CATEGORY_VALUE)
+      // Remove from local category list
+      persistCategories(categories.filter((_, i) => i !== idx))
+      toast.success(
+        moved > 0
+          ? `Category "${cat.label}" deleted. ${moved} photo(s) moved to "No Category" — assign them a new category anytime.`
+          : `Category "${cat.label}" deleted.`
+      )
+    } catch (err) {
+      toast.error('Failed to delete category. Please try again.')
+    } finally {
+      setCatDeleting(null)
+    }
+  }
+
+  // Inline quick-assign category for a photo directly from the grid badge
+  const handleInlineAssign = async (photo: Photo, newCat: string) => {
+    setInlineAssigning(photo.id)
+    try {
+      await updatePhoto({ id: photo.id, folder: newCat })
+    } catch { /* toast handled by hook */ }
+    finally { setInlineAssigning(null) }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   // Reset to page 1 when filters change
   const handleSearchChange = (value: string) => {
@@ -85,7 +269,7 @@ export default function AdminPhotos() {
       id: '',
       url: '',
       title: '',
-      category: 'ceremony'
+      category: NO_CATEGORY_VALUE
     })
     setEditingPhoto(null)
     setPreviewUrl(null)
@@ -410,6 +594,10 @@ export default function AdminPhotos() {
           <p className="text-sm text-muted-foreground">{total} photos</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => setIsCatManagerOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Manage Categories">
+            <GearSix size={16} weight="bold" />
+            Categories
+          </Button>
           <Button onClick={handleBulkAdd} variant="outline" size="sm" className="gap-1.5">
             <Images size={16} weight="bold" />
             Bulk
@@ -438,14 +626,10 @@ export default function AdminPhotos() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="books">📚 Books</SelectItem>
-            <SelectItem value="gallery">🖼️ Gallery</SelectItem>
-            <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
-            <SelectItem value="pooja">🙏 Pooja</SelectItem>
-            <SelectItem value="wedding">💒 Wedding</SelectItem>
-            <SelectItem value="charity">❤️ Charity</SelectItem>
-            <SelectItem value="events">🎉 Events</SelectItem>
-            <SelectItem value="general">📁 General</SelectItem>
+            <SelectItem value={NO_CATEGORY_VALUE}>{NO_CATEGORY_ENTRY.label}</SelectItem>
+            {categories.map(cat => (
+              <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -521,11 +705,33 @@ export default function AdminPhotos() {
                 </div>
                 <div className="text-white text-xs truncate">{photo.title}</div>
               </div>
-              {/* Category badge */}
-              <div className="absolute bottom-1.5 left-1.5 group-hover:opacity-0 transition-opacity pointer-events-none">
-                <span className="bg-white/90 text-gray-800 text-[10px] font-medium px-1.5 py-0.5 rounded truncate block">
-                  {photo.category ? photo.category.charAt(0).toUpperCase() + photo.category.slice(1) : ''}
-                </span>
+              {/* Category badge – click to quick-assign */}
+              <div
+                className="absolute bottom-1.5 left-1.5 group-hover:opacity-0 transition-opacity z-10"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {inlineAssigning === photo.id ? (
+                  <span className="bg-white/90 text-gray-600 text-[10px] font-medium px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <Spinner size={10} className="animate-spin" /> saving…
+                  </span>
+                ) : (
+                  <select
+                    value={photo.category || NO_CATEGORY_VALUE}
+                    onChange={(e) => { e.stopPropagation(); handleInlineAssign(photo, e.target.value) }}
+                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded border-0 cursor-pointer shadow-sm outline-none appearance-none ${
+                      photo.category === NO_CATEGORY_VALUE || !photo.category
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-white/90 text-gray-800'
+                    }`}
+                    title="Click to change category"
+                    style={{ maxWidth: '90px' }}
+                  >
+                    <option value={NO_CATEGORY_VALUE}>🏷️ No Category</option>
+                    {categories.map(cat => (
+                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
           ))}
@@ -672,14 +878,10 @@ export default function AdminPhotos() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="books">📚 Books</SelectItem>
-                          <SelectItem value="gallery">🖼️ Gallery</SelectItem>
-                          <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
-                          <SelectItem value="pooja">🙏 Pooja</SelectItem>
-                          <SelectItem value="wedding">💒 Wedding</SelectItem>
-                          <SelectItem value="charity">❤️ Charity</SelectItem>
-                          <SelectItem value="events">🎉 Events</SelectItem>
-                          <SelectItem value="general">📁 General</SelectItem>
+                          <SelectItem value={NO_CATEGORY_VALUE}>{NO_CATEGORY_ENTRY.label}</SelectItem>
+                          {categories.map(cat => (
+                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </CardContent>
@@ -995,30 +1197,26 @@ export default function AdminPhotos() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="books">📚 Books</SelectItem>
-                                <SelectItem value="gallery">🖼️ Gallery</SelectItem>
-                                <SelectItem value="ceremony">🪔 Ceremony</SelectItem>
-                                <SelectItem value="pooja">🙏 Pooja</SelectItem>
-                                <SelectItem value="wedding">💒 Wedding</SelectItem>
-                                <SelectItem value="charity">❤️ Charity</SelectItem>
-                                <SelectItem value="events">🎉 Events</SelectItem>
-                                <SelectItem value="general">📁 General</SelectItem>
+                                <SelectItem value={NO_CATEGORY_VALUE}>{NO_CATEGORY_ENTRY.label}</SelectItem>
+                                {categories.map(cat => (
+                                  <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             
                             <div className="flex flex-wrap gap-2 mt-3">
-                              {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map((cat) => (
+                              {[NO_CATEGORY_ENTRY, ...categories].map((cat) => (
                                 <Badge 
-                                  key={cat}
+                                  key={cat.value}
                                   variant="outline" 
                                   className={`cursor-pointer transition-all capitalize ${
-                                    formData.category === cat 
+                                    formData.category === cat.value 
                                       ? 'bg-indigo-100 border-indigo-300 text-indigo-700' 
                                       : 'hover:bg-indigo-50'
                                   }`}
-                                  onClick={() => setFormData({ ...formData, category: cat })}
+                                  onClick={() => setFormData({ ...formData, category: cat.value })}
                                 >
-                                  {cat}
+                                  {cat.label}
                                 </Badge>
                               ))}
                             </div>
@@ -1167,9 +1365,18 @@ export default function AdminPhotos() {
                 </div>
                 <div className="p-4 bg-background">
                   <h3 className="font-semibold">{previewPhoto.title}</h3>
-                  <span className="bg-white/90 text-gray-800 text-xs font-medium px-2 py-0.5 rounded mt-2 inline-block border">
-                    {previewPhoto.category ? previewPhoto.category.charAt(0).toUpperCase() + previewPhoto.category.slice(1) : ''}
-                  </span>
+                  {(() => {
+                    const cat = previewPhoto.category
+                    const isNoCat = !cat || cat === NO_CATEGORY_VALUE
+                    const label = isNoCat
+                      ? NO_CATEGORY_ENTRY.label
+                      : (categories.find(c => c.value === cat)?.label ?? cat.charAt(0).toUpperCase() + cat.slice(1))
+                    return (
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded mt-2 inline-block border ${isNoCat ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white/90 text-gray-800'}`}>
+                        {label}
+                      </span>
+                    )
+                  })()}
                 </div>
               </>
             )}
@@ -1185,6 +1392,251 @@ export default function AdminPhotos() {
         itemName={photoToDelete?.title}
         isDeleting={isDeleting}
       />
+
+      {/* ── Category Manager Dialog ──────────────────────────────── */}
+      <Dialog open={isCatManagerOpen} onOpenChange={setIsCatManagerOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden p-0 bg-background">
+          {/* Header */}
+          <div className="relative overflow-hidden bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 px-6 py-5">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                <GearSix className="h-6 w-6 text-white" weight="duotone" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white">Manage Categories</DialogTitle>
+                <DialogDescription className="text-purple-100 text-sm">
+                  Add, rename or remove photo categories
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col overflow-hidden" style={{ maxHeight: 'calc(85vh - 120px)' }}>
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+              {/* ── Add New Category ── */}
+              <Card className="border-2 border-green-100">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100">
+                      <Plus className="h-4 w-4 text-green-600" weight="bold" />
+                    </div>
+                    <h3 className="font-semibold text-green-900 text-sm">Add New Category</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {/* Icon picker */}
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                        Icon <span className="font-normal">(pick or type any emoji)</span>
+                      </Label>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {ICON_PRESETS.map(emoji => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => setNewCatIcon(emoji)}
+                            className={`text-lg rounded p-0.5 transition-all hover:scale-110 ${newCatIcon === emoji ? 'ring-2 ring-green-500 bg-green-50' : 'hover:bg-muted'}`}
+                            title={emoji}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                      <Input
+                        value={newCatIcon}
+                        onChange={(e) => setNewCatIcon(e.target.value)}
+                        placeholder="Or type any emoji…"
+                        className="h-9 text-lg"
+                        maxLength={8}
+                      />
+                    </div>
+                    {/* Name */}
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1 block">
+                        Category Name <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        value={newCatName}
+                        onChange={(e) => setNewCatName(e.target.value)}
+                        placeholder="e.g. Festival"
+                        className="h-9"
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                      />
+                      {newCatName.trim() && (
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          Preview: <span className="font-medium">{buildLabel(newCatIcon, newCatName)}</span>
+                          &nbsp;·&nbsp;key: <code className="bg-muted px-1 rounded">{newCatName.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')}</code>
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handleAddCategory}
+                      size="sm"
+                      className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Plus size={14} weight="bold" />
+                      Add Category
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ── Existing Categories ── */}
+              <Card className="border-2 border-indigo-100">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100">
+                      <FolderSimple className="h-4 w-4 text-indigo-600" weight="duotone" />
+                    </div>
+                    <h3 className="font-semibold text-indigo-900 text-sm flex-1">
+                      Existing Categories <span className="ml-1 text-muted-foreground font-normal">({categories.length + 1})</span>
+                    </h3>
+                    {publishedCats.size > 0 && (
+                      <span className="text-[11px] text-green-700 bg-green-100 px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                        <Globe size={10} weight="bold" /> {publishedCats.size} published
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {/* No Category – permanent, non-deletable, not publishable */}
+                    <div className="rounded-lg border-2 border-amber-200 bg-amber-50 px-3 py-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <span className="text-sm font-medium">{NO_CATEGORY_ENTRY.label}</span>
+                          <span className="ml-2 text-xs text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">{NO_CATEGORY_ENTRY.value}</span>
+                        </div>
+                        <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-medium shrink-0">default fallback · not publishable</span>
+                      </div>
+                    </div>
+
+                    {/* Header row */}
+                    <div className="flex items-center px-1 pb-0.5">
+                      <span className="flex-1 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Category</span>
+                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mr-1 flex items-center gap-1">
+                        <Globe size={10} /> Publish to Gallery
+                      </span>
+                    </div>
+
+                    {categories.map((cat, idx) => {
+                      const isPublished = publishedCats.has(cat.value)
+                      return (
+                      <div key={cat.value} className={`rounded-lg border px-3 py-2 transition-colors ${isPublished ? 'border-green-300 bg-green-50' : 'bg-muted/30'}`}>
+                        {catEditIndex === idx ? (
+                          /* Edit mode */
+                          <div className="space-y-1.5">
+                            {/* Icon picker row */}
+                            <div className="flex flex-wrap gap-1 mb-1">
+                              {ICON_PRESETS.slice(0, 15).map(emoji => (
+                                <button
+                                  key={emoji}
+                                  type="button"
+                                  onClick={() => setCatEditIcon(emoji)}
+                                  className={`text-base rounded p-0.5 transition-all hover:scale-110 ${catEditIcon === emoji ? 'ring-2 ring-indigo-400 bg-indigo-50' : 'hover:bg-muted'}`}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                            <div className="flex gap-1.5">
+                              <Input
+                                value={catEditIcon}
+                                onChange={(e) => setCatEditIcon(e.target.value)}
+                                placeholder="Icon"
+                                className="h-8 text-sm w-16 text-center"
+                                maxLength={8}
+                              />
+                              <Input
+                                value={catEditName}
+                                onChange={(e) => setCatEditName(e.target.value)}
+                                placeholder="Category name"
+                                className="h-8 text-sm flex-1"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="flex gap-1.5 pt-1">
+                              <Button
+                                size="sm"
+                                className="h-7 gap-1 flex-1 text-xs"
+                                onClick={() => handleSaveEditCat(idx)}
+                              >
+                                <FloppyDisk size={12} weight="bold" /> Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 gap-1 text-xs"
+                                onClick={() => setCatEditIndex(null)}
+                              >
+                                <X size={12} /> Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* View mode */
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <span className="text-sm font-medium">{cat.label}</span>
+                              <span className="ml-2 text-xs text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">{cat.value}</span>
+                              {isPublished && (
+                                <span className="ml-2 text-[10px] text-green-700 bg-green-100 px-1.5 py-0.5 rounded font-medium">live</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {/* Publish toggle */}
+                              <Button
+                                size="icon"
+                                variant={isPublished ? 'default' : 'ghost'}
+                                className={`h-7 w-7 ${isPublished ? 'bg-green-600 hover:bg-green-700 text-white' : 'text-muted-foreground hover:text-green-600 hover:bg-green-50'}`}
+                                onClick={() => togglePublishCat(cat.value)}
+                                title={isPublished ? 'Published on gallery — click to unpublish' : 'Click to publish to gallery'}
+                                disabled={publishSaving}
+                              >
+                                {publishSaving ? <Spinner size={11} className="animate-spin" /> : isPublished ? <Globe size={13} weight="bold" /> : <EyeSlash size={13} weight="bold" />}
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-indigo-600 hover:bg-indigo-50"
+                                onClick={() => handleStartEditCat(idx)}
+                                title="Rename"
+                                disabled={catDeleting === idx}
+                              >
+                                <PencilSimple size={13} weight="bold" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDeleteCat(idx)}
+                                title="Delete – photos will be moved to No Category"
+                                disabled={catDeleting !== null}
+                              >
+                                {catDeleting === idx
+                                  ? <Spinner size={13} className="animate-spin" />
+                                  : <Trash size={13} weight="bold" />}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t bg-muted/30 px-6 py-4 flex justify-end">
+              <Button variant="outline" onClick={() => setIsCatManagerOpen(false)}>
+                <X className="h-4 w-4 mr-2" /> Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
