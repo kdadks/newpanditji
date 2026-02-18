@@ -105,7 +105,7 @@ export default function TestimonialsPage() {
       <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 gap-5 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-16">
           {isLoading ? (
             // Loading skeleton
             Array.from({ length: 4 }).map((_, index) => (
@@ -134,52 +134,47 @@ export default function TestimonialsPage() {
               <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80">
                 <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <CardContent className="relative p-4">
-                  <div className="flex gap-5 items-start">
-
-                    {/* LEFT: Photo + meta */}
-                    <div className="shrink-0 w-[300px] flex flex-col gap-1.5">
-                      {testimonial.client_image_url ? (
-                        <img
-                          src={testimonial.client_image_url}
-                          alt={testimonial.client_name}
-                          className="w-[300px] h-auto rounded-lg object-cover shadow-lg border-2 border-primary/15"
-                        />
-                      ) : (
-                        <div className="w-[300px] h-[300px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
-                          <span className="text-4xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
-                        </div>
-                      )}
-                      <p className="font-semibold text-foreground text-sm leading-tight text-center">{testimonial.client_name}</p>
-                      {testimonial.client_location && (
-                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
-                          <MapPin size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
-                          <span>{testimonial.client_location}</span>
-                        </div>
-                      )}
-                      {testimonial.service_name && (
-                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
-                          <Tag size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
-                          <span className="font-bold">{testimonial.service_name}</span>
-                        </div>
-                      )}
-                      {testimonial.created_at && (
-                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
-                          <CalendarBlank size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
-                          <span>{new Date(testimonial.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* RIGHT: Verified badge + text */}
-                    <div className="flex-1 min-w-0">
-                      <div className="inline-flex items-center gap-1.5 mb-3 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded">
-                        <CheckCircle size={13} weight="fill" className="shrink-0" />
-                        Verified
+                  {/* Float image + meta left so text wraps around it */}
+                  <div className="float-left mr-4 mb-2 w-[300px] flex flex-col gap-1.5">
+                    {testimonial.client_image_url ? (
+                      <img
+                        src={testimonial.client_image_url}
+                        alt={testimonial.client_name}
+                        className="w-[300px] h-auto rounded-lg object-cover shadow-lg border-2 border-primary/15"
+                      />
+                    ) : (
+                      <div className="w-[300px] h-[300px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
+                        <span className="text-4xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
                       </div>
-                      <p className="text-foreground leading-relaxed text-sm text-justify">{testimonial.testimonial_text}</p>
-                    </div>
-
+                    )}
+                    <p className="font-semibold text-foreground text-sm leading-tight text-center">{testimonial.client_name}</p>
+                    {testimonial.client_location && (
+                      <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                        <MapPin size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                        <span>{testimonial.client_location}</span>
+                      </div>
+                    )}
+                    {testimonial.service_name && (
+                      <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                        <Tag size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                        <span className="font-bold">{testimonial.service_name}</span>
+                      </div>
+                    )}
+                    {testimonial.created_at && (
+                      <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                        <CalendarBlank size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                        <span>{new Date(testimonial.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Text flows around the float */}
+                  <div className="inline-flex items-center gap-1.5 mb-2 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded">
+                    <CheckCircle size={13} weight="fill" className="shrink-0" />
+                    Verified
+                  </div>
+                  <p className="text-foreground leading-relaxed text-sm text-justify">{testimonial.testimonial_text}</p>
+                  <div className="clear-both"></div>
                 </CardContent>
               </Card>
             ))
