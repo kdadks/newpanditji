@@ -89,7 +89,12 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
   if (categories && categories.length > 0) {
     query = query.in('folder', categories)
   } else if (category && category !== 'all') {
-    query = query.eq('folder', category)
+    if (category === NO_CATEGORY_VALUE) {
+      // Match rows where folder is null or explicitly set to 'no_category'
+      query = query.or(`folder.is.null,folder.eq.${NO_CATEGORY_VALUE}`)
+    } else {
+      query = query.eq('folder', category)
+    }
   }
 
   // Apply pagination
@@ -106,6 +111,8 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
     console.error('Error fetching photos:', error)
     throw error
   }
+
+  console.debug('[usePhotos] fetch result:', { category, categories, page, total: count, rows: data?.length })
 
   const total = count || 0
   const totalPages = Math.ceil(total / limit)
@@ -180,7 +187,7 @@ export function usePhotos(params?: PhotosQueryParams) {
   const query = useQuery<PhotosResponse>({
     queryKey: [...PHOTOS_KEY, params],
     queryFn: () => fetchPhotos(params),
-    staleTime: 30 * 60 * 1000, // Consider data fresh for 30 minutes
+    staleTime: 0, // Always fetch fresh data so filters/pagination work correctly
     gcTime: 60 * 60 * 1000, // Keep in cache for 1 hour
     enabled: params?.enabled !== false, // Default to true, can be disabled
   })
