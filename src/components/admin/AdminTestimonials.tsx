@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, ChatCircleText, Star, User, MapPin, Certificate, Quotes } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, ChatCircleText, Star, User, MapPin, Certificate, Quotes, CalendarBlank } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -11,6 +11,7 @@ import { MediaPickerInput } from '../ui/media-picker'
 import { toast } from 'sonner'
 import { useTestimonials, useCreateTestimonial, useUpdateTestimonial, useDeleteTestimonial } from '../../hooks/useTestimonials'
 import { TestimonialRow } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 interface TestimonialFormData {
@@ -22,11 +23,12 @@ interface TestimonialFormData {
   content: string
   verified: boolean
   imageUrl: string
+  publishedDate: string
 }
 
 export default function AdminTestimonials() {
   // Database hooks
-  const { data: testimonials = [], isLoading } = useTestimonials()
+  const { data: testimonials = [], isLoading, refetch: refetchTestimonials } = useTestimonials()
   const createTestimonialMutation = useCreateTestimonial()
   const updateTestimonialMutation = useUpdateTestimonial()
   const deleteTestimonialMutation = useDeleteTestimonial()
@@ -45,7 +47,8 @@ export default function AdminTestimonials() {
     rating: 5,
     content: '',
     verified: false,
-    imageUrl: ''
+    imageUrl: '',
+    publishedDate: new Date().toISOString().slice(0, 10)
   })
 
   const handleAdd = () => {
@@ -57,7 +60,8 @@ export default function AdminTestimonials() {
       rating: 5,
       content: '',
       verified: false,
-      imageUrl: ''
+      imageUrl: '',
+      publishedDate: new Date().toISOString().slice(0, 10)
     })
     setEditingTestimonial(null)
     setCurrentTab('customer')
@@ -73,7 +77,8 @@ export default function AdminTestimonials() {
       rating: testimonial.rating || 5,
       content: testimonial.testimonial_text,
       verified: testimonial.is_approved,
-      imageUrl: testimonial.client_image_url || ''
+      imageUrl: testimonial.client_image_url || '',
+      publishedDate: testimonial.created_at ? testimonial.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)
     })
     setEditingTestimonial(testimonial)
     setCurrentTab('customer')
@@ -100,6 +105,14 @@ export default function AdminTestimonials() {
           is_approved: formData.verified,
           is_published: formData.verified, // Publish when approved
         })
+        // Update created_at (published date) separately as it's not in TestimonialUpdate
+        if (formData.publishedDate) {
+          await supabase
+            .from('testimonials')
+            .update({ created_at: new Date(formData.publishedDate).toISOString() })
+            .eq('id', editingTestimonial.id)
+          await refetchTestimonials()
+        }
         toast.success('Testimonial updated successfully')
       } else {
         await createTestimonialMutation.mutateAsync({
@@ -414,6 +427,29 @@ export default function AdminTestimonials() {
                           <p className="text-xs text-green-600 mt-0.5">Verified testimonials show a badge indicating authenticity</p>
                         </div>
                       </label>
+                    </CardContent>
+                  </Card>
+
+                  {/* Published Date */}
+                  <Card className="border-2 border-blue-100 bg-background!">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                          <CalendarBlank className="h-4 w-4 text-blue-600" weight="duotone" />
+                        </div>
+                        <h3 className="font-semibold text-blue-900">Published Date</h3>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="publishedDate" className="text-sm font-medium">Date shown on testimonial</Label>
+                        <Input
+                          id="publishedDate"
+                          type="date"
+                          value={formData.publishedDate}
+                          onChange={(e) => setFormData({ ...formData, publishedDate: e.target.value })}
+                          className="h-11 bg-background"
+                          disabled={isSaving}
+                        />
+                      </div>
                     </CardContent>
                   </Card>
                 </div>

@@ -2,7 +2,7 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
-import { Star, Quotes, Sparkle, Heart, Trophy, Users } from '@phosphor-icons/react'
+import { Sparkle, Heart, Trophy, Users, CheckCircle, MapPin, CalendarBlank, Tag, Star, Quotes } from '@phosphor-icons/react'
 import { usePublishedTestimonials } from '../../hooks/useTestimonials'
 import { useTestimonialsContent } from '../../hooks/useCmsContent'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
@@ -105,25 +105,20 @@ export default function TestimonialsPage() {
       <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 gap-5 mb-16">
           {isLoading ? (
             // Loading skeleton
-            Array.from({ length: 6 }).map((_, index) => (
+            Array.from({ length: 4 }).map((_, index) => (
               <Card key={index} className="group relative overflow-hidden border-0 shadow-lg bg-linear-to-br from-card to-card/80">
-                <CardContent className="relative p-6">
-                  <div className="animate-pulse">
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="w-4 h-4 bg-muted rounded"></div>
-                      ))}
-                    </div>
-                    <div className="h-20 bg-muted rounded mb-6"></div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="h-4 bg-muted rounded w-24 mb-1"></div>
-                        <div className="h-3 bg-muted rounded w-16"></div>
-                      </div>
-                      <div className="h-6 bg-muted rounded w-8"></div>
+                <CardContent className="relative p-4">
+                  <div className="animate-pulse flex gap-4">
+                    <div className="w-[300px] h-[300px] bg-muted rounded-lg shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-24 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-32 mb-1"></div>
+                      <div className="h-3 bg-muted rounded w-28 mb-1"></div>
+                      <div className="h-3 bg-muted rounded w-20 mb-4"></div>
+                      <div className="h-20 bg-muted rounded"></div>
                     </div>
                   </div>
                 </CardContent>
@@ -135,66 +130,55 @@ export default function TestimonialsPage() {
               <p className="text-muted-foreground text-lg">No testimonials available yet.</p>
             </div>
           ) : (
-            testimonials.map((testimonial, index) => (
-              <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-102 cursor-pointer">
+            testimonials.map((testimonial) => (
+              <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80">
                 <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <CardContent className="relative p-4">
+                  <div className="flex gap-5 items-start">
 
-                <CardContent className="relative p-6">
-                  {/* Quote Icon */}
-                  <div className="absolute top-4 right-4 text-primary/20">
-                    <Quotes size={24} weight="fill" />
-                  </div>
-
-                  <div className="flex gap-5">
-                    {/* Client Photo + Name */}
-                    <div className="shrink-0 flex flex-col items-center gap-2">
+                    {/* LEFT: Photo + meta */}
+                    <div className="shrink-0 w-[300px] flex flex-col gap-1.5">
                       {testimonial.client_image_url ? (
                         <img
                           src={testimonial.client_image_url}
                           alt={testimonial.client_name}
-                          className="w-[100px] h-[100px] rounded-lg object-cover shadow-lg border-2 border-primary/15"
+                          className="w-[300px] h-auto rounded-lg object-cover shadow-lg border-2 border-primary/15"
                         />
                       ) : (
-                        <div className="w-[100px] h-[100px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
-                          <span className="text-3xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
+                        <div className="w-[300px] h-[300px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
+                          <span className="text-4xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
                         </div>
                       )}
-                      <p className="font-semibold text-foreground text-sm text-center leading-tight max-w-[100px]">{testimonial.client_name}</p>
+                      <p className="font-semibold text-foreground text-sm leading-tight text-center">{testimonial.client_name}</p>
+                      {testimonial.client_location && (
+                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                          <MapPin size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                          <span>{testimonial.client_location}</span>
+                        </div>
+                      )}
+                      {testimonial.service_name && (
+                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                          <Tag size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                          <span className="font-bold">{testimonial.service_name}</span>
+                        </div>
+                      )}
+                      {testimonial.created_at && (
+                        <div className="flex items-start gap-1 text-xs text-muted-foreground pl-[15px]">
+                          <CalendarBlank size={11} weight="fill" className="text-primary/50 shrink-0 mt-[2px]" />
+                          <span>{new Date(testimonial.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Content */}
+                    {/* RIGHT: Verified badge + text */}
                     <div className="flex-1 min-w-0">
-                      {/* Rating Stars */}
-                      <div className="flex gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={16} weight="fill" className={i < (testimonial.rating || 5) ? "text-accent" : "text-muted"} />
-                        ))}
+                      <div className="inline-flex items-center gap-1.5 mb-3 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded">
+                        <CheckCircle size={13} weight="fill" className="shrink-0" />
+                        Verified
                       </div>
-
-                      {/* Testimonial Text */}
-                      <p className="text-foreground mb-4 leading-relaxed italic text-base">
-                        "{testimonial.testimonial_text}"
-                      </p>
-
-                      {/* Service Badge & Number */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {testimonial.service_name && (
-                            <Badge variant="secondary" className="text-xs">
-                              {testimonial.service_name}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-primary/60 text-lg font-bold">
-                          {String(index + 1).padStart(2, '0')}
-                        </div>
-                      </div>
+                      <p className="text-foreground leading-relaxed text-sm text-justify">{testimonial.testimonial_text}</p>
                     </div>
-                  </div>
 
-                  {/* Decorative Element */}
-                  <div className="absolute bottom-4 left-4 text-primary/10">
-                    <Sparkle size={20} weight="fill" />
                   </div>
                 </CardContent>
               </Card>
