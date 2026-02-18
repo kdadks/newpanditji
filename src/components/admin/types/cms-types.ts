@@ -193,6 +193,7 @@ export interface QuickActionButton {
   text: string
   link: string
   icon?: string
+  color?: 'orange' | 'green' | 'black' | 'blue' | 'red' | 'purple'
 }
 
 export interface ContactInfoCard {

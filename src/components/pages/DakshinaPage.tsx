@@ -154,8 +154,8 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               <table className="w-full">
                 <thead>
                   <tr className="bg-linear-to-r from-primary via-accent to-primary text-white">
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg">Service/Package Name</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg">Duration</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg w-[60%]">Service/Package Name</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg w-[40%]">Duration</th>
                     <th className="px-4 md:px-6 py-4 md:py-5 text-right font-bold text-base md:text-lg">Dakshina</th>
                   </tr>
                 </thead>
@@ -181,7 +181,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-4 md:py-5">
-                        <Badge variant="outline" className="text-sm">
+                        <Badge variant="outline" className="text-sm whitespace-normal break-words">
                           {service.duration || 'Varies'}
                         </Badge>
                       </td>

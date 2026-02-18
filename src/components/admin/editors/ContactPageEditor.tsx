@@ -4,6 +4,7 @@ import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Label } from '../../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 import { ImageGrid } from './shared/EditorUtils'
 import type { ContactPageContent, FAQItem, TrustIndicator, QuickActionButton } from '../types/cms-types'
 
@@ -56,7 +57,8 @@ export default function ContactPageEditor({ content, setContent, onSave, isSavin
     const newAction: QuickActionButton = {
       text: 'New Action',
       link: '#',
-      icon: ''
+      icon: '',
+      color: 'orange'
     }
     setContent(prev => ({
       ...prev,
@@ -243,23 +245,42 @@ export default function ContactPageEditor({ content, setContent, onSave, isSavin
             {content.hero.quickActions.map((action, index) => (
               <Card key={`quick-action-${index}-${action.text}`} className="bg-muted/30">
                 <CardContent className="p-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-medium w-8">#{index + 1}</span>
                     <Input
                       value={action.text}
                       onChange={(e) => updateQuickAction(index, 'text', e.target.value)}
                       placeholder="Text"
-                      className="h-8 text-sm"
+                      className="h-8 text-sm flex-1"
                     />
                     <Input
                       value={action.link}
                       onChange={(e) => updateQuickAction(index, 'link', e.target.value)}
                       placeholder="Link"
-                      className="h-8 text-sm"
+                      className="h-8 text-sm flex-1"
                     />
                     <Button onClick={() => removeQuickAction(index)} size="sm" variant="ghost" className="h-8 w-8 p-0">
                       <Trash size={14} />
                     </Button>
+                  </div>
+                  <div className="flex items-center gap-2 ml-10">
+                    <Label className="text-xs whitespace-nowrap">Color:</Label>
+                    <Select
+                      value={action.color || 'orange'}
+                      onValueChange={(value) => updateQuickAction(index, 'color', value)}
+                    >
+                      <SelectTrigger className="h-8 text-sm w-32">
+                        <SelectValue placeholder="Select color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="orange">Orange</SelectItem>
+                        <SelectItem value="green">Green</SelectItem>
+                        <SelectItem value="black">Black</SelectItem>
+                        <SelectItem value="blue">Blue</SelectItem>
+                        <SelectItem value="red">Red</SelectItem>
+                        <SelectItem value="purple">Purple</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>

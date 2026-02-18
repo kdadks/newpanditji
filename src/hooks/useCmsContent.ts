@@ -561,7 +561,7 @@ function sectionsToContactContent(sections: PageSectionRow[]): ContactPageConten
       description: (heroSection.description as string) || defaultContactContent.hero.description,
       backgroundImages: (heroSection.backgroundImages as string[]) || defaultContactContent.hero.backgroundImages,
       badge: (heroSection.badge as string) || defaultContactContent.hero.badge,
-      quickActions: (heroSection.quickActions as Array<{ text: string; link: string; icon?: string }>) || defaultContactContent.hero.quickActions,
+      quickActions: (heroSection.quickActions as Array<{ text: string; link: string; icon?: string; color?: 'orange' | 'green' | 'black' | 'blue' | 'red' | 'purple' }>) || defaultContactContent.hero.quickActions,
       trustIndicators: (heroSection.trustIndicators as Array<{ title: string; description: string }>) || defaultContactContent.hero.trustIndicators,
     },
     email: (contactSection.email as string) || defaultContactContent.email,

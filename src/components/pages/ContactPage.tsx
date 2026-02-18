@@ -50,6 +50,49 @@ export default function ContactPage() {
   // SEO Configuration
   usePageMetadata('contact')
 
+  // Color mapping for quick action buttons
+  const getButtonColorClasses = (color?: string) => {
+    const colorMap: Record<string, { bg: string; hover: string; shadow: string; border: string }> = {
+      orange: {
+        bg: 'bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white',
+        hover: 'hover:from-amber-900 hover:via-orange-950 hover:to-black',
+        shadow: 'shadow-amber-900/50',
+        border: 'border-amber-700/30'
+      },
+      green: {
+        bg: 'bg-linear-to-r from-green-700 via-emerald-700 to-green-800 text-white',
+        hover: 'hover:from-green-800 hover:via-emerald-800 hover:to-green-900',
+        shadow: 'shadow-green-800/50',
+        border: 'border-green-600/40'
+      },
+      black: {
+        bg: 'bg-linear-to-r from-gray-800 via-gray-900 to-black text-white',
+        hover: 'hover:from-gray-900 hover:via-black hover:to-gray-950',
+        shadow: 'shadow-black/50',
+        border: 'border-gray-700/40'
+      },
+      blue: {
+        bg: 'bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white',
+        hover: 'hover:from-blue-800 hover:via-indigo-800 hover:to-blue-900',
+        shadow: 'shadow-blue-800/50',
+        border: 'border-blue-600/40'
+      },
+      red: {
+        bg: 'bg-linear-to-r from-red-700 via-rose-700 to-red-800 text-white',
+        hover: 'hover:from-red-800 hover:via-rose-800 hover:to-red-900',
+        shadow: 'shadow-red-800/50',
+        border: 'border-red-600/40'
+      },
+      purple: {
+        bg: 'bg-linear-to-r from-purple-700 via-violet-700 to-purple-800 text-white',
+        hover: 'hover:from-purple-800 hover:via-violet-800 hover:to-purple-900',
+        shadow: 'shadow-purple-800/50',
+        border: 'border-purple-600/40'
+      }
+    }
+    return colorMap[color || 'orange'] || colorMap.orange
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -182,35 +225,30 @@ export default function ContactPage() {
 
             {/* Quick Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {cmsContent.hero.quickActions.map((action, index) => (
-                <Button
-                  key={`action-${index}-${action.text.replace(/\s+/g, '-')}`}
-                  size="lg"
-                  className={`group px-8 py-4 text-lg font-semibold ${
-                    index === 0 
-                      ? 'bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-amber-900/50'
-                      : index === 1
-                      ? 'bg-linear-to-r from-green-700 via-emerald-700 to-green-800 text-white hover:from-green-800 hover:via-emerald-800 hover:to-green-900 shadow-green-800/50'
-                      : 'bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white hover:from-blue-800 hover:via-indigo-800 hover:to-blue-900 shadow-blue-800/50'
-                  } shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 border-2 ${
-                    index === 0 ? 'border-amber-700/30' : index === 1 ? 'border-green-600/40' : 'border-blue-600/40'
-                  }`}
-                  onClick={() => {
-                    if (action.link.startsWith('#')) {
-                      document.getElementById(action.link.substring(1))?.scrollIntoView({ behavior: 'smooth' })
-                    } else if (action.link.startsWith('http')) {
-                      window.open(action.link, '_blank', 'noopener,noreferrer')
-                    } else {
-                      window.location.href = action.link
-                    }
-                  }}
-                >
-                  {index === 0 ? <EnvelopeSimple size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
-                   index === 1 ? <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
-                   <Sparkle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />}
-                  {action.text}
-                </Button>
-              ))}
+              {cmsContent.hero.quickActions.map((action, index) => {
+                const colorClasses = getButtonColorClasses(action.color)
+                return (
+                  <Button
+                    key={`action-${index}-${action.text.replace(/\s+/g, '-')}`}
+                    size="lg"
+                    className={`group px-8 py-4 text-lg font-semibold ${colorClasses.bg} ${colorClasses.hover} ${colorClasses.shadow} shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 border-2 ${colorClasses.border}`}
+                    onClick={() => {
+                      if (action.link.startsWith('#')) {
+                        document.getElementById(action.link.substring(1))?.scrollIntoView({ behavior: 'smooth' })
+                      } else if (action.link.startsWith('http')) {
+                        window.open(action.link, '_blank', 'noopener,noreferrer')
+                      } else {
+                        window.location.href = action.link
+                      }
+                    }}
+                  >
+                    {index === 0 ? <EnvelopeSimple size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
+                     index === 1 ? <WhatsappLogo size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" /> :
+                     <Sparkle size={24} className="mr-3 group-hover:scale-110 transition-transform" weight="fill" />}
+                    {action.text}
+                  </Button>
+                )
+              })}
             </div>
           </div>
 
