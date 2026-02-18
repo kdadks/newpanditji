@@ -105,7 +105,7 @@ export default function TestimonialsPage() {
       <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {isLoading ? (
             // Loading skeleton
             Array.from({ length: 6 }).map((_, index) => (
