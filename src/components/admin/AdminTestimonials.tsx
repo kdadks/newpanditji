@@ -7,6 +7,7 @@ import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
+import { MediaPickerInput } from '../ui/media-picker'
 import { toast } from 'sonner'
 import { useTestimonials, useCreateTestimonial, useUpdateTestimonial, useDeleteTestimonial } from '../../hooks/useTestimonials'
 import { TestimonialRow } from '../../lib/supabase'
@@ -20,6 +21,7 @@ interface TestimonialFormData {
   rating: number
   content: string
   verified: boolean
+  imageUrl: string
 }
 
 export default function AdminTestimonials() {
@@ -42,7 +44,8 @@ export default function AdminTestimonials() {
     service: '',
     rating: 5,
     content: '',
-    verified: false
+    verified: false,
+    imageUrl: ''
   })
 
   const handleAdd = () => {
@@ -53,7 +56,8 @@ export default function AdminTestimonials() {
       service: '',
       rating: 5,
       content: '',
-      verified: false
+      verified: false,
+      imageUrl: ''
     })
     setEditingTestimonial(null)
     setCurrentTab('customer')
@@ -68,7 +72,8 @@ export default function AdminTestimonials() {
       service: testimonial.service_name || '',
       rating: testimonial.rating || 5,
       content: testimonial.testimonial_text,
-      verified: testimonial.is_approved
+      verified: testimonial.is_approved,
+      imageUrl: testimonial.client_image_url || ''
     })
     setEditingTestimonial(testimonial)
     setCurrentTab('customer')
@@ -88,6 +93,7 @@ export default function AdminTestimonials() {
           id: editingTestimonial.id,
           client_name: formData.name,
           client_location: formData.location || null,
+          client_image_url: formData.imageUrl || null,
           service_name: formData.service || null,
           rating: formData.rating,
           testimonial_text: formData.content,
@@ -99,7 +105,7 @@ export default function AdminTestimonials() {
         await createTestimonialMutation.mutateAsync({
           client_name: formData.name,
           client_location: formData.location || null,
-          client_image_url: null,
+          client_image_url: formData.imageUrl || null,
           service_name: formData.service || null,
           service_id: null,
           testimonial_text: formData.content,
@@ -202,6 +208,9 @@ export default function AdminTestimonials() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
+                      {testimonial.client_image_url && (
+                        <img src={testimonial.client_image_url} alt={testimonial.client_name} className="w-10 h-10 rounded-full object-cover border-2 border-amber-200" />
+                      )}
                       <h3 className="font-heading font-semibold text-lg">{testimonial.client_name}</h3>
                       {testimonial.is_approved && (
                         <Badge variant="default" className="text-xs">
@@ -310,6 +319,14 @@ export default function AdminTestimonials() {
                         <h3 className="font-semibold text-amber-900">Customer Details</h3>
                       </div>
                       
+                      {/* Customer Photo */}
+                      <MediaPickerInput
+                        value={formData.imageUrl}
+                        onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                        label="Customer Photo"
+                        placeholder="Select customer photo..."
+                      />
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name" className="text-sm font-medium">
@@ -483,7 +500,14 @@ export default function AdminTestimonials() {
                     <div className="rounded-xl bg-linear-to-r from-amber-50 to-orange-50 p-4 border border-amber-200">
                       <h4 className="font-medium text-amber-800 text-sm mb-3">👁️ Preview</h4>
                       <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-3 mb-2">
+                          {formData.imageUrl ? (
+                            <img src={formData.imageUrl} alt={formData.name} className="w-10 h-10 rounded-full object-cover border border-amber-200" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                              <User className="w-5 h-5 text-amber-500" />
+                            </div>
+                          )}
                           <span className="font-semibold text-sm">{formData.name}</span>
                           {formData.verified && (
                             <Badge variant="default" className="text-xs bg-green-500">✓ Verified</Badge>

@@ -145,30 +145,50 @@ export default function TestimonialsPage() {
                     <Quotes size={24} weight="fill" />
                   </div>
 
-                  {/* Rating Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={16} weight="fill" className={i < (testimonial.rating || 5) ? "text-accent" : "text-muted"} />
-                    ))}
-                  </div>
-
-                  {/* Testimonial Text */}
-                  <p className="text-foreground mb-6 leading-relaxed italic text-lg">
-                    "{testimonial.testimonial_text}"
-                  </p>
-
-                  {/* Author Info */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground text-sm">{testimonial.client_name}</p>
-                      {testimonial.service_name && (
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          {testimonial.service_name}
-                        </Badge>
+                  <div className="flex gap-5">
+                    {/* Client Photo + Name */}
+                    <div className="shrink-0 flex flex-col items-center gap-2">
+                      {testimonial.client_image_url ? (
+                        <img
+                          src={testimonial.client_image_url}
+                          alt={testimonial.client_name}
+                          className="w-[100px] h-[100px] rounded-lg object-cover shadow-lg border-2 border-primary/15"
+                        />
+                      ) : (
+                        <div className="w-[100px] h-[100px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
+                          <span className="text-3xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
+                        </div>
                       )}
+                      <p className="font-semibold text-foreground text-sm text-center leading-tight max-w-[100px]">{testimonial.client_name}</p>
                     </div>
-                    <div className="text-primary/60 text-lg font-bold">
-                      {String(index + 1).padStart(2, '0')}
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      {/* Rating Stars */}
+                      <div className="flex gap-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={16} weight="fill" className={i < (testimonial.rating || 5) ? "text-accent" : "text-muted"} />
+                        ))}
+                      </div>
+
+                      {/* Testimonial Text */}
+                      <p className="text-foreground mb-4 leading-relaxed italic text-base">
+                        "{testimonial.testimonial_text}"
+                      </p>
+
+                      {/* Service Badge & Number */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {testimonial.service_name && (
+                            <Badge variant="secondary" className="text-xs">
+                              {testimonial.service_name}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-primary/60 text-lg font-bold">
+                          {String(index + 1).padStart(2, '0')}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
