@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { AppPage, AppNavigationData } from '../lib/types'
-import { FlowerLotus, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react'
-import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo, PinterestLogo } from '@phosphor-icons/react'
+import { FlowerLotus, EnvelopeSimple, MapPin } from '@phosphor-icons/react'
+import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo } from '@phosphor-icons/react'
 import { useMenuItems } from '../hooks/useMenus'
+import { useFooterContent } from '../hooks/useCmsContent'
 
 interface FooterProps {
 }
@@ -16,6 +17,9 @@ export default function Footer({ }: FooterProps) {
   // Load footer and legal menus from database
   const { items: footerMenuItems } = useMenuItems('footer')
   const { items: legalMenuItems } = useMenuItems('legal')
+
+  // Load dynamic footer content (contact info, social links, copyright) from CMS
+  const { content: footerContent } = useFooterContent()
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
@@ -86,46 +90,57 @@ export default function Footer({ }: FooterProps) {
           <div>
             <h3 className="font-heading font-semibold text-lg mb-4">Contact</h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-sm">
-                <EnvelopeSimple size={18} className="mt-0.5 shrink-0" />
-                <a href="mailto:panditjoshirajesh@gmail.com" className="hover:text-accent transition-colors cursor-pointer">
-                  panditjoshirajesh@gmail.com
-                </a>
-              </li>
-              <li className="flex items-start gap-2 text-sm">
-                <MapPin size={18} className="mt-0.5 shrink-0" />
-                <span>Serving communities worldwide</span>
-              </li>
+              {footerContent.contactEmail && (
+                <li className="flex items-start gap-2 text-sm">
+                  <EnvelopeSimple size={18} className="mt-0.5 shrink-0" />
+                  <a href={`mailto:${footerContent.contactEmail}`} className="hover:text-accent transition-colors cursor-pointer">
+                    {footerContent.contactEmail}
+                  </a>
+                </li>
+              )}
+              {footerContent.contactLocation && (
+                <li className="flex items-start gap-2 text-sm">
+                  <MapPin size={18} className="mt-0.5 shrink-0" />
+                  <span>{footerContent.contactLocation}</span>
+                </li>
+              )}
             </ul>
           </div>
 
           <div>
             <h3 className="font-heading font-semibold text-lg mb-4">Follow Us</h3>
             <div className="flex flex-wrap gap-3">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <FacebookLogo size={24} weight="fill" />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <InstagramLogo size={24} weight="fill" />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <YoutubeLogo size={24} weight="fill" />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <LinkedinLogo size={24} weight="fill" />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <TwitterLogo size={24} weight="fill" />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
-                <PinterestLogo size={24} weight="fill" />
-              </a>
+              {footerContent.facebookUrl && (
+                <a href={footerContent.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <FacebookLogo size={24} weight="fill" />
+                </a>
+              )}
+              {footerContent.instagramUrl && (
+                <a href={footerContent.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <InstagramLogo size={24} weight="fill" />
+                </a>
+              )}
+              {footerContent.youtubeUrl && (
+                <a href={footerContent.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <YoutubeLogo size={24} weight="fill" />
+                </a>
+              )}
+              {footerContent.linkedinUrl && (
+                <a href={footerContent.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <LinkedinLogo size={24} weight="fill" />
+                </a>
+              )}
+              {footerContent.twitterUrl && (
+                <a href={footerContent.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <TwitterLogo size={24} weight="fill" />
+                </a>
+              )}
             </div>
           </div>
         </div>
 
         <div className="border-t border-secondary-foreground/20 mt-8 pt-8 text-center text-sm text-secondary-foreground/70">
-          <p>&copy; {currentYear} Pandit Rajesh Joshi. All rights reserved. | www.panditrajeshjoshi.com</p>
+          <p>{footerContent.copyrightText.replace('{year}', String(currentYear))}</p>
         </div>
       </div>
     </footer>

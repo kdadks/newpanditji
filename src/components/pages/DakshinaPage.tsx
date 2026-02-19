@@ -181,17 +181,17 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-4 md:py-5">
-                        <Badge variant="outline" className="text-sm whitespace-normal break-words">
+                        <span className="text-sm text-muted-foreground whitespace-normal wrap-break-word">
                           {service.duration || 'Varies'}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 md:py-5 text-right">
+                        {service.priceNote && (
+                          <div className="text-xs text-muted-foreground mb-1">{service.priceNote}</div>
+                        )}
                         <div className="font-bold text-xl text-primary">
                           €{service.price}
                         </div>
-                        {service.priceNote && (
-                          <div className="text-xs text-muted-foreground mt-1">{service.priceNote}</div>
-                        )}
                       </td>
                     </tr>
                   ))}
@@ -217,21 +217,23 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                         <div className="text-sm text-muted-foreground mb-2">{service.description}</div>
                       )}
                       {service.duration && (
-                        <Badge variant="outline" className="text-xs mb-2">
+                        <span className="text-xs text-muted-foreground mb-2 block">
                           {service.duration}
-                        </Badge>
+                        </span>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">Dakshina</div>
-                    <div className="font-bold text-xl text-primary">
-                      €{service.price}
+                    <div className="text-right">
+                      {service.priceNote && (
+                        <div className="text-xs text-muted-foreground mb-1">{service.priceNote}</div>
+                      )}
+                      <div className="font-bold text-xl text-primary">
+                        €{service.price}
+                      </div>
                     </div>
                   </div>
-                  {service.priceNote && (
-                    <div className="text-xs text-muted-foreground mt-1">{service.priceNote}</div>
-                  )}
                 </CardContent>
               </Card>
             ))}

@@ -1223,55 +1223,69 @@ export function useTestimonialsContent() {
 }
 
 // ============================================================================
-// Header/Footer Content (uses site_settings)
+// Header/Footer Content (uses site_settings key-value store)
+// Table structure: id, setting_key, setting_value, setting_type, description, category, updated_by, created_at, updated_at
+// Each setting is a separate row keyed by setting_key.
 // ============================================================================
 
-interface ExtendedSiteSettings {
-  site_logo_url: string | null
-  site_name: string | null
-  site_tagline: string | null
-  header_cta_text: string | null
-  header_cta_link: string | null
-  footer_text: string | null
-  copyright_text: string | null
-  facebook_page_url: string | null
-  instagram_url: string | null
-  youtube_channel_url: string | null
-  linkedin_url: string | null
-  twitter_url: string | null
-  pinterest_url: string | null
-}
+// Keys used by header/footer CMS
+const CMS_SETTING_KEYS = [
+  'site_logo_url', 'site_name', 'site_tagline', 'header_cta_text', 'header_cta_link',
+  'footer_text', 'copyright_text', 'primary_email', 'footer_contact_location',
+  'facebook_page_url', 'instagram_url', 'youtube_channel_url', 'linkedin_url',
+  'twitter_url', 'pinterest_url',
+] as const
+
+type CmsSettingKey = typeof CMS_SETTING_KEYS[number]
+type ExtendedSiteSettings = Partial<Record<CmsSettingKey, string | null>>
 
 /**
- * Fetch site settings for header/footer
+ * Fetch site settings for header/footer from the key-value store.
+ * Returns a plain object keyed by setting_key.
  */
-async function fetchSiteSettingsForCms(): Promise<ExtendedSiteSettings | null> {
+async function fetchSiteSettingsForCms(): Promise<ExtendedSiteSettings> {
   const { data, error } = await supabase
     .from('site_settings')
-    .select('site_logo_url, site_name, site_tagline, header_cta_text, header_cta_link, footer_text, copyright_text, facebook_page_url, instagram_url, youtube_channel_url, linkedin_url, twitter_url, pinterest_url')
-    .eq('singleton_guard', true)
-    .maybeSingle()
+    .select('setting_key, setting_value')
+    .in('setting_key', CMS_SETTING_KEYS as unknown as string[])
 
   if (error) {
-    // Silently return null if settings not found - will use default values
-    return null
+    console.error('Error fetching cms settings:', error.message)
+    return {}
   }
 
-  return data
+  const result: ExtendedSiteSettings = {}
+  ;(data || []).forEach((row: { setting_key: string; setting_value: string | null }) => {
+    if (CMS_SETTING_KEYS.includes(row.setting_key as CmsSettingKey)) {
+      result[row.setting_key as CmsSettingKey] = row.setting_value
+    }
+  })
+  return result
 }
 
 /**
- * Update site settings for header
+ * Save site settings to the key-value store.
+ * Each key-value pair is upserted as its own row.
  */
-async function updateHeaderSettings(settings: Partial<ExtendedSiteSettings>): Promise<void> {
+async function updateHeaderSettings(settings: ExtendedSiteSettings): Promise<void> {
+  const rows = (Object.entries(settings) as [CmsSettingKey, string | null | undefined][])
+    .filter(([, v]) => v !== undefined)
+    .map(([key, value]) => ({
+      setting_key: key,
+      setting_value: value ?? '',
+      setting_type: 'string' as const,
+      category: 'appearance',
+    }))
+
+  if (rows.length === 0) return
+
   const { error } = await supabase
     .from('site_settings')
-    .update(settings)
-    .eq('singleton_guard', true)
+    .upsert(rows, { onConflict: 'setting_key' })
 
   if (error) {
-    console.error('Error updating header settings:', error)
-    throw error
+    console.error('Error saving settings:', error.message, '| code:', error.code, '| details:', error.details)
+    throw new Error(error.message || 'Failed to save settings')
   }
 }
 
@@ -1344,6 +1358,8 @@ export function useFooterContent() {
       return {
         description: settings.footer_text || defaultFooterContent.description,
         copyrightText: settings.copyright_text || defaultFooterContent.copyrightText,
+        contactEmail: settings.primary_email || defaultFooterContent.contactEmail,
+        contactLocation: settings.footer_contact_location || defaultFooterContent.contactLocation,
         facebookUrl: settings.facebook_page_url || defaultFooterContent.facebookUrl,
         instagramUrl: settings.instagram_url || defaultFooterContent.instagramUrl,
         youtubeUrl: settings.youtube_channel_url || defaultFooterContent.youtubeUrl,
@@ -1360,6 +1376,8 @@ export function useFooterContent() {
       await updateHeaderSettings({
         footer_text: content.description,
         copyright_text: content.copyrightText,
+        primary_email: content.contactEmail,
+        footer_contact_location: content.contactLocation,
         facebook_page_url: content.facebookUrl,
         instagram_url: content.instagramUrl,
         youtube_channel_url: content.youtubeUrl,

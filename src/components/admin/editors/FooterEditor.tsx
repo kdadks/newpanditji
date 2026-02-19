@@ -41,6 +41,29 @@ export default function FooterEditor({ content, setContent, onSave, isSaving }: 
           </div>
 
           <div className="pt-4 border-t">
+            <Label className="text-base font-semibold mb-4 block">Contact Info</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Contact Email</Label>
+                <Input
+                  value={content.contactEmail}
+                  onChange={(e) => setContent(prev => ({ ...prev, contactEmail: e.target.value }))}
+                  placeholder="email@example.com"
+                  type="email"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Location / Service Area</Label>
+                <Input
+                  value={content.contactLocation}
+                  onChange={(e) => setContent(prev => ({ ...prev, contactLocation: e.target.value }))}
+                  placeholder="Serving communities worldwide"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t">
             <Label className="text-base font-semibold mb-4 block">Social Media Links</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">

@@ -423,6 +423,8 @@ export interface HeaderContent {
 export interface FooterContent {
   description: string
   copyrightText: string
+  contactEmail: string
+  contactLocation: string
   facebookUrl: string
   instagramUrl: string
   youtubeUrl: string

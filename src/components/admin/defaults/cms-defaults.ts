@@ -325,7 +325,9 @@ export const defaultHeaderContent: HeaderContent = {
 
 export const defaultFooterContent: FooterContent = {
   description: '',
-  copyrightText: '',
+  copyrightText: '© {year} Pandit Rajesh Joshi. All rights reserved. | www.panditrajeshjoshi.com',
+  contactEmail: '',
+  contactLocation: '',
   facebookUrl: '',
   instagramUrl: '',
   youtubeUrl: '',
