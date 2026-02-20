@@ -369,7 +369,7 @@ export default function HomePage({ }: HomePageProps) {
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
         >
-          <div className={`flex gap-6 py-8 px-4 md:px-0 w-max ${isPaused ? '' : 'animate-scroll-services'}`}>
+          <div className={`flex gap-6 py-8 px-4 md:px-0 w-max ${featuredServices.length >= 8 && !isPaused ? 'animate-scroll-services' : ''}`}>
             {/* First set of cards */}
             {featuredServices.map((service, index) => (
               <Card
@@ -467,8 +467,8 @@ export default function HomePage({ }: HomePageProps) {
               </Card>
             ))}
 
-            {/* Duplicate set for seamless loop */}
-            {featuredServices.map((service, index) => (
+            {/* Duplicate set for seamless loop – only rendered when there are enough cards to fill the viewport */}
+            {featuredServices.length >= 8 && featuredServices.map((service, index) => (
               <Card
                 key={`${service.id}-2`}
                 onClick={() => handleNavigate({ page: 'services', category: service.category })}
@@ -567,7 +567,7 @@ export default function HomePage({ }: HomePageProps) {
               <div className="absolute inset-0 bg-linear-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative flex items-center gap-3">
                 <BookOpen className="transition-transform duration-300 group-hover:rotate-12" size={24} weight="bold" />
-                <span>{cmsContent.services.buttonText}</span>
+                <span>View All {dbServices.length > 0 ? `${dbServices.length} ` : ''}Service{dbServices.length !== 1 ? 's' : ''}</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
