@@ -27,6 +27,7 @@ async function fetchPublishedTestimonials(): Promise<TestimonialRow[]> {
     .select('*')
     .eq('is_published', true)
     .eq('is_approved', true)
+    .order('approved_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -45,6 +46,7 @@ async function fetchFeaturedTestimonials(): Promise<TestimonialRow[]> {
     .eq('is_published', true)
     .eq('is_approved', true)
     .eq('is_featured', true)
+    .order('approved_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (error) {

@@ -1,8 +1,9 @@
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
+import { useState } from 'react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
-import { Sparkle, Heart, Trophy, Users, CheckCircle, MapPin, CalendarBlank, Tag, Star, Quotes } from '@phosphor-icons/react'
+import { Sparkle, Heart, Trophy, Users, CheckCircle, MapPin, CalendarBlank, Tag, Star, Quotes, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { usePublishedTestimonials } from '../../hooks/useTestimonials'
 import { useTestimonialsContent } from '../../hooks/useCmsContent'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
@@ -19,6 +20,16 @@ export default function TestimonialsPage() {
   const { data: testimonials = [], isLoading } = usePublishedTestimonials()
   const { content: cmsContent, isLoading: cmsLoading } = useTestimonialsContent()
   usePageMetadata('testimonials')
+
+  const PAGE_SIZE = 10
+  const [page, setPage] = useState(1)
+  const totalPages = Math.ceil(testimonials.length / PAGE_SIZE)
+  const pagedTestimonials = testimonials.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const goToPage = (p: number) => {
+    setPage(p)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   // Show loading state while fetching content
   if (cmsLoading) {
@@ -130,7 +141,7 @@ export default function TestimonialsPage() {
               <p className="text-muted-foreground text-lg">No testimonials available yet.</p>
             </div>
           ) : (
-            testimonials.map((testimonial) => (
+            pagedTestimonials.map((testimonial) => (
               <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80">
                 <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <CardContent className="relative p-4">
@@ -180,6 +191,45 @@ export default function TestimonialsPage() {
             ))
           )}
         </div>
+
+        {/* Pagination */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mb-16">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(page - 1)}
+              disabled={page === 1}
+              className="gap-1"
+            >
+              <CaretLeft size={16} weight="bold" />
+              Previous
+            </Button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <Button
+                key={p}
+                variant={p === page ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => goToPage(p)}
+                className={p === page ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white border-0' : ''}
+              >
+                {p}
+              </Button>
+            ))}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(page + 1)}
+              disabled={page === totalPages}
+              className="gap-1"
+            >
+              Next
+              <CaretRight size={16} weight="bold" />
+            </Button>
+          </div>
+        )}
 
         {/* Share Your Experience */}
         {(cmsContent.shareExperience.title || cmsContent.shareExperience.description) && (
