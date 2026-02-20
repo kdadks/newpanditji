@@ -34,8 +34,10 @@ export default function CookieConsentBanner() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <Card className="w-full max-w-4xl shadow-2xl border-2 border-orange-200 animate-in slide-in-from-bottom duration-500">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 animate-in fade-in duration-300">
+      {/* Backdrop — pointer-events-none so header/nav remain clickable above it */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-none" />
+      <Card className="relative w-full max-w-4xl shadow-2xl border-2 border-orange-200 animate-in slide-in-from-bottom duration-500">
         <CardHeader className="relative pb-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
