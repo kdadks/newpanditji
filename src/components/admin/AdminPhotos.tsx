@@ -77,16 +77,23 @@ export default function AdminPhotos() {
     { value: 'events',   label: '🎉 Events' },
     { value: 'general',  label: '📁 General' },
   ]
+  const CATEGORIES_KEY = 'photo_categories'
 
-  const loadCategories = (): { value: string; label: string }[] => {
-    try {
-      const stored = localStorage.getItem('photo_categories')
-      if (stored) return JSON.parse(stored)
-    } catch { /* ignore */ }
-    return INITIAL_CATEGORIES
-  }
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>(INITIAL_CATEGORIES)
 
-  const [categories, setCategories] = useState<{ value: string; label: string }[]>(loadCategories)
+  // Load categories from Supabase on mount
+  useEffect(() => {
+    supabase
+      .from('site_metadata')
+      .select('setting_value')
+      .eq('setting_key', CATEGORIES_KEY)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.setting_value) {
+          try { setCategories(JSON.parse(data.setting_value)) } catch { /* ignore */ }
+        }
+      })
+  }, [])
   // The permanent "No Category" entry – always present, never deletable
   const NO_CATEGORY_ENTRY = { value: NO_CATEGORY_VALUE, label: '🏷️ No Category' }
 
@@ -175,9 +182,30 @@ export default function AdminPhotos() {
   // Common emoji presets for quick picking
   const ICON_PRESETS = ['📚','🖼️','🪔','🙏','💒','❤️','🎉','📁','🎊','🌸','🕉️','🔱','🪷','🏛️','🎭','🌺','📿','🪅','🎆','🏔️','🌄','🌟','🎶','🛕','🌼','🌻','🎑','🎐','🎇','🪬']
 
-  const persistCategories = (cats: { value: string; label: string }[]) => {
-    localStorage.setItem('photo_categories', JSON.stringify(cats))
-    setCategories(cats)
+  const persistCategories = async (cats: { value: string; label: string }[]) => {
+    setCategories(cats) // optimistic update
+    const payload = JSON.stringify(cats)
+    try {
+      const { data: existing } = await supabase
+        .from('site_metadata')
+        .select('id')
+        .eq('setting_key', CATEGORIES_KEY)
+        .maybeSingle()
+
+      if (existing?.id) {
+        await supabase
+          .from('site_metadata')
+          .update({ setting_value: payload, updated_at: new Date().toISOString() })
+          .eq('setting_key', CATEGORIES_KEY)
+      } else {
+        await supabase
+          .from('site_metadata')
+          .insert({ setting_key: CATEGORIES_KEY, setting_value: payload, setting_type: 'json', category: 'gallery', description: 'Photo categories for media management' })
+      }
+    } catch (err) {
+      console.error('[persistCategories] failed:', err)
+      toast.error('Failed to save categories to database')
+    }
   }
 
   const buildLabel = (icon: string, name: string) =>
@@ -190,14 +218,14 @@ export default function AdminPhotos() {
     return { icon: '', name: label }
   }
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     const name = newCatName.trim()
     if (!name) { toast.error('Category name is required'); return }
     const val = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
     if (!val) { toast.error('Category name must contain letters or numbers'); return }
     if (categories.some(c => c.value === val)) { toast.error('Category already exists'); return }
     const lbl = buildLabel(newCatIcon, name)
-    persistCategories([...categories, { value: val, label: lbl }])
+    await persistCategories([...categories, { value: val, label: lbl }])
     setNewCatIcon('')
     setNewCatName('')
     toast.success(`Category "${lbl}" added`)
@@ -210,13 +238,13 @@ export default function AdminPhotos() {
     setCatEditName(parts.name)
   }
 
-  const handleSaveEditCat = (idx: number) => {
+  const handleSaveEditCat = async (idx: number) => {
     const name = catEditName.trim()
     if (!name) { toast.error('Category name is required'); return }
     const val = categories[idx].value // keep original value/key unchanged on rename
     const lbl = buildLabel(catEditIcon, name)
     const updated = categories.map((c, i) => i === idx ? { value: val, label: lbl } : c)
-    persistCategories(updated)
+    await persistCategories(updated)
     setCatEditIndex(null)
     toast.success('Category updated')
   }
@@ -229,8 +257,8 @@ export default function AdminPhotos() {
       // Reassign all photos in this category → no_category in the DB.
       // Files in Supabase Storage are NOT deleted; they keep their URLs.
       const moved = await bulkReassignCategory(cat.value, NO_CATEGORY_VALUE)
-      // Remove from local category list
-      persistCategories(categories.filter((_, i) => i !== idx))
+      // Remove from Supabase-persisted category list
+      await persistCategories(categories.filter((_, i) => i !== idx))
       toast.success(
         moved > 0
           ? `Category "${cat.label}" deleted. ${moved} photo(s) moved to "No Category" — assign them a new category anytime.`
