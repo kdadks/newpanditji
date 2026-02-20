@@ -1,7 +1,7 @@
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { Sparkle, Heart, Trophy, Users, CheckCircle, MapPin, CalendarBlank, Tag, Star, Quotes, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { usePublishedTestimonials } from '../../hooks/useTestimonials'
@@ -25,11 +25,15 @@ export default function TestimonialsPage() {
   const [page, setPage] = useState(1)
   const totalPages = Math.ceil(testimonials.length / PAGE_SIZE)
   const pagedTestimonials = testimonials.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const isFirstRender = useRef(true)
 
-  const goToPage = (p: number) => {
-    setPage(p)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  // Scroll to top of list AFTER the new page renders
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    document.getElementById('testimonials-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [page])
+
+  const goToPage = (p: number) => { setPage(p) }
 
   // Show loading state while fetching content
   if (cmsLoading) {
@@ -113,7 +117,7 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Content Section */}
-      <div className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
+      <div id="testimonials-list" className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-16">
