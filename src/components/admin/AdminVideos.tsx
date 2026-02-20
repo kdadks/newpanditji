@@ -51,8 +51,8 @@ export default function AdminVideos() {
     url: ''
   })
 
-  // Get unique categories from videos
-  const categories = Array.from(new Set(videos.map(v => v.category).filter(Boolean)))
+  // Get unique categories from videos, sorted A-Z
+  const categories = Array.from(new Set(videos.map(v => v.category).filter(Boolean))).sort()
 
   // Reset to page 1 when filters change
   const handleSearchChange = (value: string) => {

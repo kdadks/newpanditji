@@ -81,6 +81,11 @@ export default function AdminPhotos() {
 
   const [categories, setCategories] = useState<{ value: string; label: string }[]>(INITIAL_CATEGORIES)
 
+  // Sort categories A-Z by label (case-insensitive), ignoring leading emoji
+  const stripLeadingEmoji = (s: string) => s.replace(/^[^\p{L}\p{N}]+/u, '').toLowerCase()
+  const sortCats = (cats: { value: string; label: string }[]) =>
+    [...cats].sort((a, b) => stripLeadingEmoji(a.label).localeCompare(stripLeadingEmoji(b.label)))
+
   // Load categories from Supabase on mount
   useEffect(() => {
     supabase
@@ -90,7 +95,7 @@ export default function AdminPhotos() {
       .maybeSingle()
       .then(({ data }) => {
         if (data?.setting_value) {
-          try { setCategories(JSON.parse(data.setting_value)) } catch { /* ignore */ }
+          try { setCategories(sortCats(JSON.parse(data.setting_value))) } catch { /* ignore */ }
         }
       })
   }, [])
@@ -183,8 +188,9 @@ export default function AdminPhotos() {
   const ICON_PRESETS = ['📚','🖼️','🪔','🙏','💒','❤️','🎉','📁','🎊','🌸','🕉️','🔱','🪷','🏛️','🎭','🌺','📿','🪅','🎆','🏔️','🌄','🌟','🎶','🛕','🌼','🌻','🎑','🎐','🎇','🪬']
 
   const persistCategories = async (cats: { value: string; label: string }[]) => {
-    setCategories(cats) // optimistic update
-    const payload = JSON.stringify(cats)
+    const sorted = sortCats(cats)
+    setCategories(sorted) // optimistic update (sorted)
+    const payload = JSON.stringify(sorted)
     try {
       const { data: existing } = await supabase
         .from('site_metadata')
@@ -649,7 +655,7 @@ export default function AdminPhotos() {
           />
         </div>
         <Select value={filterCategory} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-full sm:w-40 h-9">
+          <SelectTrigger className="w-full sm:w-56 h-9">
             <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent>
