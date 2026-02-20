@@ -1,50 +1,36 @@
 export type AppPage = 'home' | 'services' | 'about' | 'why-choose-us' | 'gallery' | 'blog' | 'blog-detail' | 'books' | 'charity' | 'testimonials' | 'contact' | 'admin' | 'terms' | 'privacy' | 'dakshina'
 
+// ── Dynamic service content (new admin design) ─────────────────────────────
+export interface BulletItem {
+  id: string
+  icon: string
+  text: string
+}
+export interface VideoItem {
+  url: string
+  thumbnail: string
+}
+export interface ContentSection {
+  id: string
+  icon: string
+  enabled: boolean
+  title: string
+  description: string
+  bullets: BulletItem[]
+  images: string[]
+  videos: VideoItem[]
+  bgColor: string
+}
+export interface BlogLink {
+  title: string
+  url: string
+}
+
 export type AppNavigationData = {
   page: AppPage
   category?: string
   blogSlug?: string
   blogId?: string
-}
-
-// Service types
-export interface ServiceDetail {
-  deity?: {
-    name: string
-    description: string
-    significance: string
-  }
-  nature?: string
-  purpose?: string[]
-  significance?: string[]
-  scripturalRoots?: {
-    source: string
-    description: string
-  }
-  whenToPerform?: string[]
-  whereAndWho?: string
-  specialForNRIs?: string[]
-  specialForNRIsTitle?: string
-  specialForNRIsIntro?: string
-  coreAspects?: {
-    title: string
-    content: string
-  }[]
-  // Custom section titles
-  sectionTitles?: {
-    deity?: string
-    nature?: string
-    samagri?: string
-    samagriDescription?: string
-    significance?: string
-    scriptural?: string
-    when?: string
-    where?: string
-    nri?: string
-    includes?: string
-    requirements?: string
-    bestFor?: string
-  }
 }
 
 export interface Service {
@@ -55,12 +41,7 @@ export interface Service {
   description: string
   imageUrl?: string
   detailedDescription?: string
-  benefits?: string[]
-  includes?: string[]
-  requirements?: string[]
   price?: string
-  bestFor?: string[]
-  details?: ServiceDetail
   samagriFile?: {
     name: string
     data?: string
@@ -79,4 +60,8 @@ export interface Service {
     description: string
     imageUrl?: string
   }>
+  // Dynamic content from database
+  contentSections?: ContentSection[]
+  blogLinks?: BlogLink[]
+  bookingButton?: { name: string; url: string }
 }

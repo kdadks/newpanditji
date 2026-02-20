@@ -10,10 +10,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
-import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, Calendar, MapPin, Heart, Users, Sparkle, FilePdf, FileDoc, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch, CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
+import { Clock, CheckCircle, Package, Star, CurrencyDollar, Info, BookOpen, FlowerLotus, CalendarBlank, MapPin, Heart, Users, Sparkle, DownloadSimple, Printer, MagnifyingGlass, X, ArrowRight, CircleNotch, CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight,
+  Lightning, Crown, Leaf, Bell, Diamond, User, Gift, Fire, Eye, Sun, Moon, Phone, Check, Asterisk, Flame, Flower, HandsPraying, SealCheck, MedalMilitary, ShieldCheck
+} from '@phosphor-icons/react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
-import { AppPage, AppNavigationData, Service } from '../../lib/types'
+import { AppPage, AppNavigationData, Service, ContentSection, BlogLink } from '../../lib/types'
 import { categoryNames } from '../../lib/constants'
+
+// Map icon name → Phosphor component (mirrors admin)
+const ICON_MAP: Record<string, React.FC<any>> = {
+  CheckCircle, Check, SealCheck, Star, Sparkle, Heart, Diamond, Crown, MedalMilitary,
+  ShieldCheck, Lightning, Fire, Flame, Sun, Moon, Eye, Flower, Leaf, HandsPraying,
+  Bell, ArrowRight, Asterisk, BookOpen, Gift, Phone, MapPin, CalendarBlank, Users, User, Info,
+}
+const SectionIcon = ({ name, size = 20, className = '' }: { name?: string; size?: number; className?: string }) => {
+  if (!name) return null
+  const Comp = ICON_MAP[name]
+  return Comp ? <Comp size={size} className={className} weight="fill" /> : null
+}
 
 interface ServicesPageProps {
   initialCategory?: string
@@ -441,149 +455,256 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           <DialogContent className="max-w-[95vw] lg:max-w-[1200px] max-h-[90vh] overflow-y-auto">
             {selectedService && (
               <>
-                {/* Header with Image and Title */}
-                <div className="flex flex-col md:flex-row gap-6 mb-6">
-                  {/* Image Section */}
+                {/* Layout: image pinned left, all content scrolls in the right column */}
+                <div className="flex gap-6 items-start">
+                  {/* Feature Image – fixed 300px, sticks to top */}
                   {selectedService.imageUrl && (
-                    <div className="w-full md:w-auto shrink-0">
-                      <div className="relative overflow-hidden rounded-lg bg-linear-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
-                        <img 
+                    <div className="shrink-0 w-[300px] sticky top-0">
+                      <div className="overflow-hidden rounded-lg bg-linear-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
+                        <img
                           src={selectedService.imageUrl}
                           alt={selectedService.name}
-                          style={{ width: '400px', height: 'auto' }}
-                          className="object-cover"
+                          style={{ width: '300px', height: 'auto' }}
+                          className="object-cover block"
                         />
                       </div>
                     </div>
                   )}
 
-                  {/* Title and Info Section */}
-                  <div className="flex-1">
-                    {/* Back to Package Button */}
-                    {parentPackage && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleBackToPackage}
-                        className="mb-4 gap-2 hover:bg-purple-100 text-purple-700"
-                      >
-                        <CaretLeft size={16} weight="bold" />
-                        <Package size={16} weight="fill" />
-                        Back to {parentPackage.name}
-                      </Button>
-                    )}
+                  {/* Right column: all content */}
+                  <div className="flex-1 min-w-0 space-y-4">
+                  {/* Back to Package Button */}
+                  {parentPackage && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBackToPackage}
+                      className="mb-4 gap-2 hover:bg-purple-100 text-purple-700"
+                    >
+                      <CaretLeft size={16} weight="bold" />
+                      <Package size={16} weight="fill" />
+                      Back to {parentPackage.name}
+                    </Button>
+                  )}
 
-                    <div className="mb-3">
-                      <Badge className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white border-white/30">
-                        <FlowerLotus size={14} weight="fill" className="mr-1.5" />
-                        {categoryNames[selectedService.category]}
-                      </Badge>
-                    </div>
-                    <DialogTitle className="font-heading text-3xl mb-3">{selectedService.name}</DialogTitle>
-                    {/* Show detailed description if it exists, otherwise show short description */}
-                    <DialogDescription asChild>
-                      <div
-                        className="text-muted-foreground text-base prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedService.detailedDescription || selectedService.description }}
-                      />
-                    </DialogDescription>
+                  {/* Category Badge */}
+                  <div className="mb-3">
+                    <Badge className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white border-white/30">
+                      <FlowerLotus size={14} weight="fill" className="mr-1.5" />
+                      {categoryNames[selectedService.category]}
+                    </Badge>
                   </div>
-                </div>
 
-                <div className="space-y-6">
-                  {/* Quick Info Bar */}
-                  <div className="flex flex-wrap gap-4 p-4 bg-linear-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="text-primary" size={20} />
+                  {/* Title */}
+                  <DialogTitle className="font-heading text-3xl mb-3">{selectedService.name}</DialogTitle>
+
+                  {/* Description */}
+                  <DialogDescription asChild>
+                    <div
+                      className="text-muted-foreground text-base prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: selectedService.detailedDescription || selectedService.description }}
+                    />
+                  </DialogDescription>
+
+                  {/* Duration + Dakshina */}
+                  <div className="flex items-center justify-between mt-4 mb-2">
+                    <div className="flex items-center gap-2 text-sm bg-primary/5 px-3 py-1.5 rounded-full border border-primary/20">
+                      <Clock className="text-primary" size={16} />
                       <span className="font-medium">{selectedService.duration}</span>
                     </div>
                     {selectedService.price && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <CurrencyDollar className="text-primary" size={20} />
-                        <span className="font-medium">
+                      <div className="flex items-center gap-2 text-sm bg-amber-50 dark:bg-amber-950/30 px-3 py-1.5 rounded-full border border-amber-300 dark:border-amber-700">
+                        <span className="font-medium text-amber-700 dark:text-amber-300">
+                          Dakshina:{' '}
                           {!selectedService.price.includes('€') && /^\d+/.test(selectedService.price)
                             ? `€${selectedService.price}`
                             : selectedService.price}
                         </span>
                       </div>
                     )}
-                    {selectedService.samagriFile && (
-                      <div className="flex-1 flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            // Handle both URL-based and base64-based files
-                            if (selectedService.samagriFile!.url) {
-                              window.open(selectedService.samagriFile!.url, '_blank')
-                            } else if (selectedService.samagriFile!.data) {
-                              const link = document.createElement('a')
-                              link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
-                              link.download = selectedService.samagriFile!.name
-                              link.click()
-                            }
-                          }}
-                          className="gap-2"
-                        >
-                          <DownloadSimple size={16} weight="bold" />
-                          Download Samagri List
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            // Handle both URL-based and base64-based files
-                            if (selectedService.samagriFile!.url) {
-                              const printWindow = window.open(selectedService.samagriFile!.url, '_blank')
-                              if (printWindow) {
-                                printWindow.onload = () => printWindow.print()
-                              }
-                            } else if (selectedService.samagriFile!.data) {
-                              const blob = new Blob(
-                                [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
-                                { type: selectedService.samagriFile!.type }
-                              )
-                              const url = URL.createObjectURL(blob)
-                              const printWindow = window.open(url, '_blank')
-                              if (printWindow) {
-                                printWindow.onload = () => printWindow.print()
-                              }
-                            }
-                          }}
-                          className="gap-2"
-                        >
-                          <Printer size={16} weight="bold" />
-                          Print
-                        </Button>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Basic Details Sections - Show immediately after header */}
-                  <>
-                    {/* Benefits */}
-                    {selectedService.benefits && selectedService.benefits.length > 0 && (
-                      <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
-                        <CardContent className="p-6">
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <Star className="text-primary" size={24} weight="fill" />
-                            Spiritual Benefits
-                          </h3>
-                          <ul className="space-y-3">
-                            {selectedService.benefits.map((benefit, index) => (
-                              <li key={index} className="flex items-start gap-3">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={20} weight="fill" />
-                                <span className="text-muted-foreground">{benefit}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
+                  {/* Samagri download */}
+                  {selectedService.samagriFile && (
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (selectedService.samagriFile!.url) {
+                            window.open(selectedService.samagriFile!.url, '_blank')
+                          } else if (selectedService.samagriFile!.data) {
+                            const link = document.createElement('a')
+                            link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
+                            link.download = selectedService.samagriFile!.name
+                            link.click()
+                          }
+                        }}
+                        className="gap-2"
+                      >
+                        <DownloadSimple size={16} weight="bold" />
+                        Download Samagri List
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (selectedService.samagriFile!.url) {
+                            const printWindow = window.open(selectedService.samagriFile!.url, '_blank')
+                            if (printWindow) {
+                              printWindow.onload = () => printWindow.print()
+                            }
+                          } else if (selectedService.samagriFile!.data) {
+                            const blob = new Blob(
+                              [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
+                              { type: selectedService.samagriFile!.type }
+                            )
+                            const url = URL.createObjectURL(blob)
+                            const printWindow = window.open(url, '_blank')
+                            if (printWindow) {
+                              printWindow.onload = () => printWindow.print()
+                            }
+                          }
+                        }}
+                        className="gap-2"
+                      >
+                        <Printer size={16} weight="bold" />
+                        Print
+                      </Button>
+                    </div>
+                  )}
 
-                  {/* Package-Specific Sections */}
-                  {selectedService.isPackage && (
+                  {/* ── DYNAMIC CONTENT SECTIONS (new format) ── */}
+                  {selectedService.contentSections && selectedService.contentSections.length > 0 && (
+                    <div className="space-y-6">
+                      {selectedService.contentSections.map(section => (
+                        <div
+                          key={section.id}
+                          className="rounded-2xl border shadow-sm"
+                          style={{ backgroundColor: section.bgColor || undefined }}
+                        >
+                          {/* Section header */}
+                          {section.title && (
+                            <div className={`px-6 pt-5 pb-3 border-b flex items-center gap-2 ${section.bgColor ? '' : 'bg-card'}`}>
+                              {section.icon && <SectionIcon name={section.icon} size={20} className="text-primary shrink-0" />}
+                              <h3 className="font-heading font-bold text-xl text-foreground">{section.title}</h3>
+                            </div>
+                          )}
+
+                          <div className={`p-6 space-y-5 ${section.bgColor ? '' : 'bg-card'}`}>
+                            {/* Description */}
+                            {section.description && section.description !== '<p></p>' && (
+                              <div
+                                className="prose prose-sm max-w-none text-muted-foreground"
+                                dangerouslySetInnerHTML={{ __html: section.description }}
+                              />
+                            )}
+
+                            {/* Bullets */}
+                            {section.bullets && section.bullets.length > 0 && (
+                              <ul className="space-y-2.5">
+                                {section.bullets.map(bullet => (
+                                  <li key={bullet.id} className="flex items-start gap-3">
+                                    <span className="shrink-0 mt-0.5 text-primary">
+                                      <SectionIcon name={bullet.icon} size={18} />
+                                    </span>
+                                    <span className="text-muted-foreground text-sm leading-relaxed">{bullet.text}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+
+                            {/* Media: images + videos mixed, 3 per row */}
+                            {(() => {
+                              const imgs = (section.images || []).filter(Boolean) as string[]
+                              const vids = (section.videos || []).filter(v => v.url)
+                              if (imgs.length === 0 && vids.length === 0) return null
+
+                              /** Mirror Gallery's approach: normalise URL → embed → extract ID → hqdefault */
+                              const getYTEmbedUrl = (url: string): string => {
+                                if (!url) return ''
+                                let videoId = ''
+                                if (url.includes('youtu.be/'))       videoId = url.split('youtu.be/')[1]?.split('?')[0] || ''
+                                else if (url.includes('v='))          videoId = url.split('v=')[1]?.split('&')[0] || ''
+                                else if (url.includes('/embed/'))     videoId = url.split('/embed/')[1]?.split('?')[0] || ''
+                                else if (url.includes('/v/'))         videoId = url.split('/v/')[1]?.split('?')[0] || ''
+                                else if (url.includes('/shorts/'))    videoId = url.split('/shorts/')[1]?.split('?')[0] || ''
+                                return videoId ? `https://www.youtube.com/embed/${videoId}` : ''
+                              }
+
+                              const autoThumb = (url: string, saved: string): string => {
+                                // Use stored thumbnail first (set by admin) — but skip if it's a
+                                // maxresdefault that may 404 on low-res videos
+                                // Always re-derive from the video URL for reliability (hqdefault always exists)
+                                const embedUrl = getYTEmbedUrl(url)
+                                const videoId = embedUrl ? embedUrl.split('/embed/')[1] : ''
+                                if (videoId) return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                                // Non-YouTube: fall back to saved thumbnail or empty
+                                return saved || ''
+                              }
+
+                              type MediaItem =
+                                | { kind: 'image'; src: string; idx: number }
+                                | { kind: 'video'; url: string; thumb: string; idx: number }
+
+                              const items: MediaItem[] = [
+                                ...imgs.map((src, idx) => ({ kind: 'image' as const, src, idx })),
+                                ...vids.map((v, idx) => ({ kind: 'video' as const, url: v.url, thumb: autoThumb(v.url, v.thumbnail), idx })),
+                              ]
+
+                              return (
+                                <div className="grid grid-cols-3 gap-3">
+                                  {items.map(item =>
+                                    item.kind === 'image' ? (
+                                      <img
+                                        key={`img-${item.idx}`}
+                                        src={item.src}
+                                        alt={`${section.title || 'Section'} image ${item.idx + 1}`}
+                                        className="w-full aspect-square object-cover rounded-xl border shadow-sm"
+                                      />
+                                    ) : (
+                                      <a
+                                        key={`vid-${item.idx}`}
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="relative group aspect-square rounded-xl overflow-hidden border shadow-sm block"
+                                      >
+                                        {item.thumb ? (
+                                          <img
+                                            src={item.thumb}
+                                            alt={`Video ${item.idx + 1}`}
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                            decoding="async"
+                                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                                          />
+                                        ) : (
+                                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                                            <span className="text-4xl text-muted-foreground/30">▶</span>
+                                          </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                                          <div className="w-12 h-12 bg-red-600/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                            <span className="text-white font-bold ml-0.5">▶</span>
+                                          </div>
+                                        </div>
+                                      </a>
+                                    )
+                                  )}
+                                </div>
+                              )
+                            })()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  </div>{/* end right column */}
+                </div>{/* end flex row */}
+
+                {selectedService.isPackage && (
                     <>
                       {/* Package Savings */}
                       {selectedService.packageSavingsText && (
@@ -725,329 +846,39 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                     </>
                   )}
 
-                  {/* Deity Information */}
-                  {selectedService.details?.deity && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-orange-50">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          <FlowerLotus className="text-primary shrink-0 mt-1" size={32} weight="fill" />
-                          <div>
-                            {selectedService.details.sectionTitles?.deity && (
-                              <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
-                                {selectedService.details.sectionTitles.deity}
-                              </h3>
-                            )}
-                            <p className="text-muted-foreground leading-relaxed mb-3">
-                              {selectedService.details.deity.description}
-                            </p>
-                            <div className="bg-white/50 border border-amber-200 rounded-lg p-4">
-                              <p className="text-sm text-foreground leading-relaxed italic">
-                                {selectedService.details.deity.significance}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                {/* Footer: Read more links + CTA buttons – single line */}
+                <div className="mt-4 pt-4 border-t border-border flex items-center gap-3 flex-wrap">
+                  {/* Blog links inline */}
+                  {selectedService.blogLinks && selectedService.blogLinks.length > 0 && (
+                    <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
+                      <span className="text-sm text-muted-foreground italic shrink-0">Read more to know more...</span>
+                      {selectedService.blogLinks.map((link, i) => (
+                        <a
+                          key={i}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-sm text-primary underline-offset-2 hover:underline shrink-0"
+                        >
+                          <BookOpen size={13} className="text-primary shrink-0" weight="fill" />
+                          {link.title || link.url}
+                        </a>
+                      ))}
+                    </div>
                   )}
-
-                  {/* Nature and Purpose */}
-                  {selectedService.details?.nature && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
-                      <CardContent className="p-6">
-                        {selectedService.details.sectionTitles?.nature && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <BookOpen className="text-primary" size={24} />
-                            {selectedService.details.sectionTitles.nature}
-                          </h3>
-                        )}
-                        <p className="text-muted-foreground leading-relaxed mb-4">
-                          {selectedService.details.nature}
-                        </p>
-                        {selectedService.details.purpose && selectedService.details.purpose.length > 0 && (
-                          <ul className="space-y-2">
-                            {selectedService.details.purpose.map((item, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                                <span className="text-muted-foreground text-sm">{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Pooja Samagri Section */}
-                  {selectedService.samagriFile && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-rose-50 to-pink-50">
-                      <CardContent className="p-6">
-                        {selectedService.details?.sectionTitles?.samagri && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <Package className="text-primary" size={24} weight="fill" />
-                            {selectedService.details.sectionTitles.samagri}
-                          </h3>
-                        )}
-                        <div className="bg-white/60 border border-rose-200 rounded-lg p-5 space-y-4">
-                          <div className="flex items-start gap-4">
-                            {selectedService.samagriFile.type.includes('pdf') ? (
-                              <FilePdf size={48} className="text-red-500 shrink-0" weight="fill" />
-                            ) : (
-                              <FileDoc size={48} className="text-blue-500 shrink-0" weight="fill" />
-                            )}
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground mb-2">
-                                {selectedService.samagriFile.name}
-                              </p>
-                              {selectedService.details?.sectionTitles?.samagriDescription && (
-                                <p className="text-sm text-muted-foreground mb-4">
-                                  {selectedService.details.sectionTitles.samagriDescription}
-                                </p>
-                              )}
-                              <div className="flex flex-wrap gap-3">
-                                <Button
-                                  size="sm"
-                                  onClick={() => {
-                                    // Handle both URL-based and base64-based files
-                                    if (selectedService.samagriFile!.url) {
-                                      window.open(selectedService.samagriFile!.url, '_blank')
-                                    } else if (selectedService.samagriFile!.data) {
-                                      const link = document.createElement('a')
-                                      link.href = `data:${selectedService.samagriFile!.type};base64,${selectedService.samagriFile!.data}`
-                                      link.download = selectedService.samagriFile!.name
-                                      link.click()
-                                    }
-                                  }}
-                                  className="gap-2"
-                                >
-                                  <DownloadSimple size={18} weight="bold" />
-                                  Download
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    // Handle both URL-based and base64-based files
-                                    if (selectedService.samagriFile!.url) {
-                                      const printWindow = window.open(selectedService.samagriFile!.url, '_blank')
-                                      if (printWindow) {
-                                        printWindow.onload = () => printWindow.print()
-                                      }
-                                    } else if (selectedService.samagriFile!.data) {
-                                      const blob = new Blob(
-                                        [Uint8Array.from(atob(selectedService.samagriFile!.data), c => c.charCodeAt(0))],
-                                        { type: selectedService.samagriFile!.type }
-                                      )
-                                      const url = URL.createObjectURL(blob)
-                                      const printWindow = window.open(url, '_blank')
-                                      if (printWindow) {
-                                        printWindow.onload = () => printWindow.print()
-                                      }
-                                    }
-                                  }}
-                                  className="gap-2"
-                                >
-                                  <Printer size={18} weight="bold" />
-                                  Print
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Significance and Benefits */}
-                  {selectedService.details?.significance && selectedService.details.significance.length > 0 && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
-                      <CardContent className="p-6">
-                        {selectedService.details.sectionTitles?.significance && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <Star className="text-primary" size={24} weight="fill" />
-                            {selectedService.details.sectionTitles.significance}
-                          </h3>
-                        )}
-                        <ul className="space-y-3">
-                          {selectedService.details.significance.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <Sparkle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                              <span className="text-muted-foreground text-sm leading-relaxed">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Scriptural Roots */}
-                  {selectedService.details?.scripturalRoots && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-violet-50">
-                      <CardContent className="p-6">
-                        {selectedService.details.sectionTitles?.scriptural && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <BookOpen className="text-primary" size={24} />
-                            {selectedService.details.sectionTitles.scriptural}
-                          </h3>
-                        )}
-                        <Badge variant="outline" className="mb-3">
-                          {selectedService.details.scripturalRoots.source}
-                        </Badge>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                          {selectedService.details.scripturalRoots.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* When to Perform */}
-                  {selectedService.details?.whenToPerform && selectedService.details.whenToPerform.length > 0 && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-cyan-50 to-sky-50">
-                      <CardContent className="p-6">
-                        {selectedService.details.sectionTitles?.when && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <Calendar className="text-primary" size={24} />
-                            {selectedService.details.sectionTitles.when}
-                          </h3>
-                        )}
-                        <ul className="space-y-2">
-                          {selectedService.details.whenToPerform.map((item, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                              <span className="text-muted-foreground text-sm">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Where and Who */}
-                  {selectedService.details?.whereAndWho && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-pink-50 to-rose-50">
-                      <CardContent className="p-6">
-                        {selectedService.details.sectionTitles?.where && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <MapPin className="text-primary" size={24} />
-                            {selectedService.details.sectionTitles.where}
-                          </h3>
-                        )}
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                          {selectedService.details.whereAndWho}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Special for NRIs */}
-                  {selectedService.details?.specialForNRIs && selectedService.details.specialForNRIs.length > 0 && (
-                    <Card className="border-0 shadow-md bg-linear-to-br from-orange-50 to-red-50">
-                      <CardContent className="p-6">
-                        {(selectedService.details.specialForNRIsTitle || selectedService.details.sectionTitles?.nri) && (
-                          <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                            <Heart className="text-primary" size={24} weight="fill" />
-                            {selectedService.details.specialForNRIsTitle || selectedService.details.sectionTitles?.nri}
-                          </h3>
-                        )}
-                        {selectedService.details.specialForNRIsIntro && (
-                          <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                            {selectedService.details.specialForNRIsIntro}
-                          </p>
-                        )}
-                        <ul className="space-y-3">
-                          {selectedService.details.specialForNRIs.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <Users className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                              <span className="text-muted-foreground text-sm leading-relaxed">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* What's Included, Requirements, and Best For sections */}
-                  <>
-                    {/* What's Included */}
-                    {selectedService.includes && selectedService.includes.length > 0 && (
-                      <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
-                        <CardContent className="p-6">
-                          {selectedService.details?.sectionTitles?.includes && (
-                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                              <Package className="text-primary" size={24} weight="fill" />
-                              {selectedService.details.sectionTitles.includes}
-                            </h3>
-                          )}
-                          <ul className="space-y-3">
-                            {selectedService.includes.map((item, index) => (
-                              <li key={index} className="flex items-start gap-3">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={20} weight="fill" />
-                                <span className="text-muted-foreground">{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
+                  {/* Buttons pushed to the right */}
+                  <div className="flex items-center gap-2 ml-auto shrink-0">
+                    {selectedService.bookingButton?.url && (
+                      <Button asChild>
+                        <a href={selectedService.bookingButton.url} target={selectedService.bookingButton.url.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer">
+                          {selectedService.bookingButton.name || 'Book This Service'}
+                        </a>
+                      </Button>
                     )}
-
-                    {/* Requirements */}
-                    {selectedService.requirements && selectedService.requirements.length > 0 && (
-                      <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-orange-50">
-                        <CardContent className="p-6">
-                          {selectedService.details?.sectionTitles?.requirements && (
-                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                              <Info className="text-primary" size={24} />
-                              {selectedService.details.sectionTitles.requirements}
-                            </h3>
-                          )}
-                          <ul className="space-y-3">
-                            {selectedService.requirements.map((req, index) => (
-                              <li key={index} className="flex items-start gap-3">
-                                <CheckCircle className="text-primary mt-0.5 shrink-0" size={18} weight="fill" />
-                                <span className="text-muted-foreground">{req}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Best For */}
-                    {selectedService.bestFor && selectedService.bestFor.length > 0 && (
-                      <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-pink-50">
-                        <CardContent className="p-6">
-                          {selectedService.details?.sectionTitles?.bestFor && (
-                            <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                              <Heart className="text-primary" size={24} weight="fill" />
-                              {selectedService.details.sectionTitles.bestFor}
-                            </h3>
-                          )}
-                          <div className="flex flex-wrap gap-2">
-                            {selectedService.bestFor.map((item, index) => (
-                              <span
-                                key={index}
-                                className="text-sm font-medium bg-primary/10 text-primary px-4 py-2 rounded-full"
-                              >
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-border flex gap-3">
-                  <Button className="flex-1" onClick={() => {
-                    setIsDetailsOpen(false)
-                    window.location.href = '/contact'
-                  }}>
-                    Book This Service
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>
-                    Close
-                  </Button>
+                    <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>
+                      Close
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

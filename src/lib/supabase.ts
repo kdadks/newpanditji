@@ -94,7 +94,7 @@ export interface Database {
   }
 }
 
-// Service types - matches migration 20241203000003_services.sql + 20260127000001_add_service_packages.sql
+// Service types - matches live Supabase table (see 20260220000001_clean_services_schema.sql)
 export interface ServiceRow {
   id: string
   slug: string
@@ -104,39 +104,25 @@ export interface ServiceRow {
   full_description: string | null
   duration: string | null
   price: string | null
-  benefits: string[] | null
-  includes: string[] | null
-  requirements: string[] | null
-  best_for: string[] | null
-  deity_info: Record<string, unknown> | null
-  nature: string | null
-  purpose: string[] | null
-  significance: string[] | null
-  scriptural_roots: Record<string, unknown> | null
-  when_to_perform: string[] | null
-  where_and_who: string | null
-  special_notes: string[] | null
-  special_for_nris_title: string | null
-  special_for_nris_intro: string | null
-  section_titles: Record<string, string> | null
-  core_aspects: Record<string, unknown>[] | null
-  samagri_items: Record<string, unknown> | null
-  samagri_file_url: string | null
   featured_image_url: string | null
-  gallery_images: string[] | null
+  image_position: string | null           // CSS object-position for featured image
+  samagri_file_url: string | null
+  where_and_who: string | null            // JSON string {name, url} — booking CTA
+  core_aspects: Record<string, unknown>[] | null   // JSONB ContentSection[]
+  special_notes: Record<string, unknown>[] | null  // JSONB BlogLink[]
   is_featured: boolean
   is_popular: boolean
+  is_published: boolean
+  is_package: boolean
+  package_services: string[] | null       // uuid[] of included service IDs
+  package_savings_text: string | null
+  package_highlights: string[] | null
   view_count: number
   inquiry_count: number
   meta_title: string | null
   meta_description: string | null
   meta_keywords: string[] | null
-  is_published: boolean
   sort_order: number
-  // Package-specific fields
-  is_package: boolean
-  package_savings_text: string | null
-  package_highlights: string[] | null
   created_at: string
   updated_at: string
 }
@@ -165,7 +151,6 @@ export interface AdminServiceRow extends ServiceRow {
   category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
   description: string
   detailed_description: string | null
-  special_for_nris: string[] | null
 }
 
 // Package with included services for admin UI

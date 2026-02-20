@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug, type ServiceRow, type ServiceInsert, type ServiceUpdate, type AdminServiceRow } from '../lib/supabase'
 import { toast } from 'sonner'
-import type { Service, ServiceDetail } from '../lib/types'
+import type { Service, ContentSection, BlogLink } from '../lib/types'
 
 // Query keys
 const SERVICES_KEY = ['services']
@@ -18,8 +18,33 @@ interface ServiceRowWithCategory extends ServiceRow {
  * Convert ServiceRow from database to Service format for public UI
  */
 function mapServiceRowToService(row: ServiceRowWithCategory): Service {
-  // Get category from joined table or default
   const category = row.service_categories?.slug || 'pooja'
+
+  // Parse core_aspects (JSONB ContentSection[]) — filter disabled sections
+  let contentSections: ContentSection[] | undefined
+  const rawAspects = row.core_aspects as any
+  if (Array.isArray(rawAspects) && rawAspects.length > 0 && 'images' in rawAspects[0]) {
+    contentSections = (rawAspects as ContentSection[]).filter(s => s.enabled !== false)
+  }
+
+  // Parse special_notes (JSONB BlogLink[])
+  let blogLinks: BlogLink[] | undefined
+  const rawNotes = row.special_notes as any
+  if (Array.isArray(rawNotes) && rawNotes.length > 0 && typeof rawNotes[0] === 'object' && 'url' in rawNotes[0]) {
+    blogLinks = rawNotes as BlogLink[]
+  }
+
+  // Parse where_and_who → bookingButton
+  let bookingButton: { name: string; url: string } | undefined
+  const rawWhere = row.where_and_who
+  if (rawWhere) {
+    try {
+      const p = JSON.parse(rawWhere)
+      if (p.url) bookingButton = { name: p.name || 'Book This Service', url: p.url }
+    } catch {
+      bookingButton = { name: 'Book This Service', url: rawWhere }
+    }
+  }
 
   return {
     id: row.id,
@@ -29,36 +54,18 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     description: row.short_description,
     imageUrl: row.featured_image_url || undefined,
     detailedDescription: row.full_description || undefined,
-    benefits: row.benefits || undefined,
-    includes: row.includes || undefined,
-    requirements: row.requirements || undefined,
     price: row.price || undefined,
-    bestFor: row.best_for || undefined,
-    details: {
-      deity: row.deity_info as ServiceDetail['deity'] | undefined,
-      nature: row.nature || undefined,
-      purpose: row.purpose || undefined,
-      significance: row.significance || undefined,
-      scripturalRoots: row.scriptural_roots as ServiceDetail['scripturalRoots'] | undefined,
-      whenToPerform: row.when_to_perform || undefined,
-      whereAndWho: row.where_and_who || undefined,
-      specialForNRIs: row.special_notes || undefined,
-      specialForNRIsTitle: row.special_for_nris_title || undefined,
-      specialForNRIsIntro: row.special_for_nris_intro || undefined,
-      coreAspects: row.core_aspects as ServiceDetail['coreAspects'] | undefined,
-      sectionTitles: row.section_titles as ServiceDetail['sectionTitles'] | undefined,
-    },
-    // Map samagri file URL to the format expected by UI
     samagriFile: row.samagri_file_url ? {
       name: 'Samagri List',
       url: row.samagri_file_url,
       type: row.samagri_file_url.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
     } : undefined,
-    // Package-specific fields
     isPackage: row.is_package,
     packageSavingsText: row.package_savings_text || undefined,
     packageHighlights: row.package_highlights || undefined,
-    // Note: includedServices will be fetched separately for packages
+    contentSections,
+    blogLinks,
+    bookingButton,
   }
 }
 
@@ -68,14 +75,12 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
  */
 function mapServiceRowToAdminRow(row: ServiceRowWithCategory): AdminServiceRow {
   const category = row.service_categories?.slug || 'pooja'
-  
+
   return {
     ...row,
-    // Map to admin-expected field names
     category: category as AdminServiceRow['category'],
     description: row.short_description,
     detailed_description: row.full_description,
-    special_for_nris: row.special_notes,
   }
 }
 
@@ -213,7 +218,7 @@ async function createService(service: ServiceInsert): Promise<ServiceRow> {
     .single()
 
   if (error) {
-    console.error('Error creating service:', error)
+    console.error('Error creating service:', error.message, '| code:', error.code, '| details:', error.details, '| hint:', error.hint)
     throw error
   }
 
@@ -224,10 +229,6 @@ async function createService(service: ServiceInsert): Promise<ServiceRow> {
  * Update an existing service in Supabase
  */
 async function updateService({ id, ...updates }: ServiceUpdate & { id: string }): Promise<ServiceRow> {
-  // Log the actual Supabase URL being used
-  console.log('UPDATE - Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log('UPDATE - Using supabase client with URL:', (supabase as any).supabaseUrl)
-  
   const { data, error } = await supabase
     .from('services')
     .update(updates)
@@ -412,75 +413,3 @@ export function useAdminServices() {
   }
 }
 
-/**
- * Helper to convert old Service format to ServiceInsert
- */
-export function convertLegacyService(service: {
-  id?: string
-  name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
-  duration: string
-  description: string
-  detailedDescription?: string
-  benefits?: string[]
-  includes?: string[]
-  requirements?: string[]
-  price?: string
-  bestFor?: string[]
-  details?: {
-    deity?: { name: string; description: string; significance: string }
-    nature?: string
-    purpose?: string[]
-    significance?: string[]
-    scripturalRoots?: { source: string; description: string }
-    whenToPerform?: string[]
-    whereAndWho?: string
-    specialForNRIs?: string[]
-    specialForNRIsTitle?: string
-    specialForNRIsIntro?: string
-    coreAspects?: { title: string; content: string }[]
-  }
-  samagriFile?: { name: string; data: string; type: string }
-}): ServiceInsert {
-  return {
-    slug: generateSlug(service.name),
-    name: service.name,
-    category_id: null, // Will be set based on category lookup
-    short_description: service.description,
-    full_description: service.detailedDescription || null,
-    duration: service.duration || null,
-    price: service.price || null,
-    benefits: service.benefits || null,
-    includes: service.includes || null,
-    requirements: service.requirements || null,
-    best_for: service.bestFor || null,
-    deity_info: service.details?.deity || null,
-    nature: service.details?.nature || null,
-    purpose: service.details?.purpose || null,
-    significance: service.details?.significance || null,
-    scriptural_roots: service.details?.scripturalRoots || null,
-    when_to_perform: service.details?.whenToPerform || null,
-    where_and_who: service.details?.whereAndWho || null,
-    special_notes: service.details?.specialForNRIs || null,
-    special_for_nris_title: service.details?.specialForNRIsTitle || null,
-    special_for_nris_intro: service.details?.specialForNRIsIntro || null,
-    core_aspects: service.details?.coreAspects || null,
-    section_titles: null, // Section titles not used in legacy conversion
-    samagri_items: null,
-    samagri_file_url: null, // File upload handled separately
-    featured_image_url: null,
-    gallery_images: null,
-    is_featured: false,
-    is_popular: false,
-    view_count: 0,
-    inquiry_count: 0,
-    meta_title: null,
-    meta_description: null,
-    meta_keywords: null,
-    is_published: true,
-    sort_order: 0,
-    is_package: service.category === 'packages',
-    package_savings_text: null,
-    package_highlights: null
-  }
-}

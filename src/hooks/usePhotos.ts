@@ -108,7 +108,8 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
   const { data, error, count } = await query
 
   if (error) {
-    console.error('Error fetching photos:', error)
+    const msg = (error as any)?.message || (error as any)?.details || (error as any)?.hint || JSON.stringify(error)
+    console.error('Error fetching photos:', msg, error)
     throw error
   }
 
