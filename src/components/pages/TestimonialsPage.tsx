@@ -21,7 +21,7 @@ export default function TestimonialsPage() {
   const { content: cmsContent, isLoading: cmsLoading } = useTestimonialsContent()
   usePageMetadata('testimonials')
 
-  const PAGE_SIZE = 10
+  const PAGE_SIZE = 20
   const [page, setPage] = useState(1)
   const totalPages = Math.ceil(testimonials.length / PAGE_SIZE)
   const pagedTestimonials = testimonials.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -118,6 +118,45 @@ export default function TestimonialsPage() {
 
       {/* Content Section */}
       <div id="testimonials-list" className="py-8 md:py-12 px-4 md:px-8 lg:px-12">
+
+        {/* Pagination - Top */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(page - 1)}
+              disabled={page === 1}
+              className="gap-1"
+            >
+              <CaretLeft size={16} weight="bold" />
+              Previous
+            </Button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <Button
+                key={p}
+                variant={p === page ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => goToPage(p)}
+                className={p === page ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white border-0' : ''}
+              >
+                {p}
+              </Button>
+            ))}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(page + 1)}
+              disabled={page === totalPages}
+              className="gap-1"
+            >
+              Next
+              <CaretRight size={16} weight="bold" />
+            </Button>
+          </div>
+        )}
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-16">
