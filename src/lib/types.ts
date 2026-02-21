@@ -26,6 +26,12 @@ export interface BlogLink {
   url: string
 }
 
+export interface FaqItem {
+  id: string
+  question: string
+  answer: string
+}
+
 export type AppNavigationData = {
   page: AppPage
   category?: string
@@ -63,5 +69,6 @@ export interface Service {
   // Dynamic content from database
   contentSections?: ContentSection[]
   blogLinks?: BlogLink[]
+  faqs?: FaqItem[]
   bookingButton?: { name: string; url: string }
 }

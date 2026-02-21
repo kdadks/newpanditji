@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug, type ServiceRow, type ServiceInsert, type ServiceUpdate, type AdminServiceRow } from '../lib/supabase'
 import { toast } from 'sonner'
-import type { Service, ContentSection, BlogLink } from '../lib/types'
+import type { Service, ContentSection, BlogLink, FaqItem } from '../lib/types'
 
 // Query keys
 const SERVICES_KEY = ['services']
@@ -34,13 +34,15 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     blogLinks = rawNotes as BlogLink[]
   }
 
-  // Parse where_and_who → bookingButton
+  // Parse where_and_who → bookingButton + faqs
   let bookingButton: { name: string; url: string } | undefined
+  let faqs: FaqItem[] | undefined
   const rawWhere = row.where_and_who
   if (rawWhere) {
     try {
       const p = JSON.parse(rawWhere)
       if (p.url) bookingButton = { name: p.name || 'Book This Service', url: p.url }
+      if (Array.isArray(p.faqs) && p.faqs.length > 0) faqs = p.faqs as FaqItem[]
     } catch {
       bookingButton = { name: 'Book This Service', url: rawWhere }
     }
@@ -65,6 +67,7 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     packageHighlights: row.package_highlights || undefined,
     contentSections,
     blogLinks,
+    faqs,
     bookingButton,
   }
 }

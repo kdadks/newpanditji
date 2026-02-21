@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { QuillEditor } from '../ui/quill-editor'
 import {
   Plus, PencilSimple, Trash, FloppyDisk, X, MagnifyingGlass, FunnelSimple, Spinner, Package,
-  Image as ImageIcon, Clock, CaretLeft, CaretRight, GlobeSimple,
+  Image as ImageIcon, Clock, CaretLeft, CaretRight, CaretUp, CaretDown, GlobeSimple,
   CheckCircle, Star, Heart, ShieldCheck, ArrowRight, Lightning, Crown, Leaf, Bell, Diamond,
   Users, User, MapPin, CalendarBlank, Gift, Fire, Eye, Sun, Moon, BookOpen, Phone, Sparkle,
   Check, Asterisk, Flame, Flower, HandsPraying, SealCheck, MedalMilitary, EyeSlash
@@ -39,6 +39,8 @@ const SECTION_COLORS = [
 
 const genId = () => Math.random().toString(36).slice(2, 9)
 
+const DEFAULT_BG_COLORS = ['#FFF8F0', '#FAF5FF', '#EFF6FF', '#F0FFF4', '#FFFBEB', '#FFF1F2']
+
 const getYTThumbnail = (url: string): string => {
   const m = url.match(/(?:v=|\/embed\/|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/)
   return m ? `https://img.youtube.com/vi/${m[1]}/maxresdefault.jpg` : ''
@@ -46,7 +48,7 @@ const getYTThumbnail = (url: string): string => {
 
 const makeBullet = (): BulletItem => ({ id: genId(), icon: 'CheckCircle', text: '' })
 
-const makeSection = (): ContentSection => ({
+const makeSection = (idx?: number): ContentSection => ({
   id: genId(),
   icon: '',
   enabled: true,
@@ -55,7 +57,7 @@ const makeSection = (): ContentSection => ({
   bullets: [],
   images: ['', '', ''],
   videos: [{ url: '', thumbnail: '' }, { url: '', thumbnail: '' }, { url: '', thumbnail: '' }],
-  bgColor: '',
+  bgColor: idx !== undefined ? DEFAULT_BG_COLORS[idx % DEFAULT_BG_COLORS.length] : '',
 })
 
 const BULLET_ICONS: { name: string; Component: React.FC<any>; label: string }[] = [
@@ -124,6 +126,12 @@ interface BlogLink {
   url: string
 }
 
+interface FaqItem {
+  id: string
+  question: string
+  answer: string
+}
+
 interface ServiceFormData {
   id: string
   name: string
@@ -134,6 +142,7 @@ interface ServiceFormData {
   featuredImageUrl: string
   contentSections: ContentSection[]
   blogLinks: BlogLink[]
+  faqs: FaqItem[]
   bookingButtonName: string
   bookingButtonUrl: string
 }
@@ -166,6 +175,7 @@ export default function AdminServicesNew() {
     featuredImageUrl: '',
     contentSections: [],
     blogLinks: [],
+    faqs: [],
     bookingButtonName: '',
     bookingButtonUrl: '',
   })
@@ -209,8 +219,8 @@ export default function AdminServicesNew() {
     const rawAspects = service.core_aspects as any
     if (Array.isArray(rawAspects) && rawAspects.length > 0) {
       contentSections = 'images' in rawAspects[0]
-        ? (rawAspects as any[]).map((a: any) => ({ ...makeSection(), ...a, bullets: Array.isArray(a.bullets) ? a.bullets : [], icon: a.icon || '', enabled: a.enabled !== false }))
-        : rawAspects.map((a: any) => ({ ...makeSection(), title: a.title || '', description: a.content || '' }))
+        ? (rawAspects as any[]).map((a: any, i: number) => ({ ...makeSection(i), ...a, bgColor: a.bgColor || DEFAULT_BG_COLORS[i % DEFAULT_BG_COLORS.length], bullets: Array.isArray(a.bullets) ? a.bullets : [], icon: a.icon || '', enabled: a.enabled !== false }))
+        : rawAspects.map((a: any, i: number) => ({ ...makeSection(i), title: a.title || '', description: a.content || '' }))
     }
 
     // Parse blog links from special_notes
@@ -232,8 +242,14 @@ export default function AdminServicesNew() {
       blogLinks,
       ...(() => {
         const raw = service.where_and_who || ''
-        try { const p = JSON.parse(raw); return { bookingButtonName: p.name || '', bookingButtonUrl: p.url || '' } }
-        catch { return { bookingButtonName: '', bookingButtonUrl: raw } }
+        try {
+          const p = JSON.parse(raw)
+          return {
+            bookingButtonName: p.name || '',
+            bookingButtonUrl: p.url || '',
+            faqs: Array.isArray(p.faqs) ? p.faqs : [],
+          }
+        } catch { return { bookingButtonName: '', bookingButtonUrl: raw, faqs: [] } }
       })(),
     })
     setEditingService(service)
@@ -337,7 +353,7 @@ export default function AdminServicesNew() {
           is_package: formData.category === 'packages',
           core_aspects: formData.contentSections.length > 0 ? (formData.contentSections as any) : null,
           special_notes: formData.blogLinks.length > 0 ? (formData.blogLinks as any) : null,
-          where_and_who: (formData.bookingButtonName || formData.bookingButtonUrl) ? JSON.stringify({ name: formData.bookingButtonName, url: formData.bookingButtonUrl }) : null,
+          where_and_who: (formData.bookingButtonName || formData.bookingButtonUrl || formData.faqs.length > 0) ? JSON.stringify({ name: formData.bookingButtonName, url: formData.bookingButtonUrl, faqs: formData.faqs.length > 0 ? formData.faqs : undefined }) : null,
         })
       } else {
         const newService: any = {
@@ -353,7 +369,7 @@ export default function AdminServicesNew() {
           is_published: true,
           core_aspects: formData.contentSections.length > 0 ? (formData.contentSections as any) : null,
           special_notes: formData.blogLinks.length > 0 ? (formData.blogLinks as any) : null,
-          where_and_who: (formData.bookingButtonName || formData.bookingButtonUrl) ? JSON.stringify({ name: formData.bookingButtonName, url: formData.bookingButtonUrl }) : null,
+          where_and_who: (formData.bookingButtonName || formData.bookingButtonUrl || formData.faqs.length > 0) ? JSON.stringify({ name: formData.bookingButtonName, url: formData.bookingButtonUrl, faqs: formData.faqs.length > 0 ? formData.faqs : undefined }) : null,
         }
         await createService(newService)
       }
@@ -606,7 +622,7 @@ export default function AdminServicesNew() {
 
       {/* ── Add / Edit Dialog ── */}
       <Dialog open={isDialogOpen && !activeImagePicker} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[72vw]! max-w-[72vw]! max-h-[92vh] overflow-hidden flex flex-col p-0 gap-0 border shadow-2xl bg-background">
+        <DialogContent className="w-[72vw]! max-w-[72vw]! max-h-[92vh] overflow-hidden flex flex-col p-0 gap-0 border shadow-2xl bg-white">
 
           {/* Header */}
           <DialogHeader className="relative px-7 pt-6 pb-5 bg-linear-to-r from-primary/10 via-accent/5 to-secondary/10 border-b shrink-0">
@@ -773,7 +789,7 @@ export default function AdminServicesNew() {
               {formData.contentSections.map((section, secIdx) => (
                 <div
                   key={section.id}
-                  className={`rounded-2xl border shadow-sm overflow-hidden transition-shadow hover:shadow-md ${!section.enabled ? 'opacity-50' : ''}`}
+                  className={`rounded-lg border border-border/40 shadow-sm overflow-hidden transition-shadow hover:shadow-md ${!section.enabled ? 'opacity-50' : ''}`}
                   style={{ backgroundColor: section.bgColor || undefined }}
                 >
                   {/* Section header bar */}
@@ -872,6 +888,43 @@ export default function AdminServicesNew() {
                             }}
                           />
                         ))}
+                        {/* Native color picker */}
+                        <label
+                          title="Pick custom color"
+                          className="w-5 h-5 rounded-full border-2 border-border/60 overflow-hidden cursor-pointer hover:scale-110 transition-all hover:border-border shrink-0"
+                          style={{ backgroundColor: section.bgColor || 'var(--card)' }}
+                        >
+                          <input
+                            type="color"
+                            value={section.bgColor || '#ffffff'}
+                            onChange={e => setFormData(f => ({
+                              ...f,
+                              contentSections: f.contentSections.map(s =>
+                                s.id === section.id ? { ...s, bgColor: e.target.value } : s
+                              )
+                            }))}
+                            className="opacity-0 w-0 h-0 absolute"
+                          />
+                        </label>
+                        {/* Hex code input */}
+                        <input
+                          type="text"
+                          value={section.bgColor || ''}
+                          onChange={e => {
+                            const val = e.target.value
+                            if (val === '' || /^#([0-9A-Fa-f]{0,6})$/.test(val)) {
+                              setFormData(f => ({
+                                ...f,
+                                contentSections: f.contentSections.map(s =>
+                                  s.id === section.id ? { ...s, bgColor: val } : s
+                                )
+                              }))
+                            }
+                          }}
+                          placeholder="#ffffff"
+                          maxLength={7}
+                          className="h-5 w-[72px] text-[10px] font-mono px-1.5 rounded border border-border/60 bg-background text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
+                        />
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 mt-0.5">
@@ -891,6 +944,36 @@ export default function AdminServicesNew() {
                         title={section.enabled ? 'Visible on site — click to hide' : 'Hidden from site — click to show'}
                       >
                         {section.enabled ? <Eye size={15} /> : <EyeSlash size={15} />}
+                      </button>
+                      {/* Move up */}
+                      <button
+                        onClick={() => setFormData(f => {
+                          const arr = [...f.contentSections]
+                          const i = arr.findIndex(s => s.id === section.id)
+                          if (i <= 0) return f
+                          ;[arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]
+                          return { ...f, contentSections: arr }
+                        })}
+                        disabled={secIdx === 0}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move section up"
+                      >
+                        <CaretUp size={15} weight="bold" />
+                      </button>
+                      {/* Move down */}
+                      <button
+                        onClick={() => setFormData(f => {
+                          const arr = [...f.contentSections]
+                          const i = arr.findIndex(s => s.id === section.id)
+                          if (i >= arr.length - 1) return f
+                          ;[arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]
+                          return { ...f, contentSections: arr }
+                        })}
+                        disabled={secIdx === formData.contentSections.length - 1}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move section down"
+                      >
+                        <CaretDown size={15} weight="bold" />
                       </button>
                       {/* Delete */}
                       <button
@@ -1148,7 +1231,7 @@ export default function AdminServicesNew() {
 
               {/* ▸ ADD SECTION button */}
               <button
-                onClick={() => setFormData(f => ({ ...f, contentSections: [...f.contentSections, makeSection()] }))}
+                onClick={() => setFormData(f => ({ ...f, contentSections: [...f.contentSections, makeSection(f.contentSections.length)] }))}
                 className="w-full py-4 rounded-2xl border-2 border-dashed border-primary/25 flex items-center justify-center gap-3 text-primary/60 hover:text-primary hover:border-primary/60 hover:bg-primary/5 transition-all group"
               >
                 <div className="w-7 h-7 rounded-full border-2 border-current flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -1207,6 +1290,64 @@ export default function AdminServicesNew() {
                           >
                             <X size={15} />
                           </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* ▸ FAQs */}
+              <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
+                <div className="px-6 pt-5 pb-2 border-b bg-linear-to-r from-amber-500/5 to-transparent">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-5 bg-amber-500 rounded-full" />
+                      <h3 className="font-heading font-semibold text-sm uppercase tracking-wide text-amber-600 dark:text-amber-400">FAQs</h3>
+                    </div>
+                    <button
+                      onClick={() => setFormData(f => ({ ...f, faqs: [...f.faqs, { id: genId(), question: '', answer: '' }] }))}
+                      className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:bg-amber-500/5 transition-all"
+                    >
+                      <Plus size={13} weight="bold" />
+                      Add FAQ
+                    </button>
+                  </div>
+                </div>
+                <div className="p-5">
+                  {formData.faqs.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-3">
+                      No FAQs yet — click <strong>Add FAQ</strong> to add questions &amp; answers.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.faqs.map((faq, idx) => (
+                        <div key={faq.id} className="rounded-lg border border-border/50 bg-background p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 w-4">Q{idx + 1}</span>
+                            <Input
+                              value={faq.question}
+                              onChange={e => setFormData(f => ({ ...f, faqs: f.faqs.map((item, i) => i === idx ? { ...item, question: e.target.value } : item) }))}
+                              placeholder="Question…"
+                              className="h-8 text-sm flex-1 bg-background"
+                            />
+                            <button
+                              onClick={() => setFormData(f => ({ ...f, faqs: f.faqs.filter((_, i) => i !== idx) }))}
+                              className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all shrink-0"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 w-4 mt-2">A</span>
+                            <Textarea
+                              value={faq.answer}
+                              onChange={e => setFormData(f => ({ ...f, faqs: f.faqs.map((item, i) => i === idx ? { ...item, answer: e.target.value } : item) }))}
+                              placeholder="Answer…"
+                              rows={2}
+                              className="text-sm flex-1 bg-background resize-none"
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>

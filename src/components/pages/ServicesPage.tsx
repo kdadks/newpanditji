@@ -7,6 +7,7 @@ import { shouldTrackAnalytics } from '../../lib/analytics-utils'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Input } from '../ui/input'
@@ -46,6 +47,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
+  const [faqOpenItems, setFaqOpenItems] = useState<string[]>([])
   const itemsPerPage = 12
 
   // SEO Configuration
@@ -84,7 +86,8 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
     setIsDetailsOpen(true)
-    setParentPackage(null) // Clear parent package when opening a new service
+    setParentPackage(null)
+    setFaqOpenItems([])
 
     // Track service view (only in production, not localhost/development)
     if (shouldTrackAnalytics() && service.id) {
@@ -101,6 +104,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
     if (fullService) {
       setParentPackage(packageService) // Remember the package we came from
       setSelectedService(fullService)
+      setFaqOpenItems([])
 
       // Track service view
       if (shouldTrackAnalytics() && fullService.id) {
@@ -116,6 +120,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
     if (parentPackage) {
       setSelectedService(parentPackage)
       setParentPackage(null)
+      setFaqOpenItems([])
     }
   }
 
@@ -452,27 +457,26 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
         {/* Service Details Modal */}
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent className="max-w-[95vw] lg:max-w-[1200px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] lg:max-w-[1200px] max-h-[90vh] overflow-y-auto bg-white">
             {selectedService && (
               <>
-                {/* Layout: image pinned left, all content scrolls in the right column */}
-                <div className="flex gap-6 items-start">
-                  {/* Feature Image – fixed 300px, sticks to top */}
+                {/* Float image left — all content wraps around it */}
+                <div>
                   {selectedService.imageUrl && (
-                    <div className="shrink-0 w-[300px] sticky top-0">
+                    <div className="float-left mr-8 mb-8 w-[300px]" style={{ shapeOutside: 'margin-box' }}>
                       <div className="overflow-hidden rounded-lg bg-linear-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
                         <img
                           src={selectedService.imageUrl}
                           alt={selectedService.name}
-                          style={{ width: '300px', height: 'auto' }}
-                          className="object-cover block"
+                          style={{ width: '300px', height: 'auto', display: 'block' }}
+                          className="object-cover"
                         />
                       </div>
                     </div>
                   )}
 
-                  {/* Right column: all content */}
-                  <div className="flex-1 min-w-0 space-y-4">
+                  {/* Content flows around the float */}
+                  <div className="space-y-4">
                   {/* Back to Package Button */}
                   {parentPackage && (
                     <Button
@@ -576,12 +580,15 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
                   {/* ── DYNAMIC CONTENT SECTIONS (new format) ── */}
                   {selectedService.contentSections && selectedService.contentSections.length > 0 && (
-                    <div className="space-y-6">
-                      {selectedService.contentSections.map(section => (
+                    <div className="space-y-6 mt-4">
+                      {selectedService.contentSections.map((section, secIdx) => (
                         <div
                           key={section.id}
-                          className="rounded-2xl border shadow-sm"
-                          style={{ backgroundColor: section.bgColor || undefined }}
+                          className={`rounded-lg border border-border/40 shadow-sm${secIdx > 0 ? ' clear-both' : ''}`}
+                          style={{
+                            backgroundColor: section.bgColor || undefined,
+                            ...(secIdx === 0 ? { overflow: 'hidden', display: 'flow-root' } : {}),
+                          }}
                         >
                           {/* Section header */}
                           {section.title && (
@@ -701,8 +708,9 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                     </div>
                   )}
 
-                  </div>{/* end right column */}
-                </div>{/* end flex row */}
+                  </div>{/* end content */}
+                  <div className="clear-both"></div>
+                </div>{/* end float wrapper */}
 
                 {selectedService.isPackage && (
                     <>
@@ -845,6 +853,51 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                       )}
                     </>
                   )}
+
+                {/* FAQ Accordion */}
+                {selectedService.faqs && selectedService.faqs.length > 0 && (
+                  <div className="mt-4 mb-2 rounded-lg border border-border/40 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 border-b bg-amber-50/60">
+                      <h3 className="font-heading font-bold text-base flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold shrink-0">?</span>
+                        Frequently Asked Questions
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setFaqOpenItems(selectedService.faqs!.map((_, i) => `faq-${i}`))}
+                          className="text-xs text-amber-600 hover:text-amber-800 font-medium px-2 py-1 rounded hover:bg-amber-100 transition-colors"
+                        >
+                          Expand All
+                        </button>
+                        <span className="text-border">|</span>
+                        <button
+                          onClick={() => setFaqOpenItems([])}
+                          className="text-xs text-amber-600 hover:text-amber-800 font-medium px-2 py-1 rounded hover:bg-amber-100 transition-colors"
+                        >
+                          Collapse All
+                        </button>
+                      </div>
+                    </div>
+                    <div className="px-5 py-2 bg-amber-50/20">
+                      <Accordion type="multiple" value={faqOpenItems} onValueChange={setFaqOpenItems} className="space-y-0">
+                        {selectedService.faqs.map((faq, i) => (
+                          <AccordionItem
+                            key={faq.id || i}
+                            value={`faq-${i}`}
+                            className="border-b border-border/30 last:border-b-0"
+                          >
+                            <AccordionTrigger className="text-sm font-semibold text-foreground py-2.5 hover:no-underline text-left">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-sm text-muted-foreground pb-3 leading-relaxed">
+                              {faq.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </div>
+                  </div>
+                )}
 
                 {/* Footer: Read more links + CTA buttons – single line */}
                 <div className="mt-4 pt-4 border-t border-border flex items-center gap-3 flex-wrap">
