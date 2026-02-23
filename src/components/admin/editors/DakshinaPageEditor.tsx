@@ -223,7 +223,6 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
           </div>
 
           <div className="space-y-2">
-            <Label>Background Images</Label>
             <ImageGrid
               images={content.hero.backgroundImages}
               onRemove={(index) => {

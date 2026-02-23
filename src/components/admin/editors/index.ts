@@ -1,5 +1,6 @@
 // Page Editors
 export { default as HomePageEditor } from './HomePageEditor'
+export { default as BlogSidebarEditor } from './BlogSidebarEditor'
 export { default as AboutPageEditor } from './AboutPageEditor'
 export { default as WhyChoosePageEditor } from './WhyChoosePageEditor'
 export { default as BooksPageEditor } from './BooksPageEditor'

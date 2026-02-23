@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
+import { useBlogSidebarContent } from '../../hooks/useCmsContent'
 import { updateMetaTags, generateOrganizationSchema } from '../../utils/seo'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -13,6 +14,7 @@ interface BlogDetailPageProps {
 
 export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPageProps) {
   const { blogs, isLoading } = useBlogs()
+  const { content: sidebarContent } = useBlogSidebarContent()
   
   // Find the blog by slug (not ID)
   const blog = blogs?.find(b => b.slug === blogId)
@@ -257,39 +259,64 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
             {/* Sidebar */}
             <aside className="lg:col-span-4">
               <div className="sticky top-24 space-y-8">
-                {/* Author Card */}
+                {/* Author Card — only render when DB has content */}
+                {sidebarContent.authorCard.name && (
                 <div className="bg-card rounded-xl p-6 shadow-lg border">
-                  <h3 className="font-heading font-semibold text-lg mb-4">About the Author</h3>
+                  <h3 className="font-heading font-semibold text-lg mb-4">{sidebarContent.authorCard.title}</h3>
                   <div className="flex items-start gap-4">
-                    <img 
-                      src="/images/Logo/Raj ji.png" 
-                      alt="Pandit Rajesh Joshi"
-                      className="w-16 h-16 rounded-full object-cover border-2 border-primary"
-                    />
+                    {sidebarContent.authorCard.image && (
+                      <img 
+                        src={sidebarContent.authorCard.image} 
+                        alt={sidebarContent.authorCard.name}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+                      />
+                    )}
                     <div>
-                      <p className="font-medium">Pandit Rajesh Joshi</p>
-                      <p className="text-sm text-muted-foreground">Hindu Priest & Spiritual Guide</p>
+                      <p className="font-medium">{sidebarContent.authorCard.name}</p>
+                      {sidebarContent.authorCard.role && (
+                        <p className="text-sm text-muted-foreground">{sidebarContent.authorCard.role}</p>
+                      )}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-4 leading-relaxed">
-                    With over 15 years of experience in Hindu rituals and spiritual guidance, 
-                    Pandit Rajesh Joshi shares wisdom to help navigate life's sacred journey.
-                  </p>
+                  {sidebarContent.authorCard.bio && (
+                    <p className="text-sm text-muted-foreground mt-4 leading-relaxed">
+                      {sidebarContent.authorCard.bio}
+                    </p>
+                  )}
                 </div>
+                )}
 
-                {/* Quick Contact */}
+                {/* Guidance Card — only render when DB has content */}
+                {sidebarContent.guidanceCard.title && (
                 <div className="bg-primary/5 rounded-xl p-6">
-                  <h3 className="font-heading font-semibold text-lg mb-4">Need Spiritual Guidance?</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Book a consultation for personalized spiritual guidance and pooja services.
-                  </p>
-                  <Button 
-                    className="w-full"
-                    onClick={() => onNavigate('contact')}
-                  >
-                    Contact Us
-                  </Button>
+                  <h3 className="font-heading font-semibold text-lg mb-4">{sidebarContent.guidanceCard.title}</h3>
+                  {sidebarContent.guidanceCard.description && (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {sidebarContent.guidanceCard.description}
+                    </p>
+                  )}
+                  {sidebarContent.guidanceCard.ctaButtons.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {sidebarContent.guidanceCard.ctaButtons.map((btn, index) => (
+                        <Button
+                          key={index}
+                          className="w-full"
+                          onClick={() => {
+                            if (btn.link.startsWith('http')) {
+                              window.open(btn.link, '_blank', 'noopener,noreferrer')
+                            } else {
+                              const page = btn.link.replace(/^\//, '') as Page
+                              onNavigate(page)
+                            }
+                          }}
+                        >
+                          {btn.text}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
+                )}
               </div>
             </aside>
           </div>

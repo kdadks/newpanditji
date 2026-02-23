@@ -10,7 +10,8 @@ import type {
   TestimonialsPageContent,
   HeaderContent,
   FooterContent,
-  MenuItem
+  MenuItem,
+  BlogSidebarContent
 } from '../types/cms-types'
 
 // Empty defaults - Admin must fill content via CMS
@@ -334,4 +335,19 @@ export const defaultFooterContent: FooterContent = {
   linkedinUrl: '',
   twitterUrl: '',
   pinterestUrl: ''
+}
+
+export const defaultBlogSidebarContent: BlogSidebarContent = {
+  authorCard: {
+    title: '',
+    name: '',
+    role: '',
+    bio: '',
+    image: ''
+  },
+  guidanceCard: {
+    title: '',
+    description: '',
+    ctaButtons: []
+  }
 }

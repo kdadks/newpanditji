@@ -16,7 +16,8 @@ import type {
   GalleryPageContent,
   TestimonialsPageContent,
   HeaderContent,
-  FooterContent
+  FooterContent,
+  BlogSidebarContent
 } from '../components/admin/types/cms-types'
 
 // Import defaults for fallback
@@ -31,7 +32,8 @@ import {
   defaultGalleryContent,
   defaultTestimonialsContent,
   defaultHeaderContent,
-  defaultFooterContent
+  defaultFooterContent,
+  defaultBlogSidebarContent
 } from '../components/admin/defaults/cms-defaults'
 
 // Query keys
@@ -39,7 +41,7 @@ const CMS_PAGES_KEY = ['cms_pages']
 const CMS_SECTIONS_KEY = ['cms_sections']
 
 // Page slug mapping
-export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials' | 'terms' | 'privacy'
+export type CmsPageSlug = 'home' | 'about' | 'why-choose-us' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials' | 'terms' | 'privacy' | 'blog'
 
 // ============================================================================
 // Database Operations
@@ -1403,4 +1405,71 @@ export function useFooterContent() {
     isSaving: saveMutation.isPending,
     refetch: query.refetch,
   }
+}
+
+// ============================================================================
+// Blog Sidebar Content
+// ============================================================================
+
+/**
+ * Convert database sections to BlogSidebarContent
+ */
+function sectionsToBlogSidebarContent(sections: PageSectionRow[]): BlogSidebarContent {
+  const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
+
+  const authorSection = getSection('author_card') as Record<string, unknown>
+  const guidanceSection = getSection('guidance_card') as Record<string, unknown>
+
+  return {
+    authorCard: {
+      title: (authorSection.title as string) || '',
+      name: (authorSection.name as string) || '',
+      role: (authorSection.role as string) || '',
+      bio: (authorSection.bio as string) || '',
+      image: (authorSection.image as string) || '',
+    },
+    guidanceCard: {
+      title: (guidanceSection.title as string) || '',
+      description: (guidanceSection.description as string) || '',
+      ctaButtons: (guidanceSection.ctaButtons as typeof defaultBlogSidebarContent.guidanceCard.ctaButtons) || [],
+    },
+  }
+}
+
+/**
+ * Convert BlogSidebarContent to database sections
+ */
+function blogSidebarContentToSections(content: BlogSidebarContent): { sectionKey: string; content: Record<string, unknown> }[] {
+  return [
+    {
+      sectionKey: 'author_card',
+      content: {
+        title: content.authorCard.title,
+        name: content.authorCard.name,
+        role: content.authorCard.role,
+        bio: content.authorCard.bio,
+        image: content.authorCard.image,
+      }
+    },
+    {
+      sectionKey: 'guidance_card',
+      content: {
+        title: content.guidanceCard.title,
+        description: content.guidanceCard.description,
+        ctaButtons: content.guidanceCard.ctaButtons,
+      }
+    }
+  ]
+}
+
+/**
+ * Hook for Blog Sidebar content (author card + guidance card)
+ */
+export function useBlogSidebarContent() {
+  return useCmsContent(
+    'blog',
+    sectionsToBlogSidebarContent,
+    blogSidebarContentToSections,
+    defaultBlogSidebarContent
+  )
 }

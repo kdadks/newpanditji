@@ -19,7 +19,8 @@ import {
   useGalleryContent,
   useTestimonialsContent,
   useHeaderContent,
-  useFooterContent
+  useFooterContent,
+  useBlogSidebarContent
 } from '../../hooks/useCmsContent'
 
 // Import types
@@ -40,6 +41,7 @@ import {
   DakshinaPageEditor,
   GalleryPageEditor,
   TestimonialsPageEditor,
+  BlogSidebarEditor,
   HeaderEditor,
   FooterEditor,
   MenuEditor,
@@ -68,6 +70,7 @@ export default function AdminContent() {
   const testimonialsContent = useTestimonialsContent()
   const headerContentHook = useHeaderContent()
   const footerContentHook = useFooterContent()
+  const blogSidebarContent = useBlogSidebarContent()
 
   // Menu items from database (based on selected location)
   const menuItemsHook = useMenuItems(selectedMenuLocation)
@@ -84,6 +87,7 @@ export default function AdminContent() {
   const [testimonialsState, setTestimonialsState] = useState(testimonialsContent.content)
   const [headerState, setHeaderState] = useState(headerContentHook.content)
   const [footerState, setFooterState] = useState(footerContentHook.content)
+  const [blogSidebarState, setBlogSidebarState] = useState(blogSidebarContent.content)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [isSavingMenu, setIsSavingMenu] = useState(false)
 
@@ -131,6 +135,10 @@ export default function AdminContent() {
   useEffect(() => {
     if (!footerContentHook.isLoading) setFooterState(footerContentHook.content)
   }, [footerContentHook.content, footerContentHook.isLoading])
+
+  useEffect(() => {
+    if (!blogSidebarContent.isLoading) setBlogSidebarState(blogSidebarContent.content)
+  }, [blogSidebarContent.content, blogSidebarContent.isLoading])
 
   // Load menu items from database when location changes
   useEffect(() => {
@@ -181,6 +189,9 @@ export default function AdminContent() {
           break
         case 'testimonials':
           await testimonialsContent.save(testimonialsState)
+          break
+        case 'blog':
+          await blogSidebarContent.save(blogSidebarState)
           break
       }
     } catch (error) {
@@ -379,6 +390,7 @@ export default function AdminContent() {
     dakshinaContent.isLoading ||
     galleryContent.isLoading ||
     testimonialsContent.isLoading ||
+    blogSidebarContent.isLoading ||
     headerContentHook.isLoading ||
     footerContentHook.isLoading
 
@@ -394,6 +406,7 @@ export default function AdminContent() {
       case 'dakshina': return dakshinaContent.isSaving
       case 'gallery': return galleryContent.isSaving
       case 'testimonials': return testimonialsContent.isSaving
+      case 'blog': return blogSidebarContent.isSaving
       default: return false
     }
   }
@@ -428,7 +441,7 @@ export default function AdminContent() {
 
         <TabsContent value="pages" className="mt-6">
           <Tabs value={activePageTab} onValueChange={(value) => setActivePageTab(value as PageKey)}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-9 h-auto gap-2 bg-muted/50 p-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-10 h-auto gap-2 bg-muted/50 p-2">
               <TabsTrigger value="home" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Home</TabsTrigger>
               <TabsTrigger value="about" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">About Us</TabsTrigger>
               <TabsTrigger value="whyChoose" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Why Choose Us</TabsTrigger>
@@ -438,6 +451,7 @@ export default function AdminContent() {
               <TabsTrigger value="dakshina" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Dakshina</TabsTrigger>
               <TabsTrigger value="gallery" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Gallery</TabsTrigger>
               <TabsTrigger value="testimonials" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Testimonials</TabsTrigger>
+              <TabsTrigger value="blog" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Blog</TabsTrigger>
             </TabsList>
 
             <TabsContent value="home" className="mt-6">
@@ -510,6 +524,14 @@ export default function AdminContent() {
                 setContent={setTestimonialsState}
                 onSave={() => handleSavePageContent('testimonials')}
                 isSaving={getSavingState('testimonials')}
+              />
+            </TabsContent>
+            <TabsContent value="blog" className="mt-6">
+              <BlogSidebarEditor
+                content={blogSidebarState}
+                setContent={setBlogSidebarState}
+                onSave={() => handleSavePageContent('blog')}
+                isSaving={getSavingState('blog')}
               />
             </TabsContent>
           </Tabs>

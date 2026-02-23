@@ -1,6 +1,6 @@
 // CMS Content Type Definitions
 
-export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials'
+export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials' | 'blog'
 export type SectionKey = 'header' | 'footer' | 'menu'
 
 // Base Interfaces
@@ -470,6 +470,27 @@ export interface CmsContentActions {
   handleSaveFooter: () => Promise<void>
   handleSaveMenu: () => Promise<void>
   isSaving: boolean
+}
+
+// Blog Sidebar Content
+export interface BlogSidebarCTAButton {
+  text: string
+  link: string
+}
+
+export interface BlogSidebarContent {
+  authorCard: {
+    title: string
+    name: string
+    role: string
+    bio: string
+    image: string
+  }
+  guidanceCard: {
+    title: string
+    description: string
+    ctaButtons: BlogSidebarCTAButton[]
+  }
 }
 
 // Editor Props Types
