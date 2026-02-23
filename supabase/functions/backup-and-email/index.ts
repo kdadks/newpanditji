@@ -29,34 +29,11 @@ import nodemailer from 'npm:nodemailer'
 // ── Config ────────────────────────────────────────────────────────────────────
 const BACKUP_EMAIL = 'kdadks@outlook.com'
 
-// Tables exported in the backup (analytics / cookie consent skipped intentionally)
-const CONTENT_TABLES = [
-  'pages',
-  'page_sections',
-  'blog_categories',
-  'blog_posts',
-  'blog_tags',
-  'blog_post_tags',
-  'service_categories',
-  'services',
-  'service_package_items',
-  'testimonials',
-  'books',
-  'charity_projects',
-  'media_files',
-  'photo_galleries',
-  'gallery_photos',
-  'videos',
-  'site_settings',
-  'site_metadata',
-  'menus',
-  'menu_items',
-  'seo_settings',
-  'seo_redirects',
-  'contact_inquiries',
-  'admin_users',       // passwords are hashed — safe to include
-  'activity_logs',
-] as const
+// Tables to skip (system/transient data not worth backing up)
+const SKIP_TABLES = new Set([
+  'schema_migrations',
+  'pg_stat_statements',
+])
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -98,7 +75,7 @@ function harvestImageUrls(backup: Record<string, unknown[]>): string[] {
 }
 
 /** Row-count summary table for the email body */
-function rowCountsHtml(backup: Record<string, unknown[]>, tables: readonly string[]): string {
+function rowCountsHtml(backup: Record<string, unknown[]>, tables: string[]): string {
   return tables
     .map(t => `<tr><td style="padding:3px 8px;border:1px solid #ddd">${t}</td><td style="padding:3px 8px;border:1px solid #ddd;text-align:right">${(backup[t] ?? []).length.toLocaleString()}</td></tr>`)
     .join('')
@@ -139,14 +116,40 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey)
 
     const now = new Date()
-    const dateStr = now.toISOString().split('T')[0]         // e.g. 2026-02-23
+    const dateStr = now.toISOString().split('T')[0]
     const timestamp = now.toISOString()
+
+    // ── All tables in the public schema
+    const TABLES = [
+      // Auth & admin
+      'admin_users', 'admin_sessions', 'activity_logs',
+      // CMS pages
+      'pages', 'page_sections',
+      // Blog
+      'blog_categories', 'blog_posts', 'blog_tags', 'blog_post_tags',
+      // Services
+      'service_categories', 'services', 'service_package_items',
+      // Content
+      'testimonials', 'books', 'charity_projects',
+      // Media
+      'media_files', 'photo_galleries', 'gallery_photos', 'videos',
+      // Settings & navigation
+      'site_settings', 'site_metadata', 'menus', 'menu_items',
+      // SEO
+      'seo_settings', 'seo_redirects',
+      // Contact
+      'contact_inquiries',
+      // Cookie consent
+      'cookie_categories', 'cookies', 'user_cookie_consents', 'cookie_policy_versions',
+      // Analytics
+      'page_views', 'service_views', 'referrer_sources', 'analytics_summary',
+    ].filter(t => !SKIP_TABLES.has(t))
 
     // ── Export all tables
     const backup: Record<string, unknown[]> = {}
     const errors: string[] = []
 
-    for (const table of CONTENT_TABLES) {
+    for (const table of TABLES) {
       try {
         const { data, error } = await supabase
           .from(table)
@@ -175,10 +178,10 @@ Deno.serve(async (req: Request) => {
     const summary = {
       backup_created_at: timestamp,
       backup_date: dateStr,
-      tables_exported: CONTENT_TABLES.length,
+      tables_exported: TABLES.length,
       total_rows: totalRows,
       total_image_urls: imageUrls.length,
-      table_row_counts: Object.fromEntries(CONTENT_TABLES.map(t => [t, (backup[t] ?? []).length])),
+      table_row_counts: Object.fromEntries(TABLES.map(t => [t, (backup[t] ?? []).length])),
       errors: errors.length > 0 ? errors : [],
     }
 
@@ -231,7 +234,7 @@ Deno.serve(async (req: Request) => {
                 <th style="padding:4px 8px;border:1px solid #ddd;text-align:left">Table</th>
                 <th style="padding:4px 8px;border:1px solid #ddd;text-align:right">Rows</th>
               </tr>
-              ${rowCountsHtml(backup, CONTENT_TABLES)}
+              ${rowCountsHtml(backup, TABLES)}
             </table>
           </details>
 
