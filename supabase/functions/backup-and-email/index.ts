@@ -253,7 +253,7 @@ Deno.serve(async (req: Request) => {
         {
           filename: `backup_${dateStr}.zip`,
           contentType: 'application/zip',
-          content: Buffer.from(zipped),
+          content: zipped,
         },
       ],
     })
