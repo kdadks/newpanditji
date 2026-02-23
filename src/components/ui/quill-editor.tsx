@@ -1,5 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
 import { useEffect } from 'react'
 import { cn } from '../../lib/utils'
 import { Button } from './button'
@@ -9,7 +11,11 @@ import {
   ListBullets,
   ListNumbers,
   TextUnderline,
-  TextStrikethrough
+  TextStrikethrough,
+  TextAlignLeft,
+  TextAlignCenter,
+  TextAlignRight,
+  TextAlignJustify,
 } from '@phosphor-icons/react'
 
 interface QuillEditorProps {
@@ -33,6 +39,10 @@ export function QuillEditor({
         heading: {
           levels: [2, 3],
         },
+      }),
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
       }),
     ],
     content: value,
@@ -115,6 +125,48 @@ export function QuillEditor({
           title="Strikethrough"
         >
           <TextStrikethrough size={16} />
+        </MenuButton>
+
+        <MenuButton
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          isActive={editor.isActive('underline')}
+          title="Underline"
+        >
+          <TextUnderline size={16} />
+        </MenuButton>
+
+        <div className="w-px bg-border mx-1" />
+
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          isActive={editor.isActive({ textAlign: 'left' })}
+          title="Align Left"
+        >
+          <TextAlignLeft size={16} />
+        </MenuButton>
+
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          isActive={editor.isActive({ textAlign: 'center' })}
+          title="Align Center"
+        >
+          <TextAlignCenter size={16} />
+        </MenuButton>
+
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          isActive={editor.isActive({ textAlign: 'right' })}
+          title="Align Right"
+        >
+          <TextAlignRight size={16} />
+        </MenuButton>
+
+        <MenuButton
+          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+          isActive={editor.isActive({ textAlign: 'justify' })}
+          title="Justify"
+        >
+          <TextAlignJustify size={16} />
         </MenuButton>
 
         <div className="w-px bg-border mx-1" />
@@ -227,6 +279,15 @@ export function QuillEditor({
           font-style: italic;
           color: hsl(var(--muted-foreground));
         }
+
+        .tiptap u {
+          text-decoration: underline;
+        }
+
+        .tiptap [style*="text-align: center"] { text-align: center; }
+        .tiptap [style*="text-align: right"]  { text-align: right; }
+        .tiptap [style*="text-align: justify"]{ text-align: justify; }
+        .tiptap [style*="text-align: left"]   { text-align: left; }
       `}</style>
     </div>
   )
