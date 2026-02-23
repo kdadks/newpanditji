@@ -24,7 +24,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { zipSync, strToU8 } from 'https://esm.sh/fflate@0.8.2'
-import { SmtpClient } from 'https://deno.land/x/denomailer@1.6.0/mod.ts'
+import nodemailer from 'npm:nodemailer'
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const BACKUP_EMAIL = 'kdadks@outlook.com'
@@ -95,13 +95,6 @@ function harvestImageUrls(backup: Record<string, unknown[]>): string[] {
   })
 
   return Array.from(urls).sort()
-}
-
-/** Convert Uint8Array → base64 string (safe for large buffers) */
-function toBase64(bytes: Uint8Array): string {
-  let binary = ''
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
-  return btoa(binary)
 }
 
 /** Row-count summary table for the email body */
@@ -198,21 +191,18 @@ Deno.serve(async (req: Request) => {
     }
 
     const zipped = zipSync(zipInput, { level: 6 })
-    const base64Zip = toBase64(zipped)
     const fileSizeKB = Math.round(zipped.length / 1024)
 
-    // ── Send via Resend
-    // ── Send via Microsoft Exchange SMTP
-    const smtpClient = new SmtpClient()
-
-    await smtpClient.connectTLS({
-      hostname: smtpHost,
+    // ── Send via Microsoft Exchange SMTP (nodemailer)
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
       port: smtpPort,
-      username: smtpUser,
-      password: smtpPassword,
+      secure: smtpPort === 465,   // true for SSL/465, false for STARTTLS/587
+      auth: { user: smtpUser, pass: smtpPassword },
+      tls: { ciphers: 'SSLv3' },  // required for Office365
     })
 
-    await smtpClient.send({
+    await transporter.sendMail({
       from: smtpUser,
       to: BACKUP_EMAIL,
       subject: `Database Backup — ${dateStr}`,
@@ -263,13 +253,10 @@ Deno.serve(async (req: Request) => {
         {
           filename: `backup_${dateStr}.zip`,
           contentType: 'application/zip',
-          encoding: 'base64',
-          content: base64Zip,
+          content: Buffer.from(zipped),
         },
       ],
     })
-
-    await smtpClient.close()
 
     console.log(`✅ Backup sent via Exchange — ${totalRows} rows, ${imageUrls.length} image URLs, ${fileSizeKB} KB ZIP`)
 

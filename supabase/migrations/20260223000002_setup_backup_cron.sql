@@ -41,9 +41,12 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
+  -- ⚠️ Credentials removed from source control — already applied directly in DB.
+  -- To reconfigure, run: CREATE OR REPLACE FUNCTION trigger_database_backup() ...
+  -- with your actual values via the Supabase Dashboard SQL Editor (not this file).
   v_url         CONSTANT TEXT := 'https://rhwzwjaqbobmrxmrebht.supabase.co';
-  v_auth_key    CONSTANT TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3p3amFxYm9ibXJ4bXJlYmh0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzgyNDg1NCwiZXhwIjoyMDc5NDAwODU0fQ.VfGLTDPbzITrNHLa-O75vmqSRc8VJqVTCP6PkGQH3B4';
-  v_cron_secret CONSTANT TEXT := 'e9458e50701aa886924ae3b1d6fc734015aa8d86f6ee2f2840badbfae58515f9';
+  v_auth_key    CONSTANT TEXT := '__ROTATE_AND_SET_NEW_SERVICE_ROLE_KEY_HERE__';
+  v_cron_secret CONSTANT TEXT := '__SET_CRON_SECRET_HERE__';
 BEGIN
   IF v_url = '' OR v_url = '__YOUR_SUPABASE_PROJECT_URL__' THEN
     RAISE WARNING 'backup: supabase project URL is not configured — skipping';
