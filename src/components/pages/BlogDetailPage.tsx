@@ -116,7 +116,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
                 {categoryName}
               </Badge>
               
-              <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight drop-shadow-lg max-w-5xl">
+              <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] max-w-5xl">
                 {blog.title}
               </h1>
               
