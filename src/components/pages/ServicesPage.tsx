@@ -30,6 +30,11 @@ const SectionIcon = ({ name, size = 20, className = '' }: { name?: string; size?
   return Comp ? <Comp size={size} className={className} weight="fill" /> : null
 }
 
+const FAQ_BG_COLORS = [
+  '#EFF6FF', // sky blue (odd)
+  '#F0FFF4', // mint green (even)
+]
+
 interface ServicesPageProps {
   initialCategory?: string
   onNavigate?: (pageOrData: AppPage | AppNavigationData) => void
@@ -857,11 +862,13 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 {/* FAQ Accordion */}
                 {selectedService.faqs && selectedService.faqs.length > 0 && (
                   <div className="mt-4 mb-2 rounded-lg border border-border/40 shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 border-b bg-amber-50/60">
-                      <h3 className="font-heading font-bold text-base flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold shrink-0">?</span>
-                        Frequently Asked Questions
-                      </h3>
+                    <div className="flex items-center justify-between px-5 py-3 border-b bg-linear-to-r from-amber-500/10 to-amber-50/30">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-6 bg-amber-500 rounded-full shrink-0" />
+                        <h3 className="font-heading font-bold text-xl text-foreground">
+                          Frequently Asked Questions
+                        </h3>
+                      </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setFaqOpenItems(selectedService.faqs!.map((_, i) => `faq-${i}`))}
@@ -878,15 +885,16 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                         </button>
                       </div>
                     </div>
-                    <div className="px-5 py-2 bg-amber-50/20">
+                    <div className="py-0">
                       <Accordion type="multiple" value={faqOpenItems} onValueChange={setFaqOpenItems} className="space-y-0">
                         {selectedService.faqs.map((faq, i) => (
                           <AccordionItem
                             key={faq.id || i}
                             value={`faq-${i}`}
-                            className="border-b border-border/30 last:border-b-0"
+                            className="border-b border-border/60 last:border-b-0 px-5 transition-colors"
+                            style={{ backgroundColor: FAQ_BG_COLORS[i % FAQ_BG_COLORS.length] }}
                           >
-                            <AccordionTrigger className="text-sm font-semibold text-foreground py-2.5 hover:no-underline text-left">
+                            <AccordionTrigger className="text-base font-bold text-foreground py-2.5 hover:no-underline text-left">
                               {faq.question}
                             </AccordionTrigger>
                             <AccordionContent className="text-sm text-muted-foreground pb-3 leading-relaxed">
