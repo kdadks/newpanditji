@@ -1340,13 +1340,15 @@ export default function AdminServicesNew() {
                           </div>
                           <div className="flex items-start gap-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 w-4 mt-2">A</span>
-                            <Textarea
-                              value={faq.answer}
-                              onChange={e => setFormData(f => ({ ...f, faqs: f.faqs.map((item, i) => i === idx ? { ...item, answer: e.target.value } : item) }))}
-                              placeholder="Answer…"
-                              rows={2}
-                              className="text-sm flex-1 bg-background resize-none"
-                            />
+                            <div className="flex-1">
+                              <QuillEditor
+                                value={faq.answer}
+                                onChange={val => setFormData(f => ({ ...f, faqs: f.faqs.map((item, i) => i === idx ? { ...item, answer: val } : item) }))}
+                                placeholder="Answer…"
+                                minHeight="100px"
+                                className="bg-background"
+                              />
+                            </div>
                           </div>
                         </div>
                       ))}

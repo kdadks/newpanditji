@@ -890,7 +890,10 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                               {faq.question}
                             </AccordionTrigger>
                             <AccordionContent className="text-sm text-muted-foreground pb-3 leading-relaxed">
-                              {faq.answer}
+                              <div
+                                className="prose prose-sm max-w-none text-muted-foreground"
+                                dangerouslySetInnerHTML={{ __html: faq.answer }}
+                              />
                             </AccordionContent>
                           </AccordionItem>
                         ))}
