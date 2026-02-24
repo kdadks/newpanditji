@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
+import { Extension } from '@tiptap/core'
 import { useEffect } from 'react'
 import { cn } from '../../lib/utils'
 import { Button } from './button'
@@ -16,7 +17,75 @@ import {
   TextAlignCenter,
   TextAlignRight,
   TextAlignJustify,
+  TextIndent,
+  TextOutdent,
 } from '@phosphor-icons/react'
+
+// ── Custom Indent Extension ────────────────────────────────────────────────
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    indent: {
+      indent: () => ReturnType
+      outdent: () => ReturnType
+    }
+  }
+}
+
+const IndentExtension = Extension.create({
+  name: 'indent',
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ['paragraph', 'heading'],
+        attributes: {
+          indent: {
+            default: 0,
+            parseHTML: el => {
+              const ml = el.style.marginLeft
+              return ml ? Math.round(parseFloat(ml) / 2) : 0
+            },
+            renderHTML: attrs => {
+              if (!attrs.indent) return {}
+              return { style: `margin-left: ${attrs.indent * 2}rem` }
+            },
+          },
+        },
+      },
+    ]
+  },
+
+  addCommands() {
+    return {
+      indent:
+        () =>
+        ({ state, tr, dispatch }) => {
+          const { selection } = state
+          state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+            if (['paragraph', 'heading'].includes(node.type.name)) {
+              const indent = Math.min((node.attrs.indent || 0) + 1, 8)
+              tr.setNodeMarkup(pos, undefined, { ...node.attrs, indent })
+            }
+          })
+          if (dispatch) dispatch(tr)
+          return true
+        },
+      outdent:
+        () =>
+        ({ state, tr, dispatch }) => {
+          const { selection } = state
+          state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+            if (['paragraph', 'heading'].includes(node.type.name)) {
+              const indent = Math.max((node.attrs.indent || 0) - 1, 0)
+              tr.setNodeMarkup(pos, undefined, { ...node.attrs, indent })
+            }
+          })
+          if (dispatch) dispatch(tr)
+          return true
+        },
+    }
+  },
+})
 
 interface QuillEditorProps {
   value: string
@@ -44,6 +113,7 @@ export function QuillEditor({
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
+      IndentExtension,
     ],
     content: value,
     immediatelyRender: false,
@@ -196,6 +266,24 @@ export function QuillEditor({
         >
           P
         </MenuButton>
+
+        <div className="w-px bg-border mx-1" />
+
+        <MenuButton
+          onClick={() => editor.chain().focus().outdent().run()}
+          isActive={false}
+          title="Decrease Indent"
+        >
+          <TextOutdent size={16} />
+        </MenuButton>
+
+        <MenuButton
+          onClick={() => editor.chain().focus().indent().run()}
+          isActive={false}
+          title="Increase Indent"
+        >
+          <TextIndent size={16} />
+        </MenuButton>
       </div>
 
       {/* Editor - Content area (parent handles scrolling) */}
@@ -288,6 +376,7 @@ export function QuillEditor({
         .tiptap [style*="text-align: right"]  { text-align: right; }
         .tiptap [style*="text-align: justify"]{ text-align: justify; }
         .tiptap [style*="text-align: left"]   { text-align: left; }
+        .tiptap [style*="margin-left"] { display: block; }
       `}</style>
     </div>
   )
