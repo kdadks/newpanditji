@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
 import { sanitizeHTML } from '../../utils/sanitize'
-import { usePhotos } from '../../hooks/usePhotos'
+import { usePhotos, usePhotoCategories, findCategoryByKeyword } from '../../hooks/usePhotos'
 import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Article, Tag, FileText, Notebook, Image as ImageIcon, Upload, Eye, Clock, Calendar, CheckCircle, WarningCircle, ArrowLeft, ArrowRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -36,11 +36,21 @@ interface BlogFormData {
 
 export default function AdminBlogs() {
   const { blogs, isLoading, createBlog, updateBlog, deleteBlog, isCreating, isUpdating, isDeleting } = useBlogs(true) // Pass true to fetch all blogs including drafts
-  const { photos } = usePhotos({ limit: 1000 })
-  const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
+
+  // Accurate categories + counts from the same source as AdminPhotos (site_metadata)
+  const { categories: mediaCategories } = usePhotoCategories()
+
+  // Images for the picker grid — re-fetches when the selected category changes
+  const { photos: pickerPhotos, isLoading: pickerLoading } = usePhotos({
+    category: imagePickerCategory === 'all' ? undefined : imagePickerCategory,
+    limit: 500,
+  })
+
+  const [editingBlog, setEditingBlog] = useState<BlogPostRow | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentTab, setCurrentTab] = useState('basic')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [blogToDelete, setBlogToDelete] = useState<BlogPostRow | null>(null)
@@ -232,6 +242,8 @@ export default function AdminBlogs() {
     return Math.ceil(words / 200) // Average reading speed: 200 words per minute
   }
 
+  const getBlogImagePickerCategory = () => findCategoryByKeyword(mediaCategories, 'blog')
+
   const handleAdd = () => {
     setFormData({
       title: '',
@@ -244,6 +256,7 @@ export default function AdminBlogs() {
       meta_title: '',
       meta_description: ''
     })
+    setImagePickerCategory(getBlogImagePickerCategory())
     setEditingBlog(null)
     setCurrentTab('basic')
     setIsDialogOpen(true)
@@ -261,6 +274,7 @@ export default function AdminBlogs() {
       meta_title: blog.meta_title || '',
       meta_description: blog.meta_description || ''
     })
+    setImagePickerCategory(getBlogImagePickerCategory())
     setEditingBlog(blog)
     setCurrentTab('basic')
     setIsDialogOpen(true)
@@ -734,7 +748,10 @@ export default function AdminBlogs() {
                           ) : (
                             <div
                               className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
-                              onClick={() => setShowImagePicker(true)}
+                              onClick={() => {
+                                setImagePickerCategory(getBlogImagePickerCategory())
+                                setShowImagePicker(true)
+                              }}
                             >
                               <ImageIcon className="mx-auto mb-3 text-muted-foreground" size={32} weight="duotone" />
                               <p className="text-sm font-medium mb-1">
@@ -946,29 +963,26 @@ export default function AdminBlogs() {
                     </SelectTrigger>
                     <SelectContent style={{ zIndex: 10000 }}>
                       <SelectItem value="all">
-                        All Categories ({photos.length})
+                        All Categories ({mediaCategories.reduce((s, c) => s + c.count, 0)})
                       </SelectItem>
-                      {['books', 'gallery', 'ceremony', 'pooja', 'wedding', 'charity', 'events', 'general'].map(cat => {
-                        const count = photos.filter(p => p.category === cat).length
-                        return (
-                          <SelectItem key={cat} value={cat}>
-                            {cat.charAt(0).toUpperCase() + cat.slice(1)} ({count})
-                          </SelectItem>
-                        )
-                      })}
+                      {mediaCategories.map(({ value: cat, label, count }) => (
+                        <SelectItem key={cat} value={cat}>
+                          {label} ({count})
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="p-5 overflow-y-auto flex-1 min-h-0">
-                  {(() => {
-                    const filteredPhotos = imagePickerCategory === 'all' 
-                      ? photos 
-                      : photos.filter(p => p.category === imagePickerCategory)
-                    
-                    return filteredPhotos.length > 0 ? (
+                  {pickerLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                    </div>
+                  ) : (() => {
+                    return pickerPhotos.length > 0 ? (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {filteredPhotos.map((photo) => (
+                        {pickerPhotos.map((photo) => (
                           <div
                             key={photo.id}
                             className="cursor-pointer group relative aspect-video rounded-xl overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-lg"

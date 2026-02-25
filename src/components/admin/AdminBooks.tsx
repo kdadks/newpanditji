@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { usePhotos } from '../../hooks/usePhotos'
+import { usePhotos, usePhotoCategories, findCategoryByKeyword } from '../../hooks/usePhotos'
 import { useBooks, useCreateBook, useUpdateBook, useDeleteBook } from '../../hooks/useBooks'
 import { BookRow } from '../../lib/supabase'
 import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, BookOpen, Image as ImageIcon, Tag, Users, FileText, ListBullets, AmazonLogo } from '@phosphor-icons/react'
@@ -31,8 +31,6 @@ interface BookFormData {
 }
 
 export default function AdminBooks() {
-  const { photos } = usePhotos({ limit: 1000 }) // Load more photos for image picker
-  
   // Database hooks
   const { data: books = [], isLoading } = useBooks()
   const createBookMutation = useCreateBook()
@@ -43,7 +41,16 @@ export default function AdminBooks() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
-  const [imagePickerCategory, setImagePickerCategory] = useState<string>('books')
+  const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
+
+  // Accurate categories + counts from site_metadata (same source as AdminPhotos)
+  const { categories: mediaCategories } = usePhotoCategories()
+  // Images for the picker grid — re-fetches when selected category changes
+  const { photos: pickerPhotos, isLoading: pickerLoading } = usePhotos({
+    category: imagePickerCategory === 'all' ? undefined : imagePickerCategory,
+    limit: 500,
+  })
+  const getBooksImagePickerCategory = () => findCategoryByKeyword(mediaCategories, 'book')
   const [currentTab, setCurrentTab] = useState('basic')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [bookToDelete, setBookToDelete] = useState<BookRow | null>(null)
@@ -88,6 +95,7 @@ export default function AdminBooks() {
     setKeyTopicInput('')
     setEditingBook(null)
     setShowImagePicker(false)
+    setImagePickerCategory(getBooksImagePickerCategory())
     setCurrentTab('basic')
     setIsDialogOpen(true)
   }
@@ -113,6 +121,7 @@ export default function AdminBooks() {
     setKeyTopicInput('')
     setEditingBook(book)
     setShowImagePicker(false)
+    setImagePickerCategory(getBooksImagePickerCategory())
     setCurrentTab('basic')
     setIsDialogOpen(true)
   }
@@ -319,7 +328,7 @@ export default function AdminBooks() {
       </div>
 
       {/* Edit/Add Dialog - Modern Stunning UX */}
-      <Dialog open={isDialogOpen && !showImagePicker} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
           {/* Stunning Header */}
           <DialogHeader className="relative px-8 pt-8 pb-6 bg-linear-to-r from-amber-500/10 via-orange-500/5 to-rose-500/10 border-b bg-background">
@@ -707,7 +716,7 @@ export default function AdminBooks() {
                               size="sm"
                               className="flex-1 bg-white/90 hover:bg-white"
                               onClick={() => {
-                                setImagePickerCategory('books')
+                                setImagePickerCategory(getBooksImagePickerCategory())
                                 setShowImagePicker(true)
                               }}
                             >
@@ -739,7 +748,7 @@ export default function AdminBooks() {
                       <div 
                         className="border-2 border-dashed border-purple-500/30 rounded-xl p-12 text-center cursor-pointer hover:border-purple-500/50 hover:bg-purple-500/5 transition-all duration-300 group"
                         onClick={() => {
-                          setImagePickerCategory('books')
+                          setImagePickerCategory(getBooksImagePickerCategory())
                           setShowImagePicker(true)
                         }}
                       >
@@ -861,136 +870,97 @@ export default function AdminBooks() {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* Image Picker Modal */}
-      {showImagePicker && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-          style={{ zIndex: 9999 }}
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowImagePicker(false)
-            }
-          }}
-        >
-          <div 
-            className="bg-background rounded-2xl max-w-4xl w-full h-[90vh] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300"
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-purple-500/5 to-amber-500/5 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <ImageIcon size={20} className="text-purple-600" weight="fill" />
+          {/* Image Picker Modal - Inside DialogContent */}
+          {showImagePicker && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+              <div className="bg-background rounded-2xl max-w-5xl w-full h-[90vh] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-purple-500/5 to-amber-500/5 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                      <ImageIcon size={20} className="text-purple-600" weight="fill" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-semibold text-lg">Select Book Cover</h3>
+                      <p className="text-xs text-muted-foreground">Choose from your media library</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowImagePicker(false)} className="rounded-full">
+                    <X size={20} />
+                  </Button>
                 </div>
-                <div>
-                  <h3 className="font-heading font-semibold text-lg">Select Book Cover</h3>
-                  <p className="text-xs text-muted-foreground">Choose from your media library</p>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setShowImagePicker(false)}
-                className="rounded-full"
-              >
-                <X size={20} />
-              </Button>
-            </div>
-            <div className="p-5 border-b bg-muted/30 shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Label className="text-sm font-medium">Filter by Category:</Label>
+
+                {/* Category Filter */}
+                <div className="px-5 pt-4 pb-2 border-b shrink-0">
+                  <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Category</Label>
                   <Select value={imagePickerCategory} onValueChange={setImagePickerCategory}>
-                    <SelectTrigger className="w-[200px]" onMouseDown={(e) => e.stopPropagation()}>
-                      <SelectValue />
+                    <SelectTrigger className="w-full sm:w-[250px]">
+                      <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent style={{ zIndex: 10000 }}>
-                      <SelectItem value="all">All Categories ({photos.length})</SelectItem>
-                      <SelectItem value="books">📚 Books ({photos.filter(p => p.category === 'books').length})</SelectItem>
-                      <SelectItem value="gallery">🖼️ Gallery ({photos.filter(p => p.category === 'gallery').length})</SelectItem>
-                      <SelectItem value="ceremony">🪔 Ceremony ({photos.filter(p => p.category === 'ceremony').length})</SelectItem>
-                      <SelectItem value="pooja">🙏 Pooja ({photos.filter(p => p.category === 'pooja').length})</SelectItem>
-                      <SelectItem value="wedding">💒 Wedding ({photos.filter(p => p.category === 'wedding').length})</SelectItem>
-                      <SelectItem value="charity">❤️ Charity ({photos.filter(p => p.category === 'charity').length})</SelectItem>
-                      <SelectItem value="events">🎉 Events ({photos.filter(p => p.category === 'events').length})</SelectItem>
-                      <SelectItem value="general">📁 General ({photos.filter(p => p.category === 'general').length})</SelectItem>
+                      <SelectItem value="all">
+                        All Categories ({mediaCategories.reduce((s, c) => s + c.count, 0)})
+                      </SelectItem>
+                      {mediaCategories.map(({ value: cat, label, count }) => (
+                        <SelectItem key={cat} value={cat}>
+                          {label} ({count})
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <Badge variant="secondary" className="text-xs">
-                  {photos.filter(photo => imagePickerCategory === 'all' ? true : photo.category === imagePickerCategory).length} images
-                </Badge>
+
+                <div className="p-5 overflow-y-auto flex-1 min-h-0">
+                  {pickerLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                    </div>
+                  ) : pickerPhotos.length > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                      {pickerPhotos.map((photo) => (
+                        <div
+                          key={photo.id}
+                          className="cursor-pointer group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-purple-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                          onClick={() => {
+                            setFormData({ ...formData, coverImage: photo.url })
+                            setShowImagePicker(false)
+                            toast.success('Book cover selected')
+                          }}
+                        >
+                          <img
+                            src={photo.url}
+                            alt={photo.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                            <span className="bg-white text-purple-600 font-semibold px-3 py-1.5 rounded-full text-xs shadow-lg">Select</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                        <ImageIcon size={32} className="text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground font-medium mb-2">No images found</p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {imagePickerCategory === 'all'
+                          ? 'Upload images to the Media section first'
+                          : `No images in the "${imagePickerCategory}" category`}
+                      </p>
+                      <Button onClick={() => setShowImagePicker(false)} variant="outline">Close</Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="p-5 overflow-y-auto flex-1 min-h-0">
-              {(() => {
-                const filteredPhotos = imagePickerCategory === 'all' 
-                  ? photos 
-                  : photos.filter(photo => photo.category === imagePickerCategory)
-                return filteredPhotos.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                  {filteredPhotos.map((photo) => (
-                    <div
-                      key={photo.id}
-                      className="cursor-pointer group relative aspect-2/3 rounded-lg overflow-hidden border-2 border-transparent hover:border-purple-500 transition-all duration-200 shadow-sm hover:shadow-md"
-                      onClick={() => {
-                        setFormData({ ...formData, coverImage: photo.url })
-                        setShowImagePicker(false)
-                        toast.success('Book cover selected')
-                      }}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={photo.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-                        <div className="bg-white text-purple-600 font-semibold px-3 py-1.5 rounded-full text-xs shadow-lg">
-                          Select
-                        </div>
-                      </div>
-                      <div className="absolute top-1 right-1">
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 capitalize">
-                          {photo.category}
-                        </Badge>
-                      </div>
-                      <div className="absolute bottom-1 left-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <p className="text-white text-[10px] font-medium truncate drop-shadow-lg">{photo.title}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                    <ImageIcon size={32} className="text-muted-foreground" />
-                  </div>
-                    <p className="text-muted-foreground font-medium mb-2">No images found</p>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {imagePickerCategory === 'all' 
-                        ? 'No images available. Upload images in the Media section first.'
-                        : `No images in the "${imagePickerCategory}" category. Try selecting "All Categories" or upload images first.`
-                      }
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => window.open('/admin', '_blank')}
-                    >
-                      Go to Media Section
-                    </Button>
-                </div>
-              )
-              })()}
-            </div>
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}

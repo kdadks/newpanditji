@@ -1,13 +1,14 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './dialog'
 import { Button } from './button'
 import { Input } from './input'
 import { Label } from './label'
 import { Badge } from './badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
 import { ScrollArea } from './scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
 import { Image as ImageIcon, MagnifyingGlass, Check, X, Upload, FolderOpen, Spinner } from '@phosphor-icons/react'
-import { usePhotos } from '../../hooks/usePhotos'
+import { usePhotos, usePhotoCategories, NO_CATEGORY_VALUE, findCategoryByKeyword } from '../../hooks/usePhotos'
 import { uploadImage, BUCKETS } from '../../lib/storage'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
@@ -19,6 +20,9 @@ interface MediaPickerProps {
   selectedUrl?: string
   title?: string
   allowUpload?: boolean
+  defaultCategory?: string
+  /** If set, the picker will auto-select the first category whose value/label matches this keyword once categories have loaded */
+  categoryKeyword?: string
 }
 
 export function MediaPicker({ 
@@ -27,16 +31,27 @@ export function MediaPicker({
   onSelect, 
   selectedUrl,
   title = 'Select Image',
-  allowUpload = true
+  allowUpload = true,
+  defaultCategory,
+  categoryKeyword,
 }: MediaPickerProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategory ?? 'all')
   const [tempSelectedUrl, setTempSelectedUrl] = useState<string | null>(selectedUrl || null)
   const [isUploading, setIsUploading] = useState(false)
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library')
   const [currentPage, setCurrentPage] = useState(1)
-  const [categories, setCategories] = useState<string[]>(['all'])
   const pageSize = 25
+
+  // Admin-defined categories from the same source as AdminPhotos
+  const { categories: photoCategories } = usePhotoCategories()
+
+  // Resolve categoryKeyword → actual category value once photoCategories loads
+  useEffect(() => {
+    if (!categoryKeyword || !photoCategories.length) return
+    const resolved = findCategoryByKeyword(photoCategories, categoryKeyword)
+    if (resolved !== 'all') setSelectedCategory(resolved)
+  }, [photoCategories, categoryKeyword])
 
   // Only fetch photos when modal is open
   const { photos, isLoading, refetch, total, totalPages } = usePhotos({
@@ -52,38 +67,14 @@ export function MediaPicker({
     if (open) {
       setCurrentPage(1)
       setSearchQuery('')
-      setSelectedCategory('all')
-      setTempSelectedUrl(selectedUrl || null) // Reset to current selectedUrl when opening
+      // Re-resolve keyword on open in case categories loaded after last close
+      const cat = categoryKeyword
+        ? findCategoryByKeyword(photoCategories, categoryKeyword)
+        : (defaultCategory ?? 'all')
+      setSelectedCategory(cat)
+      setTempSelectedUrl(selectedUrl || null)
     }
-  }, [open, selectedUrl])
-
-  // Fetch categories only once when modal opens
-  useEffect(() => {
-    if (open) {
-      const fetchCategories = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('media_files')
-            .select('folder')
-            .eq('file_type', 'image')
-            .not('folder', 'is', null)
-
-          if (error) throw error
-
-          const uniqueFolders = new Set<string>()
-          data?.forEach((item) => {
-            if (item.folder) uniqueFolders.add(item.folder)
-          })
-
-          setCategories(['all', ...Array.from(uniqueFolders).sort()])
-        } catch (error) {
-          console.error('Error fetching categories:', error)
-        }
-      }
-
-      fetchCategories()
-    }
-  }, [open])
+  }, [open, selectedUrl, defaultCategory, categoryKeyword, photoCategories])
 
   // Reset to page 1 when search or category changes
   const handleSearchChange = (value: string) => {
@@ -193,8 +184,8 @@ export function MediaPicker({
 
           <TabsContent value="library" className="flex-1 flex flex-col min-h-0 mt-0 overflow-hidden">
             {/* Search and Filter */}
-            <div className="flex flex-wrap gap-4 mb-4 shrink-0">
-              <div className="relative flex-1 min-w-[200px]">
+            <div className="flex flex-wrap gap-3 mb-4 shrink-0 items-end">
+              <div className="relative flex-1 min-w-[180px]">
                 <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input
                   placeholder="Search images..."
@@ -203,18 +194,24 @@ export function MediaPicker({
                   className="pl-10"
                 />
               </div>
-              <div className="flex flex-wrap gap-2">
-                {categories.map(cat => (
-                  <Badge
-                    key={cat}
-                    variant={selectedCategory === cat ? 'default' : 'outline'}
-                    className="cursor-pointer capitalize"
-                    onClick={() => handleCategoryChange(cat)}
-                  >
-                    {cat}
-                  </Badge>
-                ))}
-              </div>
+              <Select
+                value={selectedCategory}
+                onValueChange={(val) => { handleCategoryChange(val) }}
+              >
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    All Categories ({photoCategories.reduce((s, c) => s + c.count, 0)})
+                  </SelectItem>
+                  {photoCategories.map(({ value, label, count }) => (
+                    <SelectItem key={value} value={value}>
+                      {label} ({count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Image Grid */}
@@ -396,9 +393,11 @@ interface MediaPickerInputProps {
   onChange: (url: string) => void
   placeholder?: string
   label?: string
+  defaultCategory?: string
+  categoryKeyword?: string
 }
 
-export function MediaPickerInput({ value, onChange, placeholder = 'Select image...', label }: MediaPickerInputProps) {
+export function MediaPickerInput({ value, onChange, placeholder = 'Select image...', label, defaultCategory, categoryKeyword }: MediaPickerInputProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -446,6 +445,8 @@ export function MediaPickerInput({ value, onChange, placeholder = 'Select image.
         onOpenChange={setIsOpen}
         onSelect={onChange}
         selectedUrl={value}
+        defaultCategory={defaultCategory}
+        categoryKeyword={categoryKeyword}
       />
     </div>
   )

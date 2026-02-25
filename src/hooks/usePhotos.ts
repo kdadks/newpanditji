@@ -178,6 +178,100 @@ async function deletePhoto(id: string): Promise<void> {
   }
 }
 
+// ─── Photo Categories (reads the same source as AdminPhotos) ─────────────────
+
+export interface PhotoCategory {
+  value: string   // folder value stored in media_files.folder
+  label: string   // display label (may include leading emoji), e.g. "📁 Services"
+  count: number   // number of images in this category
+}
+
+const PHOTO_CATEGORIES_KEY = ['photo_categories']
+
+/**
+ * Reads the admin-defined category list from site_metadata (the same source
+ * AdminPhotos uses) and augments each entry with an accurate image count.
+ */
+async function fetchPhotoCategories(): Promise<PhotoCategory[]> {
+  // 1. Load the admin-defined category list from site_metadata
+  const { data: meta } = await supabase
+    .from('site_metadata')
+    .select('setting_value')
+    .eq('setting_key', 'photo_categories')
+    .maybeSingle()
+
+  let defined: { value: string; label: string }[] = []
+  if (meta?.setting_value) {
+    try { defined = JSON.parse(meta.setting_value) } catch { /* ignore */ }
+  }
+
+  // Fall back to empty list if nothing stored yet
+  if (!defined.length) return []
+
+  // 2. Get per-folder counts from media_files (up to 10 000 rows)
+  const { data: rows } = await supabase
+    .from('media_files')
+    .select('folder')
+    .eq('file_type', 'image')
+    .range(0, 9999)
+
+  const countMap = new Map<string, number>()
+  for (const row of (rows || [])) {
+    const key = row.folder || NO_CATEGORY_VALUE
+    countMap.set(key, (countMap.get(key) || 0) + 1)
+  }
+
+  // 3. Merge: return all admin-defined categories with their counts
+  const result = defined.map(cat => ({
+    value: cat.value,
+    label: cat.label,
+    count: countMap.get(cat.value) ?? 0,
+  }))
+
+  // 4. Append the permanent "No Category" entry if any images lack a folder
+  //    (AdminPhotos always injects this separately — it is never in site_metadata)
+  const noCatCount = (countMap.get(NO_CATEGORY_VALUE) ?? 0) + (countMap.get('') ?? 0) + (countMap.get('null') ?? 0)
+  if (noCatCount > 0) {
+    result.push({ value: NO_CATEGORY_VALUE, label: '🏷️ No Category', count: noCatCount })
+  }
+
+  return result
+}
+
+/**
+ * Hook that returns the full admin-defined category list with accurate image
+ * counts — identical source to what AdminPhotos uses.
+ */
+export function usePhotoCategories() {
+  const query = useQuery<PhotoCategory[]>({
+    queryKey: PHOTO_CATEGORIES_KEY,
+    queryFn: fetchPhotoCategories,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  })
+
+  return {
+    categories: query.data || [],
+    isLoading: query.isLoading,
+  }
+}
+
+/**
+ * Given the full category list and a keyword (e.g. 'service' or 'blog'),
+ * returns the first category whose value OR label (stripped of emoji/spaces)
+ * contains the keyword (case-insensitive). Returns 'all' if not found.
+ */
+export function findCategoryByKeyword(categories: PhotoCategory[], keyword: string): string {
+  const kw = keyword.toLowerCase()
+  const stripEmoji = (s: string) => s.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase()
+  const match = categories.find(c =>
+    c.value.toLowerCase().includes(kw) || stripEmoji(c.label).includes(kw)
+  )
+  return match?.value ?? 'all'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * React hook for gallery photos CRUD operations
  */

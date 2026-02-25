@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, ChatCircleText, Star, User, MapPin, Certificate, Quotes, CalendarBlank } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, ChatCircleText, Star, User, MapPin, Certificate, Quotes, CalendarBlank, Image as ImageIcon } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -7,8 +7,9 @@ import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
-import { MediaPickerInput } from '../ui/media-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { toast } from 'sonner'
+import { usePhotos, usePhotoCategories, findCategoryByKeyword } from '../../hooks/usePhotos'
 import { useTestimonials, useCreateTestimonial, useUpdateTestimonial, useDeleteTestimonial } from '../../hooks/useTestimonials'
 import { TestimonialRow } from '../../lib/supabase'
 import { supabase } from '../../lib/supabase'
@@ -35,6 +36,16 @@ export default function AdminTestimonials() {
 
   const [editingTestimonial, setEditingTestimonial] = useState<TestimonialRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [showImagePicker, setShowImagePicker] = useState(false)
+  const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
+
+  // Photo categories (same source as AdminPhotos) and category-scoped picker images
+  const { categories: mediaCategories } = usePhotoCategories()
+  const { photos: pickerPhotos, isLoading: pickerLoading } = usePhotos({
+    category: imagePickerCategory === 'all' ? undefined : imagePickerCategory,
+    limit: 500,
+  })
+  const getTestimonialsImagePickerCategory = () => findCategoryByKeyword(mediaCategories, 'testimonial')
   const [isSaving, setIsSaving] = useState(false)
   const [currentTab, setCurrentTab] = useState('customer')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -65,6 +76,7 @@ export default function AdminTestimonials() {
     })
     setEditingTestimonial(null)
     setCurrentTab('customer')
+    setImagePickerCategory(getTestimonialsImagePickerCategory())
     setIsDialogOpen(true)
   }
 
@@ -82,6 +94,7 @@ export default function AdminTestimonials() {
     })
     setEditingTestimonial(testimonial)
     setCurrentTab('customer')
+    setImagePickerCategory(getTestimonialsImagePickerCategory())
     setIsDialogOpen(true)
   }
 
@@ -333,12 +346,55 @@ export default function AdminTestimonials() {
                       </div>
                       
                       {/* Customer Photo */}
-                      <MediaPickerInput
-                        value={formData.imageUrl}
-                        onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                        label="Customer Photo"
-                        placeholder="Select customer photo..."
-                      />
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">Customer Photo</Label>
+                        {formData.imageUrl ? (
+                          <div className="relative mb-2 rounded-lg overflow-hidden border w-40 h-40">
+                            <img
+                              src={formData.imageUrl}
+                              alt="Customer"
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover"
+                            />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2"
+                              onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                              disabled={isSaving}
+                            >
+                              <X size={14} />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div
+                            className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all w-40 h-40 flex flex-col items-center justify-center"
+                            onClick={() => {
+                              setImagePickerCategory(getTestimonialsImagePickerCategory())
+                              setShowImagePicker(true)
+                            }}
+                          >
+                            <ImageIcon className="mb-2 text-muted-foreground" size={28} weight="duotone" />
+                            <p className="text-xs font-medium">Select Photo</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">From media library</p>
+                          </div>
+                        )}
+                        {formData.imageUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2"
+                            onClick={() => {
+                              setImagePickerCategory(getTestimonialsImagePickerCategory())
+                              setShowImagePicker(true)
+                            }}
+                            disabled={isSaving}
+                          >
+                            Change Photo
+                          </Button>
+                        )}
+                      </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -618,6 +674,95 @@ export default function AdminTestimonials() {
               </div>
             </div>
           </div>
+
+          {/* Image Picker Modal */}
+          {showImagePicker && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+              <div className="bg-background rounded-2xl max-w-5xl w-full h-[90vh] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="p-5 border-b flex items-center justify-between bg-linear-to-r from-blue-500/5 to-purple-500/5 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <ImageIcon size={20} className="text-blue-600" weight="fill" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-semibold text-lg">Select Customer Photo</h3>
+                      <p className="text-xs text-muted-foreground">Choose from your media library</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowImagePicker(false)} className="rounded-full">
+                    <X size={20} />
+                  </Button>
+                </div>
+
+                {/* Category Filter */}
+                <div className="px-5 pt-4 pb-2 border-b shrink-0">
+                  <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Category</Label>
+                  <Select value={imagePickerCategory} onValueChange={setImagePickerCategory}>
+                    <SelectTrigger className="w-full sm:w-[250px]">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent style={{ zIndex: 10000 }}>
+                      <SelectItem value="all">
+                        All Categories ({mediaCategories.reduce((s, c) => s + c.count, 0)})
+                      </SelectItem>
+                      {mediaCategories.map(({ value: cat, label, count }) => (
+                        <SelectItem key={cat} value={cat}>
+                          {label} ({count})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="p-5 overflow-y-auto flex-1 min-h-0">
+                  {pickerLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                    </div>
+                  ) : pickerPhotos.length > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                      {pickerPhotos.map((photo) => (
+                        <div
+                          key={photo.id}
+                          className="cursor-pointer group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
+                          onClick={() => {
+                            setFormData({ ...formData, imageUrl: photo.url })
+                            setShowImagePicker(false)
+                            toast.success('Photo selected')
+                          }}
+                        >
+                          <img
+                            src={photo.url}
+                            alt={photo.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                            <span className="bg-white text-primary font-semibold px-3 py-1.5 rounded-full text-xs shadow-lg">Select</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                        <ImageIcon size={32} className="text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground font-medium mb-2">No images found</p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {imagePickerCategory === 'all'
+                          ? 'Upload images to the Media section first'
+                          : `No images in the "${imagePickerCategory}" category`}
+                      </p>
+                      <Button onClick={() => setShowImagePicker(false)} variant="outline">Close</Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

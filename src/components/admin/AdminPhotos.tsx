@@ -1373,6 +1373,9 @@ export default function AdminPhotos() {
       {/* Image Preview Modal */}
       <Dialog open={!!previewPhoto} onOpenChange={(open) => !open && setPreviewPhoto(null)}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black">
+          <DialogTitle className="sr-only">
+            {previewPhoto?.title || 'Image Preview'}
+          </DialogTitle>
           <DialogDescription className="sr-only">
             Full size image preview for {previewPhoto?.title || 'selected photo'}
           </DialogDescription>

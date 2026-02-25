@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAdminServices } from '../../hooks/useServices'
 import { sanitizeHTML } from '../../utils/sanitize'
-import { usePhotos } from '../../hooks/usePhotos'
+import { usePhotos, usePhotoCategories, findCategoryByKeyword } from '../../hooks/usePhotos'
 import { useAuth } from '../../hooks/useAuth'
 import { QuillEditor } from '../ui/quill-editor'
 import {
@@ -151,7 +151,6 @@ interface ServiceFormData {
 export default function AdminServicesNew() {
   const { services, isLoading, createService, updateService, deleteService, isCreating, isUpdating, isDeleting } = useAdminServices()
   const { isAuthenticated } = useAuth()
-  const { photos } = usePhotos({ limit: 1000, enabled: isAuthenticated })
   const [editingService, setEditingService] = useState<AdminServiceRow | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -161,6 +160,24 @@ export default function AdminServicesNew() {
   const [activeBulletIconPicker, setActiveBulletIconPicker] = useState<string | null>(null) // `${sectionId}__${bulletId}`
   const [activeSectionIconPicker, setActiveSectionIconPicker] = useState<string | null>(null) // sectionId
   const [imagePickerCategory, setImagePickerCategory] = useState<string>('all')
+
+  // Accurate categories + counts from the same source as AdminPhotos (site_metadata)
+  const { categories: mediaCategories } = usePhotoCategories()
+
+  // Images for the picker grid — re-fetches when the selected category changes
+  const { photos: pickerPhotos, isLoading: pickerLoading } = usePhotos({
+    category: imagePickerCategory === 'all' ? undefined : imagePickerCategory,
+    limit: 500,
+    enabled: isAuthenticated,
+  })
+
+  const getServicesImagePickerCategory = () => findCategoryByKeyword(mediaCategories, 'service')
+
+  const openImagePicker = (args: { sectionId: string; slot: number }) => {
+    setImagePickerCategory(getServicesImagePickerCategory())
+    setActiveImagePicker(args)
+  }
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [serviceToDelete, setServiceToDelete] = useState<AdminServiceRow | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -211,6 +228,7 @@ export default function AdminServicesNew() {
     setFormData(emptyForm())
     setEditingService(null)
     setActiveImagePicker(null)
+    setImagePickerCategory(getServicesImagePickerCategory())
     setIsDialogOpen(true)
   }
 
@@ -255,6 +273,7 @@ export default function AdminServicesNew() {
     })
     setEditingService(service)
     setActiveImagePicker(null)
+    setImagePickerCategory(getServicesImagePickerCategory())
     setIsDialogOpen(true)
   }
 
@@ -756,7 +775,7 @@ export default function AdminServicesNew() {
                           />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center gap-1.5">
                             <button
-                              onClick={() => setActiveImagePicker({ sectionId: 'featured', slot: 0 })}
+                              onClick={() => openImagePicker({ sectionId: 'featured', slot: 0 })}
                               className="p-1.5 bg-white rounded-lg text-primary hover:scale-110 transition-transform"
                             >
                               <PencilSimple size={13} weight="bold" />
@@ -771,7 +790,7 @@ export default function AdminServicesNew() {
                         </div>
                       ) : (
                         <button
-                          onClick={() => setActiveImagePicker({ sectionId: 'featured', slot: 0 })}
+                          onClick={() => openImagePicker({ sectionId: 'featured', slot: 0 })}
                           className="w-28 h-28 rounded-xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all shrink-0"
                         >
                           <ImageIcon size={22} />
@@ -1130,7 +1149,7 @@ export default function AdminServicesNew() {
                                   <img src={imgUrl} alt={`img ${slot + 1}`} className="w-full h-full object-cover" />
                                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                     <button
-                                      onClick={() => setActiveImagePicker({ sectionId: section.id, slot })}
+                                      onClick={() => openImagePicker({ sectionId: section.id, slot })}
                                       className="p-1.5 bg-white rounded-lg text-primary hover:scale-110 transition-transform"
                                     >
                                       <PencilSimple size={13} weight="bold" />
@@ -1152,7 +1171,7 @@ export default function AdminServicesNew() {
                                 </div>
                               ) : (
                                 <button
-                                  onClick={() => setActiveImagePicker({ sectionId: section.id, slot })}
+                                  onClick={() => openImagePicker({ sectionId: section.id, slot })}
                                   className="w-full h-full rounded-xl border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all bg-background/60"
                                 >
                                   <ImageIcon size={17} />
@@ -1468,32 +1487,30 @@ export default function AdminServicesNew() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent style={{ zIndex: 10000 }}>
-                    <SelectItem value="all">All ({photos.length})</SelectItem>
-                    <SelectItem value="books">📚 Books ({photos.filter(p => p.category === 'books').length})</SelectItem>
-                    <SelectItem value="gallery">🖼️ Gallery ({photos.filter(p => p.category === 'gallery').length})</SelectItem>
-                    <SelectItem value="ceremony">🪔 Ceremony ({photos.filter(p => p.category === 'ceremony').length})</SelectItem>
-                    <SelectItem value="pooja">🙏 Pooja ({photos.filter(p => p.category === 'pooja').length})</SelectItem>
-                    <SelectItem value="wedding">💒 Wedding ({photos.filter(p => p.category === 'wedding').length})</SelectItem>
-                    <SelectItem value="charity">❤️ Charity ({photos.filter(p => p.category === 'charity').length})</SelectItem>
-                    <SelectItem value="events">🎉 Events ({photos.filter(p => p.category === 'events').length})</SelectItem>
-                    <SelectItem value="general">📁 General ({photos.filter(p => p.category === 'general').length})</SelectItem>
+                    <SelectItem value="all">All ({mediaCategories.reduce((s, c) => s + c.count, 0)})</SelectItem>
+                    {mediaCategories.map(({ value: cat, label, count }) => (
+                      <SelectItem key={cat} value={cat}>
+                        {label} ({count})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <Badge variant="secondary" className="text-xs">
-                {photos.filter(p => imagePickerCategory === 'all' || p.category === imagePickerCategory).length} images
+                {pickerPhotos.length} images
               </Badge>
             </div>
 
             {/* Grid */}
             <div className="flex-1 overflow-y-auto p-5 min-h-0">
-              {(() => {
-                const filtered = imagePickerCategory === 'all'
-                  ? photos
-                  : photos.filter(p => p.category === imagePickerCategory)
-                return filtered.length > 0 ? (
+              {pickerLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                </div>
+              ) : (() => {
+                return pickerPhotos.length > 0 ? (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                    {filtered.map(photo => (
+                    {pickerPhotos.map(photo => (
                       <div
                         key={photo.id}
                         className="cursor-pointer group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
