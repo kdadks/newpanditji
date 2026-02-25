@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { useBlogSidebarContent } from '../../hooks/useCmsContent'
 import { updateMetaTags, generateOrganizationSchema } from '../../utils/seo'
 import { Button } from '../ui/button'
@@ -227,7 +228,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
                     prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
                     prose-pre:bg-muted prose-pre:rounded-xl prose-pre:p-6
                     prose-hr:my-12 prose-hr:border-border"
-                  dangerouslySetInnerHTML={{ __html: blog.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(blog.content) }}
                 />
               ) : (
                 <div className="text-center py-16 bg-muted/30 rounded-xl">

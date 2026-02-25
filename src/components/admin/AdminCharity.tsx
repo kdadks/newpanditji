@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCharity, convertLegacyProject } from '../../hooks/useCharity'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Heart, HandHeart, FolderSimple, VideoCamera, TextAlignLeft } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -168,7 +169,7 @@ export default function AdminCharity() {
                         </div>
                         <div 
                           className="text-sm text-muted-foreground mb-2 line-clamp-3 prose prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ __html: project.short_description || '' }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHTML(project.short_description) }}
                         />
                         {project.video_url && (
                           <p className="text-xs text-muted-foreground">Video: {project.video_url}</p>

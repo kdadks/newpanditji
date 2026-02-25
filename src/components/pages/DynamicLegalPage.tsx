@@ -1,6 +1,7 @@
 'use client'
 
 import { useLegalPage } from '../../hooks/useLegalPages'
+import { sanitizeHTML } from '../../utils/sanitize'
 
 interface DynamicLegalPageProps {
   slug: string
@@ -68,7 +69,7 @@ export default function DynamicLegalPage({ slug }: DynamicLegalPageProps) {
               )}
               <div 
                 className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: section.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(section.content) }}
               />
             </div>
           ))}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -115,7 +116,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
 
             <div className="prose max-w-none">
               <div className="text-base md:text-lg leading-relaxed text-muted-foreground space-y-4"
-                dangerouslySetInnerHTML={{ __html: cmsContent.whatIsDakshina.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(cmsContent.whatIsDakshina.content) }}
               />
             </div>
 

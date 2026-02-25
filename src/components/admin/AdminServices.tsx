@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAdminServices } from '../../hooks/useServices'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { usePhotos } from '../../hooks/usePhotos'
 import { useAuth } from '../../hooks/useAuth'
 import { QuillEditor } from '../ui/quill-editor'
@@ -522,7 +523,7 @@ export default function AdminServicesNew() {
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed"
-                   dangerouslySetInnerHTML={{ __html: service.description }}
+                   dangerouslySetInnerHTML={{ __html: sanitizeHTML(service.description) }}
                 />
 
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">

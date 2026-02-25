@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useBlogs } from '../../hooks/useBlogs'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { usePhotos } from '../../hooks/usePhotos'
 import { Plus, PencilSimple, Trash, FloppyDisk, X, Spinner, Article, Tag, FileText, Notebook, Image as ImageIcon, Upload, Eye, Clock, Calendar, CheckCircle, WarningCircle, ArrowLeft, ArrowRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
@@ -1130,7 +1131,7 @@ export default function AdminBlogs() {
                     prose-li:my-2
                     prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2
                     dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: previewBlog.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(previewBlog.content) }}
                 />
               </div>
 

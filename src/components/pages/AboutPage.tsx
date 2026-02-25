@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -161,7 +162,7 @@ export default function AboutPage({ }: AboutPageProps) {
                 <div className="space-y-5 text-muted-foreground">
                   <div 
                     className="prose prose-base max-w-none text-muted-foreground [&_p]:leading-relaxed [&_strong]:text-foreground [&_strong]:font-semibold"
-                    dangerouslySetInnerHTML={{ __html: cmsContent.spiritualJourney.content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(cmsContent.spiritualJourney.content) }}
                   />
 
                   {cmsContent.spiritualJourney.meditationPrograms.length > 0 && (

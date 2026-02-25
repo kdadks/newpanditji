@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useServices } from '../../hooks/useServices'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { trackServiceView } from '../../lib/analytics-tracker'
 import { shouldTrackAnalytics } from '../../lib/analytics-utils'
 import { Card, CardContent } from '../ui/card'
@@ -309,7 +310,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 
                 <div
                   className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3 prose prose-sm max-w-none grow"
-                  dangerouslySetInnerHTML={{ __html: service.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(service.description) }}
                 />
                 
                 {/* Package Info */}
@@ -511,7 +512,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   <DialogDescription asChild>
                     <div
                       className="text-muted-foreground text-base prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: selectedService.detailedDescription || selectedService.description }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(selectedService.detailedDescription || selectedService.description) }}
                     />
                   </DialogDescription>
 
@@ -608,7 +609,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                             {section.description && section.description !== '<p></p>' && (
                               <div
                                 className="prose prose-sm max-w-none text-muted-foreground"
-                                dangerouslySetInnerHTML={{ __html: section.description }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHTML(section.description) }}
                               />
                             )}
 
@@ -900,7 +901,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                             <AccordionContent className="text-sm text-muted-foreground pb-3 leading-relaxed">
                               <div
                                 className="prose prose-sm max-w-none text-muted-foreground"
-                                dangerouslySetInnerHTML={{ __html: faq.answer }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHTML(faq.answer) }}
                               />
                             </AccordionContent>
                           </AccordionItem>

@@ -2,6 +2,7 @@
 
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useCharity } from '../../hooks/useCharity'
+import { sanitizeHTML } from '../../utils/sanitize'
 import { useCharityContent } from '../../hooks/useCmsContent'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
@@ -449,7 +450,7 @@ export default function CharityPage() {
                             {project.full_description ? (
                               <div
                                 className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none line-clamp-4"
-                                dangerouslySetInnerHTML={{ __html: project.full_description }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHTML(project.full_description) }}
                               />
                             ) : (
                               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
