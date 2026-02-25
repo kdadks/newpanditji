@@ -1,11 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Shield, Key, Spinner } from '@phosphor-icons/react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Shield } from '@phosphor-icons/react'
 import AdminLayout from '../admin/AdminLayout'
 import AdminAnalytics from '../admin/AdminAnalytics'
 import AdminServices from '../admin/AdminServices'
@@ -20,40 +17,34 @@ import AdminSEO from '../admin/AdminSEO'
 import { useAuth } from '../../hooks/useAuth'
 import { toast } from 'sonner'
 
+/**
+ * Admin dashboard shell.
+ *
+ * Authentication is enforced server-side by:
+ *  1. middleware.ts   — redirects before page is served
+ *  2. app/admin/page.tsx — server component double-check via getUser()
+ *
+ * This component only handles the client-side session lifecycle
+ * (monitoring sign-out, section routing, etc.).
+ */
 export default function AdminPage() {
-  const { user, loading, isAuthenticated, login, logout } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const { user, loading, isAuthenticated, logout } = useAuth()
+  const router = useRouter()
   const [currentSection, setCurrentSection] = useState('analytics')
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoggingIn(true)
-
-    try {
-      const success = await login(email, password)
-      if (success) {
-        toast.success('Welcome Rajesh Ji! 🙏', {
-          description: 'You have successfully logged into the admin dashboard',
-          duration: 4000,
-        })
-      } else {
-        toast.error('Invalid credentials. Please try again.')
-      }
-    } catch {
-      toast.error('An error occurred. Please try again.')
-    } finally {
-      setIsLoggingIn(false)
+  // If the client-side session expires or is cleared while the user is on this
+  // page, redirect them back to login rather than showing a blank/broken state.
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/admin/login')
     }
-  }
+  }, [loading, isAuthenticated, router])
 
   const handleLogout = async () => {
     await logout()
-    setEmail('')
-    setPassword('')
     setCurrentSection('analytics')
     toast.success('Logged out successfully')
+    router.replace('/admin/login')
   }
 
   const renderContent = () => {
@@ -83,72 +74,14 @@ export default function AdminPage() {
     }
   }
 
-  if (loading) {
+  // Show a loading spinner while the client-side auth service initialises.
+  if (loading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" suppressHydrationWarning>
         <div className="text-center" suppressHydrationWarning>
           <Shield className="mx-auto mb-4 text-muted-foreground animate-pulse" size={64} />
           <p className="text-muted-foreground">Verifying access...</p>
         </div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Card className="max-w-md mx-4 w-full">
-          <CardHeader className="text-center pb-4">
-            <Shield className="mx-auto mb-4 text-primary" size={64} weight="fill" />
-            <CardTitle className="font-heading font-bold text-2xl">Admin Login</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoggingIn}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoggingIn}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoggingIn}>
-                {isLoggingIn ? (
-                  <>
-                    <Spinner className="mr-2 animate-spin" size={18} />
-                    Logging in...
-                  </>
-                ) : (
-                  <>
-                    <Key className="mr-2" size={18} />
-                    Login
-                  </>
-                )}
-              </Button>
-            </form>
-            <div className="mt-4 p-3 bg-muted rounded-md">
-              <p className="text-xs text-muted-foreground text-center">
-                Admin access only. Contact the site owner for credentials.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     )
   }

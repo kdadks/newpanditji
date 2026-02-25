@@ -1,4 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+// Use createBrowserClient from @supabase/ssr so the auth session is persisted
+// in cookies (not just localStorage). This allows the Next.js middleware to
+// read and validate the session server-side, closing CWE-602.
+import { createBrowserClient } from '@supabase/ssr'
 
 // Environment variables for Supabase configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -10,15 +13,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// Debug: Log the Supabase URL being used
-console.log('Supabase client configuration:', {
-  url: supabaseUrl,
-  isRemote: supabaseUrl?.includes('supabase.co'),
-  isLocal: supabaseUrl?.includes('localhost') || supabaseUrl?.includes('127.0.0.1')
-})
+// Debug: Log the Supabase URL being used (client-side only)
+if (typeof window !== 'undefined') {
+  console.log('Supabase client configuration:', {
+    url: supabaseUrl,
+    isRemote: supabaseUrl?.includes('supabase.co'),
+    isLocal: supabaseUrl?.includes('localhost') || supabaseUrl?.includes('127.0.0.1')
+  })
+}
 
-// Create Supabase client with enhanced error handling
-export const supabase = createClient(
+// Browser Supabase client — persists session in cookies so server-side
+// middleware can verify authentication without touching localStorage.
+export const supabase = createBrowserClient(
   supabaseUrl || '',
   supabaseAnonKey || '',
   {
@@ -26,8 +32,6 @@ export const supabase = createClient(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'sb-auth-token',
       flowType: 'pkce'
     },
   }
