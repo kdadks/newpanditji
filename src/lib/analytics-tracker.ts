@@ -47,12 +47,39 @@ function getOS(): string {
   return 'Unknown'
 }
 
-// Get location data (using a free IP geolocation service)
-async function getLocationData() {
+const LOCATION_CACHE_KEY = 'analytics_location_cache'
+
+interface LocationData {
+  country: string | null
+  city: string | null
+  region: string | null
+  latitude: number | null
+  longitude: number | null
+  ip_address: string | null
+}
+
+// Get location data (using a free IP geolocation service).
+// Result is cached in sessionStorage for the lifetime of the browser session
+// so ipapi.co is called at most once per session (free tier: 1,000 req/day).
+async function getLocationData(): Promise<LocationData> {
+  try {
+    const cached = sessionStorage.getItem(LOCATION_CACHE_KEY)
+    if (cached) {
+      return JSON.parse(cached) as LocationData
+    }
+  } catch {
+    // sessionStorage unavailable — fall through to fetch
+  }
+
+  const empty: LocationData = {
+    country: null, city: null, region: null,
+    latitude: null, longitude: null, ip_address: null,
+  }
+
   try {
     const response = await fetch('https://ipapi.co/json/')
     const data = await response.json()
-    return {
+    const result: LocationData = {
       country: data.country_name || null,
       city: data.city || null,
       region: data.region || null,
@@ -60,16 +87,15 @@ async function getLocationData() {
       longitude: data.longitude || null,
       ip_address: data.ip || null,
     }
+    try {
+      sessionStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(result))
+    } catch {
+      // Ignore storage quota errors
+    }
+    return result
   } catch (error) {
     console.error('Error fetching location data:', error)
-    return {
-      country: null,
-      city: null,
-      region: null,
-      latitude: null,
-      longitude: null,
-      ip_address: null,
-    }
+    return empty
   }
 }
 
