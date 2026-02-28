@@ -46,6 +46,7 @@ export default function ContactPage() {
     message: ''
   })
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // SEO Configuration
   usePageMetadata('contact')
@@ -93,7 +94,7 @@ export default function ContactPage() {
     return colorMap[color || 'orange'] || colorMap.orange
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.email || !formData.message) {
@@ -101,12 +102,28 @@ export default function ContactPage() {
       return
     }
 
-    const mailtoLink = `mailto:${cmsContent.email}?subject=Service Inquiry: ${formData.service || 'General'}&body=Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0APhone: ${formData.phone}%0D%0AService Interest: ${formData.service}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`
-    window.location.href = mailtoLink
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
 
-    toast.success('Opening your email client...')
+      const result = await response.json()
 
-    setFormData({ name: '', email: '', phone: '', service: '', message: '' })
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to send message. Please try again.')
+        return
+      }
+
+      toast.success('Message sent! We will get back to you within 24 hours. 🙏')
+      setFormData({ name: '', email: '', phone: '', service: '', message: '' })
+    } catch {
+      toast.error('Network error. Please check your connection and try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const toggleItem = (itemId: string) => {
@@ -373,10 +390,23 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full h-14 text-lg font-semibold bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                      disabled={isSubmitting}
+                      className="w-full h-14 text-lg font-semibold bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                      <EnvelopeSimple size={20} className="mr-3" />
-                      {cmsContent.form.submitButtonText}
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <EnvelopeSimple size={20} className="mr-3" />
+                          {cmsContent.form.submitButtonText}
+                        </>
+                      )}
                     </Button>
 
                     <p className="text-center text-sm text-muted-foreground">
