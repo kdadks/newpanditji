@@ -6,6 +6,14 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const RECIPIENT_EMAIL = 'amit.ranjan78@gmail.com'
 
 export async function POST(request: NextRequest) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY is not set')
+    return NextResponse.json(
+      { error: 'Email service is not configured. Please contact us directly.' },
+      { status: 503 }
+    )
+  }
+
   try {
     const body = await request.json()
     const { name, email, phone, service, message } = body
@@ -75,9 +83,9 @@ export async function POST(request: NextRequest) {
     })
 
     if (error) {
-      console.error('Resend error:', error)
+      console.error('Resend error:', JSON.stringify(error))
       return NextResponse.json(
-        { error: 'Failed to send email. Please try again.' },
+        { error: 'Failed to send email. Please try again.', detail: error },
         { status: 500 }
       )
     }
