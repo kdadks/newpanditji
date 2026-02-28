@@ -1,13 +1,11 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 import { NextRequest, NextResponse } from 'next/server'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 const RECIPIENT_EMAIL = 'amit.ranjan78@gmail.com'
 
 export async function POST(request: NextRequest) {
-  if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY is not set')
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.error('Gmail credentials are not configured')
     return NextResponse.json(
       { error: 'Email service is not configured. Please contact us directly.' },
       { status: 503 }
@@ -34,9 +32,17 @@ export async function POST(request: NextRequest) {
       service === 'other' ? 'Other' :
       'Not specified'
 
-    const { data, error } = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>',
-      to: [RECIPIENT_EMAIL],
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    })
+
+    await transporter.sendMail({
+      from: `"New Pandit Ji Contact" <${process.env.GMAIL_USER}>`,
+      to: RECIPIENT_EMAIL,
       replyTo: email,
       subject: `New Contact Form Inquiry – ${serviceLabel}`,
       html: `
@@ -82,19 +88,11 @@ export async function POST(request: NextRequest) {
       `,
     })
 
-    if (error) {
-      console.error('Resend error:', JSON.stringify(error))
-      return NextResponse.json(
-        { error: 'Failed to send email. Please try again.', detail: error },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({ success: true, id: data?.id })
+    return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Contact API error:', err)
     return NextResponse.json(
-      { error: 'An unexpected error occurred.' },
+      { error: 'Failed to send email. Please try again.' },
       { status: 500 }
     )
   }
