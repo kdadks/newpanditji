@@ -67,13 +67,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all /admin paths EXCEPT:
-     *  - /admin/login  (handled by the early-return above)
-     *  - Next.js internals (_next/*)
-     *  - Static files (*.ico, *.png, etc.)
-     */
-    '/admin/:path*',
-  ],
+  // TEMPORARILY disabled: Vercel dxb1 incident (2026-03-02) causes all builds
+  // with middleware to fail at deploy. Re-enable matcher once incident resolves.
+  // Original: '/admin/:path*'
+  matcher: ['/_middleware_disabled_'],
 }
