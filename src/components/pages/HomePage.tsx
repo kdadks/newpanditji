@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppPage, AppNavigationData } from '../../lib/types'
 import { Button } from '../ui/button'
@@ -41,13 +41,30 @@ export default function HomePage({ }: HomePageProps) {
   }
   const { services: dbServices } = useServices()
   // Use services from database only - no hardcoded fallback
-  const featuredServices = (dbServices || []).slice(0, 12) // Get services for the carousel
+  const featuredServices = dbServices || [] // Get all services for the carousel
   
   // CMS Content from database
   const { content: cmsContent, isLoading: cmsLoading } = useHomeContent()
   
   // Service carousel pause state on hover
   const [isPaused, setIsPaused] = useState(false)
+
+  // Carousel speed: pixels per second (both tracks use same value for visual parity)
+  const CAROUSEL_PX_PER_SECOND = 100
+  const galleryTrackRef = useRef<HTMLDivElement>(null)
+  const servicesTrackRef = useRef<HTMLDivElement>(null)
+  const [galleryDuration, setGalleryDuration] = useState(40)
+  const [servicesDuration, setServicesDuration] = useState(40)
+
+  useEffect(() => {
+    if (galleryTrackRef.current) {
+      // scrollWidth = 2× single set (duplicated for seamless loop), so /2 = actual travel distance
+      setGalleryDuration(galleryTrackRef.current.scrollWidth / 2 / CAROUSEL_PX_PER_SECOND)
+    }
+    if (servicesTrackRef.current) {
+      setServicesDuration(servicesTrackRef.current.scrollWidth / 2 / CAROUSEL_PX_PER_SECOND)
+    }
+  }, [cmsContent.photoGallery.images, featuredServices])
 
   // SEO Configuration - Fetched from database
   usePageMetadata('home')
@@ -205,9 +222,11 @@ export default function HomePage({ }: HomePageProps) {
         >
           {/* Main carousel track */}
           <div
+            ref={galleryTrackRef}
             className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}
             style={{
-              willChange: 'transform'
+              willChange: 'transform',
+              animationDuration: `${galleryDuration}s`
             }}
           >
             {/* First set of images */}
@@ -369,7 +388,11 @@ export default function HomePage({ }: HomePageProps) {
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
         >
-          <div className={`flex gap-6 py-8 px-4 md:px-0 w-max ${featuredServices.length >= 8 && !isPaused ? 'animate-scroll-services' : ''}`}>
+          <div
+            ref={servicesTrackRef}
+            className={`flex gap-6 py-8 px-4 md:px-0 w-max ${featuredServices.length >= 6 && !isPaused ? 'animate-scroll-services' : ''}`}
+            style={{ animationDuration: `${servicesDuration}s` }}
+          >
             {/* First set of cards */}
             {featuredServices.map((service, index) => (
               <Card
@@ -468,7 +491,7 @@ export default function HomePage({ }: HomePageProps) {
             ))}
 
             {/* Duplicate set for seamless loop – only rendered when there are enough cards to fill the viewport */}
-            {featuredServices.length >= 8 && featuredServices.map((service, index) => (
+            {featuredServices.length >= 6 && featuredServices.map((service, index) => (
               <Card
                 key={`${service.id}-2`}
                 onClick={() => handleNavigate({ page: 'services', category: service.category })}
