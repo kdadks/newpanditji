@@ -38,12 +38,6 @@ const nextConfig = {
       },
     ],
   },
-  // Configure Turbopack instead of webpack
-  turbopack: {
-    rules: {
-      // Add any custom rules if needed
-    },
-  },
 }
 
 export default nextConfig
