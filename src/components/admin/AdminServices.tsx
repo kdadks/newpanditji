@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAdminServices } from '../../hooks/useServices'
 import { sanitizeHTML } from '../../utils/sanitize'
 import { usePhotos, usePhotoCategories, findCategoryByKeyword } from '../../hooks/usePhotos'
@@ -9,7 +9,7 @@ import {
   Image as ImageIcon, Clock, CaretLeft, CaretRight, CaretUp, CaretDown, GlobeSimple,
   CheckCircle, Star, Heart, ShieldCheck, ArrowRight, Lightning, Crown, Leaf, Bell, Diamond,
   Users, User, MapPin, CalendarBlank, Gift, Fire, Eye, Sun, Moon, BookOpen, Phone, Sparkle,
-  Check, Asterisk, Flame, Flower, HandsPraying, SealCheck, MedalMilitary, EyeSlash
+  Check, Asterisk, Flame, Flower, HandsPraying, SealCheck, MedalMilitary, EyeSlash, Tag
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
@@ -20,12 +20,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
-import { categoryNames } from '../../lib/constants'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 import type { AdminServiceRow } from '../../lib/supabase'
 import { generateSlug, supabase } from '../../lib/supabase'
 
-type ServiceCategory = 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
+type ServiceCategory = string
+
+interface ServiceCategoryRow {
+  id: string
+  name: string
+  slug: string
+  sort_order: number
+}
 
 const SECTION_COLORS = [
   { label: 'Default',   value: '' },
@@ -183,10 +189,19 @@ export default function AdminServicesNew() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 25
 
+  // Category Manager state
+  const [serviceCategories, setServiceCategories] = useState<ServiceCategoryRow[]>([])
+  const [isLoadingServiceCategories, setIsLoadingServiceCategories] = useState(false)
+  const [showCategoryManager, setShowCategoryManager] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [isCreatingServiceCategory, setIsCreatingServiceCategory] = useState(false)
+  const [editingServiceCategory, setEditingServiceCategory] = useState<ServiceCategoryRow | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<ServiceCategoryRow | null>(null)
+
   const emptyForm = (): ServiceFormData => ({
     id: '',
     name: '',
-    category: 'pooja',
+    category: serviceCategories[0]?.slug ?? 'pooja',
     duration: '',
     description: '',
     dakshina: '',
@@ -199,7 +214,144 @@ export default function AdminServicesNew() {
   })
   const [formData, setFormData] = useState<ServiceFormData>(emptyForm())
 
-  // Filter services
+  // Fetch service categories on mount
+  useEffect(() => {
+    fetchServiceCategories()
+  }, [])
+
+  const fetchServiceCategories = async () => {
+    setIsLoadingServiceCategories(true)
+    try {
+      const { data, error } = await supabase
+        .from('service_categories')
+        .select('id, name, slug, sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+      if (error) throw error
+      setServiceCategories(data || [])
+    } catch (error) {
+      console.error('Error fetching service categories:', error)
+      toast.error('Failed to load service categories')
+    } finally {
+      setIsLoadingServiceCategories(false)
+    }
+  }
+
+  const handleCreateServiceCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error('Please enter a category name')
+      return
+    }
+    setIsCreatingServiceCategory(true)
+    try {
+      const slug = generateSlug(newCategoryName)
+
+      const { data: maxSort } = await supabase
+        .from('service_categories')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .single()
+
+      const nextSortOrder = (maxSort?.sort_order ?? -1) + 1
+
+      const { data, error } = await supabase
+        .from('service_categories')
+        .insert({ name: newCategoryName.trim(), slug, is_active: true, sort_order: nextSortOrder })
+        .select()
+        .single()
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('A category with this name already exists')
+        } else {
+          throw error
+        }
+        return
+      }
+
+      toast.success('Category created successfully')
+      setServiceCategories(prev => [...prev, data])
+      setNewCategoryName('')
+    } catch (error) {
+      console.error('Error creating service category:', error)
+      toast.error('Failed to create category')
+    } finally {
+      setIsCreatingServiceCategory(false)
+    }
+  }
+
+  const handleUpdateServiceCategory = async (category: ServiceCategoryRow, newName: string) => {
+    if (!newName.trim()) {
+      toast.error('Category name cannot be empty')
+      return
+    }
+    try {
+      const slug = generateSlug(newName)
+      const { error } = await supabase
+        .from('service_categories')
+        .update({ name: newName.trim(), slug, updated_at: new Date().toISOString() })
+        .eq('id', category.id)
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('A category with this name already exists')
+        } else {
+          throw error
+        }
+        return
+      }
+
+      toast.success('Category updated successfully')
+      fetchServiceCategories()
+      setEditingServiceCategory(null)
+    } catch (error) {
+      console.error('Error updating service category:', error)
+      toast.error('Failed to update category')
+    }
+  }
+
+  const handleDeleteServiceCategory = async (category: ServiceCategoryRow) => {
+    try {
+      // Ensure "Uncategorized" exists as the fallback target
+      let uncategorized = serviceCategories.find(c => c.slug === 'uncategorized')
+
+      if (!uncategorized) {
+        const { data, error: createErr } = await supabase
+          .from('service_categories')
+          .insert({ name: 'Uncategorized', slug: 'uncategorized', is_active: true, sort_order: -1 })
+          .select()
+          .single()
+        if (createErr) throw createErr
+        uncategorized = data as ServiceCategoryRow
+      }
+
+      // Move services from deleted category to Uncategorized
+      const { error: moveErr } = await supabase
+        .from('services')
+        .update({ category_id: uncategorized.id })
+        .eq('category_id', category.id)
+
+      if (moveErr) throw moveErr
+
+      // Delete the category
+      const { error: delErr } = await supabase
+        .from('service_categories')
+        .delete()
+        .eq('id', category.id)
+
+      if (delErr) throw delErr
+
+      toast.success('Category deleted; services moved to Uncategorized')
+      fetchServiceCategories()
+      setCategoryToDelete(null)
+    } catch (error) {
+      console.error('Error deleting service category:', error)
+      toast.error('Failed to delete category')
+    }
+  }
+
+
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -318,7 +470,7 @@ export default function AdminServicesNew() {
         // Category slug not found — auto-create it so the admin form always works
         console.log(`Category '${formData.category}' not found in DB, auto-creating...`)
         const meta = categoryMeta[formData.category] || {
-          name: categoryNames[formData.category] || formData.category,
+          name: serviceCategories.find(c => c.slug === formData.category)?.name || formData.category,
           icon: 'star',
           sortOrder: 99,
         }
@@ -445,10 +597,16 @@ export default function AdminServicesNew() {
                 Manage your Hindu pooja services, sanskars, and consultations
               </CardDescription>
             </div>
-            <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
-              <Plus size={20} weight="bold" />
-              Add New Service
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={() => setShowCategoryManager(true)} variant="outline" className="gap-2">
+                <Tag size={18} />
+                Manage Categories
+              </Button>
+              <Button onClick={handleAdd} className="gap-2 shadow-md hover:shadow-lg transition-all">
+                <Plus size={20} weight="bold" />
+                Add New Service
+              </Button>
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -476,12 +634,9 @@ export default function AdminServicesNew() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="pooja">Poojas</SelectItem>
-                  <SelectItem value="sanskar">Sanskars</SelectItem>
-                  <SelectItem value="paath">Paath/Recitations</SelectItem>
-                  <SelectItem value="consultation">Consultations</SelectItem>
-                  <SelectItem value="wellness">Meditation & Yoga</SelectItem>
-                  <SelectItem value="packages">📦 Service Packages</SelectItem>
+                  {serviceCategories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -536,7 +691,7 @@ export default function AdminServicesNew() {
                       )}
                     </div>
                     <Badge variant="outline" className="mb-3">
-                      {categoryNames[service.category]}
+                      {serviceCategories.find(c => c.slug === service.category)?.name || service.category}
                     </Badge>
                   </div>
                 </div>
@@ -706,12 +861,9 @@ export default function AdminServicesNew() {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pooja">🪔 Poojas</SelectItem>
-                          <SelectItem value="sanskar">🎊 Sanskars</SelectItem>
-                          <SelectItem value="paath">📿 Paath / Recitations</SelectItem>
-                          <SelectItem value="consultation">🔮 Consultations</SelectItem>
-                          <SelectItem value="wellness">🧘 Meditation & Yoga</SelectItem>
-                          <SelectItem value="packages">📦 Service Packages</SelectItem>
+                          {serviceCategories.map(cat => (
+                            <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -1567,6 +1719,106 @@ export default function AdminServicesNew() {
         title="Delete Service"
         itemName={serviceToDelete?.name}
         isDeleting={isDeleting}
+      />
+
+      {/* Category Manager Dialog */}
+      <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag size={20} />
+              Manage Service Categories
+            </DialogTitle>
+            <DialogDescription>Create, edit, and delete service categories</DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[60vh] space-y-2">
+            {isLoadingServiceCategories ? (
+              <div className="flex items-center justify-center py-8">
+                <Spinner className="animate-spin text-primary" size={24} />
+              </div>
+            ) : serviceCategories.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No categories yet</p>
+            ) : (
+              serviceCategories.map((category) => (
+                <Card key={category.id} className="p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    {editingServiceCategory?.id === category.id ? (
+                      <div className="flex-1 flex items-center gap-2">
+                        <Input
+                          value={editingServiceCategory.name}
+                          onChange={(e) => setEditingServiceCategory({ ...editingServiceCategory, name: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleUpdateServiceCategory(category, editingServiceCategory.name)
+                            } else if (e.key === 'Escape') {
+                              setEditingServiceCategory(null)
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <Button size="sm" onClick={() => handleUpdateServiceCategory(category, editingServiceCategory.name)}>
+                          <FloppyDisk size={16} />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditingServiceCategory(null)}>
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1">
+                          <p className="font-medium">{category.name}</p>
+                          <p className="text-xs text-muted-foreground">{category.slug}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingServiceCategory(category)}
+                            title="Edit"
+                          >
+                            <PencilSimple size={16} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setCategoryToDelete(category)}
+                            disabled={category.slug === 'uncategorized'}
+                            title={category.slug === 'uncategorized' ? 'Cannot delete Uncategorized' : 'Delete'}
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input
+              placeholder="New category name..."
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreateServiceCategory()}
+            />
+            <Button onClick={handleCreateServiceCategory} disabled={isCreatingServiceCategory || !newCategoryName.trim()}>
+              {isCreatingServiceCategory ? <Spinner className="animate-spin" size={16} /> : <Plus size={16} />}
+              Add
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Category Confirmation */}
+      <DeleteConfirmDialog
+        open={!!categoryToDelete}
+        onOpenChange={(open) => !open && setCategoryToDelete(null)}
+        onConfirm={() => categoryToDelete && handleDeleteServiceCategory(categoryToDelete)}
+        title="Delete Category"
+        itemName={categoryToDelete?.name}
+        isDeleting={false}
+        description="All services in this category will be moved to 'Uncategorized'"
       />
     </div>
   )
