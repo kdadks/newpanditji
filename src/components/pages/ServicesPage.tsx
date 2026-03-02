@@ -264,7 +264,6 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
             >
               {/* Image Section */}
               <div className="relative h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 shrink-0">
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent z-10"></div>
                 {service.imageUrl && (
                   <img 
                     src={service.imageUrl}

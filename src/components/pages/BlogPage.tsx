@@ -266,7 +266,6 @@ export default function BlogPage({ }: BlogPageProps) {
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
                 </div>
               ) : (
                 <div className="h-32 bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center">
