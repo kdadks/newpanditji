@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from '../ui/badge'
 import { toast } from 'sonner'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
+import { QuillEditor } from '../ui/quill-editor'
 
 interface BookFormData {
   id: string
@@ -329,7 +330,7 @@ export default function AdminBooks() {
 
       {/* Edit/Add Dialog - Modern Stunning UX */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
+        <DialogContent className="w-[72vw]! max-w-[72vw]! max-h-[92vh] overflow-hidden flex flex-col p-0 gap-0 bg-background! border shadow-2xl">
           {/* Stunning Header */}
           <DialogHeader className="relative px-8 pt-8 pb-6 bg-linear-to-r from-amber-500/10 via-orange-500/5 to-rose-500/10 border-b bg-background">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-amber-500/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -515,13 +516,11 @@ export default function AdminBooks() {
                           Full Description
                         </Label>
                         <p className="text-xs text-muted-foreground mb-2">Complete description for the book detail page</p>
-                        <Textarea
-                          id="fullDescription"
+                        <QuillEditor
                           value={formData.fullDescription}
-                          onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
+                          onChange={(value) => setFormData({ ...formData, fullDescription: value })}
                           placeholder="Comprehensive book description with key insights..."
-                          rows={6}
-                          className="bg-background border-border/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all resize-none"
+                          minHeight="250px"
                         />
                       </div>
                     </div>

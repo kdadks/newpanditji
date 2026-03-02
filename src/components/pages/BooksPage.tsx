@@ -8,7 +8,62 @@ import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBooksPageContent } from '../../hooks/useCmsContent'
 import { usePublishedBooks } from '../../hooks/useBooks'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
+import { sanitizeHTML } from '../../utils/sanitize'
 import type { BookRow } from '../../lib/supabase'
+
+// Renders book description - handles both HTML (from rich text editor) and plain text
+function renderBookDescription(text: string): React.ReactNode {
+  if (!text) return null
+  // If it looks like HTML (contains tags), sanitize and render as HTML
+  if (/<[a-z][\s\S]*?>/i.test(text)) {
+    return (
+      <div
+        className="prose text-muted-foreground leading-relaxed text-sm max-w-none"
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(text) }}
+      />
+    )
+  }
+  // Plain text: parse into paragraphs, numbered lists, and bullet lists
+  const lines = text.split('\n')
+  const nodes: React.ReactNode[] = []
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    if (!line) { i++; continue }
+    // Numbered list block
+    if (/^\d+\.\s/.test(line)) {
+      const items: string[] = []
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^\d+\.\s*/, ''))
+        i++
+      }
+      nodes.push(
+        <ol key={`ol-${nodes.length}`} className="list-decimal pl-5 mb-2 space-y-0.5 text-sm text-muted-foreground">
+          {items.map((it, idx) => <li key={idx}>{it}</li>)}
+        </ol>
+      )
+      continue
+    }
+    // Bullet list block (• or o prefix)
+    if (/^[•o]\s/.test(line)) {
+      const items: string[] = []
+      while (i < lines.length && /^[•o]\s/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^[•o]\s*/, ''))
+        i++
+      }
+      nodes.push(
+        <ul key={`ul-${nodes.length}`} className="list-disc pl-5 mb-2 space-y-0.5 text-sm text-muted-foreground">
+          {items.map((it, idx) => <li key={idx}>{it}</li>)}
+        </ul>
+      )
+      continue
+    }
+    // Regular paragraph
+    nodes.push(<p key={`p-${nodes.length}`} className="mb-2 text-sm text-muted-foreground leading-relaxed">{line}</p>)
+    i++
+  }
+  return <>{nodes}</>
+}
 
 export default function BooksPage() {
   const [selectedBook, setSelectedBook] = useState<BookRow | null>(null)
@@ -275,61 +330,51 @@ export default function BooksPage() {
           {selectedBook && (
             <>
               <DialogHeader>
-                <div className="flex flex-col md:flex-row items-start gap-6 mb-4">
-                  {/* Book Cover Image */}
-                  <div className="w-full md:w-48 shrink-0">
-                    {selectedBook.cover_image_url ? (
+                <Badge variant="secondary" className="text-xs mb-1 w-fit">
+                  {selectedBook.category}
+                </Badge>
+                <DialogTitle className="font-heading text-xl md:text-2xl mb-1">
+                  {selectedBook.title}
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground text-sm">
+                  {selectedBook.subtitle || 'Detailed information about this book'}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 mt-2">
+                {/* Full Description with floated cover image */}
+                <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
+                  <CardContent className="px-4 pb-4" style={{ paddingTop: '5px' }}>
+                    {selectedBook.cover_image_url && (
                       <img
                         src={selectedBook.cover_image_url}
                         alt={selectedBook.title}
-                        className="w-full h-auto rounded-lg shadow-lg border border-border"
+                        className="float-left mr-4 mb-2 rounded-lg shadow-lg border border-border h-auto"
+                        style={{ width: '300px', maxWidth: '45%' }}
                       />
-                    ) : (
-                      <div className="w-full aspect-2/3 rounded-lg shadow-lg border border-border bg-muted flex items-center justify-center">
-                        <BookOpen size={48} className="text-muted-foreground" />
-                      </div>
                     )}
-                  </div>
-
-                  <div className="flex-1">
-                    <Badge variant="secondary" className="text-xs mb-2">
-                      {selectedBook.category}
-                    </Badge>
-                    <DialogTitle className="font-heading text-2xl md:text-3xl mb-2">
-                      {selectedBook.title}
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground text-sm">
-                      {selectedBook.subtitle || 'Detailed information about this book'}
-                    </DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-6 mt-4">
-                {/* Full Description */}
-                {selectedBook.full_description && (
-                  <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-indigo-50">
-                    <CardContent className="p-6">
-                      <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
-                        <BookOpen className="text-primary" size={24} />
-                        About This Book
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed text-sm">
-                        {selectedBook.full_description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                    {selectedBook.full_description && (
+                      <>
+                        <h3 className="font-heading font-bold text-base mb-2 text-foreground flex items-center gap-2">
+                          <BookOpen className="text-primary" size={18} />
+                          About This Book
+                        </h3>
+                        {renderBookDescription(selectedBook.full_description)}
+                      </>
+                    )}
+                    <div className="clear-both" />
+                  </CardContent>
+                </Card>
 
                 {/* Chapters */}
                 {selectedBook.chapter_list && selectedBook.chapter_list.length > 0 && (
                   <Card className="border-0 shadow-md bg-linear-to-br from-purple-50 to-violet-50">
-                    <CardContent className="p-6">
-                      <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                        <BookBookmark className="text-primary" size={24} weight="fill" />
+                    <CardContent className="p-4">
+                      <h3 className="font-heading font-bold text-base mb-2 text-foreground flex items-center gap-2">
+                        <BookBookmark className="text-primary" size={18} weight="fill" />
                         Chapters
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1">
                         {selectedBook.chapter_list.map((chapter, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <span className="text-primary font-semibold min-w-[2rem]">{index + 1}.</span>
@@ -344,12 +389,12 @@ export default function BooksPage() {
                 {/* Key Topics */}
                 {selectedBook.key_topics && selectedBook.key_topics.length > 0 && (
                   <Card className="border-0 shadow-md bg-linear-to-br from-green-50 to-emerald-50">
-                    <CardContent className="p-6">
-                      <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                        <Lightbulb className="text-primary" size={24} weight="fill" />
+                    <CardContent className="p-4">
+                      <h3 className="font-heading font-bold text-base mb-2 text-foreground flex items-center gap-2">
+                        <Lightbulb className="text-primary" size={18} weight="fill" />
                         Key Topics Covered
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1">
                         {selectedBook.key_topics.map((topic, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <Sparkle className="text-primary mt-0.5 shrink-0" size={16} weight="fill" />
@@ -364,9 +409,9 @@ export default function BooksPage() {
                 {/* Target Audience */}
                 {selectedBook.target_audience && (
                   <Card className="border-0 shadow-md bg-linear-to-br from-orange-50 to-amber-50">
-                    <CardContent className="p-6">
-                      <h3 className="font-heading font-bold text-xl mb-3 text-foreground flex items-center gap-2">
-                        <Users className="text-primary" size={24} weight="fill" />
+                    <CardContent className="p-4">
+                      <h3 className="font-heading font-bold text-base mb-2 text-foreground flex items-center gap-2">
+                        <Users className="text-primary" size={18} weight="fill" />
                         Who Should Read This Book
                       </h3>
                       <p className="text-muted-foreground text-sm leading-relaxed">
@@ -382,12 +427,12 @@ export default function BooksPage() {
                   return (purchaseUrls.amazonIndia || purchaseUrls.amazonEU || purchaseUrls.amazonUK)
                 })() && (
                   <Card className="border-0 shadow-md bg-linear-to-br from-amber-50 to-yellow-50">
-                    <CardContent className="p-6">
-                      <h3 className="font-heading font-bold text-xl mb-4 text-foreground flex items-center gap-2">
-                        <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-6 h-6 object-contain" />
+                    <CardContent className="p-4">
+                      <h3 className="font-heading font-bold text-base mb-2 text-foreground flex items-center gap-2">
+                        <img src="/images/amazon-a-logo.jpg" alt="Amazon" className="w-5 h-5 object-contain" />
                         Get This Book on Amazon
                       </h3>
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-2">
                         {(() => {
                           const purchaseUrls = selectedBook.other_purchase_urls as Record<string, string>
                           return (
@@ -437,7 +482,7 @@ export default function BooksPage() {
                 )}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-border flex gap-3">
+              <div className="mt-4 pt-3 border-t border-border flex gap-3">
                 <Button className="flex-1" onClick={() => {
                   setIsDetailsOpen(false)
                   window.location.href = '/contact'
