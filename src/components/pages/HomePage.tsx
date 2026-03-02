@@ -408,7 +408,7 @@ export default function HomePage({ }: HomePageProps) {
                     {/* Category badge on image */}
                     <div className="absolute top-3 left-3">
                       <span className="text-xs font-bold text-white bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20 shadow-lg">
-                        {categoryNames[service.category]}
+                        {service.categoryName || (categoryNames as Record<string, string>)[service.category] || service.category}
                       </span>
                     </div>
 
@@ -503,7 +503,7 @@ export default function HomePage({ }: HomePageProps) {
 
                     <div className="absolute top-3 left-3">
                       <span className="text-xs font-bold text-white bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20 shadow-lg">
-                        {categoryNames[service.category]}
+                        {service.categoryName || (categoryNames as Record<string, string>)[service.category] || service.category}
                       </span>
                     </div>
 

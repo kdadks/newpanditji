@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useServices } from '../../hooks/useServices'
 import { sanitizeHTML } from '../../utils/sanitize'
 import { trackServiceView } from '../../lib/analytics-tracker'
@@ -43,7 +43,18 @@ interface ServicesPageProps {
 
 export default function ServicesPage({ initialCategory = 'all', onNavigate }: ServicesPageProps) {
   const { services, isLoading } = useServices()
-  const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>(initialCategory as Service['category'] | 'all')
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory)
+
+  // Derive unique categories from loaded services (dynamic, DB-driven)
+  const availableCategories = useMemo(() => {
+    const seen = new Map<string, string>()
+    services.forEach(s => {
+      if (!seen.has(s.category)) {
+        seen.set(s.category, s.categoryName || categoryNames[s.category as keyof typeof categoryNames] || s.category)
+      }
+    })
+    return Array.from(seen.entries()).map(([slug, name]) => ({ slug, name }))
+  }, [services])
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -61,7 +72,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   useEffect(() => {
     if (initialCategory && initialCategory !== selectedCategory) {
-      setSelectedCategory(initialCategory as Service['category'] | 'all')
+      setSelectedCategory(initialCategory)
     }
   }, [initialCategory])
 
@@ -72,7 +83,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   const filteredServices = services.filter(service => {
     // Filter by category
-    const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory
+    const matchesCategory = selectedCategory === 'all' || selectedCategory === '' || service.category === selectedCategory
 
     // Filter by search query
     const matchesSearch = searchQuery === '' ||
@@ -88,6 +99,9 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedServices = filteredServices.slice(startIndex, endIndex)
+
+  const getCategoryLabel = (service: Service) =>
+    service.categoryName || (categoryNames as Record<string, string>)[service.category] || service.category
 
   const handleServiceClick = (service: Service) => {
     setSelectedService(service)
@@ -204,29 +218,16 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         </div>
 
-        <Tabs value={selectedCategory} className="mb-8" onValueChange={(v) => setSelectedCategory(v as Service['category'] | 'all')} suppressHydrationWarning>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2" suppressHydrationWarning>
+        <Tabs value={selectedCategory} className="mb-8" onValueChange={setSelectedCategory} suppressHydrationWarning>
+          <TabsList className={`grid w-full h-auto gap-2 bg-muted/50 p-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-${Math.min(availableCategories.length + 1, 8)}`} suppressHydrationWarning>
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               All Services ({services.length})
             </TabsTrigger>
-            <TabsTrigger value="pooja" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Poojas ({services.filter(s => s.category === 'pooja').length})
-            </TabsTrigger>
-            <TabsTrigger value="sanskar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Sanskars ({services.filter(s => s.category === 'sanskar').length})
-            </TabsTrigger>
-            <TabsTrigger value="paath" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Paath ({services.filter(s => s.category === 'paath').length})
-            </TabsTrigger>
-            <TabsTrigger value="consultation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Consultations ({services.filter(s => s.category === 'consultation').length})
-            </TabsTrigger>
-            <TabsTrigger value="wellness" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Wellness ({services.filter(s => s.category === 'wellness').length})
-            </TabsTrigger>
-            <TabsTrigger value="packages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
-              Packages ({services.filter(s => s.category === 'packages').length})
-            </TabsTrigger>
+            {availableCategories.map(({ slug, name }) => (
+              <TabsTrigger key={slug} value={slug} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
+                {name} ({services.filter(s => s.category === slug).length})
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 
@@ -275,7 +276,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                 <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 px-4 py-2 rounded-full shadow-lg border border-white/30 backdrop-blur-sm">
                     <FlowerLotus size={14} weight="fill" />
-                    {categoryNames[service.category]}
+                    {getCategoryLabel(service)}
                   </span>
                   {/* Package Badge */}
                   {service.isPackage && (
@@ -500,7 +501,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
                   <div className="mb-3">
                     <Badge className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 text-white border-white/30">
                       <FlowerLotus size={14} weight="fill" className="mr-1.5" />
-                      {categoryNames[selectedService.category]}
+                      {getCategoryLabel(selectedService)}
                     </Badge>
                   </div>
 

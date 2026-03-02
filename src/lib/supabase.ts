@@ -152,7 +152,8 @@ export type ServicePackageItemUpdate = Partial<ServicePackageItemInsert>
 
 // Extended service row with category slug for admin UI
 export interface AdminServiceRow extends ServiceRow {
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
+  category: string
+  categoryName?: string
   description: string
   detailed_description: string | null
 }

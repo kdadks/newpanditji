@@ -11,7 +11,7 @@ const ADMIN_SERVICES_KEY = ['admin_services']
 
 // Extended ServiceRow for admin that includes category from join
 interface ServiceRowWithCategory extends ServiceRow {
-  service_categories?: { slug: string } | null
+  service_categories?: { slug: string; name: string } | null
 }
 
 /**
@@ -19,6 +19,7 @@ interface ServiceRowWithCategory extends ServiceRow {
  */
 function mapServiceRowToService(row: ServiceRowWithCategory): Service {
   const category = row.service_categories?.slug || 'pooja'
+  const categoryName = row.service_categories?.name || undefined
 
   // Parse core_aspects (JSONB ContentSection[]) — filter disabled sections
   let contentSections: ContentSection[] | undefined
@@ -52,6 +53,7 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
     id: row.id,
     name: row.name,
     category: category as Service['category'],
+    categoryName,
     duration: row.duration || '',
     description: row.short_description,
     imageUrl: row.featured_image_url || undefined,
@@ -78,10 +80,12 @@ function mapServiceRowToService(row: ServiceRowWithCategory): Service {
  */
 function mapServiceRowToAdminRow(row: ServiceRowWithCategory): AdminServiceRow {
   const category = row.service_categories?.slug || 'pooja'
+  const categoryName = row.service_categories?.name || undefined
 
   return {
     ...row,
     category: category as AdminServiceRow['category'],
+    categoryName,
     description: row.short_description,
     detailed_description: row.full_description,
   }
@@ -95,7 +99,7 @@ async function fetchServices(): Promise<Service[]> {
     .from('services')
     .select(`
       *,
-      service_categories (slug)
+      service_categories (slug, name)
     `)
     .eq('is_published', true)
     .order('sort_order', { ascending: true })
@@ -157,7 +161,7 @@ async function fetchAdminServices(): Promise<AdminServiceRow[]> {
     .from('services')
     .select(`
       *,
-      service_categories (slug)
+      service_categories (slug, name)
     `)
     .order('sort_order', { ascending: true })
 

@@ -42,7 +42,8 @@ export type AppNavigationData = {
 export interface Service {
   id: string
   name: string
-  category: 'pooja' | 'sanskar' | 'paath' | 'consultation' | 'wellness' | 'packages'
+  category: string
+  categoryName?: string
   duration: string
   description: string
   imageUrl?: string
