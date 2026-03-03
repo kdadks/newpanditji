@@ -1003,6 +1003,13 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
       badge: (pricingSection.badge as string) || defaultDakshinaContent.pricingSection.badge,
       title: (pricingSection.title as string) || defaultDakshinaContent.pricingSection.title,
       description: (pricingSection.description as string) || defaultDakshinaContent.pricingSection.description,
+      columnHeaders: {
+        col1: ((pricingSection.columnHeaders as any)?.col1 as string) || defaultDakshinaContent.pricingSection.columnHeaders.col1,
+        col2: ((pricingSection.columnHeaders as any)?.col2 as string) || defaultDakshinaContent.pricingSection.columnHeaders.col2,
+        col3: ((pricingSection.columnHeaders as any)?.col3 as string) || defaultDakshinaContent.pricingSection.columnHeaders.col3,
+        col4: ((pricingSection.columnHeaders as any)?.col4 as string) || defaultDakshinaContent.pricingSection.columnHeaders.col4,
+        col5: ((pricingSection.columnHeaders as any)?.col5 as string) || defaultDakshinaContent.pricingSection.columnHeaders.col5,
+      },
       services: ((pricingSection.services as any[]) || defaultDakshinaContent.pricingSection.services).map(service => ({
         name: service.name || '',
         description: service.description || '',
@@ -1052,6 +1059,7 @@ function dakshinaContentToSections(content: DakshinaPageContent): { sectionKey: 
         badge: content.pricingSection.badge,
         title: content.pricingSection.title,
         description: content.pricingSection.description,
+        columnHeaders: content.pricingSection.columnHeaders,
         services: content.pricingSection.services,
         notes: content.pricingSection.notes,
       }

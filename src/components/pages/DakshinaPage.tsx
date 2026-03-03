@@ -155,11 +155,11 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-linear-to-r from-primary via-accent to-primary text-white">
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Service/Package</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Pooja Duration</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Preparation Time</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Total Engagement Time</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-right font-bold text-base md:text-lg">Dakshina</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col1 || 'Service/Package'}</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col2 || 'Pooja Duration'}</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col3 || 'Preparation Time'}</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col4 || 'Total Engagement Time'}</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-right font-bold text-base md:text-lg">{cmsContent.pricingSection.columnHeaders?.col5 || 'Dakshina'}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -234,25 +234,25 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                   <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
                     {service.poojaTime && (
                       <div>
-                        <div className="text-xs text-muted-foreground font-medium">Pooja Duration</div>
+                        <div className="text-xs text-muted-foreground font-medium">{cmsContent.pricingSection.columnHeaders?.col2 || 'Pooja Duration'}</div>
                         <div>{service.poojaTime}</div>
                       </div>
                     )}
                     {service.preparationTime && (
                       <div>
-                        <div className="text-xs text-muted-foreground font-medium">Preparation Time</div>
+                        <div className="text-xs text-muted-foreground font-medium">{cmsContent.pricingSection.columnHeaders?.col3 || 'Preparation Time'}</div>
                         <div>{service.preparationTime}</div>
                       </div>
                     )}
                     {service.totalEngagementTime && (
                       <div className="col-span-2">
-                        <div className="text-xs text-muted-foreground font-medium">Total Engagement Time</div>
+                        <div className="text-xs text-muted-foreground font-medium">{cmsContent.pricingSection.columnHeaders?.col4 || 'Total Engagement Time'}</div>
                         <div>{service.totalEngagementTime}</div>
                       </div>
                     )}
                   </div>
                   <div className="flex items-center justify-between border-t pt-3">
-                    <div className="text-sm text-muted-foreground">Dakshina</div>
+                    <div className="text-sm text-muted-foreground">{cmsContent.pricingSection.columnHeaders?.col5 || 'Dakshina'}</div>
                     <div className="text-right">
                       {service.priceNote && (
                         <div className="text-xs text-muted-foreground mb-1">{service.priceNote}</div>

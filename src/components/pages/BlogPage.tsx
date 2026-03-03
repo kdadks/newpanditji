@@ -7,11 +7,10 @@ import { useBlogs } from '../../hooks/useBlogs'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch, CaretLeft } from '@phosphor-icons/react'
+import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch, CaretLeft, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { AppPage, AppNavigationData } from '../../lib/types'
 
-const PAGE_1_SIZE = 25  // 1 featured + 24 grid
-const PAGE_N_SIZE = 24  // subsequent pages grid only
+const DEFAULT_PAGE_SIZE = 20  // articles per page (resets to this on page refresh)
 
 interface BlogArticle {
   id: string
@@ -33,6 +32,7 @@ export default function BlogPage({ }: BlogPageProps) {
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('All Articles')
   const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_PAGE_SIZE)
 
   const handleCategoryChange = useCallback((cat: string) => {
     setSelectedCategory(cat)
@@ -93,13 +93,11 @@ export default function BlogPage({ }: BlogPageProps) {
 
   // Pagination calculations
   const totalArticles = filteredArticles.length
-  const totalPages = totalArticles <= PAGE_1_SIZE
-    ? 1
-    : 1 + Math.ceil((totalArticles - PAGE_1_SIZE) / PAGE_N_SIZE)
+  const totalPages = Math.ceil(totalArticles / itemsPerPage) || 1
 
   // Slice articles for the current page
-  const pageStartIndex = currentPage === 1 ? 0 : PAGE_1_SIZE + (currentPage - 2) * PAGE_N_SIZE
-  const pageEndIndex = currentPage === 1 ? PAGE_1_SIZE : pageStartIndex + PAGE_N_SIZE
+  const pageStartIndex = (currentPage - 1) * itemsPerPage
+  const pageEndIndex = pageStartIndex + itemsPerPage
   const pagedArticles = filteredArticles.slice(pageStartIndex, pageEndIndex)
   const featuredArticle = currentPage === 1 ? pagedArticles[0] : null
   const gridArticles = currentPage === 1 ? pagedArticles.slice(1) : pagedArticles
@@ -162,7 +160,7 @@ export default function BlogPage({ }: BlogPageProps) {
         <div className="container mx-auto px-4 max-w-7xl">
 
         {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           <Badge 
             variant={selectedCategory === 'All Articles' ? 'default' : 'secondary'} 
             className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
@@ -197,6 +195,44 @@ export default function BlogPage({ }: BlogPageProps) {
           </div>
         ) : (
         <>
+        {/* Top controls: per-page selector + pagination */}
+        {filteredArticles.length > 0 && (
+          <div className="mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <label htmlFor="blog-per-page">Show</label>
+              <select
+                id="blog-per-page"
+                value={itemsPerPage}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }}
+                className="border border-input rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {[10, 20, 30, 50, 100].map(n => (
+                  <option key={n} value={n}>{n} per page</option>
+                ))}
+              </select>
+              <span className="whitespace-nowrap">
+                <span className="font-semibold text-foreground">{pageStartIndex + 1}–{Math.min(pageEndIndex, totalArticles)}</span> of <span className="font-semibold text-foreground">{totalArticles}</span> articles
+              </span>
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(1)} disabled={currentPage === 1} className="h-8 w-8">
+                  <CaretDoubleLeft size={14} weight="bold" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="h-8 w-8">
+                  <CaretLeft size={14} weight="bold" />
+                </Button>
+                <span className="px-3 text-sm text-muted-foreground whitespace-nowrap">Page {currentPage} of {totalPages}</span>
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="h-8 w-8">
+                  <CaretRight size={14} weight="bold" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} className="h-8 w-8">
+                  <CaretDoubleRight size={14} weight="bold" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
         {/* Featured Article - page 1 only */}
         {featuredArticle && (
           <div className="mb-16">
@@ -359,56 +395,64 @@ export default function BlogPage({ }: BlogPageProps) {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mb-16">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="gap-1"
-            >
-              <CaretLeft size={16} />
-              Previous
-            </Button>
+          <div className="mt-12 flex flex-col items-center gap-4 mb-16">
+            <div className="flex items-center gap-2">
+              {/* First Page */}
+              <Button variant="outline" size="icon" onClick={() => handlePageChange(1)} disabled={currentPage === 1} className="h-10 w-10">
+                <CaretDoubleLeft size={16} weight="bold" />
+              </Button>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                const isFirst = page === 1
-                const isLast = page === totalPages
-                const isNearCurrent = Math.abs(page - currentPage) <= 1
-                const showPage = isFirst || isLast || isNearCurrent
+              {/* Previous Page */}
+              <Button variant="outline" size="icon" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="h-10 w-10">
+                <CaretLeft size={16} weight="bold" />
+              </Button>
 
-                if (!showPage) {
-                  // Show ellipsis only once per gap
-                  const prevVisible = page - 1 === 1 || Math.abs((page - 1) - currentPage) <= 1
-                  if (!prevVisible) return null
-                  return <span key={`ellipsis-${page}`} className="px-2 text-muted-foreground">…</span>
-                }
+              {/* Page Numbers */}
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  const showPage =
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
 
-                return (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handlePageChange(page)}
-                    className="w-9 h-9 p-0"
-                  >
-                    {page}
-                  </Button>
-                )
-              })}
+                  if (!showPage) {
+                    if (page === currentPage - 2 && currentPage > 3) {
+                      return <span key={page} className="px-2 text-muted-foreground">...</span>
+                    }
+                    if (page === currentPage + 2 && currentPage < totalPages - 2) {
+                      return <span key={page} className="px-2 text-muted-foreground">...</span>
+                    }
+                    return null
+                  }
+
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="icon"
+                      onClick={() => handlePageChange(page)}
+                      className={`h-10 w-10 ${
+                        currentPage === page ? 'bg-primary text-primary-foreground' : ''
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  )
+                })}
+              </div>
+
+              {/* Next Page */}
+              <Button variant="outline" size="icon" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="h-10 w-10">
+                <CaretRight size={16} weight="bold" />
+              </Button>
+
+              {/* Last Page */}
+              <Button variant="outline" size="icon" onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} className="h-10 w-10">
+                <CaretDoubleRight size={16} weight="bold" />
+              </Button>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="gap-1"
-            >
-              Next
-              <CaretRight size={16} />
-            </Button>
+            <p className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</p>
           </div>
         )}
 

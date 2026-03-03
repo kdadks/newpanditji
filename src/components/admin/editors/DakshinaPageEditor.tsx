@@ -382,6 +382,54 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
             />
           </div>
 
+          {/* Column Headers */}
+          <div className="border-t pt-4">
+            <Label className="text-base font-semibold mb-3 block">Grid Column Headers</Label>
+            <p className="text-xs text-muted-foreground mb-3">Customise the header names shown in the Dakshina guidelines table.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Column 1 – Service/Package</Label>
+                <Input
+                  value={content.pricingSection.columnHeaders?.col1 || ''}
+                  onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, columnHeaders: { ...prev.pricingSection.columnHeaders, col1: e.target.value } } }))}
+                  placeholder="Service/Package"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Column 2 – Pooja Duration</Label>
+                <Input
+                  value={content.pricingSection.columnHeaders?.col2 || ''}
+                  onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, columnHeaders: { ...prev.pricingSection.columnHeaders, col2: e.target.value } } }))}
+                  placeholder="Pooja Duration"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Column 3 – Preparation Time</Label>
+                <Input
+                  value={content.pricingSection.columnHeaders?.col3 || ''}
+                  onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, columnHeaders: { ...prev.pricingSection.columnHeaders, col3: e.target.value } } }))}
+                  placeholder="Preparation Time"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Column 4 – Total Engagement Time</Label>
+                <Input
+                  value={content.pricingSection.columnHeaders?.col4 || ''}
+                  onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, columnHeaders: { ...prev.pricingSection.columnHeaders, col4: e.target.value } } }))}
+                  placeholder="Total Engagement Time"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-xs">Column 5 – Dakshina</Label>
+                <Input
+                  value={content.pricingSection.columnHeaders?.col5 || ''}
+                  onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, columnHeaders: { ...prev.pricingSection.columnHeaders, col5: e.target.value } } }))}
+                  placeholder="Dakshina"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Services/Packages */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">

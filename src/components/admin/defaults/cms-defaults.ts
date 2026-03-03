@@ -257,6 +257,13 @@ export const defaultDakshinaContent: DakshinaPageContent = {
     badge: '',
     title: '',
     description: '',
+    columnHeaders: {
+      col1: 'Service/Package',
+      col2: 'Pooja Duration',
+      col3: 'Preparation Time',
+      col4: 'Total Engagement Time',
+      col5: 'Dakshina',
+    },
     services: [],
     notes: []
   },

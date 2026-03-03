@@ -64,8 +64,8 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([])
-  const itemsPerPage = 12
 
   // SEO Configuration
   usePageMetadata('services')
@@ -76,10 +76,10 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
     }
   }, [initialCategory])
 
-  // Reset to page 1 when category or search changes
+  // Reset to page 1 when category, search or items-per-page changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [selectedCategory, searchQuery])
+  }, [selectedCategory, searchQuery, itemsPerPage])
 
   const filteredServices = services.filter(service => {
     // Filter by category
@@ -239,11 +239,43 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
-        {!searchQuery && filteredServices.length > 0 && (
-          <div className="mb-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{startIndex + 1}-{Math.min(endIndex, filteredServices.length)}</span> of <span className="font-semibold text-foreground">{filteredServices.length}</span> services
-            </p>
+        {filteredServices.length > 0 && (
+          <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+            {/* Per-page selector + record count */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <label htmlFor="svc-per-page">Show</label>
+              <select
+                id="svc-per-page"
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="border border-input rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {[10, 20, 30, 50, 100].map(n => (
+                  <option key={n} value={n}>{n} per page</option>
+                ))}
+              </select>
+              <span className="whitespace-nowrap">
+                Showing <span className="font-semibold text-foreground">{startIndex + 1}–{Math.min(endIndex, filteredServices.length)}</span> of <span className="font-semibold text-foreground">{filteredServices.length}</span> services
+              </span>
+            </div>
+            {/* Top pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <Button variant="outline" size="icon" onClick={() => goToPage(1)} disabled={currentPage === 1} className="h-8 w-8">
+                  <CaretDoubleLeft size={14} weight="bold" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="h-8 w-8">
+                  <CaretLeft size={14} weight="bold" />
+                </Button>
+                <span className="px-3 text-sm text-muted-foreground whitespace-nowrap">Page {currentPage} of {totalPages}</span>
+                <Button variant="outline" size="icon" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="h-8 w-8">
+                  <CaretRight size={14} weight="bold" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages} className="h-8 w-8">
+                  <CaretDoubleRight size={14} weight="bold" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
