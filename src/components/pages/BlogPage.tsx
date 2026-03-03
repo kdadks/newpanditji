@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useBlogs } from '../../hooks/useBlogs'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch } from '@phosphor-icons/react'
+import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch, CaretLeft } from '@phosphor-icons/react'
 import { AppPage, AppNavigationData } from '../../lib/types'
+
+const PAGE_1_SIZE = 25  // 1 featured + 24 grid
+const PAGE_N_SIZE = 24  // subsequent pages grid only
 
 interface BlogArticle {
   id: string
@@ -29,6 +32,16 @@ export default function BlogPage({ }: BlogPageProps) {
   const router = useRouter()
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('All Articles')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const handleCategoryChange = useCallback((cat: string) => {
+    setSelectedCategory(cat)
+    setCurrentPage(1)
+  }, [])
+
+  const scrollToContent = useCallback(() => {
+    document.getElementById('blog-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
 
   const handleNavigate = (pageOrData: AppPage | AppNavigationData) => {
     if (typeof pageOrData === 'string') {
@@ -77,6 +90,24 @@ export default function BlogPage({ }: BlogPageProps) {
   const filteredArticles = selectedCategory === 'All Articles' 
     ? blogArticles 
     : blogArticles.filter(article => article.category === selectedCategory)
+
+  // Pagination calculations
+  const totalArticles = filteredArticles.length
+  const totalPages = totalArticles <= PAGE_1_SIZE
+    ? 1
+    : 1 + Math.ceil((totalArticles - PAGE_1_SIZE) / PAGE_N_SIZE)
+
+  // Slice articles for the current page
+  const pageStartIndex = currentPage === 1 ? 0 : PAGE_1_SIZE + (currentPage - 2) * PAGE_N_SIZE
+  const pageEndIndex = currentPage === 1 ? PAGE_1_SIZE : pageStartIndex + PAGE_N_SIZE
+  const pagedArticles = filteredArticles.slice(pageStartIndex, pageEndIndex)
+  const featuredArticle = currentPage === 1 ? pagedArticles[0] : null
+  const gridArticles = currentPage === 1 ? pagedArticles.slice(1) : pagedArticles
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    scrollToContent()
+  }
 
   return (
     <div className="w-full">
@@ -127,7 +158,7 @@ export default function BlogPage({ }: BlogPageProps) {
       </section>
 
       {/* Content Section */}
-      <div className="py-8 md:py-12">
+      <div id="blog-content" className="py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-7xl">
 
         {/* Categories */}
@@ -139,7 +170,7 @@ export default function BlogPage({ }: BlogPageProps) {
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                 : 'hover:bg-primary hover:text-primary-foreground'
             }`}
-            onClick={() => setSelectedCategory('All Articles')}
+            onClick={() => handleCategoryChange('All Articles')}
           >
             All Articles ({blogArticles.length})
           </Badge>
@@ -152,7 +183,7 @@ export default function BlogPage({ }: BlogPageProps) {
                   ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                   : 'hover:bg-primary hover:text-primary-foreground'
               }`}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => handleCategoryChange(category)}
             >
               {category} ({categoryCounts[category] || 0})
             </Badge>
@@ -166,8 +197,8 @@ export default function BlogPage({ }: BlogPageProps) {
           </div>
         ) : (
         <>
-        {/* Featured Article */}
-        {filteredArticles.length > 0 && (
+        {/* Featured Article - page 1 only */}
+        {featuredArticle && (
           <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="font-heading font-semibold text-2xl mb-2">Featured Article</h2>
@@ -180,7 +211,7 @@ export default function BlogPage({ }: BlogPageProps) {
                   <div className="p-8 lg:p-12 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-4">
                       <Badge className="bg-primary/20 text-primary border-primary/30">
-                        {'category' in filteredArticles[0] ? filteredArticles[0].category : 'Article'}
+                        {'category' in featuredArticle ? featuredArticle.category : 'Article'}
                       </Badge>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar size={14} />
@@ -189,23 +220,23 @@ export default function BlogPage({ }: BlogPageProps) {
                     </div>
 
                     <h2 className="font-heading font-bold text-3xl lg:text-4xl mb-4 leading-tight">
-                      {filteredArticles[0].title}
+                      {featuredArticle.title}
                     </h2>
 
                     <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                      {filteredArticles[0].excerpt}
+                      {featuredArticle.excerpt}
                     </p>
 
                     <Button 
                       className="w-fit shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={() => {
-                        if (filteredArticles[0].slug) {
-                          handleNavigate({ page: 'blog-detail', blogSlug: filteredArticles[0].slug })
+                        if (featuredArticle.slug) {
+                          handleNavigate({ page: 'blog-detail', blogSlug: featuredArticle.slug })
                         }
                       }}
-                      disabled={!filteredArticles[0].slug || navigatingTo === filteredArticles[0].slug}
+                      disabled={!featuredArticle.slug || navigatingTo === featuredArticle.slug}
                     >
-                      {navigatingTo === filteredArticles[0].slug ? (
+                      {navigatingTo === featuredArticle.slug ? (
                         <>
                           <CircleNotch className="mr-2 animate-spin" size={18} />
                           Loading...
@@ -221,10 +252,10 @@ export default function BlogPage({ }: BlogPageProps) {
                   </div>
 
                   <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12 min-h-[300px]">
-                    {filteredArticles[0].featured_image_url ? (
+                    {featuredArticle.featured_image_url ? (
                       <img 
-                        src={filteredArticles[0].featured_image_url} 
-                        alt={filteredArticles[0].title}
+                        src={featuredArticle.featured_image_url} 
+                        alt={featuredArticle.title}
                         className="w-full h-full object-cover rounded-lg"
                         loading="lazy"
                         decoding="async"
@@ -244,7 +275,9 @@ export default function BlogPage({ }: BlogPageProps) {
 
         {/* Article Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {filteredArticles.slice(1).map((article, index) => (
+          {gridArticles.map((article, index) => {
+            const articleNumber = pageStartIndex + index + (currentPage === 1 ? 2 : 1)
+            return (
             <Card 
               key={article.id} 
               className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-linear-to-br from-card to-card/80 hover:scale-105 cursor-pointer"
@@ -279,7 +312,7 @@ export default function BlogPage({ }: BlogPageProps) {
                     {article.category}
                   </Badge>
                   <div className="text-primary/60 text-lg font-bold">
-                    {(index + 2).toString().padStart(2, '0')}
+                    {articleNumber.toString().padStart(2, '0')}
                   </div>
                 </div>
 
@@ -320,8 +353,64 @@ export default function BlogPage({ }: BlogPageProps) {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mb-16">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="gap-1"
+            >
+              <CaretLeft size={16} />
+              Previous
+            </Button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                const isFirst = page === 1
+                const isLast = page === totalPages
+                const isNearCurrent = Math.abs(page - currentPage) <= 1
+                const showPage = isFirst || isLast || isNearCurrent
+
+                if (!showPage) {
+                  // Show ellipsis only once per gap
+                  const prevVisible = page - 1 === 1 || Math.abs((page - 1) - currentPage) <= 1
+                  if (!prevVisible) return null
+                  return <span key={`ellipsis-${page}`} className="px-2 text-muted-foreground">…</span>
+                }
+
+                return (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePageChange(page)}
+                    className="w-9 h-9 p-0"
+                  >
+                    {page}
+                  </Button>
+                )
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="gap-1"
+            >
+              Next
+              <CaretRight size={16} />
+            </Button>
+          </div>
+        )}
 
         {/* No articles found message */}
         {filteredArticles.length === 0 && !isLoading && (
@@ -333,7 +422,7 @@ export default function BlogPage({ }: BlogPageProps) {
             </p>
             <Button 
               variant="outline" 
-              onClick={() => setSelectedCategory('All Articles')}
+              onClick={() => handleCategoryChange('All Articles')}
             >
               View All Articles
             </Button>
