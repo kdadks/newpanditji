@@ -62,6 +62,27 @@
   .prose ol {
     list-style-type: decimal;
   }
+
+  /* Nested list indentation for prose (public pages) */
+  .prose li > ul,
+  .prose li > ol {
+    padding-left: 1.5em;
+    margin: 0.25em 0;
+  }
+
+  .prose li > ul {
+    list-style-type: circle;
+  }
+  .prose li > ul > li > ul {
+    list-style-type: square;
+  }
+
+  .prose li > ol {
+    list-style-type: lower-alpha;
+  }
+  .prose li > ol > li > ol {
+    list-style-type: lower-roman;
+  }
 }
 
 :root {

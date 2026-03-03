@@ -34,6 +34,25 @@ declare module '@tiptap/core' {
 const IndentExtension = Extension.create({
   name: 'indent',
 
+  addKeyboardShortcuts() {
+    return {
+      // Tab: sink list item when in a list, otherwise indent paragraph
+      Tab: () => {
+        if (this.editor.isActive('listItem')) {
+          return this.editor.commands.sinkListItem('listItem')
+        }
+        return this.editor.commands.indent()
+      },
+      // Shift-Tab: lift list item when in a list, otherwise outdent paragraph
+      'Shift-Tab': () => {
+        if (this.editor.isActive('listItem')) {
+          return this.editor.commands.liftListItem('listItem')
+        }
+        return this.editor.commands.outdent()
+      },
+    }
+  },
+
   addGlobalAttributes() {
     return [
       {
@@ -59,7 +78,11 @@ const IndentExtension = Extension.create({
     return {
       indent:
         () =>
-        ({ state, tr, dispatch }) => {
+        ({ state, tr, dispatch, editor }) => {
+          // If cursor is inside a list item, sink it (creates proper nested list)
+          if (editor.isActive('listItem')) {
+            return editor.commands.sinkListItem('listItem')
+          }
           const { selection } = state
           state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
             if (['paragraph', 'heading'].includes(node.type.name)) {
@@ -72,7 +95,11 @@ const IndentExtension = Extension.create({
         },
       outdent:
         () =>
-        ({ state, tr, dispatch }) => {
+        ({ state, tr, dispatch, editor }) => {
+          // If cursor is inside a list item, lift it
+          if (editor.isActive('listItem')) {
+            return editor.commands.liftListItem('listItem')
+          }
           const { selection } = state
           state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
             if (['paragraph', 'heading'].includes(node.type.name)) {
@@ -272,7 +299,7 @@ export function QuillEditor({
         <MenuButton
           onClick={() => editor.chain().focus().outdent().run()}
           isActive={false}
-          title="Decrease Indent"
+          title="Decrease Indent / Outdent List (Shift+Tab)"
         >
           <TextOutdent size={16} />
         </MenuButton>
@@ -280,7 +307,7 @@ export function QuillEditor({
         <MenuButton
           onClick={() => editor.chain().focus().indent().run()}
           isActive={false}
-          title="Increase Indent"
+          title="Increase Indent / Indent List (Tab)"
         >
           <TextIndent size={16} />
         </MenuButton>
@@ -339,6 +366,29 @@ export function QuillEditor({
 
         .tiptap ol {
           list-style-type: decimal;
+        }
+
+        /* Nested list indentation */
+        .tiptap li > ul,
+        .tiptap li > ol {
+          padding-left: 1.5em;
+          margin: 0.25em 0;
+        }
+
+        /* Nested bullet markers */
+        .tiptap li > ul {
+          list-style-type: circle;
+        }
+        .tiptap li > ul > li > ul {
+          list-style-type: square;
+        }
+
+        /* Nested ordered sub-list */
+        .tiptap li > ol {
+          list-style-type: lower-alpha;
+        }
+        .tiptap li > ol > li > ol {
+          list-style-type: lower-roman;
         }
 
         .tiptap li {

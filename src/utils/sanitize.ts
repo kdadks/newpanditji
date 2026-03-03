@@ -37,6 +37,7 @@ const ALLOWED_ATTR = [
   'rel',    // links — forced to noopener noreferrer below
   'style',  // TextAlign + IndentExtension emit inline styles
   'class',  // TipTap attaches Tailwind/prose classes
+  'start',  // <ol start="N"> — preserved so existing partial data renders correctly
 ]
 
 // One-time setup: force safe values on every <a> tag DOMPurify passes through.
@@ -65,7 +66,7 @@ export function sanitizeHTML(html: string | null | undefined): string {
   // so SSR callers never have real content to render anyway.
   if (typeof window === 'undefined') return ''
 
-  return DOMPurify.sanitize(html, {
+  const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     // Prevent DOM clobbering attacks
@@ -73,4 +74,73 @@ export function sanitizeHTML(html: string | null | undefined): string {
     // Strip data-* attributes (not needed, reduce attack surface)
     ALLOW_DATA_ATTR: false,
   })
+
+  return repairListNesting(clean)
+}
+
+/**
+ * Repair broken list nesting produced by the old editor.
+ *
+ * The old TipTap setup let users click the bullet-list toolbar button while
+ * inside a numbered list which created a *sibling* <ul> instead of a nested
+ * one, breaking the <ol> into two fragments and resetting the counter.
+ *
+ * This function detects and fixes two patterns:
+ *   1. <ol>…</ol><ul sub-items></ul><ol continued>…</ol>
+ *      → moves <ul> inside the last <li> of the first <ol>, then merges
+ *        the items of the continuation <ol> back into the first <ol>.
+ *   2. Consecutive <ol>…</ol><ol>…</ol>
+ *      → merges item by item into one <ol>.
+ *
+ * Runs on already-sanitized HTML so there is no XSS risk.
+ */
+function repairListNesting(html: string): string {
+  if (typeof window === 'undefined') return html
+  if (!html) return html
+
+  const div = document.createElement('div')
+  div.innerHTML = html
+
+  let changed = true
+  while (changed) {
+    changed = false
+    const children = Array.from(div.children)
+    for (let i = 0; i < children.length; i++) {
+      const curr = children[i]
+      const next = children[i + 1]
+      const afterNext = children[i + 2]
+
+      // Pattern 1: OL → UL → OL  (sub-bullets created as siblings)
+      if (
+        curr.tagName === 'OL' &&
+        next?.tagName === 'UL' &&
+        afterNext?.tagName === 'OL'
+      ) {
+        const lastLi = curr.lastElementChild
+        if (lastLi) {
+          // Nest the <ul> inside the last <li> of the first <ol>
+          lastLi.appendChild(next)
+          // Absorb all items from the continuation <ol>
+          while (afterNext.firstChild) {
+            curr.appendChild(afterNext.firstChild)
+          }
+          afterNext.remove()
+          changed = true
+          break
+        }
+      }
+
+      // Pattern 2: consecutive OL → OL  (counter restart)
+      if (curr.tagName === 'OL' && next?.tagName === 'OL') {
+        while (next.firstChild) {
+          curr.appendChild(next.firstChild)
+        }
+        next.remove()
+        changed = true
+        break
+      }
+    }
+  }
+
+  return div.innerHTML
 }
