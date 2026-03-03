@@ -1006,7 +1006,9 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
       services: ((pricingSection.services as any[]) || defaultDakshinaContent.pricingSection.services).map(service => ({
         name: service.name || '',
         description: service.description || '',
-        duration: service.duration || '',
+        poojaTime: service.poojaTime || service.duration || '',
+        preparationTime: service.preparationTime || '',
+        totalEngagementTime: service.totalEngagementTime || '',
         price: service.price || service.suggested || '',
         priceNote: service.priceNote || ''
       })),

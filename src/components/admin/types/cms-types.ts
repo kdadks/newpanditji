@@ -331,7 +331,9 @@ export interface CharityPageContent {
 export interface DakshinaService {
   name: string
   description?: string
-  duration?: string
+  poojaTime?: string
+  preparationTime?: string
+  totalEngagementTime?: string
   price: string
   priceNote?: string
 }

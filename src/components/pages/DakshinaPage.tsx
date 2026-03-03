@@ -152,11 +152,13 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
           {/* Pricing Table - Desktop */}
           <div className="hidden md:block overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-linear-to-r from-primary via-accent to-primary text-white">
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg w-[60%]">Service/Package Name</th>
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg w-[40%]">Duration</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Service/Package</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Pooja Duration</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Preparation Time</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">Total Engagement Time</th>
                     <th className="px-4 md:px-6 py-4 md:py-5 text-right font-bold text-base md:text-lg">Dakshina</th>
                   </tr>
                 </thead>
@@ -166,7 +168,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                       key={index}
                       className="hover:bg-linear-to-r hover:from-primary/5 hover:to-accent/5 transition-colors duration-200 group"
                     >
-                      <td className="px-4 md:px-6 py-4 md:py-5">
+                      <td className="px-4 md:px-6 py-4 md:py-5 border-r border-gray-200 dark:border-gray-700">
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
                             <FlowerLotus size={20} className="text-primary" weight="duotone" />
@@ -181,9 +183,19 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 md:px-6 py-4 md:py-5">
-                        <span className="text-sm text-muted-foreground whitespace-normal wrap-break-word">
-                          {service.duration || 'Varies'}
+                      <td className="px-4 md:px-6 py-4 md:py-5 border-r border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-muted-foreground whitespace-normal">
+                          {service.poojaTime || '—'}
+                        </span>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 md:py-5 border-r border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-muted-foreground whitespace-normal">
+                          {service.preparationTime || '—'}
+                        </span>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 md:py-5 border-r border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-muted-foreground whitespace-normal">
+                          {service.totalEngagementTime || '—'}
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 md:py-5 text-right">
@@ -217,14 +229,29 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                       {service.description && (
                         <div className="text-sm text-muted-foreground mb-2">{service.description}</div>
                       )}
-                      {service.duration && (
-                        <span className="text-xs text-muted-foreground mb-2 block">
-                          {service.duration}
-                        </span>
-                      )}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                    {service.poojaTime && (
+                      <div>
+                        <div className="text-xs text-muted-foreground font-medium">Pooja Duration</div>
+                        <div>{service.poojaTime}</div>
+                      </div>
+                    )}
+                    {service.preparationTime && (
+                      <div>
+                        <div className="text-xs text-muted-foreground font-medium">Preparation Time</div>
+                        <div>{service.preparationTime}</div>
+                      </div>
+                    )}
+                    {service.totalEngagementTime && (
+                      <div className="col-span-2">
+                        <div className="text-xs text-muted-foreground font-medium">Total Engagement Time</div>
+                        <div>{service.totalEngagementTime}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between border-t pt-3">
                     <div className="text-sm text-muted-foreground">Dakshina</div>
                     <div className="text-right">
                       {service.priceNote && (

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { FloppyDisk, Spinner, Plus, Trash } from '@phosphor-icons/react'
+import { FloppyDisk, Spinner, Plus, Trash, ArrowUp, ArrowDown } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
@@ -59,11 +59,24 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
     }
   }, [content.pricingSection.notes?.length])
 
+  const moveService = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1
+    const services = [...content.pricingSection.services]
+    const [removed] = services.splice(index, 1)
+    services.splice(newIndex, 0, removed)
+    setContent(prev => ({
+      ...prev,
+      pricingSection: { ...prev.pricingSection, services }
+    }))
+  }
+
   const addService = () => {
     const newService: DakshinaService = {
       name: '',
       description: '',
-      duration: '',
+      poojaTime: '',
+      preparationTime: '',
+      totalEngagementTime: '',
       price: '',
       priceNote: ''
     }
@@ -390,7 +403,29 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium">Service {index + 1}</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium">Service {index + 1}</Label>
+                        <div className="flex gap-1">
+                          <Button
+                            onClick={() => moveService(index, 'up')}
+                            size="sm"
+                            variant="ghost"
+                            disabled={index === 0}
+                            title="Move up"
+                          >
+                            <ArrowUp size={14} />
+                          </Button>
+                          <Button
+                            onClick={() => moveService(index, 'down')}
+                            size="sm"
+                            variant="ghost"
+                            disabled={index === content.pricingSection.services.length - 1}
+                            title="Move down"
+                          >
+                            <ArrowDown size={14} />
+                          </Button>
+                        </div>
+                      </div>
                       <Button
                         onClick={() => removeService(index)}
                         size="sm"
@@ -403,7 +438,7 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs">Service Name *</Label>
+                        <Label className="text-xs">Service/Package Name *</Label>
                         <Input
                           value={service.name || ''}
                           onChange={(e) => updateService(index, 'name', e.target.value)}
@@ -411,12 +446,11 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                         />
                       </div>
                       <div>
-                        <Label className="text-xs">Price (€) *</Label>
+                        <Label className="text-xs">Dakshina (€) *</Label>
                         <Input
                           value={service.price || ''}
                           onChange={(e) => updateService(index, 'price', e.target.value)}
                           placeholder="e.g., 100"
-                          type="number"
                         />
                       </div>
                     </div>
@@ -430,23 +464,40 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <Label className="text-xs">Duration</Label>
+                        <Label className="text-xs">Pooja Duration</Label>
                         <Input
-                          value={service.duration || ''}
-                          onChange={(e) => updateService(index, 'duration', e.target.value)}
-                          placeholder="e.g., 1-2 hours"
+                          value={service.poojaTime || ''}
+                          onChange={(e) => updateService(index, 'poojaTime', e.target.value)}
+                          placeholder="e.g., 1 hour"
                         />
                       </div>
                       <div>
-                        <Label className="text-xs">Price Note</Label>
+                        <Label className="text-xs">Preparation Time</Label>
                         <Input
-                          value={service.priceNote || ''}
-                          onChange={(e) => updateService(index, 'priceNote', e.target.value)}
-                          placeholder="e.g., Starting price"
+                          value={service.preparationTime || ''}
+                          onChange={(e) => updateService(index, 'preparationTime', e.target.value)}
+                          placeholder="e.g., 30 mins"
                         />
                       </div>
+                      <div>
+                        <Label className="text-xs">Total Engagement Time</Label>
+                        <Input
+                          value={service.totalEngagementTime || ''}
+                          onChange={(e) => updateService(index, 'totalEngagementTime', e.target.value)}
+                          placeholder="e.g., 1.5 hours"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs">Price Note</Label>
+                      <Input
+                        value={service.priceNote || ''}
+                        onChange={(e) => updateService(index, 'priceNote', e.target.value)}
+                        placeholder="e.g., Starting price"
+                      />
                     </div>
                   </div>
                 </Card>
