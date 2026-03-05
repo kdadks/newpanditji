@@ -10,7 +10,7 @@ import { Badge } from '../ui/badge'
 import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch, CaretLeft, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { AppPage, AppNavigationData } from '../../lib/types'
 
-const DEFAULT_PAGE_SIZE = 20  // articles per page (resets to this on page refresh)
+const DEFAULT_PAGE_SIZE = 18  // articles per page (resets to this on page refresh)
 
 interface BlogArticle {
   id: string

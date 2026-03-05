@@ -64,7 +64,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [itemsPerPage, setItemsPerPage] = useState(18)
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([])
 
   // SEO Configuration
