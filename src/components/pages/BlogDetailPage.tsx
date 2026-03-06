@@ -70,7 +70,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
     <div className="w-full">
       {/* Hero Section with Featured Image */}
       {blog.featured_image_url ? (
-        <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden bg-linear-to-br from-amber-50 via-orange-100 to-amber-100">
+        <section className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden bg-linear-to-br from-amber-50 via-orange-100 to-amber-100">
           {/* Beautiful warm gradient background pattern */}
           <div className="absolute inset-0 bg-linear-to-br from-orange-100/80 via-amber-200/60 to-orange-200/70"></div>
           <div className="absolute inset-0 opacity-30" style={{
@@ -87,13 +87,9 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
             <img
               src={blog.featured_image_url}
               alt={blog.title}
-              className="max-w-full max-h-full object-contain shadow-2xl rounded-lg"
+              className="max-w-full max-h-full object-contain"
             />
           </div>
-
-          {/* Gradient overlays for text readability */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-linear-to-r from-orange-900/20 via-transparent to-orange-900/20 pointer-events-none" />
           
           {/* Navigation at top */}
           <div className="absolute top-0 left-0 right-0 p-6 md:p-8">
@@ -111,30 +107,30 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
           </div>
           
           {/* Title overlay on image */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 lg:p-16">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-12 lg:p-16">
             <div className="container mx-auto max-w-7xl">
               <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm mb-4">
                 {categoryName}
               </Badge>
               
-              <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] max-w-5xl">
+              <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] max-w-5xl">
                 {blog.title}
               </h1>
               
               {/* Meta info on image */}
-              <div className="flex flex-wrap items-center gap-4 mt-6">
-                <div className="flex items-center gap-2 text-white/80">
+              <div className="flex flex-wrap items-center gap-4 mt-6" style={{ textShadow: '0 2px 8px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,0.8)' }}>
+                <div className="flex items-center gap-2 text-white">
                   <User size={16} />
                   <span>Pandit Rajesh Joshi</span>
                 </div>
                 {blog.reading_time_minutes && (
-                  <div className="flex items-center gap-2 text-white/80">
+                  <div className="flex items-center gap-2 text-white">
                     <BookOpen size={16} />
                     <span>{blog.reading_time_minutes} min read</span>
                   </div>
                 )}
                 {blog.published_at && (
-                  <div className="flex items-center gap-2 text-white/80">
+                  <div className="flex items-center gap-2 text-white">
                     <Calendar size={16} />
                     <span>{new Date(blog.published_at).toLocaleDateString('en-IE', {
                       year: 'numeric',

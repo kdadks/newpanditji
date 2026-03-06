@@ -6,6 +6,25 @@
     @apply border-border
   }
 
+  /* Ensure no horizontal overflow on mobile */
+  html, body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Safe touch targets — minimum 44px for interactive elements on mobile */
+  @media (max-width: 640px) {
+    button, a, [role="button"], input, select, textarea {
+      min-height: 44px;
+    }
+    
+    /* Prevent text from breaking out of containers on xs screens */
+    h1, h2, h3 {
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+  }
+
   /* Prose styles for rendered HTML content */
   .prose h2 {
     font-size: 1.5em;

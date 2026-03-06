@@ -149,7 +149,7 @@ export default function BlogPage({ }: BlogPageProps) {
               Spiritual Wisdom & Insights
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               Spiritual <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Wisdom</span> Blog
             </h1>
 
@@ -293,7 +293,7 @@ export default function BlogPage({ }: BlogPageProps) {
                     </Button>
                   </div>
 
-                  <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12 min-h-[300px]">
+                  <div className="bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 lg:p-12 min-h-[200px] sm:min-h-[250px] md:min-h-[300px]">
                     {featuredArticle.featured_image_url ? (
                       <img 
                         src={featuredArticle.featured_image_url} 

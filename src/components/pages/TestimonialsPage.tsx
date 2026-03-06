@@ -90,7 +90,7 @@ export default function TestimonialsPage() {
             )}
 
             {cmsContent.hero.title && (
-              <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
                 {renderHighlightedTitle(cmsContent.hero.title)}
               </h1>
             )}
@@ -165,8 +165,8 @@ export default function TestimonialsPage() {
             Array.from({ length: 4 }).map((_, index) => (
               <Card key={index} className="group relative overflow-hidden border-0 shadow-lg bg-linear-to-br from-card to-card/80">
                 <CardContent className="relative p-4">
-                  <div className="animate-pulse flex gap-4">
-                    <div className="w-[300px] h-[300px] bg-muted rounded-lg shrink-0"></div>
+                  <div className="animate-pulse flex flex-col md:flex-row gap-4">
+                    <div className="w-full max-w-[280px] md:w-[300px] aspect-square bg-muted rounded-lg shrink-0 mx-auto md:mx-0"></div>
                     <div className="flex-1">
                       <div className="h-4 bg-muted rounded w-24 mb-2"></div>
                       <div className="h-3 bg-muted rounded w-32 mb-1"></div>
@@ -188,16 +188,16 @@ export default function TestimonialsPage() {
               <Card key={testimonial.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-linear-to-br from-card to-card/80">
                 <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <CardContent className="relative p-4">
-                  {/* Float image + meta left so text wraps around it */}
-                  <div className="float-left mr-4 mb-2 w-[300px] flex flex-col gap-1.5">
+                  {/* Mobile: stack vertically | Desktop: float image left */}
+                  <div className="flex flex-col items-center gap-3 mb-3 md:float-left md:mr-4 md:mb-2 md:w-[300px] md:items-start">
                     {testimonial.client_image_url ? (
                       <img
                         src={testimonial.client_image_url}
                         alt={testimonial.client_name}
-                        className="w-[300px] h-auto rounded-lg object-cover shadow-lg border-2 border-primary/15"
+                        className="w-full max-w-[300px] h-auto rounded-lg object-cover shadow-lg border-2 border-primary/15"
                       />
                     ) : (
-                      <div className="w-[300px] h-[300px] rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
+                      <div className="w-full max-w-[300px] aspect-square rounded-lg bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg border-2 border-primary/10">
                         <span className="text-4xl font-bold text-primary/40">{testimonial.client_name.charAt(0).toUpperCase()}</span>
                       </div>
                     )}
@@ -222,7 +222,7 @@ export default function TestimonialsPage() {
                     )}
                   </div>
 
-                  {/* Text flows around the float */}
+                  {/* Text flows around the float on desktop, stacks on mobile */}
                   <div className="inline-flex items-center gap-1.5 mb-2 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded">
                     <CheckCircle size={13} weight="fill" className="shrink-0" />
                     Verified

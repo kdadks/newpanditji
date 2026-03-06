@@ -105,11 +105,11 @@ function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { 
   if (disableAnimation) {
     return (
       <div className="text-center">
-        <div className="text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
+        <div className="text-4xl sm:text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
           {value}
         </div>
-        <div className="text-lg md:text-xl font-semibold text-foreground mb-1">{label}</div>
-        {subtext && <div className="text-sm text-muted-foreground">{subtext}</div>}
+        <div className="text-base sm:text-lg md:text-xl font-semibold text-foreground mb-1">{label}</div>
+        {subtext && <div className="text-xs sm:text-sm text-muted-foreground">{subtext}</div>}
       </div>
     )
   }
@@ -123,7 +123,7 @@ function AnimatedCounter({ value, label, subtext, disableAnimation = false }: { 
       className="text-center"
     >
       <motion.div
-        className="text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2"
+        className="text-4xl sm:text-5xl md:text-6xl font-black bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent mb-2"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -221,7 +221,7 @@ export default function CharityPage() {
               </div>
 
               {/* Title */}
-              <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
                 {renderHighlightedTitle(cmsContent.hero.title)}
               </h1>
 
@@ -282,10 +282,10 @@ export default function CharityPage() {
                     {cmsContent.featuredProjects.badge}
                   </Badge>
                 </div>
-                <h2 className="font-heading font-black text-4xl md:text-6xl mb-6">
+                <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-6xl mb-6">
                   {renderHighlightedTitle(cmsContent.featuredProjects.title)}
                 </h2>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
                   {renderHighlightedTitle(cmsContent.featuredProjects.description)}
                 </p>
               </div>
@@ -305,7 +305,7 @@ export default function CharityPage() {
                 </motion.div>
                 <motion.h2
                   variants={fadeInUp}
-                  className="font-heading font-black text-4xl md:text-6xl mb-6"
+                  className="font-heading font-black text-3xl sm:text-4xl md:text-6xl mb-6"
                 >
                   {renderHighlightedTitle(cmsContent.featuredProjects.title)}
                 </motion.h2>
@@ -388,7 +388,7 @@ export default function CharityPage() {
                 <CircleNotch className="animate-spin text-primary" size={64} />
               </div>
             ) : projects && projects.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
                 {projects.map((project) => (
                   <motion.div
                     key={project.id}

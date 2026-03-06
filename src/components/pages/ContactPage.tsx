@@ -140,37 +140,45 @@ export default function ContactPage() {
   }
 
   const renderFAQAccordion = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
       {/* Questions Column */}
       <div className="space-y-4">
         {cmsContent.faqSection.faqs.map((faq, index) => (
           <div
             key={faq.id || `faq-${index}`}
-            className={`p-6 rounded-lg cursor-pointer transition-all duration-300 ${
+            className={`p-4 sm:p-6 rounded-lg cursor-pointer transition-all duration-300 ${
               expandedItem === faq.id
                 ? 'bg-primary/10 border-2 border-primary shadow-lg'
                 : 'bg-white/50 border-2 border-transparent hover:bg-white/70 hover:border-primary/30'
             }`}
             onClick={() => toggleItem(faq.id)}
           >
-            <div className="flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
                 expandedItem === faq.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
               }`}>
-                <span className="font-semibold text-sm">{index + 1}</span>
+                <span className="font-semibold text-xs sm:text-sm">{index + 1}</span>
               </div>
-              <h3 className={`font-semibold text-lg transition-colors ${
+              <h3 className={`font-semibold text-base sm:text-lg transition-colors ${
                 expandedItem === faq.id ? 'text-primary' : 'text-foreground hover:text-primary'
               }`}>
                 {faq.question}
               </h3>
             </div>
+            {/* Inline answer on mobile when expanded */}
+            {expandedItem === faq.id && (
+              <div className="mt-4 lg:hidden bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-primary/20">
+                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+                  {faq.answer}
+                </p>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Answer Column */}
-      <div className="lg:sticky lg:top-8">
+      {/* Answer Column - Hidden on mobile, shown on lg+ */}
+      <div className="hidden lg:block lg:sticky lg:top-8">
         {expandedItem ? (
           <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 border-2 border-primary/20 shadow-lg min-h-[300px]">
             <div className="flex items-center gap-3 mb-6">
@@ -232,7 +240,7 @@ export default function ContactPage() {
               {cmsContent.hero.badge}
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {renderHighlightedTitle(cmsContent.hero.title)}
             </h1>
 

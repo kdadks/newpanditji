@@ -133,7 +133,7 @@ export default function HomePage({ }: HomePageProps) {
                       src: cmsContent.hero.profileImage,
                       alt: 'Pandit Rajesh Joshi',
                       priority: true,
-                      className: 'relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer'
+                      className: 'relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer'
                     })}
                   />
                 </div>
@@ -147,7 +147,7 @@ export default function HomePage({ }: HomePageProps) {
                 {cmsContent.hero.subtitle}
               </div>
 
-              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-[1.15] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe max-w-[700px] mx-auto lg:mx-0">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 leading-[1.15] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe max-w-[700px] mx-auto lg:mx-0">
                 {renderHighlightedTitle(cmsContent.hero.title)}
               </h1>
 

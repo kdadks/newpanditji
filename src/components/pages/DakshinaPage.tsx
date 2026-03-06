@@ -86,7 +86,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               {cmsContent.hero.subtitle}
             </div>
 
-            <h1 className="font-heading font-black text-4xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {renderHighlightedTitle(cmsContent.hero.title)}
             </h1>
 

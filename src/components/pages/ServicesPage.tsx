@@ -170,7 +170,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
               Sacred Services & Ceremonies
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               Our <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">Services</span>
             </h1>
 
@@ -219,7 +219,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
         </div>
 
         <Tabs value={selectedCategory} className="mb-8" onValueChange={setSelectedCategory} suppressHydrationWarning>
-          <TabsList className={`grid w-full h-auto gap-2 bg-muted/50 p-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-${Math.min(availableCategories.length + 1, 8)}`} suppressHydrationWarning>
+          <TabsList className={`grid w-full h-auto gap-2 bg-muted/50 p-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(availableCategories.length + 1, 8)}`} suppressHydrationWarning>
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>
               All Services ({services.length})
             </TabsTrigger>
@@ -285,7 +285,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {!isLoading && paginatedServices.map((service, index) => {
             // Calculate the actual index for display
             const displayIndex = startIndex + index
@@ -296,7 +296,7 @@ export default function ServicesPage({ initialCategory = 'all', onNavigate }: Se
               onClick={() => handleServiceClick(service)}
             >
               {/* Image Section */}
-              <div className="relative h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 shrink-0">
+              <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-linear-to-br from-orange-100 to-amber-100 dark:from-orange-950 dark:to-amber-950 shrink-0">
                 {service.imageUrl && (
                   <img 
                     src={service.imageUrl}

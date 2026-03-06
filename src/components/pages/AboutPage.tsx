@@ -80,7 +80,7 @@ export default function AboutPage({ }: AboutPageProps) {
                   <img
                     src={cmsContent.profileImage}
                     alt="Pandit Rajesh Joshi"
-                    className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
+                    className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full object-cover border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300"
                     style={{
                       imageRendering: '-webkit-optimize-contrast',
                       backfaceVisibility: 'hidden',
@@ -100,7 +100,7 @@ export default function AboutPage({ }: AboutPageProps) {
                 {cmsContent.badge}
               </div>
 
-              <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
                 {renderHighlightedTitle(cmsContent.hero.title)}
                 {cmsContent.title && (
                   <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 font-bold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
@@ -151,7 +151,7 @@ export default function AboutPage({ }: AboutPageProps) {
           {/* Left Column - Spiritual Journey (Takes 2 columns) */}
           <div className="lg:col-span-2">
             <Card className="h-full border-0 shadow-lg bg-linear-to-br from-card to-card/50">
-              <CardContent className="p-8">
+              <CardContent className="p-4 sm:p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <FlowerLotus className="text-primary" size={24} weight="fill" />

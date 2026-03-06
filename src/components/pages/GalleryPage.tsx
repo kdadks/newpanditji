@@ -67,7 +67,20 @@ export default function GalleryPage() {
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
-  const [lightboxPhoto, setLightboxPhoto] = useState<{ url: string; title: string } | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const lightboxPhoto = lightboxIndex !== null && photos[lightboxIndex] ? photos[lightboxIndex] : null
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && lightboxIndex > 0) setLightboxIndex(lightboxIndex - 1)
+      else if (e.key === 'ArrowRight' && lightboxIndex < photos.length - 1) setLightboxIndex(lightboxIndex + 1)
+      else if (e.key === 'Escape') setLightboxIndex(null)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxIndex, photos.length])
 
   // Reset to page 1 when published set changes
   useEffect(() => {
@@ -189,7 +202,7 @@ export default function GalleryPage() {
               {galleryContent.hero.badge}
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {renderHighlightedTitle(galleryContent.hero.title)}
             </h1>
 
@@ -571,12 +584,12 @@ export default function GalleryPage() {
 
                 {/* Photo Grid / List */}
                 <div className={`grid gap-3 md:gap-4 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4' : 'grid-cols-1'}`}>
-                  {photos.map((photo) => (
+                  {photos.map((photo, index) => (
                     viewMode === 'grid' ? (
                     <div
                       key={photo.id}
                       className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300"
-                      onClick={() => setLightboxPhoto({ url: photo.url, title: photo.title })}
+                      onClick={() => setLightboxIndex(index)}
                     >
                       <img
                         src={photo.url}
@@ -599,7 +612,7 @@ export default function GalleryPage() {
                     <Card
                       key={photo.id}
                       className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
-                      onClick={() => setLightboxPhoto({ url: photo.url, title: photo.title })}
+                      onClick={() => setLightboxIndex(index)}
                     >
                       <CardContent className="p-0 flex flex-row items-center gap-4">
                         <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 overflow-hidden rounded-l-xl">
@@ -670,17 +683,38 @@ export default function GalleryPage() {
       </section>
 
       {/* Lightbox */}
-      {lightboxPhoto && (
+      {lightboxPhoto && lightboxIndex !== null && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setLightboxPhoto(null)}
+          onClick={() => setLightboxIndex(null)}
         >
           <button
             className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10"
-            onClick={() => setLightboxPhoto(null)}
+            onClick={() => setLightboxIndex(null)}
           >
             <X size={32} weight="bold" />
           </button>
+
+          {/* Previous button */}
+          {lightboxIndex > 0 && (
+            <button
+              className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-2 md:p-3 rounded-full transition-all"
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
+            >
+              <CaretLeft size={28} weight="bold" />
+            </button>
+          )}
+
+          {/* Next button */}
+          {lightboxIndex < photos.length - 1 && (
+            <button
+              className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-2 md:p-3 rounded-full transition-all"
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
+            >
+              <CaretRight size={28} weight="bold" />
+            </button>
+          )}
+
           <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <img
               src={lightboxPhoto.url}
@@ -690,6 +724,7 @@ export default function GalleryPage() {
             {lightboxPhoto.title && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm">
                 {lightboxPhoto.title}
+                <span className="ml-2 text-white/60">{lightboxIndex + 1} / {photos.length}</span>
               </div>
             )}
           </div>

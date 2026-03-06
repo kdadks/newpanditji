@@ -153,7 +153,7 @@ export default function BooksPage() {
               {cmsContent?.hero?.subtitle}
             </div>
 
-            <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] animate-fade-in-up animation-delay-200 animate-breathe">
               {renderHighlightedTitle(cmsContent?.hero?.title)}
             </h1>
 
@@ -199,7 +199,7 @@ export default function BooksPage() {
                   >
                     {/* Book Cover Image */}
                     <div 
-                      className="relative h-80 overflow-hidden bg-linear-to-br from-muted/50 to-muted shrink-0 cursor-pointer"
+                      className="relative h-52 sm:h-64 md:h-80 overflow-hidden bg-linear-to-br from-muted/50 to-muted shrink-0 cursor-pointer"
                       onClick={() => handleBookClick(book)}
                     >
                       {book.cover_image_url ? (
@@ -349,8 +349,7 @@ export default function BooksPage() {
                       <img
                         src={selectedBook.cover_image_url}
                         alt={selectedBook.title}
-                        className="float-left mr-4 mb-2 rounded-lg shadow-lg border border-border h-auto"
-                        style={{ width: '300px', maxWidth: '45%' }}
+                        className="w-full max-w-[280px] mx-auto md:float-left md:mr-4 md:mb-2 md:mx-0 rounded-lg shadow-lg border border-border h-auto md:max-w-[45%]"
                       />
                     )}
                     {selectedBook.full_description && (
