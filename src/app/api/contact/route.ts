@@ -41,15 +41,15 @@ export async function POST(request: NextRequest) {
     })
 
     await transporter.sendMail({
-      from: `"New Pandit Ji Contact" <${process.env.GMAIL_USER}>`,
+      from: `"Pandit Rajesh Joshi" <panditjoshirajesh@gmail.com>`,
       to: RECIPIENT_EMAIL,
       replyTo: email,
-      subject: `New Contact Form Inquiry – ${serviceLabel}`,
+      subject: `Contact Form Inquiry – ${serviceLabel}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #fff8f0; border-radius: 8px; border: 1px solid #f5deb3;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #b45309; margin: 0; font-size: 24px;">🙏 New Contact Form Inquiry</h1>
-            <p style="color: #78716c; margin: 8px 0 0;">Received from newpanditji.vercel.app</p>
+            <h1 style="color: #b45309; margin: 0; font-size: 24px;">🙏 Contact Form Inquiry</h1>
+            <p style="color: #78716c; margin: 8px 0 0;">Received from www.panditrajeshjoshi.com</p>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
           </div>
 
           <p style="text-align: center; color: #a8a29e; font-size: 12px; margin-top: 24px;">
-            This message was sent via the contact form on newpanditji.vercel.app
+            This message was sent via the contact form on www.panditrajeshjoshi.com
           </p>
         </div>
       `,
