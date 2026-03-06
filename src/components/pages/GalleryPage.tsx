@@ -8,8 +8,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch, X, CaretLeft, CaretRight, MagnifyingGlass } from '@phosphor-icons/react'
+import { PlayCircle, Images, Sparkle, Funnel, SquaresFour, List, CircleNotch, X, CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight, MagnifyingGlass } from '@phosphor-icons/react'
 import { renderHighlightedTitle } from '../../utils/renderHighlight'
+
+const DEFAULT_PAGE_SIZE = 18
 
 interface Photo {
   id: string
@@ -44,17 +46,24 @@ export default function GalleryPage() {
   }, [])
 
   const [photoPage, setPhotoPage] = useState(1)
-  const photoPageSize = 24
+  const [photoItemsPerPage, setPhotoItemsPerPage] = useState(16)
 
   // Show only published categories; if none configured show all
   const photosCategories: string[] | undefined =
     publishedCats.length > 0 ? publishedCats : undefined
 
-  const { photos, isLoading: loadingPhotos, total: totalPhotos, totalPages: photoTotalPages } = usePhotos({
+  const { photos, isLoading: loadingPhotos, total: totalPhotos } = usePhotos({
     page: photoPage,
-    limit: photoPageSize,
+    limit: photoItemsPerPage,
     categories: photosCategories
   })
+
+  const photoTotalPages = Math.ceil(totalPhotos / photoItemsPerPage) || 0
+
+  // Video pagination state
+  const [videoPage, setVideoPage] = useState(1)
+  const [videoItemsPerPage, setVideoItemsPerPage] = useState(DEFAULT_PAGE_SIZE)
+
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
@@ -68,6 +77,18 @@ export default function GalleryPage() {
   const filteredVideos = selectedVideoCategory === 'all'
     ? videos
     : videos.filter(v => v.category === selectedVideoCategory)
+
+  // Video pagination calculations (client-side)
+  const totalVideos = filteredVideos.length
+  const videoTotalPages = Math.ceil(totalVideos / videoItemsPerPage) || 0
+  const videoStartIndex = (videoPage - 1) * videoItemsPerPage
+  const videoEndIndex = videoStartIndex + videoItemsPerPage
+  const pagedVideos = filteredVideos.slice(videoStartIndex, videoEndIndex)
+
+  // Reset video page when category changes
+  useEffect(() => {
+    setVideoPage(1)
+  }, [selectedVideoCategory])
 
   const getYouTubeEmbedUrl = (url: string | undefined) => {
     if (!url) return ''
@@ -337,8 +358,47 @@ export default function GalleryPage() {
                 <CircleNotch className="animate-spin text-primary" size={48} />
               </div>
             ) : (
+            <>
+            {/* Top controls: per-page selector + pagination */}
+            {filteredVideos.length > 0 && (
+              <div className="mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <label htmlFor="video-per-page">Show</label>
+                  <select
+                    id="video-per-page"
+                    value={videoItemsPerPage}
+                    onChange={(e) => { setVideoItemsPerPage(Number(e.target.value)); setVideoPage(1) }}
+                    className="border border-input rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    {[10, 20, 30, 50, 100].map(n => (
+                      <option key={n} value={n}>{n} per page</option>
+                    ))}
+                  </select>
+                  <span className="whitespace-nowrap">
+                    <span className="font-semibold text-foreground">{videoStartIndex + 1}–{Math.min(videoEndIndex, totalVideos)}</span> of <span className="font-semibold text-foreground">{totalVideos}</span> videos
+                  </span>
+                </div>
+                {videoTotalPages > 1 && (
+                  <div className="flex items-center gap-1">
+                    <Button variant="outline" size="icon" onClick={() => setVideoPage(1)} disabled={videoPage === 1} className="h-8 w-8">
+                      <CaretDoubleLeft size={14} weight="bold" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => setVideoPage(p => p - 1)} disabled={videoPage === 1} className="h-8 w-8">
+                      <CaretLeft size={14} weight="bold" />
+                    </Button>
+                    <span className="px-3 text-sm text-muted-foreground whitespace-nowrap">Page {videoPage} of {videoTotalPages}</span>
+                    <Button variant="outline" size="icon" onClick={() => setVideoPage(p => p + 1)} disabled={videoPage === videoTotalPages} className="h-8 w-8">
+                      <CaretRight size={14} weight="bold" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => setVideoPage(videoTotalPages)} disabled={videoPage === videoTotalPages} className="h-8 w-8">
+                      <CaretDoubleRight size={14} weight="bold" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
             <div className={`grid gap-4 overflow-hidden ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-              {filteredVideos.map((video, index) => {
+              {pagedVideos.map((video, index) => {
                 const embedUrl = getYouTubeEmbedUrl(video.url)
                 const videoId = embedUrl ? embedUrl.split('/embed/')[1] : ''
                 const thumbnailUrl = video.thumbnail_url || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '')
@@ -373,7 +433,7 @@ export default function GalleryPage() {
                         </Badge>
                       </div>
                       <div className="absolute top-3 right-3 bg-linear-to-r from-orange-600 to-amber-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg border border-orange-400/30">
-                        {String(index + 1).padStart(2, '0')}
+                        {String(videoStartIndex + index + 1).padStart(2, '0')}
                       </div>
                     </div>
 
@@ -398,6 +458,43 @@ export default function GalleryPage() {
                 </Card>
               )})}
             </div>
+
+            {/* Bottom Pagination */}
+            {videoTotalPages > 1 && (
+              <div className="mt-8 flex flex-col items-center gap-4 mb-8">
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="icon" onClick={() => setVideoPage(1)} disabled={videoPage === 1} className="h-10 w-10">
+                    <CaretDoubleLeft size={16} weight="bold" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => setVideoPage(p => p - 1)} disabled={videoPage === 1} className="h-10 w-10">
+                    <CaretLeft size={16} weight="bold" />
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: videoTotalPages }, (_, i) => i + 1).map((page) => {
+                      const showPage = page === 1 || page === videoTotalPages || (page >= videoPage - 1 && page <= videoPage + 1)
+                      if (!showPage) {
+                        if (page === videoPage - 2 && videoPage > 3) return <span key={page} className="px-2 text-muted-foreground">...</span>
+                        if (page === videoPage + 2 && videoPage < videoTotalPages - 2) return <span key={page} className="px-2 text-muted-foreground">...</span>
+                        return null
+                      }
+                      return (
+                        <Button key={page} variant={videoPage === page ? 'default' : 'outline'} size="icon" onClick={() => setVideoPage(page)} className={`h-10 w-10 ${videoPage === page ? 'bg-primary text-primary-foreground' : ''}`}>
+                          {page}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                  <Button variant="outline" size="icon" onClick={() => setVideoPage(p => p + 1)} disabled={videoPage === videoTotalPages} className="h-10 w-10">
+                    <CaretRight size={16} weight="bold" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => setVideoPage(videoTotalPages)} disabled={videoPage === videoTotalPages} className="h-10 w-10">
+                    <CaretDoubleRight size={16} weight="bold" />
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Page {videoPage} of {videoTotalPages}</p>
+              </div>
+            )}
+            </>
             )}
           </TabsContent>
 
@@ -435,6 +532,43 @@ export default function GalleryPage() {
               </Card>
             ) : (
               <div className="space-y-6">
+                {/* Top controls: per-page selector + pagination */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <label htmlFor="photo-per-page">Show</label>
+                    <select
+                      id="photo-per-page"
+                      value={photoItemsPerPage}
+                      onChange={(e) => { setPhotoItemsPerPage(Number(e.target.value)); setPhotoPage(1) }}
+                      className="border border-input rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      {[10, 20, 30, 50, 100].map(n => (
+                        <option key={n} value={n}>{n} per page</option>
+                      ))}
+                    </select>
+                    <span className="whitespace-nowrap">
+                      <span className="font-semibold text-foreground">{(photoPage - 1) * photoItemsPerPage + 1}–{Math.min(photoPage * photoItemsPerPage, totalPhotos)}</span> of <span className="font-semibold text-foreground">{totalPhotos}</span> photos
+                    </span>
+                  </div>
+                  {photoTotalPages > 1 && (
+                    <div className="flex items-center gap-1">
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(1)} disabled={photoPage === 1} className="h-8 w-8">
+                        <CaretDoubleLeft size={14} weight="bold" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(p => p - 1)} disabled={photoPage === 1} className="h-8 w-8">
+                        <CaretLeft size={14} weight="bold" />
+                      </Button>
+                      <span className="px-3 text-sm text-muted-foreground whitespace-nowrap">Page {photoPage} of {photoTotalPages}</span>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(p => p + 1)} disabled={photoPage === photoTotalPages} className="h-8 w-8">
+                        <CaretRight size={14} weight="bold" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(photoTotalPages)} disabled={photoPage === photoTotalPages} className="h-8 w-8">
+                        <CaretDoubleRight size={14} weight="bold" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Photo Grid / List */}
                 <div className={`grid gap-3 md:gap-4 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4' : 'grid-cols-1'}`}>
                   {photos.map((photo) => (
@@ -493,52 +627,39 @@ export default function GalleryPage() {
                   ))}
                 </div>
 
-                {/* Pagination */}
+                {/* Bottom Pagination */}
                 {photoTotalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPhotoPage(p => Math.max(1, p - 1))}
-                      disabled={photoPage <= 1}
-                    >
-                      <CaretLeft size={16} className="mr-1" />
-                      Previous
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(photoTotalPages, 7) }, (_, i) => {
-                        let page: number
-                        if (photoTotalPages <= 7) {
-                          page = i + 1
-                        } else if (photoPage <= 4) {
-                          page = i + 1
-                        } else if (photoPage >= photoTotalPages - 3) {
-                          page = photoTotalPages - 6 + i
-                        } else {
-                          page = photoPage - 3 + i
-                        }
-                        return (
-                          <Button
-                            key={page}
-                            variant={photoPage === page ? 'default' : 'ghost'}
-                            size="sm"
-                            onClick={() => setPhotoPage(page)}
-                            className="w-9 h-9 p-0"
-                          >
-                            {page}
-                          </Button>
-                        )
-                      })}
+                  <div className="flex flex-col items-center gap-4 pt-4">
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(1)} disabled={photoPage === 1} className="h-10 w-10">
+                        <CaretDoubleLeft size={16} weight="bold" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(p => p - 1)} disabled={photoPage === 1} className="h-10 w-10">
+                        <CaretLeft size={16} weight="bold" />
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: photoTotalPages }, (_, i) => i + 1).map((page) => {
+                          const showPage = page === 1 || page === photoTotalPages || (page >= photoPage - 1 && page <= photoPage + 1)
+                          if (!showPage) {
+                            if (page === photoPage - 2 && photoPage > 3) return <span key={page} className="px-2 text-muted-foreground">...</span>
+                            if (page === photoPage + 2 && photoPage < photoTotalPages - 2) return <span key={page} className="px-2 text-muted-foreground">...</span>
+                            return null
+                          }
+                          return (
+                            <Button key={page} variant={photoPage === page ? 'default' : 'outline'} size="icon" onClick={() => setPhotoPage(page)} className={`h-10 w-10 ${photoPage === page ? 'bg-primary text-primary-foreground' : ''}`}>
+                              {page}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(p => p + 1)} disabled={photoPage === photoTotalPages} className="h-10 w-10">
+                        <CaretRight size={16} weight="bold" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => setPhotoPage(photoTotalPages)} disabled={photoPage === photoTotalPages} className="h-10 w-10">
+                        <CaretDoubleRight size={16} weight="bold" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPhotoPage(p => Math.min(photoTotalPages, p + 1))}
-                      disabled={photoPage >= photoTotalPages}
-                    >
-                      Next
-                      <CaretRight size={16} className="ml-1" />
-                    </Button>
+                    <p className="text-sm text-muted-foreground">Page {photoPage} of {photoTotalPages}</p>
                   </div>
                 )}
               </div>

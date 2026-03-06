@@ -49,20 +49,21 @@ export default function HomePage({ }: HomePageProps) {
   // Service carousel pause state on hover
   const [isPaused, setIsPaused] = useState(false)
 
-  // Carousel speed: pixels per second (both tracks use same value for visual parity)
-  const CAROUSEL_PX_PER_SECOND = 100
+  // Carousel speed: pixels per second
+  const GALLERY_PX_PER_SECOND = 600
+  const SERVICES_PX_PER_SECOND = 100
   const galleryTrackRef = useRef<HTMLDivElement>(null)
   const servicesTrackRef = useRef<HTMLDivElement>(null)
-  const [galleryDuration, setGalleryDuration] = useState(40)
+  const [galleryDuration, setGalleryDuration] = useState(10)
   const [servicesDuration, setServicesDuration] = useState(40)
 
   useEffect(() => {
     if (galleryTrackRef.current) {
       // scrollWidth = 2× single set (duplicated for seamless loop), so /2 = actual travel distance
-      setGalleryDuration(galleryTrackRef.current.scrollWidth / 2 / CAROUSEL_PX_PER_SECOND)
+      setGalleryDuration(galleryTrackRef.current.scrollWidth / 2 / GALLERY_PX_PER_SECOND)
     }
     if (servicesTrackRef.current) {
-      setServicesDuration(servicesTrackRef.current.scrollWidth / 2 / CAROUSEL_PX_PER_SECOND)
+      setServicesDuration(servicesTrackRef.current.scrollWidth / 2 / SERVICES_PX_PER_SECOND)
     }
   }, [cmsContent.photoGallery.images, featuredServices])
 

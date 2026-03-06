@@ -10,7 +10,8 @@ import { Badge } from '../ui/badge'
 import { BookOpen, CaretRight, Calendar, User, Sparkle, CircleNotch, CaretLeft, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { AppPage, AppNavigationData } from '../../lib/types'
 
-const DEFAULT_PAGE_SIZE = 18  // articles per page (resets to this on page refresh)
+const FIRST_PAGE_SIZE = 19   // articles on first page (1 featured + 18 grid)
+const DEFAULT_PAGE_SIZE = 18  // articles per page from page 2 onwards
 
 interface BlogArticle {
   id: string
@@ -33,6 +34,7 @@ export default function BlogPage({ }: BlogPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All Articles')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_PAGE_SIZE)
+  const [userSelectedPerPage, setUserSelectedPerPage] = useState(false)
 
   const handleCategoryChange = useCallback((cat: string) => {
     setSelectedCategory(cat)
@@ -93,11 +95,15 @@ export default function BlogPage({ }: BlogPageProps) {
 
   // Pagination calculations
   const totalArticles = filteredArticles.length
-  const totalPages = Math.ceil(totalArticles / itemsPerPage) || 1
+  const useDefaultBehavior = !userSelectedPerPage
+  const firstPageSize = useDefaultBehavior ? FIRST_PAGE_SIZE : itemsPerPage
+  const restPageSize = useDefaultBehavior ? DEFAULT_PAGE_SIZE : itemsPerPage
+  const totalPages = totalArticles <= firstPageSize ? 1 : 1 + Math.ceil((totalArticles - firstPageSize) / restPageSize) || 1
 
   // Slice articles for the current page
-  const pageStartIndex = (currentPage - 1) * itemsPerPage
-  const pageEndIndex = pageStartIndex + itemsPerPage
+  const pageStartIndex = currentPage === 1 ? 0 : firstPageSize + (currentPage - 2) * restPageSize
+  const pageSize = currentPage === 1 ? firstPageSize : restPageSize
+  const pageEndIndex = pageStartIndex + pageSize
   const pagedArticles = filteredArticles.slice(pageStartIndex, pageEndIndex)
   const featuredArticle = currentPage === 1 ? pagedArticles[0] : null
   const gridArticles = currentPage === 1 ? pagedArticles.slice(1) : pagedArticles
@@ -203,7 +209,7 @@ export default function BlogPage({ }: BlogPageProps) {
               <select
                 id="blog-per-page"
                 value={itemsPerPage}
-                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setUserSelectedPerPage(true); setCurrentPage(1) }}
                 className="border border-input rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {[10, 20, 30, 50, 100].map(n => (

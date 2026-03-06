@@ -52,6 +52,7 @@ export async function bulkReassignCategory(fromCategory: string, toCategory: str
 export interface PhotosQueryParams {
   page?: number
   limit?: number
+  offset?: number     // explicit offset; when provided, overrides page-based calculation
   search?: string
   category?: string
   categories?: string[]   // multi-category filter (OR); takes precedence over `category`
@@ -98,7 +99,7 @@ async function fetchPhotos(params?: PhotosQueryParams): Promise<PhotosResponse> 
   }
 
   // Apply pagination
-  const from = (page - 1) * limit
+  const from = params?.offset != null ? params.offset : (page - 1) * limit
   const to = from + limit - 1
 
   query = query

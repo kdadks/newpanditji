@@ -186,7 +186,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-scroll-services {
-  animation: scroll-services 40s linear infinite;
+  animation: scroll-services 10s linear infinite;
   will-change: transform;
 }
 
@@ -197,7 +197,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Desktop only animation - fallback */
 @media (min-width: 768px) {
   .md\:animate-scroll-services {
-    animation: scroll-services 40s linear infinite;
+    animation: scroll-services 10s linear infinite;
     will-change: transform;
   }
   
