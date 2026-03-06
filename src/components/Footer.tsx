@@ -141,6 +141,13 @@ export default function Footer({ }: FooterProps) {
 
         <div className="border-t border-secondary-foreground/20 mt-8 pt-8 text-center text-sm text-secondary-foreground/70">
           <p>{footerContent.copyrightText.replace('{year}', String(currentYear))}</p>
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <span>Powered By</span>
+            <a href="https://it-wala.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity">
+              <img src="/images/itwala.png" alt="IT-Wala" className="h-6 w-auto" />
+              <span className="font-semibold">IT-Wala</span>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
