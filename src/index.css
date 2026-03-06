@@ -186,7 +186,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-scroll-services {
-  animation: scroll-services 10s linear infinite;
+  animation-name: scroll-services;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
   will-change: transform;
 }
 
@@ -197,7 +200,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Desktop only animation - fallback */
 @media (min-width: 768px) {
   .md\:animate-scroll-services {
-    animation: scroll-services 10s linear infinite;
+    animation-name: scroll-services;
+    animation-duration: 10s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
     will-change: transform;
   }
   
@@ -291,24 +297,13 @@ h1, h2, h3, h4, h5, h6 {
   animation-delay: 2s;
 }
 
-/* Disable heavy animations on mobile for performance */
+/* Disable heavy decorative animations on mobile for performance */
 @media (max-width: 767px) {
   .animate-scroll-left,
   .animate-sunrise-glow,
   .animate-sunrise-rays,
   .animate-breathe,
-  .animate-pulse,
-  .animate-fade-in-up,
   .animate-scroll-3d-left {
     animation: none !important;
-  }
-  
-  /* Reduce motion for better mobile performance */
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
 }

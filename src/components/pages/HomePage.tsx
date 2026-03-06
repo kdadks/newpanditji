@@ -224,7 +224,7 @@ export default function HomePage({ }: HomePageProps) {
           {/* Main carousel track */}
           <div
             ref={galleryTrackRef}
-            className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 ${isPaused ? '' : 'md:animate-scroll-services'}`}
+            className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 ${isPaused ? '' : 'animate-scroll-services'}`}
             style={{
               willChange: 'transform',
               animationDuration: `${galleryDuration}s`
