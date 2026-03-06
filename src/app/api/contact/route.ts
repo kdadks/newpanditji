@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import { NextRequest, NextResponse } from 'next/server'
 
-const RECIPIENT_EMAIL = 'amit.ranjan78@gmail.com'
+const RECIPIENT_EMAIL = 'panditjoshirajesh@gmail.com'
 
 export async function POST(request: NextRequest) {
   if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
