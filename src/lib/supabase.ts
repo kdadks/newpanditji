@@ -192,6 +192,12 @@ export interface BlogPostRow {
   status: 'draft' | 'published' | 'archived'
   is_featured: boolean
   published_at: string | null
+  // Hero styling columns (exist in DB — set via global CMS, not per-post admin UI)
+  hero_bg_type: 'default' | 'solid' | 'gradient' | null
+  hero_bg_value: string | null
+  hero_title_color: string | null
+  hero_title_shadow: string | null
+  hero_meta_color: string | null
   created_at: string
   updated_at: string
 }

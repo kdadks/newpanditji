@@ -11,7 +11,8 @@ import type {
   HeaderContent,
   FooterContent,
   MenuItem,
-  BlogSidebarContent
+  BlogSidebarContent,
+  HeroStyleValue
 } from '../types/cms-types'
 
 // Empty defaults - Admin must fill content via CMS
@@ -335,6 +336,7 @@ export const defaultFooterContent: FooterContent = {
   description: '',
   copyrightText: '© {year} Pandit Rajesh Joshi. All rights reserved. | www.panditrajeshjoshi.com',
   contactEmail: '',
+  contactPhone: '',
   contactLocation: '',
   facebookUrl: '',
   instagramUrl: '',
@@ -345,6 +347,13 @@ export const defaultFooterContent: FooterContent = {
 }
 
 export const defaultBlogSidebarContent: BlogSidebarContent = {
+  heroStyle: {
+    hero_bg_type: 'default',
+    hero_bg_value: null,
+    hero_title_color: null,
+    hero_title_shadow: null,
+    hero_meta_color: null,
+  } satisfies HeroStyleValue,
   authorCard: {
     title: '',
     name: '',

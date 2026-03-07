@@ -73,7 +73,7 @@ export default function AdminBlogs() {
     status: 'draft',
     reading_time_minutes: null,
     meta_title: '',
-    meta_description: ''
+    meta_description: '',
   })
 
   // Fetch categories
@@ -254,7 +254,7 @@ export default function AdminBlogs() {
       status: 'draft',
       reading_time_minutes: null,
       meta_title: '',
-      meta_description: ''
+      meta_description: '',
     })
     setImagePickerCategory(getBlogImagePickerCategory())
     setEditingBlog(null)
@@ -272,7 +272,7 @@ export default function AdminBlogs() {
       status: blog.status,
       reading_time_minutes: blog.reading_time_minutes,
       meta_title: blog.meta_title || '',
-      meta_description: blog.meta_description || ''
+      meta_description: blog.meta_description || '',
     })
     setImagePickerCategory(getBlogImagePickerCategory())
     setEditingBlog(blog)
@@ -346,7 +346,13 @@ export default function AdminBlogs() {
         canonical_url: null,
         view_count: 0,
         is_featured: false,
-        published_at: formData.status === 'published' ? new Date().toISOString() : null
+        published_at: formData.status === 'published' ? new Date().toISOString() : null,
+        // Hero columns exist in DB but are managed globally via CMS, not per-post
+        hero_bg_type: null,
+        hero_bg_value: null,
+        hero_title_color: null,
+        hero_title_shadow: null,
+        hero_meta_color: null,
       }
 
       if (editingBlog) {
@@ -892,11 +898,11 @@ export default function AdminBlogs() {
                     <Button 
                       onClick={handleSave} 
                       disabled={
-                        isSaving || 
-                        !formData.title || 
-                        !formData.content || 
-                        !formData.excerpt || 
-                        (!formData.category_id && !showAddCategory) || 
+                        isSaving ||
+                        !formData.title ||
+                        !formData.content ||
+                        !formData.excerpt ||
+                        (!formData.category_id && !showAddCategory) ||
                         (showAddCategory && !newCategoryName.trim())
                       }
                       className="gap-2"

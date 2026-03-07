@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { AppPage, AppNavigationData } from '../lib/types'
-import { FlowerLotus, EnvelopeSimple, MapPin } from '@phosphor-icons/react'
-import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo } from '@phosphor-icons/react'
+import { FlowerLotus, EnvelopeSimple, MapPin, Phone } from '@phosphor-icons/react'
+import { FacebookLogo, InstagramLogo, YoutubeLogo, LinkedinLogo, TwitterLogo, PinterestLogo } from '@phosphor-icons/react'
 import { useMenuItems } from '../hooks/useMenus'
 import { useFooterContent } from '../hooks/useCmsContent'
 
@@ -98,6 +98,14 @@ export default function Footer({ }: FooterProps) {
                   </a>
                 </li>
               )}
+              {footerContent.contactPhone && (
+                <li className="flex items-start gap-2 text-sm">
+                  <Phone size={18} className="mt-0.5 shrink-0" />
+                  <a href={`tel:${footerContent.contactPhone}`} className="hover:text-accent transition-colors cursor-pointer">
+                    {footerContent.contactPhone}
+                  </a>
+                </li>
+              )}
               {footerContent.contactLocation && (
                 <li className="flex items-start gap-2 text-sm">
                   <MapPin size={18} className="mt-0.5 shrink-0" />
@@ -133,6 +141,11 @@ export default function Footer({ }: FooterProps) {
               {footerContent.twitterUrl && (
                 <a href={footerContent.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
                   <TwitterLogo size={24} weight="fill" />
+                </a>
+              )}
+              {footerContent.pinterestUrl && (
+                <a href={footerContent.pinterestUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-foreground hover:text-accent transition-colors cursor-pointer">
+                  <PinterestLogo size={24} weight="fill" />
                 </a>
               )}
             </div>

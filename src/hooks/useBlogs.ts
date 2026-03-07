@@ -194,6 +194,11 @@ export function convertLegacyBlog(blog: {
     view_count: 0,
     status: 'published',
     is_featured: false,
-    published_at: new Date().toISOString()
+    published_at: new Date().toISOString(),
+    hero_bg_type: null,
+    hero_bg_value: null,
+    hero_title_color: null,
+    hero_title_shadow: null,
+    hero_meta_color: null,
   }
 }

@@ -1,4 +1,4 @@
-import { FloppyDisk, Spinner } from '@phosphor-icons/react'
+import { FloppyDisk, Spinner, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
@@ -13,7 +13,18 @@ interface FooterEditorProps {
   isSaving: boolean
 }
 
+const SOCIAL_FIELDS: { key: keyof FooterContent; label: string; placeholder: string }[] = [
+  { key: 'facebookUrl',  label: 'Facebook',   placeholder: 'https://facebook.com/...' },
+  { key: 'instagramUrl', label: 'Instagram',  placeholder: 'https://instagram.com/...' },
+  { key: 'youtubeUrl',   label: 'YouTube',    placeholder: 'https://youtube.com/...' },
+  { key: 'linkedinUrl',  label: 'LinkedIn',   placeholder: 'https://linkedin.com/...' },
+  { key: 'twitterUrl',  label: 'Twitter / X', placeholder: 'https://twitter.com/...' },
+  { key: 'pinterestUrl', label: 'Pinterest',  placeholder: 'https://pinterest.com/...' },
+]
+
 export default function FooterEditor({ content, setContent, onSave, isSaving }: FooterEditorProps) {
+  const clearSocial = (key: keyof FooterContent) =>
+    setContent(prev => ({ ...prev, [key]: '' }))
   return (
     <div className="space-y-6">
       <Card>
@@ -53,6 +64,15 @@ export default function FooterEditor({ content, setContent, onSave, isSaving }: 
                 />
               </div>
               <div className="space-y-2">
+                <Label>Contact Phone</Label>
+                <Input
+                  value={content.contactPhone}
+                  onChange={(e) => setContent(prev => ({ ...prev, contactPhone: e.target.value }))}
+                  placeholder="+353 1 234 5678"
+                  type="tel"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Location / Service Area</Label>
                 <Input
                   value={content.contactLocation}
@@ -64,56 +84,34 @@ export default function FooterEditor({ content, setContent, onSave, isSaving }: 
           </div>
 
           <div className="pt-4 border-t">
-            <Label className="text-base font-semibold mb-4 block">Social Media Links</Label>
+            <Label className="text-base font-semibold mb-1 block">Social Media Links</Label>
+            <p className="text-xs text-muted-foreground mb-4">Clear or delete a link to hide that icon from the public footer.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Facebook</Label>
-                <Input
-                  value={content.facebookUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, facebookUrl: e.target.value }))}
-                  placeholder="https://facebook.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Instagram</Label>
-                <Input
-                  value={content.instagramUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, instagramUrl: e.target.value }))}
-                  placeholder="https://instagram.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>YouTube</Label>
-                <Input
-                  value={content.youtubeUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, youtubeUrl: e.target.value }))}
-                  placeholder="https://youtube.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>LinkedIn</Label>
-                <Input
-                  value={content.linkedinUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, linkedinUrl: e.target.value }))}
-                  placeholder="https://linkedin.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Twitter/X</Label>
-                <Input
-                  value={content.twitterUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, twitterUrl: e.target.value }))}
-                  placeholder="https://twitter.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Pinterest</Label>
-                <Input
-                  value={content.pinterestUrl}
-                  onChange={(e) => setContent(prev => ({ ...prev, pinterestUrl: e.target.value }))}
-                  placeholder="https://pinterest.com/..."
-                />
-              </div>
+              {SOCIAL_FIELDS.map(({ key, label, placeholder }) => (
+                <div key={key} className="space-y-2">
+                  <Label>{label}</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={content[key] as string}
+                      onChange={(e) => setContent(prev => ({ ...prev, [key]: e.target.value }))}
+                      placeholder={placeholder}
+                      className="flex-1"
+                    />
+                    {(content[key] as string) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => clearSocial(key)}
+                        title={`Remove ${label}`}
+                        className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <X size={16} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>

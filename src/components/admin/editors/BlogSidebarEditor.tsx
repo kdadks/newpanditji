@@ -5,7 +5,8 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Label } from '../../ui/label'
 import { MediaPickerInput } from '../../ui/media-picker'
-import type { BlogSidebarContent, BlogSidebarCTAButton } from '../types/cms-types'
+import BlogHeroStyleEditor from './BlogHeroStyleEditor'
+import type { BlogSidebarContent, BlogSidebarCTAButton, HeroStyleValue } from '../types/cms-types'
 
 interface BlogSidebarEditorProps {
   content: BlogSidebarContent
@@ -71,9 +72,24 @@ export default function BlogSidebarEditor({ content, setContent, onSave, isSavin
       <div className="flex justify-end">
         <Button onClick={onSave} disabled={isSaving} size="lg">
           {isSaving ? <Spinner className="mr-2 animate-spin" size={18} /> : <FloppyDisk className="mr-2" size={18} />}
-          {isSaving ? 'Saving...' : 'Save Blog Sidebar'}
+          {isSaving ? 'Saving...' : 'Save Blog Settings'}
         </Button>
       </div>
+
+      {/* Hero Background & Styling */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Blog Detail Page — Hero Styling</CardTitle>
+          <CardDescription>Global background, title colour/shadow, and meta text colour applied to every blog article's hero section.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <BlogHeroStyleEditor
+            value={content.heroStyle}
+            onChange={(v: HeroStyleValue) => setContent(prev => ({ ...prev, heroStyle: v }))}
+            disabled={isSaving}
+          />
+        </CardContent>
+      </Card>
 
       {/* Author Card */}
       <Card>

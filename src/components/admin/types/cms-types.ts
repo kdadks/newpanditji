@@ -3,6 +3,15 @@
 export type PageKey = 'home' | 'about' | 'whyChoose' | 'books' | 'contact' | 'charity' | 'dakshina' | 'gallery' | 'testimonials' | 'blog'
 export type SectionKey = 'header' | 'footer' | 'menu'
 
+// Hero Style (global, stored in CMS Blog page settings)
+export interface HeroStyleValue {
+  hero_bg_type: 'default' | 'solid' | 'gradient'
+  hero_bg_value: string | null
+  hero_title_color: string | null
+  hero_title_shadow: string | null
+  hero_meta_color: string | null
+}
+
 // Base Interfaces
 export interface HeroContent {
   title: string
@@ -433,6 +442,7 @@ export interface FooterContent {
   description: string
   copyrightText: string
   contactEmail: string
+  contactPhone: string
   contactLocation: string
   facebookUrl: string
   instagramUrl: string
@@ -488,6 +498,7 @@ export interface BlogSidebarCTAButton {
 }
 
 export interface BlogSidebarContent {
+  heroStyle: HeroStyleValue
   authorCard: {
     title: string
     name: string

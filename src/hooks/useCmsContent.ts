@@ -17,7 +17,8 @@ import type {
   TestimonialsPageContent,
   HeaderContent,
   FooterContent,
-  BlogSidebarContent
+  BlogSidebarContent,
+  HeroStyleValue
 } from '../components/admin/types/cms-types'
 
 // Import defaults for fallback
@@ -1243,7 +1244,7 @@ export function useTestimonialsContent() {
 // Keys used by header/footer CMS
 const CMS_SETTING_KEYS = [
   'site_logo_url', 'site_name', 'site_tagline', 'header_cta_text', 'header_cta_link',
-  'footer_text', 'copyright_text', 'primary_email', 'footer_contact_location',
+  'footer_text', 'copyright_text', 'primary_email', 'primary_phone', 'footer_contact_location',
   'facebook_page_url', 'instagram_url', 'youtube_channel_url', 'linkedin_url',
   'twitter_url', 'pinterest_url',
 ] as const
@@ -1371,13 +1372,14 @@ export function useFooterContent() {
         description: settings.footer_text || defaultFooterContent.description,
         copyrightText: settings.copyright_text || defaultFooterContent.copyrightText,
         contactEmail: settings.primary_email || defaultFooterContent.contactEmail,
+        contactPhone: settings.primary_phone ?? defaultFooterContent.contactPhone,
         contactLocation: settings.footer_contact_location || defaultFooterContent.contactLocation,
-        facebookUrl: settings.facebook_page_url || defaultFooterContent.facebookUrl,
-        instagramUrl: settings.instagram_url || defaultFooterContent.instagramUrl,
-        youtubeUrl: settings.youtube_channel_url || defaultFooterContent.youtubeUrl,
-        linkedinUrl: settings.linkedin_url || defaultFooterContent.linkedinUrl,
-        twitterUrl: settings.twitter_url || defaultFooterContent.twitterUrl,
-        pinterestUrl: settings.pinterest_url || defaultFooterContent.pinterestUrl,
+        facebookUrl: settings.facebook_page_url ?? defaultFooterContent.facebookUrl,
+        instagramUrl: settings.instagram_url ?? defaultFooterContent.instagramUrl,
+        youtubeUrl: settings.youtube_channel_url ?? defaultFooterContent.youtubeUrl,
+        linkedinUrl: settings.linkedin_url ?? defaultFooterContent.linkedinUrl,
+        twitterUrl: settings.twitter_url ?? defaultFooterContent.twitterUrl,
+        pinterestUrl: settings.pinterest_url ?? defaultFooterContent.pinterestUrl,
       } as FooterContent
     },
     staleTime: 5 * 60 * 1000,
@@ -1389,6 +1391,7 @@ export function useFooterContent() {
         footer_text: content.description,
         copyright_text: content.copyrightText,
         primary_email: content.contactEmail,
+        primary_phone: content.contactPhone,
         footer_contact_location: content.contactLocation,
         facebook_page_url: content.facebookUrl,
         instagram_url: content.instagramUrl,
@@ -1427,10 +1430,18 @@ export function useFooterContent() {
 function sectionsToBlogSidebarContent(sections: PageSectionRow[]): BlogSidebarContent {
   const getSection = (key: string) => sections.find(s => s.section_key === key)?.content || {}
 
+  const heroSection = getSection('hero_style') as Record<string, unknown>
   const authorSection = getSection('author_card') as Record<string, unknown>
   const guidanceSection = getSection('guidance_card') as Record<string, unknown>
 
   return {
+    heroStyle: {
+      hero_bg_type: ((heroSection.hero_bg_type as string) || 'default') as HeroStyleValue['hero_bg_type'],
+      hero_bg_value: (heroSection.hero_bg_value as string | null) ?? null,
+      hero_title_color: (heroSection.hero_title_color as string | null) ?? null,
+      hero_title_shadow: (heroSection.hero_title_shadow as string | null) ?? null,
+      hero_meta_color: (heroSection.hero_meta_color as string | null) ?? null,
+    },
     authorCard: {
       title: (authorSection.title as string) || '',
       name: (authorSection.name as string) || '',
@@ -1451,6 +1462,16 @@ function sectionsToBlogSidebarContent(sections: PageSectionRow[]): BlogSidebarCo
  */
 function blogSidebarContentToSections(content: BlogSidebarContent): { sectionKey: string; content: Record<string, unknown> }[] {
   return [
+    {
+      sectionKey: 'hero_style',
+      content: {
+        hero_bg_type: content.heroStyle.hero_bg_type,
+        hero_bg_value: content.heroStyle.hero_bg_value,
+        hero_title_color: content.heroStyle.hero_title_color,
+        hero_title_shadow: content.heroStyle.hero_title_shadow,
+        hero_meta_color: content.heroStyle.hero_meta_color,
+      }
+    },
     {
       sectionKey: 'author_card',
       content: {

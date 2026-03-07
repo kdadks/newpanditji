@@ -7,6 +7,7 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { BookOpen, Calendar, User, Sparkle, CircleNotch, ArrowLeft } from '@phosphor-icons/react'
 import { Page } from '../../App'
+import { buildGradientCSS, type GradientConfig } from '../admin/editors/BlogHeroStyleEditor'
 
 interface BlogDetailPageProps {
   blogId: string
@@ -66,13 +67,77 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
 
   const categoryName = blog.category_name || 'Article'
 
+  // ── Hero style helpers (global CMS setting, not per-post) ──────────────────
+  const heroStyle = sidebarContent?.heroStyle
+  const bgType = heroStyle?.hero_bg_type ?? 'default'
+  const isDefaultBg = bgType === 'default' || !bgType
+
+  // Compute the CSS background value for non-default types
+  let heroBgStyle: React.CSSProperties = {}
+  if (bgType === 'solid' && heroStyle?.hero_bg_value) {
+    heroBgStyle = { background: heroStyle.hero_bg_value }
+  } else if (bgType === 'gradient' && heroStyle?.hero_bg_value) {
+    try {
+      const cfg = JSON.parse(heroStyle.hero_bg_value) as GradientConfig
+      if (cfg?.direction && Array.isArray(cfg?.stops)) {
+        heroBgStyle = { background: buildGradientCSS(cfg) }
+      }
+    } catch {
+      // fallback to default
+    }
+  }
+
+  // Shadow presets map
+  const SHADOW_PRESET_CSS: Record<string, string> = {
+    default: '0 4px 8px rgba(0,0,0,0.9)',
+    light:   '0 2px 4px rgba(0,0,0,0.5)',
+    medium:  '0 3px 6px rgba(0,0,0,0.7)',
+    none:    'none',
+  }
+  const rawShadow = heroStyle?.hero_title_shadow ?? 'default'
+  const titleShadowCSS = SHADOW_PRESET_CSS[rawShadow] ?? rawShadow
+
+  const titleColor = heroStyle?.hero_title_color ?? '#ffffff'
+  const metaColor  = heroStyle?.hero_meta_color  ?? undefined  // leave undefined to use Tailwind class when null
+
+  // Tailwind drop-shadow class used when bg is default (matches blog listing page)
+  const defaultTitleShadowClass = 'drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]'
+
+  // Inline style for title when custom colours are set
+  const titleStyle: React.CSSProperties = {
+    color: titleColor,
+    textShadow: isDefaultBg ? undefined : (titleShadowCSS === 'none' ? 'none' : titleShadowCSS),
+  }
+  const metaStyle: React.CSSProperties = metaColor ? { color: metaColor } : {}
+  // ────────────────────────────────────────────────────────────────────────────
+
   return (
     <div className="w-full">
       {/* Hero Section with Featured Image */}
       {blog.featured_image_url ? (
-        <section className="relative w-full bg-linear-to-br from-slate-900 via-orange-950/60 to-amber-950 overflow-hidden">
+        <section className="relative w-full overflow-hidden" style={isDefaultBg ? {} : heroBgStyle}>
+          {/* Default sunrise background — only shown when no custom bg is set */}
+          {isDefaultBg && (
+            <>
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="flex gap-0 animate-scroll-left w-max h-full">
+                  <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
+            </>
+          )}
           {/* Mobile: image full width with title overlay + fixed back badge */}
-          <div className="md:hidden relative h-[55vw] min-h-[220px] max-h-[360px]">
+          <div className="md:hidden relative z-10 h-[55vw] min-h-[220px] max-h-[360px]">
             {/* Full-bleed image */}
             <img
               src={blog.featured_image_url}
@@ -95,17 +160,20 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
               <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-2">
                 {categoryName}
               </Badge>
-              <h1 className="font-heading font-bold text-xl sm:text-2xl text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+              <h1
+                className={`font-heading font-bold text-xl sm:text-2xl leading-tight${isDefaultBg ? ' text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]' : ''}`}
+                style={isDefaultBg ? {} : { ...titleStyle, textShadow: titleShadowCSS === 'none' ? 'none' : titleShadowCSS }}
+              >
                 {blog.title}
               </h1>
             </div>
           </div>
 
           {/* Meta row — below image, centered, dark theme */}
-          <div className="md:hidden flex flex-wrap justify-center items-center gap-3 px-4 py-3 text-xs text-amber-950 bg-amber-50/60 border-b border-amber-200/60">
-            <div className="flex items-center gap-1"><User size={12} /><span>Pandit Rajesh Joshi</span></div>
-            {blog.reading_time_minutes && <div className="flex items-center gap-1"><BookOpen size={12} /><span>{blog.reading_time_minutes} min read</span></div>}
-            {blog.published_at && <div className="flex items-center gap-1"><Calendar size={12} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
+          <div className="md:hidden relative z-10 flex flex-wrap justify-center items-center gap-3 px-4 py-3 text-xs text-amber-950 bg-amber-50/60 border-b border-amber-200/60">
+            <div className="flex items-center gap-1" style={metaStyle}><User size={12} /><span>Pandit Rajesh Joshi</span></div>
+            {blog.reading_time_minutes && <div className="flex items-center gap-1" style={metaStyle}><BookOpen size={12} /><span>{blog.reading_time_minutes} min read</span></div>}
+            {blog.published_at && <div className="flex items-center gap-1" style={metaStyle}><Calendar size={12} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
           </div>
 
           {/* Desktop: side-by-side layout */}
@@ -128,13 +196,16 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
                   <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-5">
                     {categoryName}
                   </Badge>
-                  <h1 className="font-heading font-bold text-4xl lg:text-4xl xl:text-5xl text-white leading-tight mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                  <h1
+                    className={`font-heading font-bold text-4xl lg:text-4xl xl:text-5xl leading-tight mb-6${isDefaultBg ? ` text-white ${defaultTitleShadowClass}` : ''}`}
+                    style={isDefaultBg ? {} : titleStyle}
+                  >
                     {blog.title}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-amber-200/80">
-                    <div className="flex items-center gap-2"><User size={14} /><span>Pandit Rajesh Joshi</span></div>
-                    {blog.reading_time_minutes && <div className="flex items-center gap-2"><BookOpen size={14} /><span>{blog.reading_time_minutes} min read</span></div>}
-                    {blog.published_at && <div className="flex items-center gap-2"><Calendar size={14} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
+                  <div className="flex flex-wrap items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2" style={isDefaultBg ? {} : metaStyle}><User size={14} /><span>Pandit Rajesh Joshi</span></div>
+                    {blog.reading_time_minutes && <div className="flex items-center gap-2" style={isDefaultBg ? {} : metaStyle}><BookOpen size={14} /><span>{blog.reading_time_minutes} min read</span></div>}
+                    {blog.published_at && <div className="flex items-center gap-2" style={isDefaultBg ? {} : metaStyle}><Calendar size={14} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
                   </div>
                 </div>
 
@@ -152,7 +223,27 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
         </section>
       ) : (
         /* Header without image */
-        <section className="bg-linear-to-br from-slate-900 via-orange-950/60 to-amber-950 py-12 md:py-16">
+        <section className="relative py-12 md:py-16 overflow-hidden" style={isDefaultBg ? {} : heroBgStyle}>
+          {/* Default sunrise background — only shown when no custom bg is set */}
+          {isDefaultBg && (
+            <>
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="flex gap-0 animate-scroll-left w-max h-full">
+                  <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" loading="lazy" decoding="async" />
+                  <img src="/images/South Asian Temple Complex.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/Golden Temples of Devotion.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/Traditional Altar with Marigold Flowers.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img src="/images/20251122_1252_Divine Vaidyanath Temple Aura_simple_compose_01kansspg9eems9y5np35d35pt.png" alt="" className="h-full w-auto object-contain opacity-40 shrink-0" aria-hidden="true" loading="lazy" decoding="async" />
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-linear-to-t from-orange-900/60 via-amber-600/30 to-sky-700/40"></div>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full bg-gradient-radial from-amber-300/50 via-orange-400/30 to-transparent animate-sunrise-glow"></div>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-full h-full opacity-30 animate-sunrise-rays" style={{background: 'conic-gradient(from 180deg, transparent 0deg, rgba(251, 191, 36, 0.4) 10deg, transparent 20deg, transparent 30deg, rgba(251, 191, 36, 0.3) 40deg, transparent 50deg, transparent 60deg, rgba(251, 191, 36, 0.4) 70deg, transparent 80deg, transparent 90deg, rgba(251, 191, 36, 0.3) 100deg, transparent 110deg, transparent 120deg, rgba(251, 191, 36, 0.4) 130deg, transparent 140deg, transparent 150deg, rgba(251, 191, 36, 0.3) 160deg, transparent 170deg, transparent 180deg)'}}></div>
+            </>
+          )}
           {/* Mobile-only fixed Back to Blog badge */}
           <div className="fixed top-[60px] left-0 right-0 z-40 flex justify-start px-4 md:hidden">
             <Badge
@@ -163,7 +254,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
               Back to Blog
             </Badge>
           </div>
-          <div className="container mx-auto px-4 md:px-8 max-w-7xl pt-10 md:pt-0">
+          <div className="container mx-auto px-4 md:px-8 max-w-7xl pt-10 md:pt-0 relative z-10">
             <div className="hidden md:flex justify-start mb-6">
               <Badge
                 onClick={() => onNavigate('blog')}
@@ -178,24 +269,27 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
               {categoryName}
             </Badge>
             
-            <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight max-w-5xl mb-6 text-white">
+            <h1
+              className={`font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight max-w-5xl mb-6${isDefaultBg ? ` text-white ${defaultTitleShadowClass}` : ''}`}
+              style={isDefaultBg ? {} : titleStyle}
+            >
               {blog.title}
             </h1>
             
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 text-amber-200/80">
+              <div className={`flex items-center gap-2${isDefaultBg ? ' text-amber-200/80' : ''}`} style={isDefaultBg ? {} : metaStyle}>
                 <User size={16} />
                 <span>Pandit Rajesh Joshi</span>
               </div>
               {blog.reading_time_minutes && (
-                <div className="flex items-center gap-2 text-amber-200/80">
+                <div className={`flex items-center gap-2${isDefaultBg ? ' text-amber-200/80' : ''}`} style={isDefaultBg ? {} : metaStyle}>
                   <BookOpen size={16} />
                   <span>{blog.reading_time_minutes} min read</span>
                 </div>
               )}
               {blog.published_at && (
-                <div className="flex items-center gap-2 text-amber-200/80">
+                <div className={`flex items-center gap-2${isDefaultBg ? ' text-amber-200/80' : ''}`} style={isDefaultBg ? {} : metaStyle}>
                   <Calendar size={16} />
                   <span>{new Date(blog.published_at).toLocaleDateString('en-IE', {
                     year: 'numeric',
