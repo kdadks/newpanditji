@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import ScrollToTopButton from './components/ScrollToTopButton'
 import { Toaster } from './components/ui/sonner'
 import { updateMetaTags, pageSEOConfig, generateOrganizationSchema } from './utils/seo'
 
@@ -152,6 +153,7 @@ function App() {
         </Suspense>
       </main>
       {!isAdminPage && <Footer />}
+      {!isAdminPage && <ScrollToTopButton />}
       {!isAdminPage && <WhatsAppButton />}
       <Toaster />
     </div>

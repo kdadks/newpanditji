@@ -70,117 +70,132 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
     <div className="w-full">
       {/* Hero Section with Featured Image */}
       {blog.featured_image_url ? (
-        <section className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden bg-linear-to-br from-amber-50 via-orange-100 to-amber-100">
-          {/* Beautiful warm gradient background pattern */}
-          <div className="absolute inset-0 bg-linear-to-br from-orange-100/80 via-amber-200/60 to-orange-200/70"></div>
-          <div className="absolute inset-0 opacity-30" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(217, 119, 6, 0.25) 0%, transparent 50%)'
-          }}></div>
-
-          {/* Decorative pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(251, 146, 60, 0.5) 35px, rgba(251, 146, 60, 0.5) 70px)'
-          }}></div>
-
-          {/* Centered image with proper sizing */}
-          <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
+        <section className="relative w-full bg-linear-to-br from-slate-900 via-orange-950/60 to-amber-950 overflow-hidden">
+          {/* Mobile: image full width with title overlay + fixed back badge */}
+          <div className="md:hidden relative h-[55vw] min-h-[220px] max-h-[360px]">
+            {/* Full-bleed image */}
             <img
               src={blog.featured_image_url}
               alt={blog.title}
-              className="max-w-full max-h-full object-contain"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
-          </div>
-          
-          {/* Navigation at top */}
-          <div className="absolute top-0 left-0 right-0 p-6 md:p-8">
-            <div className="container mx-auto max-w-7xl">
-              <Button
-                variant="ghost"
-                size="sm"
+            {/* Back to Blog badge — top left over image */}
+            <div className="absolute top-3 left-4 z-10">
+              <Badge
                 onClick={() => onNavigate('blog')}
-                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 border border-orange-600/30 backdrop-blur-sm"
+                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 cursor-pointer transition-colors"
               >
-                <ArrowLeft size={18} className="mr-2" />
+                <ArrowLeft size={12} />
                 Back to Blog
-              </Button>
+              </Badge>
             </div>
-          </div>
-          
-          {/* Title overlay on image */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-12 lg:p-16">
-            <div className="container mx-auto max-w-7xl">
-              <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm mb-4">
+
+            {/* Title + category overlay at bottom of image */}
+            <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 z-10">
+              <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-2">
                 {categoryName}
               </Badge>
-              
-              <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] max-w-5xl">
+              <h1 className="font-heading font-bold text-xl sm:text-2xl text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 {blog.title}
               </h1>
-              
-              {/* Meta info on image */}
-              <div className="flex flex-wrap items-center gap-4 mt-6" style={{ textShadow: '0 2px 8px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,0.8)' }}>
-                <div className="flex items-center gap-2 text-white">
-                  <User size={16} />
-                  <span>Pandit Rajesh Joshi</span>
+            </div>
+          </div>
+
+          {/* Meta row — below image, centered, dark theme */}
+          <div className="md:hidden flex flex-wrap justify-center items-center gap-3 px-4 py-3 text-xs text-amber-950 bg-amber-50/60 border-b border-amber-200/60">
+            <div className="flex items-center gap-1"><User size={12} /><span>Pandit Rajesh Joshi</span></div>
+            {blog.reading_time_minutes && <div className="flex items-center gap-1"><BookOpen size={12} /><span>{blog.reading_time_minutes} min read</span></div>}
+            {blog.published_at && <div className="flex items-center gap-1"><Calendar size={12} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
+          </div>
+
+          {/* Desktop: side-by-side layout */}
+          <div className="hidden md:block relative z-10">
+            <div className="container mx-auto max-w-7xl px-8 py-12 lg:py-16">
+              {/* Desktop Back to Blog badge */}
+              <div className="mb-8">
+                <Badge
+                  onClick={() => onNavigate('blog')}
+                  className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 cursor-pointer transition-colors"
+                >
+                  <ArrowLeft size={12} />
+                  Back to Blog
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-12 lg:gap-16">
+                {/* Text column */}
+                <div className="flex-1 min-w-0">
+                  <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-5">
+                    {categoryName}
+                  </Badge>
+                  <h1 className="font-heading font-bold text-4xl lg:text-4xl xl:text-5xl text-white leading-tight mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                    {blog.title}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-amber-200/80">
+                    <div className="flex items-center gap-2"><User size={14} /><span>Pandit Rajesh Joshi</span></div>
+                    {blog.reading_time_minutes && <div className="flex items-center gap-2"><BookOpen size={14} /><span>{blog.reading_time_minutes} min read</span></div>}
+                    {blog.published_at && <div className="flex items-center gap-2"><Calendar size={14} /><span>{new Date(blog.published_at).toLocaleDateString('en-IE', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>}
+                  </div>
                 </div>
-                {blog.reading_time_minutes && (
-                  <div className="flex items-center gap-2 text-white">
-                    <BookOpen size={16} />
-                    <span>{blog.reading_time_minutes} min read</span>
-                  </div>
-                )}
-                {blog.published_at && (
-                  <div className="flex items-center gap-2 text-white">
-                    <Calendar size={16} />
-                    <span>{new Date(blog.published_at).toLocaleDateString('en-IE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}</span>
-                  </div>
-                )}
+
+                {/* Image column */}
+                <div className="w-1/2 lg:w-[520px] xl:w-xl shrink-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
+                  <img
+                    src={blog.featured_image_url}
+                    alt={blog.title}
+                    className="w-full aspect-3/2 object-cover object-center"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </section>
       ) : (
         /* Header without image */
-        <section className="bg-linear-to-br from-primary/5 via-background to-accent/5 py-12 md:py-16">
-          <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-            <div className="flex justify-start mb-6">
-              <Button
-                variant="ghost"
-                size="sm"
+        <section className="bg-linear-to-br from-slate-900 via-orange-950/60 to-amber-950 py-12 md:py-16">
+          {/* Mobile-only fixed Back to Blog badge */}
+          <div className="fixed top-[60px] left-0 right-0 z-40 flex justify-start px-4 md:hidden">
+            <Badge
+              onClick={() => onNavigate('blog')}
+              className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 cursor-pointer transition-colors"
+            >
+              <ArrowLeft size={12} />
+              Back to Blog
+            </Badge>
+          </div>
+          <div className="container mx-auto px-4 md:px-8 max-w-7xl pt-10 md:pt-0">
+            <div className="hidden md:flex justify-start mb-6">
+              <Badge
                 onClick={() => onNavigate('blog')}
-                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 border border-orange-600/30 backdrop-blur-sm"
+                className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm hover:from-orange-800 hover:via-amber-800 hover:to-orange-900 cursor-pointer transition-colors"
               >
-                <ArrowLeft size={18} className="mr-2" />
+                <ArrowLeft size={12} />
                 Back to Blog
-              </Button>
+              </Badge>
             </div>
             
             <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 backdrop-blur-sm mb-4">
               {categoryName}
             </Badge>
             
-            <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight max-w-5xl mb-6">
+            <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight max-w-5xl mb-6 text-white">
               {blog.title}
             </h1>
             
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-amber-200/80">
                 <User size={16} />
                 <span>Pandit Rajesh Joshi</span>
               </div>
               {blog.reading_time_minutes && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-amber-200/80">
                   <BookOpen size={16} />
                   <span>{blog.reading_time_minutes} min read</span>
                 </div>
               )}
               {blog.published_at && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-amber-200/80">
                   <Calendar size={16} />
                   <span>{new Date(blog.published_at).toLocaleDateString('en-IE', {
                     year: 'numeric',

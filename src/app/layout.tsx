@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import WhatsAppButton from '../components/WhatsAppButton'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 import { AuthErrorHandler } from '../components/AuthErrorHandler'
 import { AnalyticsProvider } from '../components/AnalyticsProvider'
 import CookieConsentBanner from '../components/CookieConsentBanner'
@@ -142,6 +143,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 {!isAdminRoute && <Footer />}
+                {!isAdminRoute && <ScrollToTopButton />}
                 {!isAdminRoute && <WhatsAppButton />}
                 <Toaster />
               </div>
