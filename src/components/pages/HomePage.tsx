@@ -50,7 +50,7 @@ export default function HomePage({ }: HomePageProps) {
   const [isPaused, setIsPaused] = useState(false)
 
   // Carousel speed: pixels per second
-  const GALLERY_PX_PER_SECOND = 600
+  const GALLERY_PX_PER_SECOND = 400
   const SERVICES_PX_PER_SECOND = 100
   const galleryTrackRef = useRef<HTMLDivElement>(null)
   const servicesTrackRef = useRef<HTMLDivElement>(null)
@@ -224,7 +224,7 @@ export default function HomePage({ }: HomePageProps) {
           {/* Main carousel track */}
           <div
             ref={galleryTrackRef}
-            className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 ${isPaused ? '' : 'animate-scroll-services'}`}
+            className={`flex gap-6 md:gap-8 py-8 px-4 md:px-0 w-max ${isPaused ? '' : 'animate-scroll-services'}`}
             style={{
               willChange: 'transform',
               animationDuration: `${galleryDuration}s`
@@ -249,7 +249,7 @@ export default function HomePage({ }: HomePageProps) {
                       src={img}
                       alt="Sacred Ceremony"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                     />
 
@@ -299,7 +299,7 @@ export default function HomePage({ }: HomePageProps) {
                       src={img}
                       alt=""
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                     />
 
