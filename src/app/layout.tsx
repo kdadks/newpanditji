@@ -2,6 +2,7 @@
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ErrorBoundary } from "react-error-boundary"
 import { ThemeProvider } from 'next-themes'
@@ -124,6 +125,25 @@ export default function RootLayout({
         <link rel="preconnect" href="https://supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://storage.googleapis.com" />
         <link rel="preconnect" href="https://storage.googleapis.com" crossOrigin="anonymous" />
+        {/* Google Analytics 4 — only loads when NEXT_PUBLIC_GA_MEASUREMENT_ID is set */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
+                  page_path: window.location.pathname
+                });
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <ErrorBoundary FallbackComponent={ErrorFallback}>

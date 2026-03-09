@@ -5,7 +5,7 @@ import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
-import { MagnifyingGlass, FloppyDisk, Spinner, Globe } from '@phosphor-icons/react'
+import { MagnifyingGlass, FloppyDisk, Spinner, Globe, ChartBar } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { supabase } from '../../lib/supabase'
 
@@ -26,6 +26,7 @@ interface SiteMetadata {
   site_title: string
   site_description: string
   site_keywords: string
+  ga4_measurement_id: string
 }
 
 export default function AdminSEO() {
@@ -37,7 +38,8 @@ export default function AdminSEO() {
   const [siteMetadata, setSiteMetadata] = useState<SiteMetadata>({
     site_title: '',
     site_description: '',
-    site_keywords: ''
+    site_keywords: '',
+    ga4_measurement_id: ''
   })
   const [isLoadingSiteSettings, setIsLoadingSiteSettings] = useState(true)
 
@@ -76,7 +78,7 @@ export default function AdminSEO() {
         .from('site_metadata')
         .select('setting_key, setting_value')
         .eq('category', 'metadata')
-        .in('setting_key', ['site_title', 'site_description', 'site_keywords'])
+        .in('setting_key', ['site_title', 'site_description', 'site_keywords', 'ga4_measurement_id'])
 
       if (error) throw error
 
@@ -88,7 +90,8 @@ export default function AdminSEO() {
       setSiteMetadata({
         site_title: settings.site_title || 'Pandit Rajesh Joshi - Hindu Priest & Spiritual Guide',
         site_description: settings.site_description || 'Experience authentic Hindu rituals and spiritual guidance',
-        site_keywords: settings.site_keywords || 'hindu priest ireland, pandit ireland'
+        site_keywords: settings.site_keywords || 'hindu priest ireland, pandit ireland',
+        ga4_measurement_id: settings.ga4_measurement_id || ''
       })
     } catch (error) {
       console.error('Error loading site metadata:', error)
@@ -104,17 +107,18 @@ export default function AdminSEO() {
       const updates = [
         { key: 'site_title', value: siteMetadata.site_title },
         { key: 'site_description', value: siteMetadata.site_description },
-        { key: 'site_keywords', value: siteMetadata.site_keywords }
+        { key: 'site_keywords', value: siteMetadata.site_keywords },
+        { key: 'ga4_measurement_id', value: siteMetadata.ga4_measurement_id }
       ]
 
       for (const { key, value } of updates) {
+        // upsert: create the row if it doesn't exist yet (e.g. ga4_measurement_id may be new)
         const { error } = await supabase
           .from('site_metadata')
-          .update({ 
-            setting_value: value,
-            updated_at: new Date().toISOString()
-          })
-          .eq('setting_key', key)
+          .upsert(
+            { setting_key: key, setting_value: value, category: 'metadata', updated_at: new Date().toISOString() },
+            { onConflict: 'setting_key' }
+          )
 
         if (error) throw error
       }
@@ -380,6 +384,27 @@ export default function AdminSEO() {
                       onChange={(e) => setSiteMetadata({ ...siteMetadata, site_keywords: e.target.value })}
                       placeholder="keyword1, keyword2, keyword3"
                     />
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ChartBar size={18} className="text-primary" />
+                      <h4 className="font-semibold">Google Analytics 4</h4>
+                    </div>
+                    <div>
+                      <Label htmlFor="ga4_measurement_id">GA4 Measurement ID</Label>
+                      <Input
+                        id="ga4_measurement_id"
+                        value={siteMetadata.ga4_measurement_id}
+                        onChange={(e) => setSiteMetadata({ ...siteMetadata, ga4_measurement_id: e.target.value })}
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Find this in your{' '}
+                        <span className="font-medium">Google Analytics → Admin → Data Streams → your stream → Measurement ID</span>.
+                        Also set <code className="bg-muted px-1 rounded">NEXT_PUBLIC_GA_MEASUREMENT_ID</code> in Vercel env vars and redeploy for the fastest possible script loading.
+                      </p>
+                    </div>
                   </div>
 
                   <Button onClick={saveSiteMetadata} disabled={isSaving} className="gap-2">
