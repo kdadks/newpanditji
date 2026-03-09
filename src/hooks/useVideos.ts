@@ -7,13 +7,29 @@ import { toast } from 'sonner'
 // Query keys
 const VIDEOS_KEY = ['videos']
 
+export const NO_CATEGORY_VALUE = 'no_category'
+
 // UI-friendly video format
 export interface Video {
   id: string
   title: string
-  category: 'educational' | 'poetry' | 'charity' | 'podcast' | 'ceremony' | 'other'
+  category: string
   url: string
   thumbnail_url?: string | null
+}
+
+/**
+ * Bulk-reassign all videos that belong to `fromCategory` → `toCategory` in Supabase.
+ */
+export async function bulkReassignCategory(fromCategory: string, toCategory: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('videos')
+    .update({ category: toCategory })
+    .eq('category', fromCategory)
+    .select('id')
+
+  if (error) throw error
+  return data?.length ?? 0
 }
 
 /**
@@ -235,7 +251,7 @@ export function convertLegacyVideo(video: {
     description: null,
     video_url: video.url,
     thumbnail_url: youtubeId ? `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg` : null,
-    category: video.category as 'educational' | 'poetry' | 'charity' | 'podcast' | 'ceremony' | 'other',
+    category: video.category,
     duration: null,
     view_count: 0,
     is_featured: false,

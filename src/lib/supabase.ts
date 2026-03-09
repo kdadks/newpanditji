@@ -213,7 +213,7 @@ export interface VideoRow {
   description: string | null
   video_url: string
   thumbnail_url: string | null
-  category: 'educational' | 'poetry' | 'charity' | 'podcast' | 'ceremony' | 'other'
+  category: string
   duration: number | null
   view_count: number
   is_featured: boolean
@@ -471,7 +471,7 @@ export type MenuItemUpdate = Partial<MenuItemInsert>
 // Helper function to extract YouTube video ID from various URL formats
 export function extractYouTubeId(url: string): string | null {
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
     /^([a-zA-Z0-9_-]{11})$/,
   ]
   

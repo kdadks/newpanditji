@@ -64,7 +64,7 @@ export default function GalleryPage() {
   const [videoPage, setVideoPage] = useState(1)
   const [videoItemsPerPage, setVideoItemsPerPage] = useState(DEFAULT_PAGE_SIZE)
 
-  const [selectedVideoCategory, setSelectedVideoCategory] = useState<'all' | Video['category']>('all')
+  const [selectedVideoCategory, setSelectedVideoCategory] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState('videos')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -98,10 +98,48 @@ export default function GalleryPage() {
   const videoEndIndex = videoStartIndex + videoItemsPerPage
   const pagedVideos = filteredVideos.slice(videoStartIndex, videoEndIndex)
 
+  // ── Video categories (dynamic from site_metadata) ────────────────────────
+  const [videoCategories, setVideoCategories] = useState<{ value: string; label: string }[]>([])
+
+  useEffect(() => {
+    supabase
+      .from('site_metadata')
+      .select('setting_value')
+      .eq('setting_key', 'video_categories')
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.setting_value) {
+          try { setVideoCategories(JSON.parse(data.setting_value)) } catch { /* ignore */ }
+        }
+      })
+  }, [])
+
+  // Derive unique categories present in the loaded videos (for count badges)
+  const activeCatValues = Array.from(new Set(videos.map(v => v.category).filter(Boolean)))
+
+  // Palette for dynamic category badge colours (cycles through a fixed set)
+  const CAT_PALETTE = [
+    'bg-blue-100 text-blue-800 border-blue-200',
+    'bg-purple-100 text-purple-800 border-purple-200',
+    'bg-green-100 text-green-800 border-green-200',
+    'bg-orange-100 text-orange-800 border-orange-200',
+    'bg-amber-100 text-amber-800 border-amber-200',
+    'bg-pink-100 text-pink-800 border-pink-200',
+    'bg-teal-100 text-teal-800 border-teal-200',
+    'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'bg-rose-100 text-rose-800 border-rose-200',
+    'bg-cyan-100 text-cyan-800 border-cyan-200',
+  ]
+  // Stable index per category value
+  const catColorMap = new Map(activeCatValues.map((v, i) => [v, CAT_PALETTE[i % CAT_PALETTE.length]]))
+  const getCatColor = (cat: string) => catColorMap.get(cat) ?? 'bg-gray-100 text-gray-800 border-gray-200'
+
   // Reset video page when category changes
   useEffect(() => {
     setVideoPage(1)
   }, [selectedVideoCategory])
+
+  const categoryColors: Record<string, string> = {}
 
   const getYouTubeEmbedUrl = (url: string | undefined) => {
     if (!url) return ''
@@ -131,15 +169,6 @@ export default function GalleryPage() {
     }
     
     return videoId ? `https://www.youtube.com/embed/${videoId}` : ''
-  }
-
-  const categoryColors: Record<string, string> = {
-    educational: 'bg-blue-100 text-blue-800 border-blue-200',
-    poetry: 'bg-purple-100 text-purple-800 border-purple-200',
-    charity: 'bg-green-100 text-green-800 border-green-200',
-    podcast: 'bg-orange-100 text-orange-800 border-orange-200',
-    ceremony: 'bg-amber-100 text-amber-800 border-amber-200',
-    other: 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
   // Show loading state while fetching content to prevent flash of placeholder text
@@ -323,46 +352,20 @@ export default function GalleryPage() {
                 <Funnel size={14} className="mr-2" />
                 All Videos ({videos.length})
               </Button>
-              <Button
-                variant={selectedVideoCategory === 'educational' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedVideoCategory('educational')}
-                className="rounded-full"
-              >
-                Educational ({videos.filter(v => v.category === 'educational').length})
-              </Button>
-              <Button
-                variant={selectedVideoCategory === 'ceremony' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedVideoCategory('ceremony')}
-                className="rounded-full"
-              >
-                Ceremony ({videos.filter(v => v.category === 'ceremony').length})
-              </Button>
-              <Button
-                variant={selectedVideoCategory === 'poetry' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedVideoCategory('poetry')}
-                className="rounded-full"
-              >
-                Poetry ({videos.filter(v => v.category === 'poetry').length})
-              </Button>
-              <Button
-                variant={selectedVideoCategory === 'charity' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedVideoCategory('charity')}
-                className="rounded-full"
-              >
-                Charity ({videos.filter(v => v.category === 'charity').length})
-              </Button>
-              <Button
-                variant={selectedVideoCategory === 'podcast' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedVideoCategory('podcast')}
-                className="rounded-full"
-              >
-                Podcasts ({videos.filter(v => v.category === 'podcast').length})
-              </Button>
+              {/* Dynamic categories — show only those that have at least 1 video */}
+              {(videoCategories.length > 0 ? videoCategories : activeCatValues.map(v => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) })))
+                .filter(cat => videos.some(v => v.category === cat.value))
+                .map(cat => (
+                  <Button
+                    key={cat.value}
+                    variant={selectedVideoCategory === cat.value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedVideoCategory(cat.value)}
+                    className="rounded-full"
+                  >
+                    {cat.label} ({videos.filter(v => v.category === cat.value).length})
+                  </Button>
+                ))}
             </div>
 
             {/* Videos Grid */}
@@ -441,8 +444,8 @@ export default function GalleryPage() {
                         </div>
                       )}
                       <div className="absolute top-3 left-3">
-                        <Badge className={`${categoryColors[video.category] || 'bg-gray-100 text-gray-800 border-gray-200'} border`}>
-                          {video.category}
+                        <Badge className={`${getCatColor(video.category)} border`}>
+                          {videoCategories.find(c => c.value === video.category)?.label ?? (video.category ? video.category.charAt(0).toUpperCase() + video.category.slice(1) : '')}
                         </Badge>
                       </div>
                       <div className="absolute top-3 right-3 bg-linear-to-r from-orange-600 to-amber-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg border border-orange-400/30">
