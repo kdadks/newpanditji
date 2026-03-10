@@ -50,7 +50,7 @@ export default function HomePage({ }: HomePageProps) {
   const [isPaused, setIsPaused] = useState(false)
 
   // Carousel speed: pixels per second
-  const GALLERY_PX_PER_SECOND = 400
+  const GALLERY_PX_PER_SECOND = 200
   const SERVICES_PX_PER_SECOND = 100
   const galleryTrackRef = useRef<HTMLDivElement>(null)
   const servicesTrackRef = useRef<HTMLDivElement>(null)
