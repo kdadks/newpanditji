@@ -146,7 +146,7 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.className}${isAdminRoute ? ' admin-page' : ''}`} suppressHydrationWarning>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <QueryClientProvider client={queryClient}>
             <ThemeProvider
@@ -158,7 +158,7 @@ export default function RootLayout({
               <AuthErrorHandler />
               <AnalyticsProvider />
               <CookieConsentBanner />
-              <ContentProtection />
+              {!isAdminRoute && <ContentProtection />}
               <div className="min-h-screen flex flex-col bg-background">
                 <Header />
                 <main className="flex-1">

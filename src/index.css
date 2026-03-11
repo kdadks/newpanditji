@@ -7,8 +7,8 @@
   }
 
   /* ── Content Protection ─────────────────────────────────────────────────── */
-  /* Disable text selection site-wide */
-  body {
+  /* Disable text selection on frontend only (not admin) */
+  body:not(.admin-page) {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -24,16 +24,16 @@
     user-select: text;
   }
 
-  /* Prevent images from being dragged */
-  img {
+  /* Prevent images from being dragged (frontend only, not admin) */
+  body:not(.admin-page) img {
     -webkit-user-drag: none;
     user-drag: none;
     pointer-events: none; /* also prevents right-click save on images */
   }
 
   /* Re-enable pointer events for images that are links/buttons */
-  a img,
-  button img {
+  body:not(.admin-page) a img,
+  body:not(.admin-page) button img {
     pointer-events: auto;
   }
   /* ── End Content Protection ─────────────────────────────────────────────── */
