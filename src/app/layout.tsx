@@ -16,6 +16,7 @@ import ScrollToTopButton from '../components/ScrollToTopButton'
 import { AuthErrorHandler } from '../components/AuthErrorHandler'
 import { AnalyticsProvider } from '../components/AnalyticsProvider'
 import CookieConsentBanner from '../components/CookieConsentBanner'
+import ContentProtection from '../components/ContentProtection'
 import { Toaster } from '../components/ui/sonner'
 import { ErrorFallback } from '../ErrorFallback'
 import { AppPage, AppNavigationData } from '../lib/types'
@@ -157,6 +158,7 @@ export default function RootLayout({
               <AuthErrorHandler />
               <AnalyticsProvider />
               <CookieConsentBanner />
+              <ContentProtection />
               <div className="min-h-screen flex flex-col bg-background">
                 <Header />
                 <main className="flex-1">

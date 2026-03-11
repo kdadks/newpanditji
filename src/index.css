@@ -6,6 +6,38 @@
     @apply border-border
   }
 
+  /* ── Content Protection ─────────────────────────────────────────────────── */
+  /* Disable text selection site-wide */
+  body {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow selection inside form fields and explicitly opted-in elements */
+  input,
+  textarea,
+  [contenteditable],
+  .allow-copy {
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  /* Prevent images from being dragged */
+  img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: none; /* also prevents right-click save on images */
+  }
+
+  /* Re-enable pointer events for images that are links/buttons */
+  a img,
+  button img {
+    pointer-events: auto;
+  }
+  /* ── End Content Protection ─────────────────────────────────────────────── */
+
   /* Ensure no horizontal overflow on mobile */
   html, body {
     overflow-x: hidden;
