@@ -1171,12 +1171,12 @@ function sectionsToTestimonialsContent(sections: PageSectionRow[]): Testimonials
     shareExperience: {
       title: (shareSection.title as string) || defaultTestimonialsContent.shareExperience.title,
       description: (shareSection.description as string) || defaultTestimonialsContent.shareExperience.description,
-      primaryButtonText: (shareSection.primaryButtonText as string) || defaultTestimonialsContent.shareExperience.primaryButtonText,
-      secondaryButtonText: (shareSection.secondaryButtonText as string) || defaultTestimonialsContent.shareExperience.secondaryButtonText,
-      shareText: (shareSection.shareText as string) || defaultTestimonialsContent.shareExperience.shareText,
-      googleReviewUrl: (shareSection.googleReviewUrl as string) || defaultTestimonialsContent.shareExperience.googleReviewUrl,
-      email: (shareSection.email as string) || defaultTestimonialsContent.shareExperience.email,
-      emailSubject: (shareSection.emailSubject as string) || defaultTestimonialsContent.shareExperience.emailSubject,
+      primaryButtonText: (shareSection.primaryButtonText as string) ?? defaultTestimonialsContent.shareExperience.primaryButtonText,
+      secondaryButtonText: (shareSection.secondaryButtonText as string) ?? defaultTestimonialsContent.shareExperience.secondaryButtonText,
+      shareText: (shareSection.shareText as string) ?? defaultTestimonialsContent.shareExperience.shareText,
+      googleReviewUrl: (shareSection.googleReviewUrl as string) ?? defaultTestimonialsContent.shareExperience.googleReviewUrl,
+      email: (shareSection.email as string) ?? defaultTestimonialsContent.shareExperience.email,
+      emailSubject: (shareSection.emailSubject as string) ?? defaultTestimonialsContent.shareExperience.emailSubject,
     },
     whyChooseUs: {
       title: (whyChooseSection.title as string) || defaultTestimonialsContent.whyChooseUs.title,
