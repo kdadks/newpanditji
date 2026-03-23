@@ -1,11 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { sanitizeHTML } from '../../utils/sanitize'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, Info, HandHeart, GraduationCap, ArrowRight } from '@phosphor-icons/react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
+import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, HandHeart, GraduationCap, ArrowRight } from '@phosphor-icons/react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useDakshinaContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
@@ -14,8 +16,14 @@ import { renderHighlightedTitle, stripHighlightTags } from '../../utils/renderHi
 interface DakshinaPageProps {
 }
 
+const FAQ_BG_COLORS = [
+  '#EFF6FF', // sky blue
+  '#F0FFF4', // mint green
+]
+
 export default function DakshinaPage({ }: DakshinaPageProps) {
   const router = useRouter()
+  const [faqOpenItems, setFaqOpenItems] = useState<string[]>([])
 
   const handleNavigate = (page: AppPage) => {
     router.push(page === 'home' ? '/' : `/${page}`)
@@ -274,22 +282,53 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
             ))}
           </div>
 
-          {/* Pricing Notes */}
-          {cmsContent.pricingSection.notes && cmsContent.pricingSection.notes.length > 0 && (
-            <div className="mt-8 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 md:p-6">
-              <div className="flex items-start gap-3">
-                <Info size={20} className="text-amber-600 dark:text-amber-400 shrink-0 mt-1" weight="fill" />
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-base md:text-lg text-amber-900 dark:text-amber-100">Important Notes</h3>
-                  <ul className="space-y-2 text-sm text-amber-800 dark:text-amber-200">
-                    {cmsContent.pricingSection.notes.map((note, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <CheckCircle size={16} weight="fill" className="shrink-0 mt-0.5" />
-                        <span>{note}</span>
-                      </li>
-                    ))}
-                  </ul>
+          {/* FAQ Section */}
+          {cmsContent.pricingSection.faqs && cmsContent.pricingSection.faqs.length > 0 && (
+            <div className="mt-8 rounded-lg border border-border/40 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b bg-linear-to-r from-amber-500/10 to-amber-50/30 dark:to-amber-950/20">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-6 bg-amber-500 rounded-full shrink-0" />
+                  <h3 className="font-heading font-bold text-xl text-foreground">
+                    Frequently Asked Questions
+                  </h3>
                 </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setFaqOpenItems(cmsContent.pricingSection.faqs!.map((_, i) => `faq-${i}`))}
+                    className="text-xs text-amber-600 hover:text-amber-800 font-medium px-2 py-1 rounded hover:bg-amber-100 transition-colors"
+                  >
+                    Expand All
+                  </button>
+                  <span className="text-border">|</span>
+                  <button
+                    onClick={() => setFaqOpenItems([])}
+                    className="text-xs text-amber-600 hover:text-amber-800 font-medium px-2 py-1 rounded hover:bg-amber-100 transition-colors"
+                  >
+                    Collapse All
+                  </button>
+                </div>
+              </div>
+              <div className="py-0">
+                <Accordion type="multiple" value={faqOpenItems} onValueChange={setFaqOpenItems} className="space-y-0">
+                  {cmsContent.pricingSection.faqs.map((faq, i) => (
+                    <AccordionItem
+                      key={faq.id || i}
+                      value={`faq-${i}`}
+                      className="border-b border-border/60 last:border-b-0 px-5 transition-colors"
+                      style={{ backgroundColor: FAQ_BG_COLORS[i % FAQ_BG_COLORS.length] }}
+                    >
+                      <AccordionTrigger className="text-base font-bold text-foreground py-2.5 hover:no-underline text-left">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground pb-3 leading-relaxed">
+                        <div
+                          className="prose prose-sm max-w-none text-muted-foreground"
+                          dangerouslySetInnerHTML={{ __html: sanitizeHTML(faq.answer) }}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             </div>
           )}

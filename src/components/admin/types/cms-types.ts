@@ -337,6 +337,12 @@ export interface CharityPageContent {
   }
 }
 
+export interface DakshinaFaq {
+  id: string
+  question: string
+  answer: string
+}
+
 export interface DakshinaService {
   name: string
   description?: string
@@ -375,7 +381,7 @@ export interface DakshinaPageContent {
       col5: string
     }
     services: DakshinaService[]
-    notes?: string[]
+    faqs?: DakshinaFaq[]
   }
   ctaSection: {
     title: string

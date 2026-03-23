@@ -266,7 +266,7 @@ export const defaultDakshinaContent: DakshinaPageContent = {
       col5: 'Dakshina',
     },
     services: [],
-    notes: []
+    faqs: []
   },
   ctaSection: {
     title: '',

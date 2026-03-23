@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { FloppyDisk, Spinner, Plus, Trash, ArrowUp, ArrowDown } from '@phosphor-icons/react'
+import { FloppyDisk, Spinner, Plus, Trash, ArrowUp, ArrowDown, X } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
@@ -9,7 +9,7 @@ import { Badge } from '../../ui/badge'
 import { QuillEditor } from '../../ui/quill-editor'
 import { MediaPickerInput } from '../../ui/media-picker'
 import { ImageGrid } from './shared/EditorUtils'
-import type { DakshinaPageContent, DakshinaService } from '../types/cms-types'
+import type { DakshinaPageContent, DakshinaService, DakshinaFaq } from '../types/cms-types'
 
 interface DakshinaPageEditorProps {
   content: DakshinaPageContent
@@ -21,10 +21,10 @@ interface DakshinaPageEditorProps {
 export default function DakshinaPageEditor({ content, setContent, onSave, isSaving }: DakshinaPageEditorProps) {
   const serviceRefs = useRef<(HTMLDivElement | null)[]>([])
   const keyPointRefs = useRef<(HTMLDivElement | null)[]>([])
-  const noteRefs = useRef<(HTMLDivElement | null)[]>([])
+  const faqRefs = useRef<(HTMLDivElement | null)[]>([])
   const lastServiceIndex = useRef<number>(-1)
   const lastKeyPointIndex = useRef<number>(-1)
-  const lastNoteIndex = useRef<number>(-1)
+  const lastFaqIndex = useRef<number>(-1)
 
   useEffect(() => {
     // Scroll to newly added service
@@ -49,15 +49,15 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
   }, [content.whatIsDakshina.keyPoints.length])
 
   useEffect(() => {
-    // Scroll to newly added note
-    if (lastNoteIndex.current !== -1 && noteRefs.current[lastNoteIndex.current]) {
-      noteRefs.current[lastNoteIndex.current]?.scrollIntoView({
+    // Scroll to newly added FAQ
+    if (lastFaqIndex.current !== -1 && faqRefs.current[lastFaqIndex.current]) {
+      faqRefs.current[lastFaqIndex.current]?.scrollIntoView({
         behavior: 'smooth',
         block: 'center'
       })
-      lastNoteIndex.current = -1
+      lastFaqIndex.current = -1
     }
-  }, [content.pricingSection.notes?.length])
+  }, [content.pricingSection.faqs?.length])
 
   const moveService = (index: number, direction: 'up' | 'down') => {
     const newIndex = direction === 'up' ? index - 1 : index + 1
@@ -145,33 +145,33 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
     }))
   }
 
-  const addNote = () => {
-    lastNoteIndex.current = content.pricingSection.notes?.length || 0
+  const addFaq = () => {
+    lastFaqIndex.current = content.pricingSection.faqs?.length || 0
     setContent(prev => ({
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: [...(prev.pricingSection.notes || []), '']
+        faqs: [...(prev.pricingSection.faqs || []), { id: crypto.randomUUID(), question: '', answer: '' }]
       }
     }))
   }
 
-  const updateNote = (index: number, value: string) => {
+  const updateFaq = (index: number, field: keyof DakshinaFaq, value: string) => {
     setContent(prev => ({
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: (prev.pricingSection.notes || []).map((note, i) => i === index ? value : note)
+        faqs: (prev.pricingSection.faqs || []).map((faq, i) => i === index ? { ...faq, [field]: value } : faq)
       }
     }))
   }
 
-  const removeNote = (index: number) => {
+  const removeFaq = (index: number) => {
     setContent(prev => ({
       ...prev,
       pricingSection: {
         ...prev.pricingSection,
-        notes: (prev.pricingSection.notes || []).filter((_, i) => i !== index)
+        faqs: (prev.pricingSection.faqs || []).filter((_, i) => i !== index)
       }
     }))
   }
@@ -554,41 +554,61 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
             </div>
           </div>
 
-          {/* Important Notes */}
+          {/* FAQs */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">
-              <Label className="text-base font-semibold">Important Notes</Label>
-              <Button onClick={addNote} size="sm" variant="outline">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-5 bg-amber-500 rounded-full" />
+                <Label className="text-base font-semibold text-amber-600">FAQs</Label>
+              </div>
+              <Button onClick={addFaq} size="sm" variant="outline" className="text-amber-600 border-amber-500/30 hover:bg-amber-500/5">
                 <Plus size={16} className="mr-2" />
-                Add Note
+                Add FAQ
               </Button>
             </div>
 
-            <div className="space-y-2">
-              {content.pricingSection.notes?.map((note, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2"
-                  ref={(el) => {
-                    noteRefs.current[index] = el
-                  }}
-                >
-                  <Input
-                    value={note}
-                    onChange={(e) => updateNote(index, e.target.value)}
-                    placeholder="Enter an important note"
-                  />
-                  <Button
-                    onClick={() => removeNote(index)}
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive"
+            {(!content.pricingSection.faqs || content.pricingSection.faqs.length === 0) ? (
+              <p className="text-sm text-muted-foreground text-center py-3">
+                No FAQs yet — click <strong>Add FAQ</strong> to add questions &amp; answers.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {content.pricingSection.faqs.map((faq, index) => (
+                  <div
+                    key={faq.id || index}
+                    className="rounded-lg border border-border/50 bg-background p-3 space-y-2"
+                    ref={(el) => { faqRefs.current[index] = el }}
                   >
-                    <Trash size={16} />
-                  </Button>
-                </div>
-              ))}
-            </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 w-5">Q{index + 1}</span>
+                      <Input
+                        value={faq.question}
+                        onChange={(e) => updateFaq(index, 'question', e.target.value)}
+                        placeholder="Question…"
+                        className="h-8 text-sm flex-1"
+                      />
+                      <button
+                        onClick={() => removeFaq(index)}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all shrink-0"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 w-5 mt-2">A</span>
+                      <div className="flex-1">
+                        <QuillEditor
+                          value={faq.answer}
+                          onChange={(val) => updateFaq(index, 'answer', val)}
+                          placeholder="Answer…"
+                          minHeight="100px"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -1020,7 +1020,11 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
         price: service.price || service.suggested || '',
         priceNote: service.priceNote || ''
       })),
-      notes: (pricingSection.notes as string[]) || defaultDakshinaContent.pricingSection.notes,
+      faqs: ((pricingSection.faqs as any[]) || defaultDakshinaContent.pricingSection.faqs || []).map((faq: any) => ({
+        id: faq.id || '',
+        question: faq.question || '',
+        answer: faq.answer || '',
+      })),
     },
     ctaSection: {
       title: (ctaSection.title as string) || defaultDakshinaContent.ctaSection.title,
@@ -1062,7 +1066,7 @@ function dakshinaContentToSections(content: DakshinaPageContent): { sectionKey: 
         description: content.pricingSection.description,
         columnHeaders: content.pricingSection.columnHeaders,
         services: content.pricingSection.services,
-        notes: content.pricingSection.notes,
+        faqs: content.pricingSection.faqs,
       }
     },
     {
