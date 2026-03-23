@@ -144,9 +144,10 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               {cmsContent.pricingSection.badge}
             </div>
             <h2 className="font-heading font-bold text-3xl md:text-5xl mb-4">{cmsContent.pricingSection.title}</h2>
-            <p className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto">
-              {cmsContent.pricingSection.description}
-            </p>
+            <div
+              className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto prose prose-sm dark:prose-invert text-left"
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(cmsContent.pricingSection.description || '') }}
+            />
           </div>
 
           {/* Pricing Table - Desktop */}
@@ -155,7 +156,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-linear-to-r from-primary via-accent to-primary text-white">
-                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col1 || 'Service/Package'}</th>
+                    <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30 w-2/5 min-w-[280px]">{cmsContent.pricingSection.columnHeaders?.col1 || 'Service/Package'}</th>
                     <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col2 || 'Pooja Duration'}</th>
                     <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col3 || 'Preparation Time'}</th>
                     <th className="px-4 md:px-6 py-4 md:py-5 text-left font-bold text-base md:text-lg border-r border-white/30">{cmsContent.pricingSection.columnHeaders?.col4 || 'Total Engagement Time'}</th>
@@ -178,7 +179,10 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                               {service.name}
                             </div>
                             {service.description && (
-                              <div className="text-sm text-muted-foreground">{service.description}</div>
+                              <div
+                                className="text-sm text-muted-foreground prose prose-sm max-w-none dark:prose-invert"
+                                dangerouslySetInnerHTML={{ __html: sanitizeHTML(service.description) }}
+                              />
                             )}
                           </div>
                         </div>
@@ -203,7 +207,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                           <div className="text-xs text-muted-foreground mb-1">{service.priceNote}</div>
                         )}
                         <div className="font-bold text-xl text-primary">
-                          €{service.price}
+                          {service.price}
                         </div>
                       </td>
                     </tr>
@@ -227,7 +231,10 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                         {service.name}
                       </div>
                       {service.description && (
-                        <div className="text-sm text-muted-foreground mb-2">{service.description}</div>
+                        <div
+                          className="text-sm text-muted-foreground mb-2 prose prose-sm max-w-none dark:prose-invert"
+                          dangerouslySetInnerHTML={{ __html: sanitizeHTML(service.description) }}
+                        />
                       )}
                     </div>
                   </div>
@@ -258,7 +265,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                         <div className="text-xs text-muted-foreground mb-1">{service.priceNote}</div>
                       )}
                       <div className="font-bold text-xl text-primary">
-                        €{service.price}
+                        {service.price}
                       </div>
                     </div>
                   </div>

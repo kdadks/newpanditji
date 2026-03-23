@@ -374,11 +374,11 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
 
           <div className="space-y-2">
             <Label>Description</Label>
-            <Textarea
+            <QuillEditor
               value={content.pricingSection.description || ''}
-              onChange={(e) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, description: e.target.value } }))}
+              onChange={(value) => setContent(prev => ({ ...prev, pricingSection: { ...prev.pricingSection, description: value } }))}
               placeholder="Brief description of pricing"
-              rows={3}
+              minHeight="150px"
             />
           </div>
 
@@ -505,10 +505,11 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
 
                     <div>
                       <Label className="text-xs">Description</Label>
-                      <Input
+                      <QuillEditor
                         value={service.description || ''}
-                        onChange={(e) => updateService(index, 'description', e.target.value)}
+                        onChange={(value) => updateService(index, 'description', value)}
                         placeholder="Brief description of the service"
+                        minHeight="150px"
                       />
                     </div>
 
