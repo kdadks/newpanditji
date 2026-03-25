@@ -7,7 +7,7 @@ import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
-import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, HandHeart, ArrowRight, Images, YoutubeLogo, CaretLeft, CaretRight } from '@phosphor-icons/react'
+import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, HandHeart, ArrowRight, Images, YoutubeLogo, CaretLeft, CaretRight, X, Play, MagnifyingGlass } from '@phosphor-icons/react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useDakshinaContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
@@ -30,6 +30,7 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
   const [photoCanScrollRight, setPhotoCanScrollRight] = useState(false)
   const [videoCanScrollLeft, setVideoCanScrollLeft] = useState(false)
   const [videoCanScrollRight, setVideoCanScrollRight] = useState(false)
+  const [lightboxPhoto, setLightboxPhoto] = useState<{ url: string; caption: string } | null>(null)
 
   const updateScrollState = (
     el: HTMLDivElement,
@@ -97,6 +98,32 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
 
   return (
     <div className="w-full">
+      {/* Photo Lightbox */}
+      {lightboxPhoto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxPhoto(null)}
+        >
+          <button
+            onClick={() => setLightboxPhoto(null)}
+            aria-label="Close lightbox"
+            className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <X size={22} weight="bold" />
+          </button>
+          <div className="max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightboxPhoto.url}
+              alt={lightboxPhoto.caption}
+              className="w-full max-h-[85vh] object-contain rounded-xl"
+            />
+            {lightboxPhoto.caption && (
+              <p className="text-white/80 text-sm text-center mt-3">{lightboxPhoto.caption}</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Hero Section with Sunrise Effect */}
       <section className="relative pt-8 md:pt-16 pb-6 md:pb-12 overflow-hidden">
         {/* Background decoration with animated rolling images - Hidden on mobile for performance */}
@@ -237,15 +264,23 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                   {cmsContent.photosSection.photos.map((photo) => (
                     <div
                       key={photo.id}
-                      className="shrink-0 snap-start w-72 rounded-2xl overflow-hidden border border-primary/10 bg-card"
+                      onClick={() => setLightboxPhoto({ url: photo.url, caption: photo.caption || '' })}
+                      className="shrink-0 snap-start w-72 rounded-2xl overflow-hidden border border-primary/10 bg-card cursor-pointer group/photo"
                     >
-                      <img
-                        src={photo.url}
-                        alt={photo.caption || cmsContent.photosSection.sectionTitle}
-                        className="w-full h-48 object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={photo.url}
+                          alt={photo.caption || cmsContent.photosSection.sectionTitle}
+                          className="w-full h-48 object-cover group-hover/photo:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                          <div className="opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-2.5">
+                            <MagnifyingGlass size={22} className="text-gray-800" weight="bold" />
+                          </div>
+                        </div>
+                      </div>
                       {photo.caption && (
                         <div className="px-3 py-2.5 md:px-4 md:py-3">
                           <p className="text-xs md:text-sm text-muted-foreground font-medium text-center">{photo.caption}</p>
@@ -300,27 +335,39 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
                 >
                   {cmsContent.videosSection.videos.map((video) => {
                     const videoId = video.youtubeUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&\s]+)/)?.[1]
+                    const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : video.youtubeUrl
                     return (
                       <div
                         key={video.id}
                         className="shrink-0 snap-start w-80 rounded-2xl overflow-hidden border border-red-200 dark:border-red-900 bg-card"
                       >
-                        {videoId ? (
-                          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                            <iframe
-                              src={`https://www.youtube.com/embed/${videoId}`}
-                              title={video.title || 'Pooja Video'}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
+                        <a
+                          href={watchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block relative group/video"
+                          aria-label={video.title || 'Watch on YouTube'}
+                        >
+                          {videoId ? (
+                            <img
+                              src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                              alt={video.title || 'Pooja Video'}
+                              className="w-full h-48 object-cover group-hover/video:brightness-75 transition-all duration-300"
                               loading="lazy"
-                              className="absolute inset-0 w-full h-full"
+                              decoding="async"
                             />
+                          ) : (
+                            <div className="w-full h-48 bg-muted flex items-center justify-center">
+                              <YoutubeLogo size={40} className="text-muted-foreground" />
+                            </div>
+                          )}
+                          {/* Play button overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-full bg-red-600 group-hover/video:bg-red-500 flex items-center justify-center shadow-xl transition-colors duration-200">
+                              <Play size={24} weight="fill" className="text-white ml-1" />
+                            </div>
                           </div>
-                        ) : (
-                          <div className="w-full h-48 bg-muted flex items-center justify-center">
-                            <YoutubeLogo size={40} className="text-muted-foreground" />
-                          </div>
-                        )}
+                        </a>
                         {video.title && (
                           <div className="px-3 py-2.5 md:px-4 md:py-3">
                             <p className="text-xs md:text-sm font-semibold text-center">{video.title}</p>
