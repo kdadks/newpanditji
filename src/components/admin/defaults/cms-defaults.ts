@@ -268,6 +268,16 @@ export const defaultDakshinaContent: DakshinaPageContent = {
     services: [],
     faqs: []
   },
+  photosSection: {
+    enabled: true,
+    sectionTitle: 'Pooja Vedi Setup',
+    photos: []
+  },
+  videosSection: {
+    enabled: true,
+    sectionTitle: 'Pooja Setup Videos',
+    videos: []
+  },
   ctaSection: {
     title: '',
     description: '',

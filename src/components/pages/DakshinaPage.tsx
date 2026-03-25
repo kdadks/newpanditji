@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { sanitizeHTML } from '../../utils/sanitize'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
-import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, HandHeart, GraduationCap, ArrowRight } from '@phosphor-icons/react'
+import { FlowerLotus, CurrencyDollar, Heart, Sparkle, CheckCircle, HandHeart, ArrowRight, Images, YoutubeLogo, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { usePageMetadata } from '../../hooks/usePageMetadata'
 import { useDakshinaContent } from '../../hooks/useCmsContent'
 import { AppPage } from '../../lib/types'
@@ -24,12 +24,61 @@ const FAQ_BG_COLORS = [
 export default function DakshinaPage({ }: DakshinaPageProps) {
   const router = useRouter()
   const [faqOpenItems, setFaqOpenItems] = useState<string[]>([])
+  const photoScrollRef = useRef<HTMLDivElement>(null)
+  const videoScrollRef = useRef<HTMLDivElement>(null)
+  const [photoCanScrollLeft, setPhotoCanScrollLeft] = useState(false)
+  const [photoCanScrollRight, setPhotoCanScrollRight] = useState(false)
+  const [videoCanScrollLeft, setVideoCanScrollLeft] = useState(false)
+  const [videoCanScrollRight, setVideoCanScrollRight] = useState(false)
+
+  const updateScrollState = (
+    el: HTMLDivElement,
+    setLeft: (v: boolean) => void,
+    setRight: (v: boolean) => void
+  ) => {
+    setLeft(el.scrollLeft > 4)
+    setRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+  }
+
+  const scrollCarousel = (ref: React.RefObject<HTMLDivElement | null>, dir: 'left' | 'right') => {
+    ref.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' })
+  }
 
   const handleNavigate = (page: AppPage) => {
     router.push(page === 'home' ? '/' : `/${page}`)
   }
-  // CMS Content
+
   const { content: cmsContent, isLoading: cmsLoading } = useDakshinaContent()
+
+  // Re-check scroll state whenever content loads/changes
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (photoScrollRef.current)
+        updateScrollState(photoScrollRef.current, setPhotoCanScrollLeft, setPhotoCanScrollRight)
+      if (videoScrollRef.current)
+        updateScrollState(videoScrollRef.current, setVideoCanScrollLeft, setVideoCanScrollRight)
+    })
+  }, [cmsContent])
+
+  // Attach ongoing scroll listeners
+  useEffect(() => {
+    const photoEl = photoScrollRef.current
+    if (photoEl) {
+      const handler = () => updateScrollState(photoEl, setPhotoCanScrollLeft, setPhotoCanScrollRight)
+      photoEl.addEventListener('scroll', handler, { passive: true })
+      return () => photoEl.removeEventListener('scroll', handler)
+    }
+  }, [cmsContent])
+
+  useEffect(() => {
+    const videoEl = videoScrollRef.current
+    if (videoEl) {
+      const handler = () => updateScrollState(videoEl, setVideoCanScrollLeft, setVideoCanScrollRight)
+      videoEl.addEventListener('scroll', handler, { passive: true })
+      return () => videoEl.removeEventListener('scroll', handler)
+    }
+  }, [cmsContent])
+
 
   // SEO Configuration
   usePageMetadata('dakshina')
@@ -144,19 +193,161 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
           </CardContent>
         </Card>
 
-        {/* Pricing Section */}
-        <div className="mb-12 md:mb-16">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-6 py-3 rounded-full text-sm font-bold mb-6">
-              <Sparkle size={18} weight="fill" />
-              {cmsContent.pricingSection.badge}
-            </div>
-            <h2 className="font-heading font-bold text-3xl md:text-5xl mb-4">{cmsContent.pricingSection.title}</h2>
-            <div
-              className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto prose prose-sm dark:prose-invert text-left"
-              dangerouslySetInnerHTML={{ __html: sanitizeHTML(cmsContent.pricingSection.description || '') }}
-            />
+        {/* Dakshina Guideline Header */}
+        <div className="mb-8 md:mb-12 text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-6 py-3 rounded-full text-sm font-bold mb-6">
+            <Sparkle size={18} weight="fill" />
+            {cmsContent.pricingSection.badge}
           </div>
+          <h2 className="font-heading font-bold text-3xl md:text-5xl mb-4">{cmsContent.pricingSection.title}</h2>
+          <div
+            className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto prose prose-sm dark:prose-invert text-left"
+            dangerouslySetInnerHTML={{ __html: sanitizeHTML(cmsContent.pricingSection.description || '') }}
+          />
+        </div>
+
+        {/* Photos Section */}
+        {cmsContent.photosSection?.enabled && (
+          <div className="mb-12 md:mb-16">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2.5 md:p-3 bg-linear-to-br from-primary to-accent rounded-2xl shadow-xl">
+                <Images className="text-white" size={22} weight="fill" />
+              </div>
+              <h2 className="font-heading font-bold text-xl md:text-3xl">
+                {cmsContent.photosSection.sectionTitle || 'Pooja Vedi Setup'}
+              </h2>
+            </div>
+            {cmsContent.photosSection.photos.length > 0 ? (
+              <div className="relative">
+                {/* Left button */}
+                <button
+                  onClick={() => scrollCarousel(photoScrollRef, 'left')}
+                  aria-label="Scroll photos left"
+                  style={{ backgroundColor: '#111827' }}
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-9 h-9 rounded-full border-2 border-white text-white hover:opacity-80 transition-opacity duration-200 shadow-xl ${photoCanScrollLeft ? 'flex' : 'hidden'}`}
+                >
+                  <CaretLeft size={18} weight="bold" />
+                </button>
+                {/* Scroll container */}
+                <div
+                  ref={photoScrollRef}
+                  className="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth pb-3 snap-x snap-mandatory scrollbar-hide"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+                >
+                  {cmsContent.photosSection.photos.map((photo) => (
+                    <div
+                      key={photo.id}
+                      className="shrink-0 snap-start w-72 rounded-2xl overflow-hidden border border-primary/10 bg-card"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.caption || cmsContent.photosSection.sectionTitle}
+                        className="w-full h-48 object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {photo.caption && (
+                        <div className="px-3 py-2.5 md:px-4 md:py-3">
+                          <p className="text-xs md:text-sm text-muted-foreground font-medium text-center">{photo.caption}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {/* Right button */}
+                <button
+                  onClick={() => scrollCarousel(photoScrollRef, 'right')}
+                  aria-label="Scroll photos right"
+                  style={{ backgroundColor: '#111827' }}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-9 h-9 rounded-full border-2 border-white text-white hover:opacity-80 transition-opacity duration-200 shadow-xl ${photoCanScrollRight ? 'flex' : 'hidden'}`}
+                >
+                  <CaretRight size={18} weight="bold" />
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">Photos will appear here once added via the admin panel.</p>
+            )}
+          </div>
+        )}
+
+        {/* Videos Section */}
+        {cmsContent.videosSection?.enabled && (
+          <div className="mb-12 md:mb-16">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2.5 md:p-3 bg-linear-to-br from-red-500 to-red-700 rounded-2xl shadow-xl">
+                <YoutubeLogo className="text-white" size={22} weight="fill" />
+              </div>
+              <h2 className="font-heading font-bold text-xl md:text-3xl">
+                {cmsContent.videosSection.sectionTitle || 'Pooja Setup Videos'}
+              </h2>
+            </div>
+            {cmsContent.videosSection.videos.length > 0 ? (
+              <div className="relative">
+                {/* Left button */}
+                <button
+                  onClick={() => scrollCarousel(videoScrollRef, 'left')}
+                  aria-label="Scroll videos left"
+                  style={{ backgroundColor: '#111827' }}
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-9 h-9 rounded-full border-2 border-white text-white hover:opacity-80 transition-opacity duration-200 shadow-xl ${videoCanScrollLeft ? 'flex' : 'hidden'}`}
+                >
+                  <CaretLeft size={18} weight="bold" />
+                </button>
+                {/* Scroll container */}
+                <div
+                  ref={videoScrollRef}
+                  className="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth pb-3 snap-x snap-mandatory scrollbar-hide"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+                >
+                  {cmsContent.videosSection.videos.map((video) => {
+                    const videoId = video.youtubeUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&\s]+)/)?.[1]
+                    return (
+                      <div
+                        key={video.id}
+                        className="shrink-0 snap-start w-80 rounded-2xl overflow-hidden border border-red-200 dark:border-red-900 bg-card"
+                      >
+                        {videoId ? (
+                          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                            <iframe
+                              src={`https://www.youtube.com/embed/${videoId}`}
+                              title={video.title || 'Pooja Video'}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              loading="lazy"
+                              className="absolute inset-0 w-full h-full"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-48 bg-muted flex items-center justify-center">
+                            <YoutubeLogo size={40} className="text-muted-foreground" />
+                          </div>
+                        )}
+                        {video.title && (
+                          <div className="px-3 py-2.5 md:px-4 md:py-3">
+                            <p className="text-xs md:text-sm font-semibold text-center">{video.title}</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* Right button */}
+                <button
+                  onClick={() => scrollCarousel(videoScrollRef, 'right')}
+                  aria-label="Scroll videos right"
+                  style={{ backgroundColor: '#111827' }}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-9 h-9 rounded-full border-2 border-white text-white hover:opacity-80 transition-opacity duration-200 shadow-xl ${videoCanScrollRight ? 'flex' : 'hidden'}`}
+                >
+                  <CaretRight size={18} weight="bold" />
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">Videos will appear here once added via the admin panel.</p>
+            )}
+          </div>
+        )}
+
+        {/* Pricing Table */}
+        <div className="mb-12 md:mb-16">
 
           {/* Pricing Table - Desktop */}
           <div className="hidden md:block overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
@@ -335,35 +526,36 @@ export default function DakshinaPage({ }: DakshinaPageProps) {
         </div>
 
         {/* CTA Section */}
-        <Card className="border-0 shadow-2xl bg-linear-to-br from-primary via-accent to-secondary text-white overflow-hidden relative">
-          <CardContent className="p-8 md:p-16 text-center relative z-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6">
-              <HandHeart size={40} className="text-white" weight="fill" />
-            </div>
-            <h2 className="font-heading font-bold text-2xl md:text-4xl mb-4">
-              {cmsContent.ctaSection.title}
-            </h2>
-            <p className="text-white/90 text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-              {cmsContent.ctaSection.description}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                onClick={() => handleNavigate('contact')}
-                className="font-semibold bg-linear-to-r from-amber-800 via-orange-900 to-amber-950 text-white hover:from-amber-900 hover:via-orange-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-amber-900/50 transition-all duration-300 hover:scale-105 border-2 border-amber-700/30 text-base md:text-lg px-6 md:px-8 py-4 md:py-6"
-              >
-                <Heart className="mr-2" size={24} weight="fill" />
-                {cmsContent.ctaSection.primaryButtonText}
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => handleNavigate('services')}
-                className="font-semibold bg-linear-to-r from-stone-700 via-amber-900 to-stone-900 text-white hover:from-stone-800 hover:via-amber-950 hover:to-black shadow-2xl hover:shadow-3xl shadow-stone-900/50 transition-all duration-300 hover:scale-105 border-2 border-stone-600/30 text-base md:text-lg px-6 md:px-8 py-4 md:py-6"
-              >
-                <GraduationCap className="mr-2" size={24} weight="duotone" />
-                {cmsContent.ctaSection.secondaryButtonText}
-                <ArrowRight className="ml-2" size={20} />
-              </Button>
+        <Card className="border-0 shadow-lg bg-linear-to-r from-primary to-accent text-white overflow-hidden">
+          <CardContent className="p-5 md:p-7">
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-between">
+              <div className="flex items-center gap-3 text-center sm:text-left">
+                <HandHeart size={28} className="text-white/80 shrink-0" weight="fill" />
+                <div>
+                  <p className="font-heading font-bold text-lg md:text-xl leading-tight">{cmsContent.ctaSection.title}</p>
+                  {cmsContent.ctaSection.description && (
+                    <p className="text-white/80 text-sm mt-0.5">{cmsContent.ctaSection.description}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-3 shrink-0">
+                <Button
+                  size="sm"
+                  onClick={() => handleNavigate('contact')}
+                  className="font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-all duration-200 hover:scale-105"
+                >
+                  <Heart className="mr-1.5" size={16} weight="fill" />
+                  {cmsContent.ctaSection.primaryButtonText}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleNavigate('services')}
+                  className="font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all duration-200 hover:scale-105"
+                >
+                  {cmsContent.ctaSection.secondaryButtonText}
+                  <ArrowRight className="ml-1.5" size={16} />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

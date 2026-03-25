@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { FloppyDisk, Spinner, Plus, Trash, ArrowUp, ArrowDown, X } from '@phosphor-icons/react'
+import { FloppyDisk, Spinner, Plus, Trash, ArrowUp, ArrowDown, X, Images, YoutubeLogo } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
@@ -172,6 +172,68 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
       pricingSection: {
         ...prev.pricingSection,
         faqs: (prev.pricingSection.faqs || []).filter((_, i) => i !== index)
+      }
+    }))
+  }
+
+  // Photos helpers
+  const addPhoto = () => {
+    setContent(prev => ({
+      ...prev,
+      photosSection: {
+        ...prev.photosSection,
+        photos: [...(prev.photosSection?.photos || []), { id: crypto.randomUUID(), url: '', caption: '' }]
+      }
+    }))
+  }
+
+  const updatePhoto = (index: number, field: 'url' | 'caption', value: string) => {
+    setContent(prev => ({
+      ...prev,
+      photosSection: {
+        ...prev.photosSection,
+        photos: (prev.photosSection?.photos || []).map((p, i) => i === index ? { ...p, [field]: value } : p)
+      }
+    }))
+  }
+
+  const removePhoto = (index: number) => {
+    setContent(prev => ({
+      ...prev,
+      photosSection: {
+        ...prev.photosSection,
+        photos: (prev.photosSection?.photos || []).filter((_, i) => i !== index)
+      }
+    }))
+  }
+
+  // Videos helpers
+  const addVideo = () => {
+    setContent(prev => ({
+      ...prev,
+      videosSection: {
+        ...prev.videosSection,
+        videos: [...(prev.videosSection?.videos || []), { id: crypto.randomUUID(), youtubeUrl: '', title: '' }]
+      }
+    }))
+  }
+
+  const updateVideo = (index: number, field: 'youtubeUrl' | 'title', value: string) => {
+    setContent(prev => ({
+      ...prev,
+      videosSection: {
+        ...prev.videosSection,
+        videos: (prev.videosSection?.videos || []).map((v, i) => i === index ? { ...v, [field]: value } : v)
+      }
+    }))
+  }
+
+  const removeVideo = (index: number) => {
+    setContent(prev => ({
+      ...prev,
+      videosSection: {
+        ...prev.videosSection,
+        videos: (prev.videosSection?.videos || []).filter((_, i) => i !== index)
       }
     }))
   }
@@ -613,10 +675,183 @@ export default function DakshinaPageEditor({ content, setContent, onSave, isSavi
         </CardContent>
       </Card>
 
-      {/* Section 4: CTA Section */}
+      {/* Section 4: Photos Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">4. Call-to-Action Section</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Images size={20} className="text-primary" />
+            4. Photos Section (Pooja Setup Gallery)
+          </CardTitle>
+          <CardDescription>Add scrollable photos of Pooja Vedi / Pooja setup. Visitors scroll left to right.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="photos-enabled"
+              checked={content.photosSection?.enabled ?? true}
+              onChange={(e) => setContent(prev => ({ ...prev, photosSection: { ...prev.photosSection, enabled: e.target.checked } }))}
+              className="h-4 w-4 accent-primary"
+            />
+            <Label htmlFor="photos-enabled">Show Photos Section on Page</Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Section Heading</Label>
+            <Input
+              value={content.photosSection?.sectionTitle || ''}
+              onChange={(e) => setContent(prev => ({ ...prev, photosSection: { ...prev.photosSection, sectionTitle: e.target.value } }))}
+              placeholder="e.g., Pooja Vedi Setup"
+            />
+          </div>
+
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-base font-semibold">Photos</Label>
+              <Button onClick={addPhoto} size="sm" variant="outline">
+                <Plus size={16} className="mr-2" />
+                Add Photo
+              </Button>
+            </div>
+
+            {(!content.photosSection?.photos || content.photosSection.photos.length === 0) ? (
+              <p className="text-sm text-muted-foreground text-center py-3">
+                No photos yet — click <strong>Add Photo</strong> to add images.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {content.photosSection.photos.map((photo, index) => (
+                  <div key={photo.id} className="rounded-lg border border-border/50 bg-background p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Photo {index + 1}</Label>
+                      <button
+                        onClick={() => removePhoto(index)}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Image URL</Label>
+                      <MediaPickerInput
+                        value={photo.url}
+                        onChange={(url) => updatePhoto(index, 'url', url)}
+                        placeholder="Paste image URL or pick from media library"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Caption (optional)</Label>
+                      <Input
+                        value={photo.caption}
+                        onChange={(e) => updatePhoto(index, 'caption', e.target.value)}
+                        placeholder="e.g., Pooja Vedi with flowers and diyas"
+                      />
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 5: Videos Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <YoutubeLogo size={20} className="text-red-500" />
+            5. Videos Section (YouTube)
+          </CardTitle>
+          <CardDescription>Add YouTube videos of Pooja setup. Visitors scroll left to right.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="videos-enabled"
+              checked={content.videosSection?.enabled ?? true}
+              onChange={(e) => setContent(prev => ({ ...prev, videosSection: { ...prev.videosSection, enabled: e.target.checked } }))}
+              className="h-4 w-4 accent-primary"
+            />
+            <Label htmlFor="videos-enabled">Show Videos Section on Page</Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Section Heading</Label>
+            <Input
+              value={content.videosSection?.sectionTitle || ''}
+              onChange={(e) => setContent(prev => ({ ...prev, videosSection: { ...prev.videosSection, sectionTitle: e.target.value } }))}
+              placeholder="e.g., Pooja Setup Videos"
+            />
+          </div>
+
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-base font-semibold">Videos</Label>
+              <Button onClick={addVideo} size="sm" variant="outline">
+                <Plus size={16} className="mr-2" />
+                Add Video
+              </Button>
+            </div>
+
+            {(!content.videosSection?.videos || content.videosSection.videos.length === 0) ? (
+              <p className="text-sm text-muted-foreground text-center py-3">
+                No videos yet — click <strong>Add Video</strong> to add YouTube links.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {content.videosSection.videos.map((video, index) => (
+                  <div key={video.id} className="rounded-lg border border-border/50 bg-background p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Video {index + 1}</Label>
+                      <button
+                        onClick={() => removeVideo(index)}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">YouTube URL</Label>
+                      <Input
+                        value={video.youtubeUrl}
+                        onChange={(e) => updateVideo(index, 'youtubeUrl', e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Paste any YouTube link (watch, shorts, or youtu.be)</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Video Title</Label>
+                      <Input
+                        value={video.title}
+                        onChange={(e) => updateVideo(index, 'title', e.target.value)}
+                        placeholder="e.g., Pooja Setup Guide"
+                      />
+                    </div>
+                    {(() => {
+                      const videoId = video.youtubeUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&\s]+)/)?.[1]
+                      return videoId ? (
+                        <img
+                          src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
+                          alt={video.title || 'Video preview'}
+                          className="max-h-24 rounded border border-border"
+                          loading="lazy"
+                        />
+                      ) : null
+                    })()}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 6: CTA Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">6. Call-to-Action Section</CardTitle>
           <CardDescription>Encourage users to take action</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

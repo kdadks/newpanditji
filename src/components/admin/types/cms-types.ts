@@ -383,6 +383,24 @@ export interface DakshinaPageContent {
     services: DakshinaService[]
     faqs?: DakshinaFaq[]
   }
+  photosSection: {
+    enabled: boolean
+    sectionTitle: string
+    photos: {
+      id: string
+      url: string
+      caption: string
+    }[]
+  }
+  videosSection: {
+    enabled: boolean
+    sectionTitle: string
+    videos: {
+      id: string
+      youtubeUrl: string
+      title: string
+    }[]
+  }
   ctaSection: {
     title: string
     description: string

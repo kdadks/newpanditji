@@ -985,6 +985,8 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
   const heroSection = getSection('hero') as Record<string, unknown>
   const whatIsDakshinaSection = getSection('what_is_dakshina') as Record<string, unknown>
   const pricingSection = getSection('pricing_section') as Record<string, unknown>
+  const photosSectionRaw = getSection('photos_section') as Record<string, unknown>
+  const videosSectionRaw = getSection('videos_section') as Record<string, unknown>
   const ctaSection = getSection('cta_section') as Record<string, unknown>
   
   return {
@@ -1024,6 +1026,24 @@ function sectionsToDakshinaContent(sections: PageSectionRow[]): DakshinaPageCont
         id: faq.id || '',
         question: faq.question || '',
         answer: faq.answer || '',
+      })),
+    },
+    photosSection: {
+      enabled: typeof photosSectionRaw.enabled === 'boolean' ? photosSectionRaw.enabled : defaultDakshinaContent.photosSection.enabled,
+      sectionTitle: (photosSectionRaw.sectionTitle as string) || defaultDakshinaContent.photosSection.sectionTitle,
+      photos: ((photosSectionRaw.photos as any[]) || []).map((p: any) => ({
+        id: p.id || crypto.randomUUID(),
+        url: p.url || '',
+        caption: p.caption || '',
+      })),
+    },
+    videosSection: {
+      enabled: typeof videosSectionRaw.enabled === 'boolean' ? videosSectionRaw.enabled : defaultDakshinaContent.videosSection.enabled,
+      sectionTitle: (videosSectionRaw.sectionTitle as string) || defaultDakshinaContent.videosSection.sectionTitle,
+      videos: ((videosSectionRaw.videos as any[]) || []).map((v: any) => ({
+        id: v.id || crypto.randomUUID(),
+        youtubeUrl: v.youtubeUrl || '',
+        title: v.title || '',
       })),
     },
     ctaSection: {
@@ -1067,6 +1087,22 @@ function dakshinaContentToSections(content: DakshinaPageContent): { sectionKey: 
         columnHeaders: content.pricingSection.columnHeaders,
         services: content.pricingSection.services,
         faqs: content.pricingSection.faqs,
+      }
+    },
+    {
+      sectionKey: 'photos_section',
+      content: {
+        enabled: content.photosSection.enabled,
+        sectionTitle: content.photosSection.sectionTitle,
+        photos: content.photosSection.photos,
+      }
+    },
+    {
+      sectionKey: 'videos_section',
+      content: {
+        enabled: content.videosSection.enabled,
+        sectionTitle: content.videosSection.sectionTitle,
+        videos: content.videosSection.videos,
       }
     },
     {
