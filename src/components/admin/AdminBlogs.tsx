@@ -1140,7 +1140,7 @@ export default function AdminBlogs() {
 
                 {/* Main Content */}
                 <div 
-                  className="prose prose-lg max-w-none
+                  className="blog-content prose prose-lg max-w-none
                     prose-headings:font-heading prose-headings:font-bold
                     prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
                     prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3

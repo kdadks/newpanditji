@@ -319,7 +319,7 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
               {/* Full Content */}
               {blog.content ? (
                 <article 
-                  className="prose prose-lg md:prose-xl max-w-none
+                  className="blog-content prose prose-lg md:prose-xl max-w-none
                     prose-headings:font-heading prose-headings:text-foreground
                     prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mt-12 prose-h2:mb-6
                     prose-h3:text-xl prose-h3:md:text-2xl prose-h3:mt-10 prose-h3:mb-4
@@ -328,7 +328,6 @@ export default function BlogDetailPage({ blogId, onNavigate }: BlogDetailPagePro
                     prose-strong:text-foreground prose-strong:font-semibold
                     prose-ul:my-6 prose-ol:my-6
                     prose-li:text-muted-foreground prose-li:text-base prose-li:md:text-lg prose-li:mb-2
-                    prose-img:rounded-xl prose-img:shadow-xl prose-img:my-10
                     prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-muted-foreground prose-blockquote:my-8
                     prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
                     prose-pre:bg-muted prose-pre:rounded-xl prose-pre:p-6

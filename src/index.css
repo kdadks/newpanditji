@@ -358,3 +358,48 @@ h1, h2, h3, h4, h5, h6 {
     animation: none !important;
   }
 }
+
+/* ── Blog / CMS rich-text content ──────────────────────────────────────────
+   Applied to every container that renders TipTap HTML via
+   dangerouslySetInnerHTML (admin preview + public blog page).
+   Using !important to beat any Tailwind resets on these elements.
+*/
+.blog-content table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 1em 0 !important;
+  table-layout: auto !important;
+}
+.blog-content th,
+.blog-content td {
+  border: 1px solid #9ca3af !important; /* gray-400 */
+  padding: 0.35em 0.75em !important;
+  vertical-align: top !important;
+  text-align: left !important;
+}
+.blog-content th {
+  background-color: #f3f4f6 !important; /* gray-100 */
+  font-weight: 600 !important;
+}
+[data-appearance="dark"] .blog-content th {
+  background-color: #374151 !important; /* gray-700 */
+}
+[data-appearance="dark"] .blog-content th,
+[data-appearance="dark"] .blog-content td {
+  border-color: #4b5563 !important; /* gray-600 */
+}
+
+/* Images inside blog content: respect saved width, never overflow */
+.blog-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 0.5em 0;
+}
+
+/* tableWrapper div emitted by TipTap */
+.blog-content .tableWrapper {
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
