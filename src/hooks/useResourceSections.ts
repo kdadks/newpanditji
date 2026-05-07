@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, generateSlug } from '../lib/supabase'
+import { deleteFileByUrl, BUCKETS } from '../lib/storage'
 import { toast } from 'sonner'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -147,12 +148,29 @@ async function updateResourceSection({ id, ...rest }: ResourceSectionUpdate): Pr
 }
 
 async function deleteResourceSection(id: string): Promise<void> {
+  // Fetch file_links first so we can remove uploaded files from storage
+  const { data: row } = await supabase
+    .from('resource_sections')
+    .select('file_links')
+    .eq('id', id)
+    .single()
+
+  const fileLinks: ResourceFileLink[] = row?.file_links ?? []
+
+  // Delete the DB row
   const { error } = await supabase
     .from('resource_sections')
     .delete()
     .eq('id', id)
 
   if (error) throw error
+
+  // Best-effort: remove uploaded files from Supabase Storage
+  await Promise.allSettled(
+    fileLinks
+      .filter(f => f.url)
+      .map(f => deleteFileByUrl(f.url, BUCKETS.DOCUMENTS))
+  )
 }
 
 // ─── Hooks ─────────────────────────────────────────────────────────────────

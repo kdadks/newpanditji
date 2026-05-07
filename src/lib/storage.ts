@@ -123,6 +123,35 @@ export async function deleteFile(bucket: BucketName, path: string): Promise<void
 }
 
 /**
+ * Extract the storage object path from a Supabase public URL.
+ * Returns null if the URL does not belong to the given bucket.
+ *
+ * Example public URL:
+ *   https://<project>.supabase.co/storage/v1/object/public/documents/resource-center/1234_guide.pdf
+ * Returned path: "resource-center/1234_guide.pdf"
+ */
+export function pathFromPublicUrl(url: string, bucket: BucketName): string | null {
+  try {
+    const marker = `/object/public/${bucket}/`
+    const idx = url.indexOf(marker)
+    if (idx === -1) return null
+    return decodeURIComponent(url.slice(idx + marker.length))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Delete a resource file by its public URL.
+ * Silently ignores URLs that are not hosted in Supabase Storage (e.g. external links).
+ */
+export async function deleteFileByUrl(url: string, bucket: BucketName): Promise<void> {
+  const path = pathFromPublicUrl(url, bucket)
+  if (!path) return // external URL — nothing to delete in storage
+  await deleteFile(bucket, path)
+}
+
+/**
  * Get a signed URL for private files (documents)
  */
 export async function getSignedUrl(

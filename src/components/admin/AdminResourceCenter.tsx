@@ -12,7 +12,7 @@ import {
 import { generateSlug } from '../../lib/supabase'
 import { usePhotos, usePhotoCategories } from '../../hooks/usePhotos'
 import { sanitizeHTML } from '../../utils/sanitize'
-import { uploadFile, BUCKETS } from '../../lib/storage'
+import { uploadFile, deleteFileByUrl, BUCKETS } from '../../lib/storage'
 import {
   Plus, PencilSimple, Trash, X, Spinner, Newspaper, Tag, FileText,
   Image as ImageIcon, Eye, CheckCircle, WarningCircle, Link, ArrowLeft,
@@ -54,7 +54,7 @@ const EMPTY_FORM: FormData = {
   meta_description: '',
 }
 
-const MAX_FILES = 5
+const MAX_FILES = 3
 
 const FILE_TYPE_MAP: Record<string, ResourceFileLink['type']> = {
   'application/pdf': 'pdf',
@@ -340,6 +340,11 @@ export default function AdminResourceCenter() {
     }
     setUploadingFileIdx(idx)
     try {
+      // If replacing an existing uploaded file, delete the old one first
+      const existing = formData.file_links[idx]
+      if (existing?.url) {
+        await deleteFileByUrl(existing.url, BUCKETS.DOCUMENTS).catch(() => {})
+      }
       const { url } = await uploadFile(BUCKETS.DOCUMENTS, file, 'resource-center')
       const type = FILE_TYPE_MAP[file.type] ?? 'other'
       const next = [...formData.file_links]
@@ -434,7 +439,7 @@ export default function AdminResourceCenter() {
       {/* Create / Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden p-0 flex flex-col">
-          <div className="relative overflow-hidden bg-linear-to-r from-primary via-primary/90 to-accent px-6 py-6">
+          <div className="relative overflow-hidden shrink-0 bg-linear-to-r from-primary via-primary/90 to-accent px-6 py-6">
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')]" />
             <div className="relative flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur ring-2 ring-white/30">
@@ -573,6 +578,9 @@ export default function AdminResourceCenter() {
                     <p className="text-sm text-muted-foreground">
                       Attach up to {MAX_FILES} files (PDF, PPT, Word, Excel). Upload from your device or paste a URL.
                     </p>
+                    {formData.file_links.length >= MAX_FILES && (
+                      <p className="text-xs text-amber-600 font-medium">Maximum of {MAX_FILES} files reached.</p>
+                    )}
 
                     {Array.from({ length: MAX_FILES }).map((_, i) => {
                       const entry = formData.file_links[i]
@@ -582,10 +590,12 @@ export default function AdminResourceCenter() {
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">File {i + 1}</span>
                             {entry && (
-                              <button type="button" onClick={() => {
+                              <button type="button" onClick={async () => {
                                 const next = [...formData.file_links]
                                 next.splice(i, 1)
                                 setFormData(prev => ({ ...prev, file_links: next }))
+                                // Delete from Supabase Storage if it was uploaded there
+                                await deleteFileByUrl(entry.url, BUCKETS.DOCUMENTS).catch(() => {})
                               }} className="text-red-500 hover:text-red-700" aria-label="Remove file">
                                 <X size={15} />
                               </button>
