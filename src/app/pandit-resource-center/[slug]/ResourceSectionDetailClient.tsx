@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { useResourceSectionBySlug } from '../../../hooks/useResourceSections'
 import { sanitizeHTML } from '../../../utils/sanitize'
-import { ArrowLeft, CircleNotch, Images, Link as LinkIcon, Newspaper } from '@phosphor-icons/react'
+import { ArrowLeft, CircleNotch, Images, Link as LinkIcon, Newspaper, FilePdf, FileDoc, FileXls, FilePpt, PaperclipHorizontal, DownloadSimple } from '@phosphor-icons/react'
+import type { ResourceFileLink } from '../../../hooks/useResourceSections'
 
 interface Props {
   slug: string
@@ -39,6 +40,15 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
 
   const images = section.image_urls.filter(Boolean)
   const videos = section.video_links.filter(Boolean)
+  const files = (section.file_links ?? []).filter(f => f.url && f.label)
+
+  function FileIcon({ type }: { type: ResourceFileLink['type'] }) {
+    if (type === 'pdf')   return <FilePdf   size={22} className="text-red-500" />
+    if (type === 'ppt')   return <FilePpt   size={22} className="text-orange-500" />
+    if (type === 'word')  return <FileDoc   size={22} className="text-blue-600" />
+    if (type === 'excel') return <FileXls   size={22} className="text-green-600" />
+    return <PaperclipHorizontal size={22} className="text-gray-500" />
+  }
 
   return (
     <main className="min-h-screen bg-linear-to-b from-orange-50 to-white py-12 md:py-16">
@@ -119,6 +129,47 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
                       {link}
                     </span>
                     <span className="ml-auto text-xs text-gray-400 shrink-0">Opens in new tab ↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Downloadable files */}
+        {files.length > 0 && (
+          <section className="mb-10" aria-label="Downloads">
+            <h2 className="font-heading text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <DownloadSimple size={22} className="text-orange-500" />
+              Downloads
+            </h2>
+            <ul className="space-y-3">
+              {files.map((file, i) => (
+                <li key={i}>
+                  <a
+                    href={file.url}
+                    download={file.fileName ?? file.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-orange-100 hover:border-orange-300 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-50 shrink-0 group-hover:bg-orange-100 transition-colors">
+                      <FileIcon type={file.type} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate">
+                        {file.label}
+                      </p>
+                      {file.sizeBytes && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {(file.sizeBytes / 1024 / 1024).toFixed(1)} MB · {file.type.toUpperCase()}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0 text-xs font-medium text-orange-600 group-hover:text-orange-700">
+                      <DownloadSimple size={16} />
+                      Download
+                    </div>
                   </a>
                 </li>
               ))}

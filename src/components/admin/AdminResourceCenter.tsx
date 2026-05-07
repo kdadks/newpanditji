@@ -7,13 +7,16 @@ import {
   validateSlug,
   type ResourceSection,
   type ResourceSectionInsert,
+  type ResourceFileLink,
 } from '../../hooks/useResourceSections'
 import { generateSlug } from '../../lib/supabase'
 import { usePhotos, usePhotoCategories } from '../../hooks/usePhotos'
 import { sanitizeHTML } from '../../utils/sanitize'
+import { uploadFile, BUCKETS } from '../../lib/storage'
 import {
   Plus, PencilSimple, Trash, X, Spinner, Newspaper, Tag, FileText,
   Image as ImageIcon, Eye, CheckCircle, WarningCircle, Link, ArrowLeft,
+  FilePdf, FileDoc, FileXls, FilePpt, PaperclipHorizontal, UploadSimple,
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
@@ -33,6 +36,7 @@ interface FormData {
   description: string
   image_urls: [string, string, string]
   video_links: [string, string, string]
+  file_links: ResourceFileLink[]
   status: 'draft' | 'published'
   meta_title: string
   meta_description: string
@@ -44,9 +48,41 @@ const EMPTY_FORM: FormData = {
   description: '',
   image_urls: ['', '', ''],
   video_links: ['', '', ''],
+  file_links: [],
   status: 'draft',
   meta_title: '',
   meta_description: '',
+}
+
+const MAX_FILES = 5
+
+const FILE_TYPE_MAP: Record<string, ResourceFileLink['type']> = {
+  'application/pdf': 'pdf',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'ppt',
+  'application/vnd.ms-powerpoint': 'ppt',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'word',
+  'application/msword': 'word',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'excel',
+  'application/vnd.ms-excel': 'excel',
+}
+
+const ALLOWED_FILE_TYPES = Object.keys(FILE_TYPE_MAP)
+
+function guessTypeFromUrl(url: string): ResourceFileLink['type'] {
+  const lower = url.toLowerCase()
+  if (lower.includes('.pdf')) return 'pdf'
+  if (lower.includes('.ppt') || lower.includes('.pptx')) return 'ppt'
+  if (lower.includes('.doc') || lower.includes('.docx')) return 'word'
+  if (lower.includes('.xls') || lower.includes('.xlsx')) return 'excel'
+  return 'other'
+}
+
+function FileTypeIcon({ type, size = 18 }: { type: ResourceFileLink['type']; size?: number }) {
+  if (type === 'pdf')   return <FilePdf   size={size} className="text-red-500" />
+  if (type === 'ppt')   return <FilePpt   size={size} className="text-orange-500" />
+  if (type === 'word')  return <FileDoc   size={size} className="text-blue-600" />
+  if (type === 'excel') return <FileXls   size={size} className="text-green-600" />
+  return <PaperclipHorizontal size={size} className="text-muted-foreground" />
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -160,7 +196,7 @@ export default function AdminResourceCenter() {
   } = useResourceSections(true)
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentTab, setCurrentTab] = useState<'basic' | 'images' | 'videos' | 'content' | 'seo'>('basic')
+  const [currentTab, setCurrentTab] = useState<'basic' | 'images' | 'videos' | 'files' | 'content' | 'seo'>('basic')
   const [editingSection, setEditingSection] = useState<ResourceSection | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
   const [slugError, setSlugError] = useState<string | null>(null)
@@ -170,6 +206,7 @@ export default function AdminResourceCenter() {
   const [sectionToDelete, setSectionToDelete] = useState<ResourceSection | null>(null)
   const [previewSection, setPreviewSection] = useState<ResourceSection | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [uploadingFileIdx, setUploadingFileIdx] = useState<number | null>(null)
   const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Auto-generate slug from title unless admin manually edited it
@@ -212,6 +249,7 @@ export default function AdminResourceCenter() {
       description: section.description,
       image_urls: imgs as [string, string, string],
       video_links: vids as [string, string, string],
+      file_links: section.file_links ?? [],
       status: section.status,
       meta_title: section.meta_title ?? '',
       meta_description: section.meta_description ?? '',
@@ -241,6 +279,7 @@ export default function AdminResourceCenter() {
       description: formData.description,
       image_urls: formData.image_urls.filter(u => u.trim()),
       video_links: formData.video_links.filter(u => u.trim()),
+      file_links: formData.file_links.filter(f => f.url.trim() && f.label.trim()),
       status: formData.status,
       sort_order: editingSection?.sort_order ?? sections.length,
       meta_title: formData.meta_title.trim() || null,
@@ -287,8 +326,32 @@ export default function AdminResourceCenter() {
     )
   }
 
-  const TABS = ['basic', 'images', 'videos', 'content', 'seo'] as const
+  const TABS = ['basic', 'images', 'videos', 'files', 'content', 'seo'] as const
   type TabId = typeof TABS[number]
+
+  const handleFileUpload = async (idx: number, file: File) => {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      toast.error('Unsupported file type. Allowed: PDF, PPT, Word, Excel.')
+      return
+    }
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error('File too large (max 30 MB).')
+      return
+    }
+    setUploadingFileIdx(idx)
+    try {
+      const { url } = await uploadFile(BUCKETS.DOCUMENTS, file, 'resource-center')
+      const type = FILE_TYPE_MAP[file.type] ?? 'other'
+      const next = [...formData.file_links]
+      next[idx] = { url, label: file.name.replace(/\.[^.]+$/, ''), type, fileName: file.name, sizeBytes: file.size }
+      setFormData(prev => ({ ...prev, file_links: next }))
+      toast.success('File uploaded successfully')
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : null) ?? 'Upload failed')
+    } finally {
+      setUploadingFileIdx(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -370,7 +433,7 @@ export default function AdminResourceCenter() {
 
       {/* Create / Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden p-0">
+        <DialogContent className="w-[70vw]! max-w-[70vw]! max-h-[90vh] overflow-hidden p-0 flex flex-col">
           <div className="relative overflow-hidden bg-linear-to-r from-primary via-primary/90 to-accent px-6 py-6">
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')]" />
             <div className="relative flex items-center gap-4">
@@ -391,6 +454,7 @@ export default function AdminResourceCenter() {
                 { id: 'basic' as TabId,   label: 'Details',   Icon: Tag },
                 { id: 'images' as TabId,  label: 'Images',    Icon: ImageIcon },
                 { id: 'videos' as TabId,  label: 'Videos',    Icon: Link },
+                { id: 'files' as TabId,   label: 'Files',     Icon: PaperclipHorizontal },
                 { id: 'content' as TabId, label: 'Content',   Icon: FileText },
                 { id: 'seo' as TabId,     label: 'SEO',       Icon: Eye },
               ]).map(({ id, label, Icon }) => (
@@ -404,7 +468,7 @@ export default function AdminResourceCenter() {
             </div>
           </div>
 
-          <div className="flex flex-col h-[calc(90vh-220px)]">
+          <div className="flex flex-col min-h-0 flex-1">
             <div className="flex-1 overflow-y-auto px-6 py-5">
 
               {currentTab === 'basic' && (
@@ -499,6 +563,130 @@ export default function AdminResourceCenter() {
                         )}
                       </div>
                     ))}
+                  </CardContent></Card>
+                </div>
+              )}
+
+              {currentTab === 'files' && (
+                <div className="space-y-5">
+                  <Card><CardContent className="pt-5 space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Attach up to {MAX_FILES} files (PDF, PPT, Word, Excel). Upload from your device or paste a URL.
+                    </p>
+
+                    {Array.from({ length: MAX_FILES }).map((_, i) => {
+                      const entry = formData.file_links[i]
+                      const isUploading = uploadingFileIdx === i
+                      return (
+                        <div key={i} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">File {i + 1}</span>
+                            {entry && (
+                              <button type="button" onClick={() => {
+                                const next = [...formData.file_links]
+                                next.splice(i, 1)
+                                setFormData(prev => ({ ...prev, file_links: next }))
+                              }} className="text-red-500 hover:text-red-700" aria-label="Remove file">
+                                <X size={15} />
+                              </button>
+                            )}
+                          </div>
+
+                          {entry ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <FileTypeIcon type={entry.type} size={20} />
+                                <span className="text-xs text-muted-foreground truncate flex-1" title={entry.fileName ?? entry.url}>
+                                  {entry.fileName ?? entry.url}
+                                </span>
+                                {typeof entry.sizeBytes === 'number' && (
+                                  <Badge variant="outline" className="text-xs shrink-0">{(entry.sizeBytes / 1024 / 1024).toFixed(1)} MB</Badge>
+                                )}
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Display label</Label>
+                                <Input
+                                  value={entry.label}
+                                  maxLength={80}
+                                  onChange={(e) => {
+                                    const next = [...formData.file_links]
+                                    next[i] = { ...entry, label: e.target.value }
+                                    setFormData(prev => ({ ...prev, file_links: next }))
+                                  }}
+                                  placeholder="e.g. Kundali Reading Guide"
+                                  className="h-8 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">File type</Label>
+                                <div className="flex gap-2 flex-wrap">
+                                  {(['pdf', 'ppt', 'word', 'excel', 'other'] as ResourceFileLink['type'][]).map(t => (
+                                    <button key={t} type="button"
+                                      onClick={() => {
+                                        const next = [...formData.file_links]
+                                        next[i] = { ...entry, type: t }
+                                        setFormData(prev => ({ ...prev, file_links: next }))
+                                      }}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors ${
+                                        entry.type === t ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-accent'
+                                      }`}
+                                    >
+                                      <FileTypeIcon type={t} size={13} />
+                                      {t.toUpperCase()}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {/* Upload from device */}
+                              <div>
+                                <label className="w-full cursor-pointer">
+                                  <div className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-lg px-4 py-3 text-sm transition-colors ${
+                                    isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary hover:bg-accent/30'
+                                  }`}>
+                                    {isUploading
+                                      ? <><Spinner size={16} className="animate-spin" /> Uploading…</>
+                                      : <><UploadSimple size={16} /> Upload file (PDF, PPT, Word, Excel)</>}
+                                  </div>
+                                  <input
+                                    type="file"
+                                    className="sr-only"
+                                    accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx"
+                                    disabled={isUploading}
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0]
+                                      if (file) handleFileUpload(i, file)
+                                      e.target.value = ''
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                              {/* Or paste URL */}
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Or paste a URL</Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    placeholder="https://…/document.pdf"
+                                    className="h-8 text-sm"
+                                    onBlur={(e) => {
+                                      const url = e.target.value.trim()
+                                      if (!url) return
+                                      if (!isValidUrl(url)) { toast.error('Invalid URL'); return }
+                                      const next = [...formData.file_links]
+                                      next[i] = { url, label: url.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'File', type: guessTypeFromUrl(url) }
+                                      setFormData(prev => ({ ...prev, file_links: next }))
+                                      e.target.value = ''
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </CardContent></Card>
                 </div>
               )}

@@ -6,6 +6,14 @@ import { toast } from 'sonner'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
+export interface ResourceFileLink {
+  url: string
+  label: string
+  type: 'pdf' | 'ppt' | 'word' | 'excel' | 'other'
+  fileName?: string
+  sizeBytes?: number
+}
+
 export interface ResourceSection {
   id: string
   title: string
@@ -13,6 +21,7 @@ export interface ResourceSection {
   description: string
   image_urls: string[]
   video_links: string[]
+  file_links: ResourceFileLink[]
   status: 'draft' | 'published'
   sort_order: number
   meta_title: string | null
