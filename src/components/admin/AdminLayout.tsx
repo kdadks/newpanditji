@@ -15,7 +15,8 @@ import {
   X,
   ChartLine,
   Books,
-  MagnifyingGlass
+  MagnifyingGlass,
+  Newspaper
 } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { cn } from '../../lib/utils'
@@ -41,6 +42,7 @@ const menuItems: MenuItem[] = [
   { id: 'media', label: 'Media', icon: <Images size={20} /> },
   { id: 'books', label: 'Books', icon: <Books size={20} /> },
   { id: 'blogs', label: 'Blogs', icon: <BookOpen size={20} /> },
+  { id: 'resourceCenter', label: 'Resource Center', icon: <Newspaper size={20} /> },
   { id: 'testimonials', label: 'Testimonials', icon: <List size={20} /> },
   { id: 'charity', label: 'Charity', icon: <Heart size={20} /> },
   { id: 'profile', label: 'Profile', icon: <User size={20} /> },

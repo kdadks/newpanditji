@@ -14,6 +14,7 @@ import AdminCharity from '../admin/AdminCharity'
 import AdminProfile from '../admin/AdminProfile'
 import AdminContent from '../admin/AdminContent'
 import AdminSEO from '../admin/AdminSEO'
+import AdminResourceCenter from '../admin/AdminResourceCenter'
 import { useAuth } from '../../hooks/useAuth'
 import { toast } from 'sonner'
 
@@ -69,6 +70,8 @@ export default function AdminPage() {
         return <AdminContent />
       case 'seo':
         return <AdminSEO />
+      case 'resourceCenter':
+        return <AdminResourceCenter />
       default:
         return <AdminAnalytics />
     }

@@ -14,9 +14,6 @@ export { default as TestimonialsPageEditor } from './TestimonialsPageEditor'
 export { default as LegalPagesManager } from './LegalPagesManager'
 export { default as DynamicPageEditor } from './DynamicPageEditor'
 
-// Resource Center (modular drag-and-drop page)
-export { default as ResourceCenterEditor } from './ResourceCenterEditor'
-
 // Section Editors
 export { default as HeaderEditor } from './HeaderEditor'
 export { default as FooterEditor } from './FooterEditor'

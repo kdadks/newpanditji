@@ -633,7 +633,7 @@ function MediaGalleryEditor({
                   <img
                     src={v.thumbnail}
                     alt={`${v.title} thumbnail`}
-                    className="w-24 h-16 object-cover rounded flex-shrink-0"
+                    className="w-24 h-16 object-cover rounded shrink-0"
                     loading="lazy"
                   />
                 )}
@@ -661,7 +661,7 @@ function MediaGalleryEditor({
                   size="sm"
                   onClick={() => removeVideo(i)}
                   aria-label={`Remove video ${v.title}`}
-                  className="text-red-600 flex-shrink-0"
+                  className="text-red-600 shrink-0"
                 >
                   <Trash size={16} />
                 </Button>
@@ -716,7 +716,7 @@ function MediaGalleryEditor({
                 <img
                   src={p.src}
                   alt={p.alt || p.title}
-                  className="w-24 h-24 object-cover rounded flex-shrink-0"
+                  className="w-24 h-24 object-cover rounded shrink-0"
                   loading="lazy"
                 />
                 <div className="flex-1 space-y-1.5 min-w-0">
@@ -751,7 +751,7 @@ function MediaGalleryEditor({
                   size="sm"
                   onClick={() => removePhoto(i)}
                   aria-label={`Remove photo ${p.title}`}
-                  className="text-red-600 flex-shrink-0"
+                  className="text-red-600 shrink-0"
                 >
                   <Trash size={16} />
                 </Button>
@@ -877,7 +877,7 @@ function FileAttachmentsEditor({
         {content.files.map((f, i) => (
           <li key={i} className="border rounded-md p-3 bg-muted/30">
             <div className="flex items-start gap-3">
-              <div className="mt-1 flex-shrink-0">{fileIconFor(f.mimeType)}</div>
+              <div className="mt-1 shrink-0">{fileIconFor(f.mimeType)}</div>
               <div className="flex-1 space-y-2 min-w-0">
                 <Input
                   value={f.title}
@@ -908,7 +908,7 @@ function FileAttachmentsEditor({
                 size="sm"
                 onClick={() => removeFile(i)}
                 aria-label={`Remove file ${f.title}`}
-                className="text-red-600 flex-shrink-0"
+                className="text-red-600 shrink-0"
               >
                 <Trash size={16} />
               </Button>
