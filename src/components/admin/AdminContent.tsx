@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, Article as HeaderIcon, Scales } from '@phosphor-icons/react'
+import { FileText, Article as HeaderIcon, Scales, BookOpen as ResourceIcon } from '@phosphor-icons/react'
 import { Card, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Button } from '../ui/button'
@@ -46,11 +46,13 @@ import {
   FooterEditor,
   MenuEditor,
   LegalPagesManager,
-  DynamicPageEditor
+  DynamicPageEditor,
+  ResourceCenterEditor
 } from './editors'
+import { useResourceCenter } from '../../hooks/useResourceCenter'
 
 export default function AdminContent() {
-  const [activeTab, setActiveTab] = useState<'pages' | 'sections' | 'legal'>('pages')
+  const [activeTab, setActiveTab] = useState<'pages' | 'sections' | 'legal' | 'resourceCenter'>('pages')
   const [activePageTab, setActivePageTab] = useState<PageKey>('home')
   const [activeSectionTab, setActiveSectionTab] = useState<SectionKey>('header')
   const [selectedMenuLocation, setSelectedMenuLocation] = useState<'header' | 'footer' | 'legal'>('header')
@@ -71,6 +73,9 @@ export default function AdminContent() {
   const headerContentHook = useHeaderContent()
   const footerContentHook = useFooterContent()
   const blogSidebarContent = useBlogSidebarContent()
+
+  // Resource Center hook (modular drag-and-drop page)
+  const resourceCenter = useResourceCenter()
 
   // Menu items from database (based on selected location)
   const menuItemsHook = useMenuItems(selectedMenuLocation)
@@ -423,8 +428,8 @@ export default function AdminContent() {
         </CardHeader>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'pages' | 'sections' | 'legal')}>
-        <TabsList className="grid w-full grid-cols-3 h-auto gap-2 bg-muted/50 p-2">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'pages' | 'sections' | 'legal' | 'resourceCenter')}>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-2 bg-muted/50 p-2">
           <TabsTrigger value="pages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <FileText size={16} className="mr-2" />
             Page Content
@@ -436,6 +441,10 @@ export default function AdminContent() {
           <TabsTrigger value="legal" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Scales size={16} className="mr-2" />
             Legal Pages
+          </TabsTrigger>
+          <TabsTrigger value="resourceCenter" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <ResourceIcon size={16} className="mr-2" />
+            Resource Center
           </TabsTrigger>
         </TabsList>
 
@@ -614,6 +623,17 @@ export default function AdminContent() {
               onEditPage={(slug) => setEditingLegalPageSlug(slug)}
             />
           )}
+        </TabsContent>
+
+        {/* Resource Center Tab */}
+        <TabsContent value="resourceCenter" className="mt-6">
+          <ResourceCenterEditor
+            content={resourceCenter.content}
+            isLoading={resourceCenter.isLoading}
+            isSaving={resourceCenter.isSaving}
+            onSave={(next) => resourceCenter.save(next)}
+            makeLocalId={resourceCenter.makeLocalId}
+          />
         </TabsContent>
       </Tabs>
     </div>

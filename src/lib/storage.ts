@@ -4,7 +4,8 @@ import { supabase } from './supabase'
 export const BUCKETS = {
   MEDIA: 'media',
   DOCUMENTS: 'documents',
-  VIDEOS: 'videos'
+  VIDEOS: 'videos',
+  RESOURCES: 'resources'
 } as const
 
 export type BucketName = typeof BUCKETS[keyof typeof BUCKETS]
