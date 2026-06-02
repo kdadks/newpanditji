@@ -87,8 +87,7 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
               </Badge>
             </div>
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 z-10">
-              <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-2">Resource Center</Badge>
-              <h1 className="font-heading font-bold text-xl sm:text-2xl leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+              <h1 className="font-heading font-bold text-2xl sm:text-3xl leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 {section.title}
               </h1>
             </div>
@@ -100,10 +99,18 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
                 <Link href="/pandit-resource-center"><ArrowLeft size={12} /> Back to Resource Center</Link>
               </Badge>
             </div>
-            <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-3">Resource Center</Badge>
-            <h1 className="font-heading font-bold text-2xl leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+            <h1 className="font-heading font-bold text-3xl leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
               {section.title}
             </h1>
+          </div>
+        )}
+
+        {/* Mobile meta strip — below hero, matching blog style */}
+        {(files.length > 0 || videos.length > 0 || images.length > 1) && (
+          <div className="md:hidden relative z-10 flex flex-wrap justify-center items-center gap-3 px-4 py-3 text-xs text-amber-950 bg-amber-50/60 border-b border-amber-200/60">
+            {files.length > 0 && <div className="flex items-center gap-1"><PaperclipHorizontal size={12} /><span>{files.length} download{files.length > 1 ? 's' : ''}</span></div>}
+            {videos.length > 0 && <div className="flex items-center gap-1"><LinkIcon size={12} /><span>{videos.length} video{videos.length > 1 ? 's' : ''}</span></div>}
+            {images.length > 1 && <div className="flex items-center gap-1"><Images size={12} /><span>{images.length} images</span></div>}
           </div>
         )}
 
@@ -118,14 +125,13 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
             {images[0] ? (
               <div className="flex items-center gap-12 lg:gap-16">
                 <div className="flex-1 min-w-0">
-                  <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-5">Resource Center</Badge>
-                  <h1 className="font-heading font-bold text-4xl lg:text-4xl xl:text-5xl leading-tight mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
+                  <h1 className="font-heading font-bold text-4xl lg:text-5xl xl:text-6xl leading-tight mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
                     {section.title}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-amber-200/80">
-                    {files.length > 0 && <span className="flex items-center gap-1.5"><PaperclipHorizontal size={14} /> {files.length} download{files.length > 1 ? 's' : ''}</span>}
-                    {videos.length > 0 && <span className="flex items-center gap-1.5"><LinkIcon size={14} /> {videos.length} video{videos.length > 1 ? 's' : ''}</span>}
-                    {images.length > 1 && <span className="flex items-center gap-1.5"><Images size={14} /> {images.length} images</span>}
+                  <div className="flex flex-wrap items-center gap-4 text-sm">
+                    {files.length > 0 && <div className="flex items-center gap-2"><PaperclipHorizontal size={14} /><span>{files.length} download{files.length > 1 ? 's' : ''}</span></div>}
+                    {videos.length > 0 && <div className="flex items-center gap-2"><LinkIcon size={14} /><span>{videos.length} video{videos.length > 1 ? 's' : ''}</span></div>}
+                    {images.length > 1 && <div className="flex items-center gap-2"><Images size={14} /><span>{images.length} images</span></div>}
                   </div>
                 </div>
                 <div className="w-1/2 lg:w-[520px] xl:w-xl shrink-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
@@ -134,14 +140,13 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
               </div>
             ) : (
               <>
-                <Badge className="bg-linear-to-r from-orange-700 via-amber-700 to-orange-800 text-white border-orange-600/30 mb-5">Resource Center</Badge>
                 <h1 className="font-heading font-bold text-4xl lg:text-5xl xl:text-6xl leading-tight max-w-5xl mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
                   {section.title}
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-amber-200/80">
-                  {files.length > 0 && <span className="flex items-center gap-1.5"><PaperclipHorizontal size={14} /> {files.length} download{files.length > 1 ? 's' : ''}</span>}
-                  {videos.length > 0 && <span className="flex items-center gap-1.5"><LinkIcon size={14} /> {videos.length} video{videos.length > 1 ? 's' : ''}</span>}
-                  {images.length > 1 && <span className="flex items-center gap-1.5"><Images size={14} /> {images.length} images</span>}
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  {files.length > 0 && <div className="flex items-center gap-2"><PaperclipHorizontal size={14} /><span>{files.length} download{files.length > 1 ? 's' : ''}</span></div>}
+                  {videos.length > 0 && <div className="flex items-center gap-2"><LinkIcon size={14} /><span>{videos.length} video{videos.length > 1 ? 's' : ''}</span></div>}
+                  {images.length > 1 && <div className="flex items-center gap-2"><Images size={14} /><span>{images.length} images</span></div>}
                 </div>
               </>
             )}
@@ -157,6 +162,15 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
             {/* ── Main column ── */}
             <div className="lg:col-span-8">
 
+              {/* Subtitle / summary */}
+              {section.meta_description && (
+                <div className="mb-10">
+                  <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed border-l-4 border-primary pl-6 italic">
+                    {section.meta_description}
+                  </p>
+                </div>
+              )}
+
               {/* Description */}
               <article
                 className="prose prose-lg md:prose-xl max-w-none
@@ -169,6 +183,8 @@ export default function ResourceSectionDetailClient({ slug }: Props) {
                   prose-ul:my-6 prose-ol:my-6
                   prose-li:text-muted-foreground prose-li:text-base prose-li:md:text-lg prose-li:mb-2
                   prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-muted-foreground prose-blockquote:my-8
+                  prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
+                  prose-pre:bg-muted prose-pre:rounded-xl prose-pre:p-6
                   prose-hr:my-12 prose-hr:border-border"
                 dangerouslySetInnerHTML={{ __html: sanitizeHTML(section.description) }}
               />

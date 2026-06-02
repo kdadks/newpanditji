@@ -3,12 +3,18 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useResourceSections } from '../../hooks/useResourceSections'
+import { usePageSections } from '../../hooks/usePageContent'
 import { CircleNotch, Images, Link as LinkIcon, Newspaper, MagnifyingGlass, PaperclipHorizontal, X } from '@phosphor-icons/react'
 
 const PAGE_SIZE = 12
+const SLUG = 'pandit-resource-center'
 
 export default function ResourceCenterPage() {
   const { sections, isLoading } = useResourceSections(false)
+  const { sections: pageSections } = usePageSections(SLUG)
+  const heroSection = pageSections.find(s => s.section_key === 'hero')
+  const pageTitle = heroSection?.title ?? ''
+  const pageDescription = heroSection?.subtitle ?? ''
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
 
@@ -46,14 +52,20 @@ export default function ResourceCenterPage() {
     <main className="min-h-screen bg-linear-to-b from-orange-50 to-white py-12 md:py-16">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Page header */}
-        <header className="text-center mb-10 md:mb-14">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-            Pandit Resource Center
-          </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Curated resources, guides, and learning materials for sacred rituals and Vedic practices.
-          </p>
-        </header>
+        {(pageTitle || pageDescription) && (
+          <header className="text-center mb-10 md:mb-14">
+            {pageTitle && (
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+                {pageTitle}
+              </h1>
+            )}
+            {pageDescription && (
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                {pageDescription}
+              </p>
+            )}
+          </header>
+        )}
 
         {/* Search bar */}
         <div className="relative max-w-xl mx-auto mb-10">

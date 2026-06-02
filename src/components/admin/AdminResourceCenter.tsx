@@ -9,6 +9,7 @@ import {
   type ResourceSectionInsert,
   type ResourceFileLink,
 } from '../../hooks/useResourceSections'
+import { usePage, usePageSections } from '../../hooks/usePageContent'
 import { generateSlug } from '../../lib/supabase'
 import { usePhotos, usePhotoCategories } from '../../hooks/usePhotos'
 import { sanitizeHTML } from '../../utils/sanitize'
@@ -16,11 +17,12 @@ import { uploadFile, deleteFileByUrl, BUCKETS } from '../../lib/storage'
 import {
   Plus, PencilSimple, Trash, X, Spinner, Newspaper, Tag, FileText,
   Image as ImageIcon, Eye, CheckCircle, WarningCircle, Link, ArrowLeft,
-  FilePdf, FileDoc, FileXls, FilePpt, PaperclipHorizontal, UploadSimple,
+  FilePdf, FileDoc, FileXls, FilePpt, PaperclipHorizontal, UploadSimple, FloppyDisk,
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
 import { Badge } from '../ui/badge'
@@ -195,6 +197,36 @@ export default function AdminResourceCenter() {
     isCreating, isUpdating, isDeleting,
   } = useResourceSections(true)
 
+  // Page header (hero) settings
+  const PAGE_SLUG = 'pandit-resource-center'
+  const { page } = usePage(PAGE_SLUG)
+  const { sections: pageSections, upsertSection: upsertHeroSection, isSaving: isSavingHero } = usePageSections(PAGE_SLUG)
+  const heroSection = pageSections.find(s => s.section_key === 'hero')
+  const [heroTitle, setHeroTitle] = useState('')
+  const [heroDescription, setHeroDescription] = useState('')
+
+  // Sync hero state when fetched
+  useEffect(() => {
+    if (heroSection) {
+      setHeroTitle(heroSection.title ?? '')
+      setHeroDescription(heroSection.subtitle ?? '')
+    }
+  }, [heroSection, pageSections.length])
+
+  const handleSaveHero = async () => {
+    if (!page?.id) { toast.error('Page record not found'); return }
+    await upsertHeroSection({
+      page_id: page.id,
+      section_key: 'hero',
+      section_type: 'hero',
+      title: heroTitle.trim(),
+      subtitle: heroDescription.trim(),
+      content: {},
+      sort_order: 0,
+      is_visible: true,
+    })
+  }
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentTab, setCurrentTab] = useState<'basic' | 'images' | 'videos' | 'files' | 'content' | 'seo'>('basic')
   const [editingSection, setEditingSection] = useState<ResourceSection | null>(null)
@@ -360,6 +392,43 @@ export default function AdminResourceCenter() {
 
   return (
     <div className="space-y-6">
+      {/* Page header settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Page Header</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            Title and description shown at the top of the public Resource Center page.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="hero-title">Page Title</Label>
+            <Input
+              id="hero-title"
+              value={heroTitle}
+              onChange={e => setHeroTitle(e.target.value)}
+              placeholder="Pandit Resource Center"
+              disabled={isSavingHero}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hero-description">Page Description</Label>
+            <Textarea
+              id="hero-description"
+              value={heroDescription}
+              onChange={e => setHeroDescription(e.target.value)}
+              placeholder="Curated resources, guides, and learning materials…"
+              rows={3}
+              disabled={isSavingHero}
+            />
+          </div>
+          <Button onClick={handleSaveHero} disabled={isSavingHero || !page?.id} className="gap-2">
+            {isSavingHero ? <Spinner className="animate-spin" size={16} /> : <FloppyDisk size={16} />}
+            {isSavingHero ? 'Saving…' : 'Save Header'}
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Header card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -414,7 +483,11 @@ export default function AdminResourceCenter() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground font-mono">/{section.slug}</p>
+                        {section.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                            {section.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}
+                          </p>
+                        )}
                       </div>
                       <div className="flex flex-row gap-1.5 lg:flex-col">
                         <Button variant="outline" size="sm" onClick={() => { setPreviewSection(section); setIsPreviewOpen(true) }} title="Preview" className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200">
