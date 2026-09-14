@@ -9,7 +9,8 @@
         "start": "next start",
         "lint": "next lint",
         "migrate": "tsx scripts/migrate-data.ts",
-        "migrate:images": "tsx scripts/migrate-images-to-supabase.ts"
+        "migrate:images": "tsx scripts/migrate-images-to-supabase.ts",
+        "migrate:pg17": "node scripts/supabase-pg17-migration.mjs"
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",

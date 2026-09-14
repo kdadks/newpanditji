@@ -11,15 +11,15 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Supabase configuration
-const supabaseUrl = process.env.VITE_SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || ''
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''
+const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || process.env.SECRET_KEY || ''
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing Supabase credentials. Please set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
+if (!supabaseUrl || !supabaseSecretKey) {
+  console.error('Missing Supabase credentials. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY environment variables.')
   process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseSecretKey)
 
 interface ImageFile {
   localPath: string

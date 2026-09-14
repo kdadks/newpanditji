@@ -22,14 +22,12 @@ Add these three variables (copy-paste values exactly):
 - **Value**: `https://rhwzwjaqbobmrxmrebht.supabase.co`
 - **Environments**: ✓ Production, ✓ Preview, ✓ Development
 
-#### Variable 2: NEXT_PUBLIC_SUPABASE_ANON_KEY
-- **Name**: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- **Value**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3p3amFxYm9ibXJ4bXJlYmh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjQ4NTQsImV4cCI6MjA3OTQwMDg1NH0.Yuxna6GrSh7RNQHiA5kwEUG3X3nl2t-dlv3cEzmTAI8`
+#### Variable 2: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+- **Name**: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - **Environments**: ✓ Production, ✓ Preview, ✓ Development
 
-#### Variable 3: SUPABASE_SERVICE_ROLE_KEY
-- **Name**: `SUPABASE_SERVICE_ROLE_KEY`
-- **Value**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3p3amFxYm9ibXJ4bXJlYmh0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzgyNDg1NCwiZXhwIjoyMDc5NDAwODU0fQ.VfGLTDPbzITrNHLa-O75vmqSRc8VJqVTCP6PkGQH3B4`
+#### Variable 3: SUPABASE_SECRET_KEY
+- **Name**: `SUPABASE_SECRET_KEY`
 - **Environments**: ✓ Production, ✓ Preview, ✓ Development
 
 ### Step 3: Redeploy
@@ -46,11 +44,11 @@ If you have Vercel CLI installed, run:
 vercel env add NEXT_PUBLIC_SUPABASE_URL production
 # Paste: https://rhwzwjaqbobmrxmrebht.supabase.co
 
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-# Paste the anon key
+vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
+# Paste the publishable key
 
-vercel env add SUPABASE_SERVICE_ROLE_KEY production
-# Paste the service role key
+vercel env add SUPABASE_SECRET_KEY production
+# Paste the secret key
 ```
 
 ## Files Created/Updated

@@ -17,7 +17,7 @@ Make sure you have a Supabase project set up with:
 3. **Environment Variables**: Check your `.env` file has:
    ```env
    VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_PUBLISHABLE_KEY=your_publishable_key
    ```
 
 ## Step 2: Run the Migration
@@ -106,7 +106,7 @@ Example:
 
 ### Error: "Missing Supabase credentials"
 - Check your `.env` file exists
-- Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set
+- Verify `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are set
 
 ### Error: "Permission denied"
 - Make sure your Supabase anon key has permission to upload to storage

@@ -207,7 +207,7 @@ No CSRF tokens or SameSite cookie attributes are implemented for state-changing 
 **Recommendation:**
 1. Configure Supabase auth with secure cookie settings:
 ```typescript
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     storage: cookieStorage,
     flowType: 'pkce',
@@ -585,7 +585,7 @@ import { createBrowserClient } from '@supabase/ssr'
 
 export const supabase = createBrowserClient(
   supabaseUrl,
-  supabaseAnonKey,
+  supabasePublishableKey,
   {
     auth: {
       storage: cookieStorage,

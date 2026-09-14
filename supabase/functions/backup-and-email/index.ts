@@ -16,7 +16,7 @@
  *
  * Built-in secrets (injected automatically by Supabase):
  *   SUPABASE_URL
- *   SUPABASE_SERVICE_ROLE_KEY
+ *   SUPABASE_SECRET_KEY
  *
  * Deploy:
  *   supabase functions deploy backup-and-email --no-verify-jwt
@@ -88,10 +88,10 @@ Deno.serve(async (req: Request) => {
     const cronSecret = Deno.env.get('CRON_SECRET')
     const incomingSecret = req.headers.get('x-cron-secret')
     const authHeader = req.headers.get('Authorization') ?? ''
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
 
     const isCronCall = cronSecret && incomingSecret === cronSecret
-    const isServiceRole = authHeader === `Bearer ${serviceRoleKey}`
+    const isServiceRole = authHeader === `Bearer ${secretKey}`
     const isManualPost = req.method === 'POST' // Allow manual trigger for testing
 
     if (!isCronCall && !isServiceRole && !isManualPost) {
@@ -105,15 +105,15 @@ Deno.serve(async (req: Request) => {
     const smtpUser     = Deno.env.get('SMTP_USER')
     const smtpPassword = Deno.env.get('SMTP_PASSWORD')
 
-    if (!supabaseUrl || !serviceRoleKey) {
-      return new Response(JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' }), { status: 500 })
+    if (!supabaseUrl || !secretKey) {
+      return new Response(JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SECRET_KEY' }), { status: 500 })
     }
     if (!smtpHost || !smtpUser || !smtpPassword) {
       return new Response(JSON.stringify({ error: 'Missing SMTP_HOST, SMTP_USER or SMTP_PASSWORD — add them in Supabase Dashboard → Project Settings → Edge Functions → Secrets' }), { status: 500 })
     }
 
-    // ── Supabase client (service role — bypasses RLS)
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    // ── Supabase client (secret key — authenticated server session)
+    const supabase = createClient(supabaseUrl, secretKey)
 
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]

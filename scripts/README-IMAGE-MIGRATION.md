@@ -6,8 +6,8 @@ This script migrates all images from the `/public/images` folder to Supabase Sto
 
 1. Make sure your Supabase project is set up
 2. Ensure you have the necessary environment variables in your `.env` file:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY` or `SUPABASE_SERVICE_ROLE_KEY` (recommended for migration)
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_SECRET_KEY` (recommended for migration)
 
 ## Running the Migration
 

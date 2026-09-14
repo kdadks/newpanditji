@@ -132,7 +132,7 @@ To avoid this error in the future:
 2. Run `npm run build` to rebuild the app
 3. Check that environment variables are set correctly:
    - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 ### Login Not Working?
 1. Verify Supabase project is accessible

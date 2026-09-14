@@ -4,12 +4,12 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 // Environment variables for Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rhwzwjaqbobmrxmrebht.supabase.co'
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'dummy_key_for_build'
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY)) {
   console.warn(
-    'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+    'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
   )
 }
 
@@ -26,7 +26,7 @@ if (typeof window !== 'undefined') {
 // middleware can verify authentication without touching localStorage.
 export const supabase = createBrowserClient(
   supabaseUrl || '',
-  supabaseAnonKey || '',
+  supabasePublishableKey || '',
   {
     auth: {
       autoRefreshToken: true,

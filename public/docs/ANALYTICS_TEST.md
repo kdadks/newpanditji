@@ -75,7 +75,7 @@ npm run dev
 2. **Verify Supabase Connection**
    - Check `.env.local` has correct:
      - `NEXT_PUBLIC_SUPABASE_URL`
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 3. **Check Database Schema**
    - In Supabase Dashboard → SQL Editor, run:

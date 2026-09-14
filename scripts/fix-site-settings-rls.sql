@@ -15,9 +15,9 @@ CREATE POLICY site_settings_admin_all ON site_settings
   USING (auth.uid() IS NOT NULL)
   WITH CHECK (auth.uid() IS NOT NULL);
 
--- Public (anon) users can only read
-CREATE POLICY site_settings_anon_read ON site_settings
-  FOR SELECT TO anon
+-- Authenticated session read policy
+CREATE POLICY site_settings_authenticated_select ON site_settings
+  FOR SELECT TO authenticated
   USING (true);
 
 -- Verify policies
