@@ -37,6 +37,52 @@ const SKIP_TABLES = new Set([
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/** Fetch ALL rows from a table using range pagination to bypass PostgREST's 1,000 row default limit */
+async function fetchAllRows(supabase: any, table: string): Promise<{ data: unknown[]; error: any }> {
+  const PAGE_SIZE = 1000
+  const allRows: unknown[] = []
+  let page = 0
+  let hasMore = true
+  let orderColumn: string | null = 'created_at'
+
+  while (hasMore) {
+    const from = page * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
+    let query = supabase.from(table).select('*')
+    if (orderColumn) {
+      query = query.order(orderColumn, { ascending: true })
+    }
+    query = query.range(from, to)
+
+    let { data, error } = await query
+
+    if (error && orderColumn && (error.message?.includes('created_at') || error.code === '42703' || error.message?.includes('column'))) {
+      orderColumn = null
+      const retryResult = await supabase.from(table).select('*').range(from, to)
+      data = retryResult.data
+      error = retryResult.error
+    }
+
+    if (error) {
+      return { data: allRows, error }
+    }
+
+    if (data && data.length > 0) {
+      allRows.push(...data)
+      if (data.length < PAGE_SIZE) {
+        hasMore = false
+      } else {
+        page++
+      }
+    } else {
+      hasMore = false
+    }
+  }
+
+  return { data: allRows, error: null }
+}
+
 /** Safely cast jsonb content and harvest image-like URLs */
 function harvestImageUrls(backup: Record<string, unknown[]>): string[] {
   const urls = new Set<string>()
@@ -84,36 +130,57 @@ function rowCountsHtml(backup: Record<string, unknown[]>, tables: string[]): str
 // ── Main handler ──────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
   try {
-    // ── Auth: accept cron-secret header OR Supabase service-role JWT
+    // ── Auth & Key resolution
     const cronSecret = Deno.env.get('CRON_SECRET')
     const incomingSecret = req.headers.get('x-cron-secret')
     const authHeader = req.headers.get('Authorization') ?? ''
-    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
+    const bearerKey = authHeader.replace(/^Bearer\s+/i, '').trim()
+
+    // Key priority: 1. SUPABASE_SECRET_KEY, 2. Authorization header bearer key, 3. SUPABASE_SERVICE_ROLE_KEY
+    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ||
+                      (bearerKey && bearerKey !== 'undefined' ? bearerKey : '') ||
+                      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ||
+                      ''
 
     const isCronCall = cronSecret && incomingSecret === cronSecret
-    const isServiceRole = authHeader === `Bearer ${secretKey}`
+    const isServiceRole = secretKey && authHeader === `Bearer ${secretKey}`
     const isManualPost = req.method === 'POST' // Allow manual trigger for testing
 
     if (!isCronCall && !isServiceRole && !isManualPost) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     }
 
-    // ── Required env vars
+    // ── Database parameters
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
+
+    // ── SMTP parameters
     const smtpHost     = Deno.env.get('SMTP_HOST')
     const smtpPort     = parseInt(Deno.env.get('SMTP_PORT') ?? '587', 10)
     const smtpUser     = Deno.env.get('SMTP_USER')
     const smtpPassword = Deno.env.get('SMTP_PASSWORD')
 
     if (!supabaseUrl || !secretKey) {
-      return new Response(JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SECRET_KEY' }), { status: 500 })
+      return new Response(
+        JSON.stringify({ error: 'Missing SUPABASE_URL or secret key (SUPABASE_SECRET_KEY / Authorization header)' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
     }
     if (!smtpHost || !smtpUser || !smtpPassword) {
-      return new Response(JSON.stringify({ error: 'Missing SMTP_HOST, SMTP_USER or SMTP_PASSWORD — add them in Supabase Dashboard → Project Settings → Edge Functions → Secrets' }), { status: 500 })
+      return new Response(
+        JSON.stringify({ error: 'Missing SMTP_HOST, SMTP_USER or SMTP_PASSWORD — add them in Supabase Dashboard → Project Settings → Edge Functions → Secrets' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
-    // ── Supabase client (secret key — authenticated server session)
-    const supabase = createClient(supabaseUrl, secretKey)
+    // Initialize Supabase client using secret key
+    const supabase = createClient(supabaseUrl, secretKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        headers: {
+          'apikey': secretKey,
+        },
+      },
+    })
 
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
@@ -143,6 +210,8 @@ Deno.serve(async (req: Request) => {
       'cookie_categories', 'cookies', 'user_cookie_consents', 'cookie_policy_versions',
       // Analytics
       'page_views', 'service_views', 'referrer_sources', 'analytics_summary',
+      // Resource center
+      'resource_sections',
     ].filter(t => !SKIP_TABLES.has(t))
 
     // ── Export all tables
@@ -151,13 +220,9 @@ Deno.serve(async (req: Request) => {
 
     for (const table of TABLES) {
       try {
-        const { data, error } = await supabase
-          .from(table)
-          .select('*')
-          .order('created_at', { ascending: true })
+        const { data, error } = await fetchAllRows(supabase, table)
 
         if (error) {
-          // Table may not exist (some are optional) — log but continue
           errors.push(`${table}: ${error.message}`)
           backup[table] = []
         } else {
