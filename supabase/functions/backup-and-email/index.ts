@@ -19,7 +19,7 @@
  *
  * Configure this Edge Function secret with a Supabase secret API key
  * (sb_secret_...):
- *   SUPABASE_SECRET_KEY
+ *   SECRET_KEY
  *
  * Deploy:
  *   supabase functions deploy backup-and-email --no-verify-jwt
@@ -137,7 +137,7 @@ Deno.serve(async (req: Request) => {
     const cronSecret = Deno.env.get('CRON_SECRET')
     const incomingSecret = req.headers.get('x-cron-secret')
     const authHeader = req.headers.get('Authorization') ?? ''
-    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
+    const secretKey = Deno.env.get('SECRET_KEY') ?? Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
 
     const isCronCall = cronSecret && incomingSecret === cronSecret
     const isServiceRole = secretKey && authHeader === `Bearer ${secretKey}`
@@ -157,7 +157,7 @@ Deno.serve(async (req: Request) => {
 
     if (!supabaseUrl || !secretKey) {
       return new Response(
-        JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SECRET_KEY — configure a Supabase secret API key in Edge Function secrets' }),
+        JSON.stringify({ error: 'Missing SECRET_KEY — configure a Supabase secret API key in Edge Function secrets' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       )
     }

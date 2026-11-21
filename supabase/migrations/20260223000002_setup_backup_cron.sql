@@ -9,7 +9,7 @@
 --
 --   2. Add these secrets in Supabase Dashboard →
 --      Project Settings → Edge Functions → Secrets:
---        SUPABASE_SECRET_KEY = a Supabase secret API key (sb_secret_...)
+--        SECRET_KEY        = a Supabase secret API key (sb_secret_...)
 --        SMTP_HOST        = smtp.office365.com
 --        SMTP_PORT        = 587
 --        SMTP_USER        = your-exchange-email@domain.com
@@ -57,7 +57,8 @@ BEGIN
     body    := jsonb_build_object(
                  'trigger',       'cron',
                  'scheduled_at',  now()::text
-               )
+               ),
+    timeout_milliseconds := 120000
   );
 
   RAISE NOTICE 'backup: HTTP request dispatched at %', now();
