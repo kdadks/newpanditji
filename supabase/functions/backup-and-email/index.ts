@@ -14,8 +14,11 @@
  *   SMTP_PASSWORD    — your account password or app password
  *   CRON_SECRET      — random string shared with the cron migration
  *
- * Built-in secrets (injected automatically by Supabase):
+ * Built-in secret (injected automatically by Supabase):
  *   SUPABASE_URL
+ *
+ * Configure this Edge Function secret with a Supabase secret API key
+ * (sb_secret_...):
  *   SUPABASE_SECRET_KEY
  *
  * Deploy:
@@ -134,19 +137,12 @@ Deno.serve(async (req: Request) => {
     const cronSecret = Deno.env.get('CRON_SECRET')
     const incomingSecret = req.headers.get('x-cron-secret')
     const authHeader = req.headers.get('Authorization') ?? ''
-    const bearerKey = authHeader.replace(/^Bearer\s+/i, '').trim()
-
-    // Key priority: 1. SUPABASE_SECRET_KEY, 2. Authorization header bearer key, 3. SUPABASE_SERVICE_ROLE_KEY
-    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ||
-                      (bearerKey && bearerKey !== 'undefined' ? bearerKey : '') ||
-                      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ||
-                      ''
+    const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
 
     const isCronCall = cronSecret && incomingSecret === cronSecret
     const isServiceRole = secretKey && authHeader === `Bearer ${secretKey}`
-    const isManualPost = req.method === 'POST' // Allow manual trigger for testing
 
-    if (!isCronCall && !isServiceRole && !isManualPost) {
+    if (!isCronCall && !isServiceRole) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     }
 
@@ -161,7 +157,7 @@ Deno.serve(async (req: Request) => {
 
     if (!supabaseUrl || !secretKey) {
       return new Response(
-        JSON.stringify({ error: 'Missing SUPABASE_URL or secret key (SUPABASE_SECRET_KEY / Authorization header)' }),
+        JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SECRET_KEY — configure a Supabase secret API key in Edge Function secrets' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       )
     }
@@ -172,14 +168,9 @@ Deno.serve(async (req: Request) => {
       )
     }
 
-    // Initialize Supabase client using secret key
+    // Use the configured secret API key; never reuse the cron request's auth token.
     const supabase = createClient(supabaseUrl, secretKey, {
       auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        headers: {
-          'apikey': secretKey,
-        },
-      },
     })
 
     const now = new Date()

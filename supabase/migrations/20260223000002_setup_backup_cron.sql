@@ -9,16 +9,14 @@
 --
 --   2. Add these secrets in Supabase Dashboard →
 --      Project Settings → Edge Functions → Secrets:
+--        SUPABASE_SECRET_KEY = a Supabase secret API key (sb_secret_...)
 --        SMTP_HOST        = smtp.office365.com
 --        SMTP_PORT        = 587
 --        SMTP_USER        = your-exchange-email@domain.com
 --        SMTP_PASSWORD    = your-password-or-app-password
 --        CRON_SECRET      = <paste the same value used in step 3 below>
 --
---   3. Replace the three placeholder values in this file:
---        __YOUR_SUPABASE_PROJECT_URL__       e.g. https://abcdefgh.supabase.co
---        __YOUR_SUPABASE_SECRET_KEY__        from Project Settings → API
---        __YOUR_CRON_SECRET__                any random string you choose
+--   3. Set CRON_SECRET to the same random string used in this function below.
 --
 -- The backup email will be sent to: kdadks@outlook.com
 -- Schedule: 09:00 UTC on the 1st and 15th of every month (~every 2 weeks)
@@ -31,10 +29,8 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
 -- ── Helper function: invoke the backup edge function ────────────────────────
--- ⚠️  Replace the three placeholder values below before running this migration:
---      __YOUR_SUPABASE_PROJECT_URL__       e.g. https://abcdefgh.supabase.co
---      __YOUR_SUPABASE_SECRET_KEY__        from Project Settings → API
---      __YOUR_CRON_SECRET__                any random string you choose
+-- ⚠️  Set v_cron_secret to the same value configured as the CRON_SECRET
+--      Edge Function secret.
 CREATE OR REPLACE FUNCTION trigger_database_backup()
 RETURNS void
 LANGUAGE plpgsql
@@ -45,7 +41,6 @@ DECLARE
   -- To reconfigure, run: CREATE OR REPLACE FUNCTION trigger_database_backup() ...
   -- with your actual values via the Supabase Dashboard SQL Editor (not this file).
   v_url         CONSTANT TEXT := 'https://rhwzwjaqbobmrxmrebht.supabase.co';
-  v_auth_key    CONSTANT TEXT := '__ROTATE_AND_SET_NEW_SECRET_KEY_HERE__';
   v_cron_secret CONSTANT TEXT := '__SET_CRON_SECRET_HERE__';
 BEGIN
   IF v_url = '' OR v_url = '__YOUR_SUPABASE_PROJECT_URL__' THEN
@@ -57,7 +52,6 @@ BEGIN
     url     := v_url || '/functions/v1/backup-and-email',
     headers := jsonb_build_object(
                  'Content-Type',    'application/json',
-                 'Authorization',   'Bearer ' || v_auth_key,
                  'x-cron-secret',   v_cron_secret
                ),
     body    := jsonb_build_object(
