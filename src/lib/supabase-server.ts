@@ -7,17 +7,22 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { NextRequest, NextResponse } from 'next/server'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rhwzwjaqbobmrxmrebht.supabase.co'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gsqfaguqsmnuoeuhpxro.supabase.co'
 const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'dummy_key_for_build'
+const supabaseSchema = process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || 'panditji'
 
 /**
  * Creates a Supabase client for Server Components and API routes.
  * Reads and writes session cookies via next/headers.
+ * Configured with schema 'panditji' for multi-tenant isolation.
  */
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies()
 
   return createServerClient(supabaseUrl, supabasePublishableKey, {
+    db: {
+      schema: supabaseSchema as any
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -45,6 +50,9 @@ export function createMiddlewareSupabaseClient(
   response: NextResponse
 ) {
   return createServerClient(supabaseUrl, supabasePublishableKey, {
+    db: {
+      schema: supabaseSchema as any
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll()

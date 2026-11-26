@@ -46,6 +46,20 @@ export async function requireAuth(
       )
     }
 
+    // Layer 2 & 3: Multi-tenant air-gap check via app_metadata project binding
+    const appMeta = user.app_metadata || {}
+    const project = (appMeta as any).project
+    const projects = (appMeta as any).projects
+    const isBound = project === 'panditji' || (Array.isArray(projects) && projects.includes('panditji'))
+
+    if (!isBound) {
+      console.warn(`[requireAuth] Access denied: User ${user.email} is not bound to project panditji in app_metadata.`)
+      return NextResponse.json(
+        { error: 'Forbidden. User account is not assigned to the panditji project.' },
+        { status: 403 }
+      )
+    }
+
     return { user }
   } catch (err) {
     console.error('[requireAuth] Unexpected error:', err)

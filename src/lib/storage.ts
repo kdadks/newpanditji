@@ -1,11 +1,11 @@
 import { supabase } from './supabase'
 
-// Storage bucket names
+// Storage bucket names (prefixed with project name for multi-tenant isolation)
 export const BUCKETS = {
-  MEDIA: 'media',
-  DOCUMENTS: 'documents',
-  VIDEOS: 'videos',
-  RESOURCES: 'resources'
+  MEDIA: 'panditji-media',
+  DOCUMENTS: 'panditji-documents',
+  VIDEOS: 'panditji-videos',
+  RESOURCES: 'panditji-resources'
 } as const
 
 export type BucketName = typeof BUCKETS[keyof typeof BUCKETS]
@@ -133,9 +133,19 @@ export async function deleteFile(bucket: BucketName, path: string): Promise<void
 export function pathFromPublicUrl(url: string, bucket: BucketName): string | null {
   try {
     const marker = `/object/public/${bucket}/`
-    const idx = url.indexOf(marker)
+    let idx = url.indexOf(marker)
+    let markerLen = marker.length
+
+    // Fallback: Check if URL uses the legacy unprefixed bucket name
+    if (idx === -1) {
+      const legacyBucket = bucket.replace(/^panditji-/, '')
+      const legacyMarker = `/object/public/${legacyBucket}/`
+      idx = url.indexOf(legacyMarker)
+      markerLen = legacyMarker.length
+    }
+
     if (idx === -1) return null
-    return decodeURIComponent(url.slice(idx + marker.length))
+    return decodeURIComponent(url.slice(idx + markerLen))
   } catch {
     return null
   }

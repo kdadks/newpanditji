@@ -4,8 +4,9 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 // Environment variables for Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rhwzwjaqbobmrxmrebht.supabase.co'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gsqfaguqsmnuoeuhpxro.supabase.co'
 const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'dummy_key_for_build'
+const supabaseSchema = process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || 'panditji'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY)) {
   console.warn(
@@ -17,6 +18,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !(process.env.NEXT_PUBLIC_SUPABASE_
 if (typeof window !== 'undefined') {
   console.log('Supabase client configuration:', {
     url: supabaseUrl,
+    schema: supabaseSchema,
     isRemote: supabaseUrl?.includes('supabase.co'),
     isLocal: supabaseUrl?.includes('localhost') || supabaseUrl?.includes('127.0.0.1')
   })
@@ -24,10 +26,14 @@ if (typeof window !== 'undefined') {
 
 // Browser Supabase client — persists session in cookies so server-side
 // middleware can verify authentication without touching localStorage.
+// Configured to target the 'panditji' schema in the shared Supabase instance.
 export const supabase = createBrowserClient(
   supabaseUrl || '',
   supabasePublishableKey || '',
   {
+    db: {
+      schema: supabaseSchema as any
+    },
     auth: {
       autoRefreshToken: true,
       persistSession: true,

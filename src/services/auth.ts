@@ -39,10 +39,24 @@ const notifyListeners = () => {
 // Transform Supabase user to AuthUser
 const transformUser = (user: User | null): AuthUser | null => {
   if (!user) return null
+
+  // Layer 2: Check app_metadata project binding
+  const appMeta = user.app_metadata || {}
+  const project = (appMeta as any).project
+  const projects = (appMeta as any).projects
+  const isBound = project === 'panditji' || (Array.isArray(projects) && projects.includes('panditji'))
+
+  if (!isBound) {
+    console.warn(`[auth] User ${user.email} is not bound to project 'panditji' in app_metadata.`)
+    return null
+  }
+
+  const role = (appMeta as any).role === 'admin' ? 'admin' : 'owner'
+
   return {
     id: user.id,
     email: user.email || '',
-    role: 'owner' // Super admin only - no public signup
+    role
   }
 }
 
@@ -165,17 +179,29 @@ class AuthService {
    */
   async login(email: string, password: string): Promise<boolean> {
     try {
+      // Clear any prior session or stale cookies from other projects on the shared Supabase instance
+      await clearAllAuthData()
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
       if (error) {
-        console.error('Login error:', error.message)
+        console.warn('Login attempt failed:', error.message)
         return false
       }
 
-      return !!data.user
+      if (!data.user) return false
+
+      const transformed = transformUser(data.user)
+      if (!transformed) {
+        console.warn('Login failed: Account is not bound to project panditji in app_metadata.')
+        await supabase.auth.signOut()
+        return false
+      }
+
+      return true
     } catch (error) {
       console.error('Login exception:', error)
       return false

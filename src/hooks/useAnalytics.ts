@@ -68,7 +68,7 @@ async function fetchAnalyticsSummary(): Promise<AnalyticsSummary[]> {
     .limit(30)
 
   if (error) {
-    console.error('Error fetching analytics summary:', error)
+    console.warn('Error fetching analytics summary:', error)
     // Return empty array instead of throwing to prevent UI crashes
     return []
   }
@@ -86,7 +86,7 @@ async function fetchPopularPages(): Promise<PopularPage[]> {
       .limit(500)
 
     if (error) {
-      console.error('Error fetching page views for popular pages:', error)
+      console.warn('Error fetching page views for popular pages:', error)
       return []
     }
 
@@ -146,7 +146,7 @@ async function fetchPopularServices(): Promise<PopularService[]> {
       .limit(500)
 
     if (error) {
-      console.error('Error fetching service views:', error)
+      console.warn('Error fetching service views:', error)
       return []
     }
 
@@ -202,7 +202,7 @@ async function fetchLocationStats(): Promise<LocationStat[]> {
       .limit(1000)
 
     if (error) {
-      console.error('Error fetching location stats:', error)
+      console.warn('Error fetching location stats:', error)
       return []
     }
 
@@ -286,7 +286,7 @@ async function fetchTopReferrers(): Promise<TopReferrer[]> {
       .sort((a, b) => b.total_visits - a.total_visits)
       .slice(0, 10)
   } catch (err) {
-    console.error('Error in fetchTopReferrers:', err)
+    console.warn('Error in fetchTopReferrers:', err)
     return []
   }
 }
@@ -300,7 +300,7 @@ async function fetchRecentPageViews(limit: number = 50): Promise<PageView[]> {
     .limit(limit)
 
   if (error) {
-    console.error('Error fetching recent page views:', error)
+    console.warn('Error fetching recent page views:', error)
     return []
   }
 
@@ -340,7 +340,7 @@ async function fetchTotalStats() {
       uniqueVisitors: uniqueSessions,
     }
   } catch (err) {
-    console.error('Error in fetchTotalStats:', err)
+    console.warn('Error in fetchTotalStats:', err)
     return {
       totalPageViews: 0,
       totalServiceViews: 0,
